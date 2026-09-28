@@ -7,11 +7,15 @@
 - Added static item database.
 - Added item acquisition source database.
 - Added dedicated Wand progression database.
+- Added an expanded OctoWoW-verified Wand Progression catalog covering early, mid, and late leveling options.
+- Added faction-aware Wand recommendation ranges for Alliance and Horde.
+- Added suggested level ranges for useful non-primary Wand alternatives.
 - Added quest database.
 - Added quest chain database.
 - Added instance database for dungeon and raid references.
 - Added support for multiple acquisition sources per item.
 - Added support for faction-specific item sources.
+- Added lightweight quest and drop source metadata for progression items whose full Source Details records are not implemented yet.
 - Added automatic player faction detection.
 - Added automatic player level detection.
 - Added Wand list with:
@@ -29,6 +33,7 @@
   - Recommended items only.
 - Added automatic faction filtering mode based on the current character.
 - Added recommended progression highlighting.
+- Added faction-aware recommendation highlighting based on the active faction filter/player faction.
 - Added unavailable item highlighting when the player's level is too low.
 - Added colored Required Level indicator for unusable items.
 - Added dynamic item DPS calculation.
@@ -92,6 +97,7 @@
 - Added profession skill abstraction.
 - Added asynchronous ClassicAPI item data handling.
 - Separated static item data from acquisition source data.
+- Separated item equip requirements from quest/source acquisition requirements.
 - Separated Wand progression recommendations from item properties.
 - Separated quest data from quest chain relationships.
 - Added reusable instance references for dungeon and raid content.
@@ -111,6 +117,7 @@
 - Added Gravestone Scepter Alliance quest chain.
 - Added native Blackfathom Deeps WorldMap metadata (`mapID 7`, `zoneID 1`).
 - Added Argent Guard Thaelrid dungeon coordinates for Blackfathom Deeps.
+- Added OctoWoW-verified progression entries for Flaring Baton, Moonstone Wand, Torchlight Wand, Sable Wand, Wand of Decay, Sizzle Stick, Cookie's Stirring Rod, Spellcrafter Wand, Branding Rod, Excavation Rod, Consecrated Wand, Charred Wand, Dancing Flame, Captain Rackmore's Tiller, Rod of Sorrow, Burning Sliver, Flash Wand, Eyepoker, Kodo Brander, Gnomish Zapper, Goblin Igniter, Charged Lightning Rod, Nature's Breath, Noxious Shooter, Rod of Corrosion, and Smokey's Fireshooter.
 
 ### Changed
 - Redesigned Wand Progression from a single-item information panel into a compact list.
@@ -120,6 +127,8 @@
 - Redesigned crafting tooltip to reduce unnecessary information.
 - Changed source data to support multiple acquisition methods for the same item.
 - Changed faction restrictions to belong to acquisition sources instead of items.
+- Changed the Recommended column to prefer faction-specific recommendation ranges and fall back to general suggested ranges.
+- Changed Wand usability checks to consider both actual item equip requirements and acquisition-source requirements.
 - Changed quest chain presentation to show the reward quest first, followed by its prerequisites.
 - Changed the main window size to provide more vertical space.
 - Improved organization of UI layout values for easier visual adjustment.
@@ -132,6 +141,8 @@
 - Fixed ClassicAPI item icons displaying the unknown-item icon while item data was still loading.
 - Fixed UnitXP SP3 detection when loaded through environments that do not expose `Vanilla1121mod.UnitXP_SP3`.
 - Fixed faction source detection when an item has both Alliance and Horde acquisition paths.
+- Fixed quest-reward Wands incorrectly treating the quest minimum level as an intrinsic item equip requirement.
+- Fixed incomplete catalog sources showing a Source Details action before detailed quest/NPC/map data exists.
 - Improved tooltip positioning near screen boundaries.
 - Improved Wand column alignment.
 - Improved dropdown spacing and filter readability.
@@ -140,7 +151,7 @@
 - Fixed Blackfathom Deeps quest markers to use the native dungeon map and correct Thaelrid coordinates.
 
 ### Planned
-- Complete the Wand Progression item database.
+- Complete the remaining Wand Progression entries after OctoWoW existence/source verification.
 - Add OctoWoW custom Wands, quests, NPCs, and sources.
 - Replace or improve the current dungeon icon.
 - Expand optional pfQuest integration for missing quest/map data where useful.

@@ -117,7 +117,7 @@
 - Added Gravestone Scepter Alliance quest chain.
 - Added native Blackfathom Deeps WorldMap metadata (`mapID 7`, `zoneID 1`).
 - Added Argent Guard Thaelrid dungeon coordinates for Blackfathom Deeps.
-- Added OctoWoW-verified progression entries for Flaring Baton, Moonstone Wand, Torchlight Wand, Sable Wand, Wand of Decay, Sizzle Stick, Cookie's Stirring Rod, Spellcrafter Wand, Branding Rod, Excavation Rod, Consecrated Wand, Charred Wand, Dancing Flame, Captain Rackmore's Tiller, Rod of Sorrow, Burning Sliver, Flash Wand, Eyepoker, Kodo Brander, Gnomish Zapper, Goblin Igniter, Charged Lightning Rod, Nature's Breath, Noxious Shooter, Rod of Corrosion, and Smokey's Fireshooter.
+- Added OctoWoW-verified progression entries for Flaring Baton, Moonstone Wand, Torchlight Wand, Sable Wand, Wand of Decay, Moonbeam Wand, Sizzle Stick, Cookie's Stirring Rod, Spellcrafter Wand, Branding Rod, Excavation Rod, Consecrated Wand, Charred Wand, Dancing Flame, Captain Rackmore's Tiller, Rod of Sorrow, Burning Sliver, Flash Wand, Eyepoker, Kodo Brander, Gnomish Zapper, Goblin Igniter, Charged Lightning Rod, Nature's Breath, Noxious Shooter, Rod of Corrosion, and Smokey's Fireshooter.
 
 ### Changed
 - Redesigned Wand Progression from a single-item information panel into a compact list.

@@ -89,6 +89,27 @@ Sources[11288] = {
 -- Early Quest / Dungeon Options
 --------------------------------------------------
 
+Sources[12296] = {
+    {
+        type = "quest",
+        questID = 14,
+        questName = "The People's Militia",
+        faction = "Alliance",
+        requiredLevel = 9,
+        zone = "Westfall"
+    }
+}
+
+Sources[5208] = {
+    {
+        type = "vendor",
+        npcName = "Wand merchants",
+        zone = "Stormwind, Ironforge, Orgrimmar, Undercity",
+        faction = "Both",
+        requiredLevel = 15
+    }
+}
+
 Sources[5326] = {
     {
         type = "quest",
@@ -141,6 +162,16 @@ Sources[5252] = {
         faction = "Horde",
         requiredLevel = 16,
         zone = "Silverpine Forest"
+    }
+}
+
+Sources[5211] = {
+    {
+        type = "vendor",
+        npcName = "Wand merchants",
+        zone = "Stormwind, Ironforge, Orgrimmar, Undercity",
+        faction = "Both",
+        requiredLevel = 20
     }
 }
 
@@ -369,6 +400,27 @@ Sources[5253] = {
 -- Late Progression
 --------------------------------------------------
 
+Sources[5239] = {
+    {
+        type = "vendor",
+        npcName = "Wand merchants",
+        zone = "Stormwind, Ironforge, Orgrimmar, Undercity",
+        faction = "Both",
+        requiredLevel = 41
+    }
+}
+
+Sources[9654] = {
+    {
+        type = "quest",
+        questID = 2942,
+        questName = "The Morrow Stone",
+        faction = "Alliance",
+        requiredLevel = 42,
+        zone = "Feralas"
+    }
+}
+
 Sources[11860] = {
     {
         type = "quest",
@@ -413,6 +465,26 @@ Sources[10836] = {
         zone = "The Temple of Atal'Hakkar",
         faction = "Both",
         requiredLevel = 51
+    }
+}
+
+Sources[15281] = {
+    {
+        type = "drop",
+        npcName = "World drop",
+        zone = "Azeroth",
+        faction = "Both",
+        requiredLevel = 52
+    }
+}
+
+Sources[15282] = {
+    {
+        type = "drop",
+        npcName = "World drop",
+        zone = "Azeroth",
+        faction = "Both",
+        requiredLevel = 55
     }
 }
 

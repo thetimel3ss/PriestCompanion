@@ -87,6 +87,28 @@ AddWand(
 )
 
 AddWand(
+    12296,
+    25,
+    15,
+    17,
+    15,
+    17,
+    nil,
+    nil
+)
+
+AddWand(
+    5208,
+    27,
+    15,
+    19,
+    nil,
+    nil,
+    nil,
+    nil
+)
+
+AddWand(
     5326,
     30,
     17,
@@ -135,6 +157,17 @@ AddWand(
     70,
     18,
     20,
+    nil,
+    nil,
+    nil,
+    nil
+)
+
+AddWand(
+    5211,
+    75,
+    20,
+    24,
     nil,
     nil,
     nil,
@@ -348,6 +381,28 @@ AddWand(
 --------------------------------------------------
 
 AddWand(
+    5239,
+    245,
+    41,
+    47,
+    nil,
+    nil,
+    nil,
+    nil
+)
+
+AddWand(
+    9654,
+    255,
+    48,
+    50,
+    48,
+    50,
+    nil,
+    nil
+)
+
+AddWand(
     11860,
     250,
     45,
@@ -384,6 +439,28 @@ AddWand(
     10836,
     280,
     51,
+    60,
+    nil,
+    nil,
+    nil,
+    nil
+)
+
+AddWand(
+    15281,
+    285,
+    52,
+    60,
+    nil,
+    nil,
+    nil,
+    nil
+)
+
+AddWand(
+    15282,
+    295,
+    55,
     60,
     nil,
     nil,

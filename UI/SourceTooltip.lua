@@ -620,9 +620,17 @@ local function HasDetails(source)
         return true
     end
 
+    --------------------------------------------------
+    -- Basic catalog records can exist before their
+    -- full Source Details data is implemented.
+    --------------------------------------------------
+
     if source.type == "quest"
-    or source.type == "drop"
-    or source.type == "vendor" then
+    and source.questID
+    and PC.Data.Quests
+    and PC.Data.Quests[
+        source.questID
+    ] then
         return true
     end
 
@@ -878,6 +886,7 @@ local function BuildQuest(
     local questName =
         quest
         and quest.name
+        or source.questName
         or (
             "Quest " ..
             tostring(
@@ -893,6 +902,18 @@ local function BuildQuest(
     )
 
     AddInstanceRow(source)
+
+    if not GetSourceInstanceID(
+        source
+    )
+    and source.zone then
+        AddRow(
+            "Interface\\Icons\\INV_Misc_Map_01",
+            "Location",
+            source.zone,
+            "neutral"
+        )
+    end
 
     local questStatus =
         "unknown"

@@ -212,6 +212,17 @@ AddWand(
 )
 
 AddWand(
+    5818,
+    135,
+    28,
+    31,
+    nil,
+    nil,
+    nil,
+    nil
+)
+
+AddWand(
     7001,
     140,
     27,

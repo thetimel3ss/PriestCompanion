@@ -1,0 +1,86 @@
+[
+  {
+    "id": 2008,
+    "name": "Dangerous!",
+    "maps": [
+      {
+        "zoneID": 36,
+        "zone": "Alterac Mountains",
+        "x": 61.37,
+        "y": 81.37
+      }
+    ]
+  },
+  {
+    "id": 144063,
+    "name": "Equinex Monolith",
+    "maps": [
+      {
+        "zoneID": 357,
+        "zone": "Feralas",
+        "x": 38.8298,
+        "y": 13.151
+      }
+    ]
+  },
+  {
+    "id": 142958,
+    "name": "Feralas: A History",
+    "maps": [
+      {
+        "zoneID": 141,
+        "zone": "Teldrassil",
+        "x": 55.239,
+        "y": 91.4697
+      }
+    ]
+  },
+  {
+    "id": 177787,
+    "name": "Rackmore's Log",
+    "maps": [
+      {
+        "zoneID": 405,
+        "zone": "Desolace",
+        "x": 36.0852,
+        "y": 30.3905
+      }
+    ]
+  },
+  {
+    "id": 2713,
+    "name": "Wanted Board",
+    "maps": [
+      {
+        "zoneID": 45,
+        "zone": "Arathi Highlands",
+        "x": 46.04,
+        "y": 47.74
+      }
+    ]
+  },
+  {
+    "id": 21042,
+    "name": "Theramore Guard Badge",
+    "maps": [
+      {
+        "zoneID": 15,
+        "zone": "Dustwallow Marsh",
+        "x": 29.83,
+        "y": 48.22
+      }
+    ]
+  },
+  {
+    "id": 173265,
+    "name": "Wooden Outhouse",
+    "maps": [
+      {
+        "zoneID": 51,
+        "zone": "Searing Gorge",
+        "x": 65.57,
+        "y": 62.12
+      }
+    ]
+  }
+]

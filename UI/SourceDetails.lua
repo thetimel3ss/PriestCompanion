@@ -119,6 +119,16 @@ local function GetTextHeight(fontString)
     return height
 end
 
+local function FormatChance(chance)
+    if chance < 0.01 then
+        return string.format("%.6f%%", chance)
+    end
+    if chance < 1 then
+        return string.format("%.4f%%", chance)
+    end
+    return string.format("%.2f%%", chance)
+end
+
 local function FormatQuestText(text)
     if not text then
         return ""
@@ -659,6 +669,50 @@ local genericRows = {}
 local visibleQuestCards = 0
 local visibleConnectors = 0
 local visibleGenericRows = 0
+local visibleLootLimit = 40
+local visibleMobLimit = 40
+
+local bossMapButton = CreateFrame("Button", nil, scrollChild, "UIPanelButtonTemplate")
+bossMapButton:SetWidth(160)
+bossMapButton:SetHeight(22)
+bossMapButton:SetText("Show Boss on Map")
+bossMapButton:SetScript("OnClick", function()
+    local source = activeSource
+    if not source then return end
+    local npc = PC.Data.NPCs[source.npcID]
+        or { id = source.npcID, name = source.npcName, zone = source.zone }
+    if PC.Map then
+        if PC.Map.ShowNPC(npc, "boss", nil) then return end
+        local instance = source.instanceID and GetInstance(source.instanceID)
+        if instance and instance.entrance then
+            PC.Map.ShowLocation(instance.entrance, "unknown",
+                instance.name .. " entrance")
+        elseif instance and instance.entranceZone then
+            PC.Map.ShowZone(instance.entranceZone)
+        end
+    end
+end)
+bossMapButton:Hide()
+
+local moreLootButton = CreateFrame("Button", nil, scrollChild, "UIPanelButtonTemplate")
+moreLootButton:SetWidth(170)
+moreLootButton:SetHeight(22)
+moreLootButton:SetText("Show More Loot")
+moreLootButton:SetScript("OnClick", function()
+    visibleLootLimit = visibleLootLimit + 40
+    if Refresh then Refresh() end
+end)
+moreLootButton:Hide()
+
+local moreMobsButton = CreateFrame("Button", nil, scrollChild, "UIPanelButtonTemplate")
+moreMobsButton:SetWidth(185)
+moreMobsButton:SetHeight(22)
+moreMobsButton:SetText("Show More Creatures")
+moreMobsButton:SetScript("OnClick", function()
+    visibleMobLimit = visibleMobLimit + 40
+    if Refresh then Refresh() end
+end)
+moreMobsButton:Hide()
 
 --------------------------------------------------
 -- Quest Card
@@ -2471,6 +2525,10 @@ local function ClearContent()
         genericRows[i]:Hide()
     end
 
+    bossMapButton:Hide()
+    moreLootButton:Hide()
+    moreMobsButton:Hide()
+
     visibleQuestCards = 0
     visibleConnectors = 0
     visibleGenericRows = 0
@@ -2507,7 +2565,15 @@ local function BuildQuestDetails(
     if chain
     and chain.name then
         sourceTitle:SetText(
-            "Quest Chain" ..
+            (
+                instance
+                and (
+                    instance.type == "raid"
+                    and "Raid Quest Chain"
+                    or "Dungeon Quest Chain"
+                )
+                or "Quest Chain"
+            ) ..
             (
                 instance
                 and (
@@ -2520,7 +2586,11 @@ local function BuildQuestDetails(
 
     elseif instance then
         sourceTitle:SetText(
-            "Quest  |  " ..
+            (
+                instance.type == "raid"
+                and "Raid Quest  |  "
+                or "Dungeon Quest  |  "
+            ) ..
             instance.name
         )
 
@@ -2568,8 +2638,11 @@ local function BuildQuestDetails(
                     visibleQuestCards
                 )
 
+            local depth =
+                math.min(displayDepth, 4)
+
             local indent =
-                displayDepth *
+                depth *
                 CHAIN_INDENT
 
             card:ClearAllPoints()
@@ -2588,7 +2661,7 @@ local function BuildQuestDetails(
                     questID,
                     source,
                     itemID,
-                    displayDepth
+                    depth
                 )
 
             y =
@@ -2734,16 +2807,93 @@ local function BuildDropDetails(source)
             "Interface\\Icons\\INV_Misc_Bag_10",
             nil,
             "Drop Chance",
-            string.format(
-                "%.2f%%",
-                source.dropChance
-            )
+            FormatChance(source.dropChance)
         )
+    end
+
+    if source.npcType == "Boss" and source.npcID then
+        bossMapButton:ClearAllPoints()
+        bossMapButton:SetPoint("TOPLEFT", scrollChild, "TOPLEFT", 4, y - 4)
+        bossMapButton:Show()
+        y = y - 32
+    end
+
+    if source.mobs and table.getn(source.mobs) > 0 then
+        if source.mobCount and source.mobCount > 1 then
+            y = AddGenericRow(y, "Interface\\Icons\\INV_Misc_Bag_10",
+                nil, "Creatures with this drop", tostring(source.mobCount))
+        end
+        local i
+        for i = 1, math.min(visibleMobLimit, table.getn(source.mobs)) do
+            local mob = source.mobs[i]
+            y = AddGenericRow(y, "Interface\\Icons\\INV_Misc_Bag_10",
+                nil, mob.name or (PC.Data.DropMobs and PC.Data.DropMobs[mob.id])
+                    or ("NPC " .. tostring(mob.id)),
+                mob.chance and FormatChance(mob.chance) or "")
+        end
+        if table.getn(source.mobs) > visibleMobLimit then
+            moreMobsButton:ClearAllPoints()
+            moreMobsButton:SetPoint("TOPLEFT", scrollChild, "TOPLEFT", 4, y - 4)
+            moreMobsButton:SetText("Show More Creatures (" ..
+                tostring(table.getn(source.mobs) - visibleMobLimit) .. ")")
+            moreMobsButton:Show()
+            y = y - 32
+        end
+    end
+
+    local loot = source.lootNPCID and PC.Data.BossLoot
+        and PC.Data.BossLoot[source.lootNPCID]
+    if loot and table.getn(loot) > 0 then
+        y = AddGenericRow(y, "Interface\\Icons\\INV_Misc_Bag_10",
+            nil, "Complete boss loot table", tostring(table.getn(loot)) .. " items")
+        local i
+        for i = 1, math.min(visibleLootLimit, table.getn(loot)) do
+            local entry = loot[i]
+            y = AddGenericRow(y, PC.API.GetItemIcon(entry.itemID), nil,
+                entry.name,
+                entry.chance and FormatChance(entry.chance) or "")
+        end
+        if table.getn(loot) > visibleLootLimit then
+            moreLootButton:ClearAllPoints()
+            moreLootButton:SetPoint("TOPLEFT", scrollChild, "TOPLEFT", 4, y - 4)
+            moreLootButton:SetText("Show More Loot (" ..
+                tostring(table.getn(loot) - visibleLootLimit) .. ")")
+            moreLootButton:Show()
+            y = y - 32
+        end
     end
 
     scrollChild:SetHeight(
         -y
     )
+end
+
+--------------------------------------------------
+-- Craft Details
+--------------------------------------------------
+
+local function BuildCraftDetails(source)
+    sourceTitle:SetText("Craft  |  " .. tostring(source.profession or "Profession"))
+    local y = AddGenericRow(0, "Interface\\Icons\\Trade_Engraving",
+        nil, "Required skill", tostring(source.skill or "?"))
+    if source.reagents then
+        local i
+        for i = 1, table.getn(source.reagents) do
+            local reagent = source.reagents[i]
+            y = AddGenericRow(y, PC.API.GetItemIcon(reagent.itemID), nil,
+                PC.API.GetItemName(reagent.itemID),
+                "x" .. tostring(reagent.amount or 1))
+        end
+    end
+    if source.tools then
+        local i
+        for i = 1, table.getn(source.tools) do
+            local tool = source.tools[i]
+            y = AddGenericRow(y, PC.API.GetItemIcon(tool.itemID), nil,
+                "Tool: " .. PC.API.GetItemName(tool.itemID), "")
+        end
+    end
+    scrollChild:SetHeight(-y)
 end
 
 --------------------------------------------------
@@ -2853,6 +3003,10 @@ Refresh =
             )
 
         elseif activeSource.type ==
+        "craft" then
+            BuildCraftDetails(activeSource)
+
+        elseif activeSource.type ==
         "vendor" then
             BuildVendorDetails(
                 activeSource
@@ -2915,6 +3069,8 @@ function SourceDetails.Open(
     activeItemID = itemID
     activeSource = source
     expandedQuests = {}
+    visibleLootLimit = 40
+    visibleMobLimit = 40
 
     GameTooltip:Hide()
 

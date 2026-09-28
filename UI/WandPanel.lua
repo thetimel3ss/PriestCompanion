@@ -2457,13 +2457,24 @@ local function SortWands(
     local second =
         PC.Data.Wands[secondID]
 
+    local firstItem = PC.Data.Items[firstID]
+    local secondItem = PC.Data.Items[secondID]
     local firstOrder =
-        first.order or 9999
+        GetRequiredLevel(firstItem, PC.Data.Sources[firstID])
+        or (firstItem and firstItem.itemLevel and firstItem.itemLevel - 5)
+        or first.order or 9999
 
     local secondOrder =
-        second.order or 9999
+        GetRequiredLevel(secondItem, PC.Data.Sources[secondID])
+        or (secondItem and secondItem.itemLevel and secondItem.itemLevel - 5)
+        or second.order or 9999
 
     if firstOrder == secondOrder then
+        local firstDPS = GetItemDPS(firstItem) or 0
+        local secondDPS = GetItemDPS(secondItem) or 0
+        if firstDPS ~= secondDPS then
+            return firstDPS < secondDPS
+        end
         return firstID < secondID
     end
 

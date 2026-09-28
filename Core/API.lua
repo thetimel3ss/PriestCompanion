@@ -49,6 +49,11 @@ function PC.API.GetItemName(itemID)
         return item.name
     end
 
+    if PC.Data.ItemNames
+    and PC.Data.ItemNames[itemID] then
+        return PC.Data.ItemNames[itemID]
+    end
+
     local name = GetItemInfo(itemID)
 
     if name then

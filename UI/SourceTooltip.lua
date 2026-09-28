@@ -1070,6 +1070,11 @@ local function BuildDrop(
         "neutral"
     )
 
+    if source.mobCount and source.mobCount > 1 then
+        AddRow("Interface\\Icons\\INV_Misc_Bag_10",
+            "Creatures with this drop", tostring(source.mobCount), "neutral")
+    end
+
     AddInstanceRow(source)
 
     if not source.instanceID

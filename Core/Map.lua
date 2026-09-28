@@ -760,6 +760,31 @@ function Map.ShowLocation(
 end
 
 --------------------------------------------------
+-- Zone fallback without an unverified boss pin
+--------------------------------------------------
+
+function Map.ShowZone(zoneName)
+    if not zoneName
+    or not WorldMapFrame
+    or type(SetMapZoom) ~= "function" then
+        return false
+    end
+
+    local continent, zone = Map.ResolveZone(zoneName)
+    if not continent or zone == nil then
+        return false
+    end
+
+    if not WorldMapFrame:IsShown() then
+        WorldMapFrame:Show()
+    end
+    SetMapZoom(continent, zone)
+    if marker then marker:Hide() end
+    Print("Boss coordinates are unavailable; showing " .. zoneName .. ".")
+    return true
+end
+
+--------------------------------------------------
 -- NPC Convenience Wrapper
 --------------------------------------------------
 
@@ -788,12 +813,15 @@ function Map.ShowNPC(
     end
 
     if npc.map then
-        return
+        local found =
             Map.ShowLocation(
                 npc.map,
                 markerType,
                 label
             )
+        if found then
+            return true
+        end
     end
 
     --------------------------------------------------
@@ -816,7 +844,31 @@ function Map.ShowNPC(
 
         local maps = nil
 
-        if npc.id
+        if npc.kind == "object"
+        and npc.id
+        and type(
+            pfDatabase.SearchObjectID
+        ) == "function" then
+            maps =
+                pfDatabase:SearchObjectID(
+                    npc.id,
+                    meta
+                )
+
+        elseif npc.kind == "object"
+        and npc.name
+        and type(
+            pfDatabase.SearchObject
+        ) == "function" then
+            maps =
+                pfDatabase:SearchObject(
+                    npc.name,
+                    meta,
+                    "LOWER"
+                )
+
+        elseif npc.kind ~= "object"
+        and npc.id
         and type(
             pfDatabase.SearchMobID
         ) == "function" then

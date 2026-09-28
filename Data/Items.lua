@@ -378,7 +378,7 @@ AddWand(
 AddWand(
     6806,
     "Dancing Flame",
-    2,
+    3,
     40,
     nil,
     36,

@@ -21,6 +21,16 @@ Data\Sources.lua
 Data\Wands.lua
 Data\Quests.lua
 Data\QuestChains.lua
+Data\OctoItems.lua
+Data\OctoInstances.lua
+Data\OctoNPCs.lua
+Data\OctoWands.lua
+Data\OctoQuests.lua
+Data\OctoQuestChains.lua
+Data\OctoItemNames.lua
+Data\OctoLoot.lua
+Data\OctoDropMobs.lua
+Data\OctoSources.lua
 
 UI\MainFrame.lua
 UI\SourceTooltip.lua

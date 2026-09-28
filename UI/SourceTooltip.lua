@@ -927,7 +927,7 @@ local function BuildQuest(
     if questStatus ==
     "completed" then
         AddRow(
-            "Interface\GossipFrame\ActiveQuestIcon",
+            "Interface\\GossipFrame\\ActiveQuestIcon",
             "Quest Status",
             "Completed",
             "good"
@@ -936,7 +936,7 @@ local function BuildQuest(
     elseif questStatus ==
     "in_progress" then
         AddRow(
-            "Interface\GossipFrame\ActiveQuestIcon",
+            "Interface\\GossipFrame\\ActiveQuestIcon",
             "Quest Status",
             "In progress",
             "warn"
@@ -944,7 +944,7 @@ local function BuildQuest(
 
     else
         AddRow(
-            "Interface\GossipFrame\AvailableQuestIcon",
+            "Interface\\GossipFrame\\AvailableQuestIcon",
             "Quest Status",
             "Unknown",
             "neutral"

@@ -57,18 +57,7 @@ NPCs[4787] = {
             "Blackfathom Deeps",
 
         x = 13.3,
-        y = 51.2,
-
-        fallback = {
-            zone =
-                "Ashenvale",
-
-            x = 13.9,
-            y = 14.3,
-
-            label =
-                "Blackfathom Deeps entrance"
-        }
+        y = 51.2
     }
 }
 

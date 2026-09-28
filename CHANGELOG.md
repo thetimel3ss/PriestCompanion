@@ -137,6 +137,7 @@
 - Changed dungeon map metadata to live in `Data/Instances.lua` instead of map core logic.
 
 ### Fixed
+- Fixed Wand list scroll position after changing filters so shorter result sets always reopen from the top.
 - Fixed Wand list failing to load when adding multiple entries.
 - Fixed ClassicAPI item icons displaying the unknown-item icon while item data was still loading.
 - Fixed UnitXP SP3 detection when loaded through environments that do not expose `Vanilla1121mod.UnitXP_SP3`.

@@ -208,6 +208,18 @@ AddWand(
 )
 
 AddWand(
+    5818,
+    "Moonbeam Wand",
+    2,
+    30,
+    nil,
+    30,
+    57,
+    "Nature",
+    1.80
+)
+
+AddWand(
     7001,
     "Gravestone Scepter",
     3,

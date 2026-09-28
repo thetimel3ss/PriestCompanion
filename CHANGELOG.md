@@ -62,6 +62,14 @@
 - Added GameTooltip support for items displayed inside quest details.
 - Added Show Start and Show End actions for quest NPCs.
 - Added dungeon context for quests completed inside instances.
+- Added per-character quest completion history.
+- Added direct server quest history synchronization via `.queststatus` / `TWQUEST` when supported.
+- Added optional `pfQuest_history` import as an additional quest completion provider.
+- Added live quest completion tracking through `QUEST_TURNED_IN` when available.
+- Added native Show Start / Show End world map navigation.
+- Added animated quest start and quest end map markers.
+- Added native Vanilla dungeon map support through `SetMapZoom()` indices.
+- Added centralized NPC database with reusable NPC locations.
 
 ### Source Details
 - Added dedicated Source Details panel.
@@ -87,6 +95,9 @@
 - Separated Wand progression recommendations from item properties.
 - Separated quest data from quest chain relationships.
 - Added reusable instance references for dungeon and raid content.
+- Added centralized NPC references shared by quests and map navigation.
+- Added unified quest history providers while keeping pfQuest and ClassicAPI optional.
+- Added instance-owned WorldMap metadata and entrance fallbacks.
 
 ### Data
 - Added Lesser Magic Wand.
@@ -98,6 +109,8 @@
 - Added Alliance Blackfathom Villainy quest data.
 - Added Horde Blackfathom Villainy quest data.
 - Added Gravestone Scepter Alliance quest chain.
+- Added native Blackfathom Deeps WorldMap metadata (`mapID 7`, `zoneID 1`).
+- Added Argent Guard Thaelrid dungeon coordinates for Blackfathom Deeps.
 
 ### Changed
 - Redesigned Wand Progression from a single-item information panel into a compact list.
@@ -110,6 +123,9 @@
 - Changed quest chain presentation to show the reward quest first, followed by its prerequisites.
 - Changed the main window size to provide more vertical space.
 - Improved organization of UI layout values for easier visual adjustment.
+- Changed Wand source metadata elements to use independently configurable X/Y positions.
+- Changed quest NPC references to use centralized NPC IDs instead of duplicated NPC data.
+- Changed dungeon map metadata to live in `Data/Instances.lua` instead of map core logic.
 
 ### Fixed
 - Fixed Wand list failing to load when adding multiple entries.
@@ -119,28 +135,15 @@
 - Improved tooltip positioning near screen boundaries.
 - Improved Wand column alignment.
 - Improved dropdown spacing and filter readability.
+- Fixed Source Details scroll range after expanding and collapsing quests.
+- Fixed XP and reputation reward coloring in Source Details.
+- Fixed Blackfathom Deeps quest markers to use the native dungeon map and correct Thaelrid coordinates.
 
 ### Planned
 - Complete the Wand Progression item database.
 - Add OctoWoW custom Wands, quests, NPCs, and sources.
-- Improve independent positioning controls for:
-  - Source icon.
-  - Source text.
-  - Faction icon.
-  - Faction text.
-  - Instance icon.
-  - Instance text.
-  - Details indicator.
 - Replace or improve the current dungeon icon.
-- Improve Wand list spacing near the scrollbar.
-- Improve Source Details spacing near the scrollbar.
-- Fix Source Details scroll range updates after expanding and collapsing quests.
-- Add standard game colors for XP and reputation rewards.
-- Add native Priest Companion world map markers.
-- Add animated quest start and quest end markers.
-- Add map coordinate support for NPCs.
-- Remove the need for pfQuest for basic Show Start / Show End functionality.
-- Keep pfQuest as an optional integration for enhanced map and quest features.
+- Expand optional pfQuest integration for missing quest/map data where useful.
 - Add dungeon drop sources.
 - Add boss drop information.
 - Add drop chance information.
@@ -151,6 +154,7 @@
 - Add Talent builds.
 - Add BiS lists.
 - Add Consumables.
+- Add Settings tab with quest-history sync preferences and reset controls.
 - Add Minimap button.
 - Add Auto Mana tools.
 - Add OOM announcer.

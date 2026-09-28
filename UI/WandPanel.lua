@@ -1479,7 +1479,7 @@ recommendedCheck:SetScript(
             and true
             or false
 
-        RefreshWandList()
+        RefreshWandList(true)
     end
 )
 
@@ -1522,7 +1522,7 @@ UIDropDownMenu_Initialize(
                         sourceDropdown
                     )
 
-                    RefreshWandList()
+                    RefreshWandList(true)
                 end
 
             UIDropDownMenu_AddButton(info)
@@ -1573,7 +1573,7 @@ UIDropDownMenu_Initialize(
                         factionDropdown
                     )
 
-                    RefreshWandList()
+                    RefreshWandList(true)
                 end
 
             UIDropDownMenu_AddButton(info)
@@ -1615,7 +1615,7 @@ UIDropDownMenu_Initialize(
                         levelDropdown
                     )
 
-                    RefreshWandList()
+                    RefreshWandList(true)
                 end
 
             UIDropDownMenu_AddButton(info)
@@ -2475,7 +2475,7 @@ end
 --------------------------------------------------
 
 RefreshWandList =
-    function()
+    function(resetScroll)
         UpdatePlayerContext()
 
         --------------------------------------------------
@@ -2591,6 +2591,34 @@ RefreshWandList =
         end
 
         scrollChild:SetHeight(height)
+
+        --------------------------------------------------
+        -- Scroll Range / Filter Reset
+        --------------------------------------------------
+        --
+        -- Recalculate the scroll child after the visible
+        -- item count changes. Filter interactions also
+        -- return the list to the top so a previous large
+        -- scroll offset cannot leave a shorter filtered
+        -- result outside the visible area.
+        --------------------------------------------------
+
+        if scrollFrame.UpdateScrollChildRect then
+            scrollFrame:UpdateScrollChildRect()
+        end
+
+        if resetScroll then
+            scrollFrame:SetVerticalScroll(0)
+
+            local scrollBar =
+                getglobal(
+                    "PriestCompanionWandScrollFrameScrollBar"
+                )
+
+            if scrollBar then
+                scrollBar:SetValue(0)
+            end
+        end
     end
 
 --------------------------------------------------

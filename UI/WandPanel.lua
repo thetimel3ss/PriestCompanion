@@ -202,18 +202,78 @@ end
 -- Recommended Range
 --------------------------------------------------
 
-local function GetRecommendedText(wand)
-    if not wand
-    or not wand.recommended
-    or not wand.recommendedLevel then
+local function GetRecommendationFaction()
+    if filters.faction == "Alliance"
+    or filters.faction == "Horde" then
+        return filters.faction
+    end
+
+    return playerFaction
+end
+
+local function GetRecommendationRange(wand)
+    if not wand then
+        return nil
+    end
+
+    if wand.recommendations then
+        local faction =
+            GetRecommendationFaction()
+
+        if faction
+        and wand.recommendations[
+            faction
+        ] then
+            return
+                wand.recommendations[
+                    faction
+                ]
+        end
+
+        if wand.recommendations.Both then
+            return
+                wand.recommendations.Both
+        end
+    end
+
+    --------------------------------------------------
+    -- Backwards compatibility with older records.
+    --------------------------------------------------
+
+    if wand.recommended
+    and wand.recommendedLevel then
+        return wand.recommendedLevel
+    end
+
+    return nil
+end
+
+local function GetDisplayLevelRange(wand)
+    local recommendation =
+        GetRecommendationRange(wand)
+
+    if recommendation then
+        return recommendation
+    end
+
+    if wand
+    and wand.suggestedLevel then
+        return wand.suggestedLevel
+    end
+
+    return nil
+end
+
+local function FormatLevelRange(range)
+    if not range then
         return "-"
     end
 
     local minLevel =
-        wand.recommendedLevel.min
+        range.min
 
     local maxLevel =
-        wand.recommendedLevel.max
+        range.max
 
     if minLevel
     and maxLevel then
@@ -232,18 +292,37 @@ local function GetRecommendedText(wand)
     return "-"
 end
 
+local function GetRecommendedText(wand)
+    return
+        FormatLevelRange(
+            GetDisplayLevelRange(
+                wand
+            )
+        )
+end
+
+local function HasRecommendation(wand)
+    return
+        GetRecommendationRange(
+            wand
+        ) ~= nil
+end
+
 local function IsRecommendedNow(wand)
-    if not wand
-    or not wand.recommended
-    or not wand.recommendedLevel then
+    local range =
+        GetRecommendationRange(
+            wand
+        )
+
+    if not range then
         return false
     end
 
     local minLevel =
-        wand.recommendedLevel.min
+        range.min
 
     local maxLevel =
-        wand.recommendedLevel.max
+        range.max
 
     if minLevel
     and playerLevel < minLevel then
@@ -258,15 +337,100 @@ local function IsRecommendedNow(wand)
     return true
 end
 
-local function IsUsable(item)
-    if not item
-    or not item.requiredLevel then
+--------------------------------------------------
+-- Effective Required Level
+--------------------------------------------------
+
+local function GetSourceRequiredLevel(source)
+    if not source then
+        return nil
+    end
+
+    if source.requiredLevel then
+        return source.requiredLevel
+    end
+
+    if source.type == "quest"
+    and source.questID
+    and PC.Data.Quests then
+        local quest =
+            PC.Data.Quests[
+                source.questID
+            ]
+
+        if quest then
+            return quest.requiredLevel
+        end
+    end
+
+    return nil
+end
+
+local function GetRequiredLevel(
+    item,
+    sources
+)
+    local itemRequired =
+        item
+        and item.requiredLevel
+
+    local sourceRequired = nil
+
+    if sources then
+        local i
+
+        for i = 1,
+            table.getn(sources)
+        do
+            local required =
+                GetSourceRequiredLevel(
+                    sources[i]
+                )
+
+            if required
+            and (
+                not sourceRequired
+                or required <
+                sourceRequired
+            ) then
+                sourceRequired =
+                    required
+            end
+        end
+    end
+
+    if itemRequired
+    and sourceRequired then
+        if itemRequired >
+        sourceRequired then
+            return itemRequired
+        end
+
+        return sourceRequired
+    end
+
+    return
+        itemRequired
+        or sourceRequired
+end
+
+local function IsUsable(
+    item,
+    sources
+)
+    local requiredLevel =
+        GetRequiredLevel(
+            item,
+            sources
+        )
+
+    if not requiredLevel then
         return true
     end
 
     return
         playerLevel >=
-        item.requiredLevel
+        requiredLevel
 end
 
 --------------------------------------------------
@@ -581,17 +745,25 @@ local function ItemPassesFilters(itemID)
     end
 
     if filters.recommendedOnly
-    and not wand.recommended then
+    and not HasRecommendation(
+        wand
+    ) then
         return false
     end
 
     if filters.level == "Usable" then
-        if not IsUsable(item) then
+        if not IsUsable(
+            item,
+            matchingSources
+        ) then
             return false
         end
 
     elseif filters.level == "Future" then
-        if IsUsable(item) then
+        if IsUsable(
+            item,
+            matchingSources
+        ) then
             return false
         end
 
@@ -1992,10 +2164,14 @@ end
 local function ApplyRowState(
     row,
     item,
-    wand
+    wand,
+    sources
 )
     local usable =
-        IsUsable(item)
+        IsUsable(
+            item,
+            sources
+        )
 
     row.requiredLevelText:SetTextColor(
         0.85,
@@ -2098,10 +2274,18 @@ local function RefreshItemRow(
         )
     )
 
-    row.requiredLevelText:SetText(
-        tostring(
-            item.requiredLevel
+    local requiredLevel =
+        GetRequiredLevel(
+            item,
+            matchingSources
         )
+
+    row.requiredLevelText:SetText(
+        requiredLevel
+        and tostring(
+            requiredLevel
+        )
+        or "-"
     )
 
     row.recommendedText:SetText(
@@ -2252,7 +2436,8 @@ local function RefreshItemRow(
     ApplyRowState(
         row,
         item,
-        wand
+        wand,
+        matchingSources
     )
 
     row:Show()

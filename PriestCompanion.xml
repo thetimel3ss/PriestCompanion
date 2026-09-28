@@ -1,0 +1,11 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/">
+
+    <Script file="PriestCompanion.lua"/>
+
+    <Script file="Data\Items.lua"/>
+    <Script file="Data\Sources.lua"/>
+
+    <Script file="UI\MainFrame.lua"/>
+    <Script file="UI\WandPanel.lua"/>
+
+</Ui>

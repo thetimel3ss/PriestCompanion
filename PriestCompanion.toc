@@ -1,0 +1,27 @@
+## Interface: 11200
+## Title: Priest Companion
+## Notes: Priest knowledge and tools for Vanilla WoW
+## Author: Timeless
+## Version: 0.1.0
+## SavedVariables: PriestCompanionDB
+
+Core\Bootstrap.lua
+Core\API.lua
+Core\Capabilities.lua
+Core\QuestHistory.lua
+Core\Map.lua
+
+PriestCompanion.lua
+
+Data\Items.lua
+Data\Instances.lua
+Data\NPCs.lua
+Data\Sources.lua
+Data\Wands.lua
+Data\Quests.lua
+Data\QuestChains.lua
+
+UI\MainFrame.lua
+UI\SourceTooltip.lua
+UI\SourceDetails.lua
+UI\WandPanel.lua

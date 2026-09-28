@@ -1,0 +1,15 @@
+# Archives / releases
+*.zip
+*.7z
+*.rar
+
+# Editor / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.bak
+*~

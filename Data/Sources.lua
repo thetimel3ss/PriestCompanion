@@ -216,6 +216,17 @@ Sources[5244] = {
     }
 }
 
+Sources[5818] = {
+    {
+        type = "quest",
+        questID = 1044,
+        questName = "Answered Questions",
+        faction = "Alliance",
+        requiredLevel = 25,
+        zone = "Ashenvale"
+    }
+}
+
 Sources[7001] = {
     {
         type = "quest",

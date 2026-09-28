@@ -72,6 +72,30 @@ AddWand(
 )
 
 AddWand(
+    12296,
+    "Spark of the People's Militia",
+    2,
+    17,
+    nil,
+    16,
+    30,
+    "Arcane",
+    1.80
+)
+
+AddWand(
+    5208,
+    "Smoldering Wand",
+    1,
+    20,
+    15,
+    15,
+    28,
+    "Fire",
+    1.60
+)
+
+AddWand(
     5326,
     "Flaring Baton",
     2,
@@ -129,6 +153,18 @@ AddWand(
     31,
     "Shadow",
     1.50
+)
+
+AddWand(
+    5211,
+    "Dusk Wand",
+    1,
+    25,
+    20,
+    21,
+    39,
+    "Shadow",
+    1.70
 )
 
 AddWand(
@@ -356,6 +392,30 @@ AddWand(
 --------------------------------------------------
 
 AddWand(
+    5239,
+    "Blackbone Wand",
+    1,
+    46,
+    41,
+    39,
+    74,
+    "Shadow",
+    1.60
+)
+
+AddWand(
+    9654,
+    "Cairnstone Sliver",
+    2,
+    50,
+    nil,
+    52,
+    97,
+    "Arcane",
+    1.80
+)
+
+AddWand(
     11860,
     "Charged Lightning Rod",
     2,
@@ -401,6 +461,30 @@ AddWand(
     93,
     "Nature",
     1.30
+)
+
+AddWand(
+    15281,
+    "Glowstar Rod",
+    2,
+    57,
+    52,
+    52,
+    98,
+    "Arcane",
+    1.50
+)
+
+AddWand(
+    15282,
+    "Dragon Finger",
+    2,
+    60,
+    55,
+    52,
+    97,
+    "Fire",
+    1.40
 )
 
 AddWand(

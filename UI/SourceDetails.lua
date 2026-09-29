@@ -129,6 +129,39 @@ local function FormatChance(chance)
     return string.format("%.2f%%", chance)
 end
 
+local function SetItemQualityColor(fontString, itemID, quality)
+    local resolvedQuality = quality
+
+    if resolvedQuality == nil
+    and PC.Data
+    and PC.Data.Items
+    and PC.Data.Items[itemID] then
+        resolvedQuality = PC.Data.Items[itemID].quality
+    end
+
+    if resolvedQuality == nil
+    and type(GetItemInfo) == "function" then
+        local _, _, clientQuality = GetItemInfo(itemID)
+        resolvedQuality = clientQuality
+    end
+
+    if resolvedQuality == 0 then
+        fontString:SetTextColor(0.62, 0.62, 0.62)
+    elseif resolvedQuality == 1 then
+        fontString:SetTextColor(1.00, 1.00, 1.00)
+    elseif resolvedQuality == 2 then
+        fontString:SetTextColor(0.12, 1.00, 0.00)
+    elseif resolvedQuality == 3 then
+        fontString:SetTextColor(0.00, 0.44, 0.87)
+    elseif resolvedQuality == 4 then
+        fontString:SetTextColor(0.64, 0.21, 0.93)
+    elseif resolvedQuality == 5 then
+        fontString:SetTextColor(1.00, 0.50, 0.00)
+    else
+        fontString:SetTextColor(0.90, 0.90, 0.90)
+    end
+end
+
 local function FormatQuestText(text)
     if not text then
         return ""
@@ -717,10 +750,15 @@ bossMapButton:SetScript("OnClick", function()
         or { id = source.npcID, name = source.npcName, zone = source.zone }
     if PC.Map then
         if PC.Map.ShowNPC(npc, "boss", nil) then return end
+        if source.instanceID
+        and PC.Map.ShowInstance
+        and PC.Map.ShowInstance(source.instanceID, source.npcName) then
+            return
+        end
         local instance = source.instanceID and GetInstance(source.instanceID)
         if instance and instance.entrance then
             PC.Map.ShowLocation(instance.entrance, "unknown",
-                instance.name .. " entrance")
+                tostring(instance.name or "Dungeon") .. " entrance")
         elseif instance and instance.entranceZone then
             PC.Map.ShowZone(instance.entranceZone)
         end
@@ -2732,7 +2770,8 @@ local function AddDropItemRow(
     y,
     itemID,
     itemText,
-    valueText
+    valueText,
+    quality
 )
     if not itemID then
         return y
@@ -2778,10 +2817,10 @@ local function AddDropItemRow(
         valueText or ""
     )
 
-    row.name:SetTextColor(
-        0.90,
-        0.90,
-        0.90
+    SetItemQualityColor(
+        row.name,
+        itemID,
+        quality
     )
 
     row.value:SetTextColor(
@@ -3219,7 +3258,8 @@ local function BuildDropDetails(source)
                 y,
                 entry.itemID,
                 entry.name,
-                entry.chance and FormatChance(entry.chance) or ""
+                entry.chance and FormatChance(entry.chance) or "",
+                entry.quality
             )
         end
         if table.getn(loot) > visibleLootLimit then

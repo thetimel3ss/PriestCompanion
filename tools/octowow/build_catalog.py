@@ -77,7 +77,7 @@ REAGENT_NAMES={4470:'Simple Wood',10938:'Lesser Magic Essence',
   11134:'Lesser Mystic Essence',11083:'Soul Dust',
   11135:'Greater Mystic Essence',11137:'Vision Dust',
   6218:'Runed Copper Rod',11130:'Runed Golden Rod'}
-QUALITY={2:4,3:3,4:2,5:1,6:0}
+QUALITY={1:5,2:4,3:3,4:2,5:1,6:0}
 
 def lua(x):
     if x is None:return 'nil'
@@ -301,7 +301,8 @@ for id,x in sorted(items.items()):
 for id in sorted(loot_ids):
     rows=npcs[id]['loot']
     loot_rows.append((id,[{'itemID':r['id'],'name':r['name'],
-      'chance':r['percent']} for r in rows]))
+      'chance':r['percent'],'quality':QUALITY.get(r.get('quality'))}
+      for r in rows]))
 write('OctoLoot.lua','BossLoot',loot_rows)
 write('OctoDropMobs.lua','DropMobs',sorted(drop_names.items()))
 write('OctoSources.lua','Sources',sources)

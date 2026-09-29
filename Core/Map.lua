@@ -763,7 +763,7 @@ end
 -- Zone fallback without an unverified boss pin
 --------------------------------------------------
 
-function Map.ShowZone(zoneName)
+function Map.ShowZone(zoneName, message)
     if not zoneName
     or not WorldMapFrame
     or type(SetMapZoom) ~= "function" then
@@ -780,8 +780,80 @@ function Map.ShowZone(zoneName)
     end
     SetMapZoom(continent, zone)
     if marker then marker:Hide() end
-    Print("Boss coordinates are unavailable; showing " .. zoneName .. ".")
+    Print(message or ("Boss coordinates are unavailable; showing " .. zoneName .. "."))
     return true
+end
+
+--------------------------------------------------
+-- Instance fallback without an unverified boss pin
+--------------------------------------------------
+
+function Map.ShowInstance(instanceID, label)
+    if not instanceID
+    or not PC.Data
+    or not PC.Data.Instances then
+        return false
+    end
+
+    local instance = PC.Data.Instances[instanceID]
+    if not instance then
+        return false
+    end
+
+    local instanceMap = instance.worldMap
+
+    if instanceMap
+    and instanceMap.mapID
+    and WorldMapFrame
+    and type(SetMapZoom) == "function" then
+        if not WorldMapFrame:IsShown() then
+            WorldMapFrame:Show()
+        end
+
+        SetMapZoom(
+            instanceMap.mapID,
+            instanceMap.zoneID or 1
+        )
+
+        if marker then marker:Hide() end
+
+        Print(
+            "Showing " ..
+            tostring(label or instance.name or "instance") ..
+            " on the " ..
+            tostring(instance.name or "dungeon") ..
+            " map."
+        )
+
+        return true
+    end
+
+    if instance.entrance then
+        local shown = Map.ShowLocation(
+            instance.entrance,
+            "unknown",
+            label or (
+                tostring(instance.name or "Dungeon") ..
+                " entrance"
+            )
+        )
+
+        if shown then
+            return true
+        end
+    end
+
+    if instance.entranceZone then
+        return Map.ShowZone(
+            instance.entranceZone,
+            "Boss coordinates are unavailable; showing the " ..
+            tostring(instance.name or "dungeon") ..
+            " entrance in " ..
+            tostring(instance.entranceZone) .. "."
+        )
+    end
+
+    return false
 end
 
 --------------------------------------------------
@@ -915,8 +987,25 @@ function Map.ShowNPC(
         end
     end
 
+    if npc.instanceID
+    and Map.ShowInstance(
+        npc.instanceID,
+        label
+    ) then
+        return true
+    end
+
     local text =
         label
+
+    if npc.zone
+    and Map.ShowZone(
+        npc.zone,
+        "Coordinates are unavailable; showing " ..
+        tostring(npc.zone) .. "."
+    ) then
+        return true
+    end
 
     if npc.zone then
         text =

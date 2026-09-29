@@ -57,12 +57,27 @@ Wands[7001] = {
 --------------------------------------------------
 
 Wands[5092] = {
-    order = 4,
+    order = 5,
 
     recommended = true,
 
     recommendedLevel = {
         min = 18,
+        max = 20
+    }
+}
+
+--------------------------------------------------
+-- Cookie's Stirring Rod
+--------------------------------------------------
+
+Wands[5198] = {
+    order = 4,
+
+    recommended = true,
+
+    recommendedLevel = {
+        min = 17,
         max = 20
     }
 }

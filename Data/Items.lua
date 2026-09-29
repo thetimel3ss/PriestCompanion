@@ -94,3 +94,25 @@ Items[5092] = {
         speed = 1.50
     }
 }
+
+--------------------------------------------------
+-- Cookie's Stirring Rod
+--------------------------------------------------
+
+Items[5198] = {
+    name = "Cookie's Stirring Rod",
+
+    quality = 3,
+    itemLevel = 22,
+    requiredLevel = 17,
+
+    itemType = "Wand",
+    equipSlot = "Ranged",
+
+    damage = {
+        min = 20,
+        max = 38,
+        school = "Arcane",
+        speed = 1.30
+    }
+}

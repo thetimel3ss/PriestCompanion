@@ -64,3 +64,37 @@ Instances[719] = {
             "Blackfathom Deeps entrance"
     }
 }
+
+--------------------------------------------------
+-- The Deadmines
+--------------------------------------------------
+
+Instances[1581] = {
+    name =
+        "The Deadmines",
+
+    shortName =
+        "DM",
+
+    type =
+        "dungeon",
+
+    description =
+        "Dungeon encounter in The Deadmines.",
+
+    icon =
+        "Interface\\Icons\\INV_Misc_Map_01",
+
+    --------------------------------------------------
+    -- Vanilla World Map
+    --------------------------------------------------
+    --
+    -- Confirmed in the Instance Journal map catalog:
+    --   SetMapZoom(21, 1)
+    --
+
+    worldMap = {
+        mapID = 21,
+        zoneID = 1
+    }
+}

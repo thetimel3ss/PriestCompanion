@@ -138,6 +138,38 @@ Sources[5092] = {
 }
 
 --------------------------------------------------
+-- Cookie's Stirring Rod
+--------------------------------------------------
+
+Sources[5198] = {
+    {
+        type = "drop",
+
+        npcID = 645,
+        npcName = "Cookie",
+        npcType = "Boss",
+
+        instanceID = 1581,
+        zone = "The Deadmines",
+        dropChance = 35,
+
+        mobs = {
+            {
+                id = 645,
+                chance = 35
+            }
+        },
+
+        mobCount = 1,
+        lootNPCID = 645,
+        details = true,
+
+        faction = "Both",
+        requiredLevel = 17
+    }
+}
+
+--------------------------------------------------
 -- Future Drop Example
 --------------------------------------------------
 --

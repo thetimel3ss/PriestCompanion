@@ -598,6 +598,34 @@ itemName:SetPoint(
 itemName:SetWidth(280)
 itemName:SetJustifyH("LEFT")
 
+local headerItemButton =
+    CreateFrame(
+        "Button",
+        nil,
+        frame
+    )
+
+headerItemButton:SetPoint(
+    "TOPLEFT",
+    itemIcon,
+    "TOPLEFT",
+    -4,
+    4
+)
+
+headerItemButton:SetWidth(360)
+headerItemButton:SetHeight(40)
+
+headerItemButton:SetScript(
+    "OnEnter",
+    ShowItemTooltip
+)
+
+headerItemButton:SetScript(
+    "OnLeave",
+    HideItemTooltip
+)
+
 local sourceTitle =
     frame:CreateFontString(
         nil,
@@ -665,10 +693,16 @@ scrollFrame:SetScrollChild(
 local questCards = {}
 local connectors = {}
 local genericRows = {}
+local dropItemRows = {}
+local dropSectionRows = {}
+local dropTextRows = {}
 
 local visibleQuestCards = 0
 local visibleConnectors = 0
 local visibleGenericRows = 0
+local visibleDropItemRows = 0
+local visibleDropSectionRows = 0
+local visibleDropTextRows = 0
 local visibleLootLimit = 40
 local visibleMobLimit = 40
 
@@ -2492,6 +2526,276 @@ local function AddGenericRow(
 end
 
 --------------------------------------------------
+-- Drop Sections and Item Rows
+--------------------------------------------------
+
+local function AcquireDropSection(index)
+    local section =
+        dropSectionRows[index]
+
+    if section then
+        return section
+    end
+
+    section =
+        CreateFrame(
+            "Frame",
+            nil,
+            scrollChild
+        )
+
+    section:SetHeight(22)
+
+    section.line =
+        section:CreateTexture(
+            nil,
+            "ARTWORK"
+        )
+
+    section.line:SetTexture(
+        0.45,
+        0.35,
+        0.18,
+        0.85
+    )
+
+    section.line:SetHeight(1)
+    section.line:SetPoint(
+        "LEFT",
+        section,
+        "LEFT",
+        0,
+        -8
+    )
+
+    section.line:SetPoint(
+        "RIGHT",
+        section,
+        "RIGHT",
+        0,
+        -8
+    )
+
+    section.title =
+        section:CreateFontString(
+            nil,
+            "OVERLAY",
+            "GameFontNormalSmall"
+        )
+
+    section.title:SetPoint(
+        "LEFT",
+        section,
+        "LEFT",
+        5,
+        0
+    )
+
+    section.title:SetPoint(
+        "RIGHT",
+        section,
+        "RIGHT",
+        -5,
+        0
+    )
+
+    section.title:SetJustifyH("LEFT")
+    section.title:SetTextColor(1.00, 0.82, 0.20)
+
+    dropSectionRows[index] = section
+
+    return section
+end
+
+local function AddDropSection(y, titleText)
+    visibleDropSectionRows =
+        visibleDropSectionRows + 1
+
+    local section =
+        AcquireDropSection(
+            visibleDropSectionRows
+        )
+
+    section:ClearAllPoints()
+
+    section:SetPoint(
+        "TOPLEFT",
+        scrollChild,
+        "TOPLEFT",
+        0,
+        y
+    )
+
+    section:SetWidth(CONTENT_WIDTH - 8)
+    section.title:SetText(titleText or "")
+    section:Show()
+
+    return y - 24
+end
+
+local function AcquireDropText(index)
+    local row =
+        dropTextRows[index]
+
+    if row then
+        return row
+    end
+
+    row =
+        CreateFrame(
+            "Frame",
+            nil,
+            scrollChild
+        )
+
+    row.title =
+        row:CreateFontString(
+            nil,
+            "OVERLAY",
+            "GameFontHighlightSmall"
+        )
+
+    row.title:SetTextColor(1.00, 0.82, 0.20)
+
+    row.body =
+        row:CreateFontString(
+            nil,
+            "OVERLAY",
+            "GameFontHighlightSmall"
+        )
+
+    row.body:SetJustifyH("LEFT")
+    row.body:SetJustifyV("TOP")
+
+    dropTextRows[index] = row
+
+    return row
+end
+
+local function AddDropDescription(y, titleText, bodyText)
+    if not bodyText or bodyText == "" then
+        return y
+    end
+
+    visibleDropTextRows =
+        visibleDropTextRows + 1
+
+    local row =
+        AcquireDropText(
+            visibleDropTextRows
+        )
+
+    local width =
+        CONTENT_WIDTH -
+        8
+
+    row:ClearAllPoints()
+
+    row:SetPoint(
+        "TOPLEFT",
+        scrollChild,
+        "TOPLEFT",
+        4,
+        y
+    )
+
+    row:SetWidth(width)
+    row.title:SetWidth(width)
+    row.title:SetText(titleText or "Details")
+    row.title:Show()
+
+    row.body:SetWidth(width)
+    row.body:SetText(bodyText)
+    row.body:Show()
+
+    local height =
+        16 +
+        GetTextHeight(row.body) +
+        8
+
+    row:SetHeight(height)
+    row:Show()
+
+    return y - height
+end
+
+local function AcquireDropItemRow(index)
+    return
+        AcquireItemRow(
+            dropItemRows,
+            scrollChild,
+            index
+        )
+end
+
+local function AddDropItemRow(
+    y,
+    itemID,
+    itemText,
+    valueText
+)
+    if not itemID then
+        return y
+    end
+
+    visibleDropItemRows =
+        visibleDropItemRows + 1
+
+    local row =
+        AcquireDropItemRow(
+            visibleDropItemRows
+        )
+
+    local width =
+        CONTENT_WIDTH -
+        8
+
+    row:ClearAllPoints()
+
+    row:SetPoint(
+        "TOPLEFT",
+        scrollChild,
+        "TOPLEFT",
+        4,
+        y
+    )
+
+    row:SetWidth(width)
+    row.name:SetWidth(width - 94)
+    row.value:SetWidth(86)
+    row.itemID = itemID
+
+    row.icon:SetTexture(
+        PC.API.GetItemIcon(itemID)
+    )
+
+    row.name:SetText(
+        itemText
+        or PC.API.GetItemName(itemID)
+    )
+
+    row.value:SetText(
+        valueText or ""
+    )
+
+    row.name:SetTextColor(
+        0.90,
+        0.90,
+        0.90
+    )
+
+    row.value:SetTextColor(
+        0.75,
+        0.75,
+        0.75
+    )
+
+    row:Show()
+
+    return y - ITEM_ROW_HEIGHT
+end
+
+--------------------------------------------------
 -- Clear Dynamic Content
 --------------------------------------------------
 
@@ -2525,6 +2829,30 @@ local function ClearContent()
         genericRows[i]:Hide()
     end
 
+    for i = 1,
+        table.getn(
+            dropItemRows
+        )
+    do
+        dropItemRows[i]:Hide()
+    end
+
+    for i = 1,
+        table.getn(
+            dropSectionRows
+        )
+    do
+        dropSectionRows[i]:Hide()
+    end
+
+    for i = 1,
+        table.getn(
+            dropTextRows
+        )
+    do
+        dropTextRows[i]:Hide()
+    end
+
     bossMapButton:Hide()
     moreLootButton:Hide()
     moreMobsButton:Hide()
@@ -2532,6 +2860,9 @@ local function ClearContent()
     visibleQuestCards = 0
     visibleConnectors = 0
     visibleGenericRows = 0
+    visibleDropItemRows = 0
+    visibleDropSectionRows = 0
+    visibleDropTextRows = 0
 end
 
 --------------------------------------------------
@@ -2755,16 +3086,27 @@ local function BuildDropDetails(source)
 
     if instance then
         sourceTitle:SetText(
-            "Drop  |  " ..
+            (
+                instance.type == "raid"
+                and "Raid Drop  |  "
+                or "Dungeon Drop  |  "
+            ) ..
             instance.name
         )
     else
         sourceTitle:SetText(
-            "Drop Details"
+            "World Drop Details"
         )
     end
 
     local y = 0
+
+    y = AddDropSection(
+        y,
+        source.npcType == "Boss"
+        and "Boss drop"
+        or "Drop source"
+    )
 
     y = AddGenericRow(
         y,
@@ -2789,6 +3131,12 @@ local function BuildDropDetails(source)
             and "Raid"
             or "Dungeon",
             instance.name
+        )
+
+        y = AddDropDescription(
+            y,
+            "Dungeon description",
+            instance.description
         )
 
     elseif source.zone then
@@ -2819,9 +3167,16 @@ local function BuildDropDetails(source)
     end
 
     if source.mobs and table.getn(source.mobs) > 0 then
+        y = AddDropSection(
+            y,
+            source.mobCount and source.mobCount > 1
+            and "Dropped by creatures"
+            or "Dropped by"
+        )
+
         if source.mobCount and source.mobCount > 1 then
             y = AddGenericRow(y, "Interface\\Icons\\INV_Misc_Bag_10",
-                nil, "Creatures with this drop", tostring(source.mobCount))
+                nil, "Registered creatures", tostring(source.mobCount))
         end
         local i
         for i = 1, math.min(visibleMobLimit, table.getn(source.mobs)) do
@@ -2844,14 +3199,28 @@ local function BuildDropDetails(source)
     local loot = source.lootNPCID and PC.Data.BossLoot
         and PC.Data.BossLoot[source.lootNPCID]
     if loot and table.getn(loot) > 0 then
-        y = AddGenericRow(y, "Interface\\Icons\\INV_Misc_Bag_10",
-            nil, "Complete boss loot table", tostring(table.getn(loot)) .. " items")
+        y = AddDropSection(
+            y,
+            "Complete boss loot table"
+        )
+
+        y = AddGenericRow(
+            y,
+            "Interface\\Icons\\INV_Misc_Bag_10",
+            nil,
+            "Items in table",
+            tostring(table.getn(loot))
+        )
+
         local i
         for i = 1, math.min(visibleLootLimit, table.getn(loot)) do
             local entry = loot[i]
-            y = AddGenericRow(y, PC.API.GetItemIcon(entry.itemID), nil,
+            y = AddDropItemRow(
+                y,
+                entry.itemID,
                 entry.name,
-                entry.chance and FormatChance(entry.chance) or "")
+                entry.chance and FormatChance(entry.chance) or ""
+            )
         end
         if table.getn(loot) > visibleLootLimit then
             moreLootButton:ClearAllPoints()
@@ -2874,23 +3243,36 @@ end
 
 local function BuildCraftDetails(source)
     sourceTitle:SetText("Craft  |  " .. tostring(source.profession or "Profession"))
-    local y = AddGenericRow(0, "Interface\\Icons\\Trade_Engraving",
+    local y = AddDropSection(0, "Recipe requirements")
+
+    y = AddGenericRow(y, "Interface\\Icons\\Trade_Engraving",
         nil, "Required skill", tostring(source.skill or "?"))
+
     if source.reagents then
+        y = AddDropSection(y, "Reagents")
         local i
         for i = 1, table.getn(source.reagents) do
             local reagent = source.reagents[i]
-            y = AddGenericRow(y, PC.API.GetItemIcon(reagent.itemID), nil,
+            y = AddDropItemRow(
+                y,
+                reagent.itemID,
                 PC.API.GetItemName(reagent.itemID),
-                "x" .. tostring(reagent.amount or 1))
+                "x" .. tostring(reagent.amount or 1)
+            )
         end
     end
+
     if source.tools then
+        y = AddDropSection(y, "Required tool")
         local i
         for i = 1, table.getn(source.tools) do
             local tool = source.tools[i]
-            y = AddGenericRow(y, PC.API.GetItemIcon(tool.itemID), nil,
-                "Tool: " .. PC.API.GetItemName(tool.itemID), "")
+            y = AddDropItemRow(
+                y,
+                tool.itemID,
+                PC.API.GetItemName(tool.itemID),
+                "Tool"
+            )
         end
     end
     scrollChild:SetHeight(-y)
@@ -2982,6 +3364,8 @@ Refresh =
                 activeItemID
             )
         )
+
+        headerItemButton.itemID = activeItemID
 
         itemName:SetText(
             PC.API.GetItemName(

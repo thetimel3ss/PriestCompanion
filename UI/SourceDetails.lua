@@ -777,7 +777,7 @@ bossMapButton:SetScript("OnClick", function()
     and PC.Map.ShowInstance(
         source.instanceID,
         tostring(source.npcName or "Boss") ..
-            " (instance entrance)"
+            " (instance map)"
     ) then
         return
     end
@@ -3258,14 +3258,18 @@ local function BuildDropDetails(source)
         end
     end
 
-    local loot = source.lootNPCID and PC.Data.BossLoot
-        and PC.Data.BossLoot[source.lootNPCID]
-    if loot and table.getn(loot) > 0 then
+    local lootNPCID = source.lootNPCID or source.npcID
+    local loot = lootNPCID and PC.Data.BossLoot
+        and PC.Data.BossLoot[lootNPCID]
+
+    if source.npcType == "Boss" then
         y = AddDropSection(
             y,
             "Boss Loot Table"
         )
+    end
 
+    if loot and table.getn(loot) > 0 then
         y = AddGenericRow(
             y,
             "Interface\\Icons\\INV_Misc_Bag_10",
@@ -3287,6 +3291,12 @@ local function BuildDropDetails(source)
                 entry.quality
             )
         end
+    elseif source.npcType == "Boss" then
+        y = AddDropDescription(
+            y,
+            "Loot data",
+            "No boss loot table is available in the catalog yet."
+        )
     end
 
     scrollChild:SetHeight(

@@ -30,6 +30,7 @@ Data\OctoItemNames.lua
 Data\OctoLoot.lua
 Data\OctoDropMobs.lua
 Data\OctoSources.lua
+Data\InstanceJournalMaps.lua
 
 UI\MainFrame.lua
 UI\SourceTooltip.lua

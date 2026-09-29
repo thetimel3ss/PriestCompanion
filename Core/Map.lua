@@ -282,8 +282,11 @@ local function ResolveInstanceWorldMap(location)
         instance.worldMap
 
     return {
-        continent = worldMap.mapID,
-        zone = worldMap.zoneID or 1,
+        continent = location.mapID or worldMap.mapID,
+        zone = location.zoneID
+            or location.mapZoneID
+            or worldMap.zoneID
+            or 1,
         zoneName =
             instance.name
             or location.zone,

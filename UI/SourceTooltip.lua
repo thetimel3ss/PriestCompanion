@@ -1033,14 +1033,8 @@ end
 --------------------------------------------------
 
 local function GetDropperIcon(source)
-    if source
-    and source.npcType == "Boss" then
-        return
-            "Interface\\TargetingFrame\\UI-TargetingFrame-Skull"
-    end
-
     return
-        "Interface\\Icons\\INV_Misc_MonsterClaw_04"
+        "Interface\\TargetingFrame\\UI-TargetingFrame-Skull"
 end
 
 local function BuildDrop(

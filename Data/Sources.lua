@@ -118,6 +118,26 @@ Sources[7001] = {
 }
 
 --------------------------------------------------
+-- Charred Razormane Wand
+--------------------------------------------------
+
+Sources[5092] = {
+    {
+        type = "drop",
+
+        npcID = 3458,
+        npcName = "Razormane Seer",
+        npcType = "Named creature",
+
+        zone = "The Barrens",
+        dropChance = 29.94,
+
+        faction = "Both",
+        requiredLevel = 18
+    }
+}
+
+--------------------------------------------------
 -- Future Drop Example
 --------------------------------------------------
 --

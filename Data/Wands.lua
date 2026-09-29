@@ -51,3 +51,18 @@ Wands[7001] = {
         max = 29
     }
 }
+
+--------------------------------------------------
+-- Charred Razormane Wand
+--------------------------------------------------
+
+Wands[5092] = {
+    order = 4,
+
+    recommended = true,
+
+    recommendedLevel = {
+        min = 18,
+        max = 20
+    }
+}

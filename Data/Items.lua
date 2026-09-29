@@ -72,3 +72,25 @@ Items[7001] = {
         speed = 1.50
     }
 }
+
+--------------------------------------------------
+-- Charred Razormane Wand
+--------------------------------------------------
+
+Items[5092] = {
+    name = "Charred Razormane Wand",
+
+    quality = 1,
+    itemLevel = 23,
+    requiredLevel = 18,
+
+    itemType = "Wand",
+    equipSlot = "Ranged",
+
+    damage = {
+        min = 16,
+        max = 31,
+        school = "Fire",
+        speed = 1.50
+    }
+}

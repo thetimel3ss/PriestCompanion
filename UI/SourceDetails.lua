@@ -36,6 +36,7 @@ local MIN_EXPANDED_HEIGHT = 120
 
 local ITEM_ROW_HEIGHT = 26
 local GAIN_ROW_HEIGHT = 20
+local LOOT_HEADER_HEIGHT = 20
 
 local QUEST_ICON_SIZE = 22
 local TOGGLE_SIZE = 16
@@ -95,6 +96,54 @@ local function SetStatusColor(
         fontString:SetTextColor(
             1.00,
             0.82,
+            0.00
+        )
+
+    else
+        fontString:SetTextColor(
+            0.85,
+            0.85,
+            0.85
+        )
+    end
+end
+
+local function SetQualityColor(
+    fontString,
+    quality
+)
+    if quality == 0 then
+        fontString:SetTextColor(
+            0.62,
+            0.62,
+            0.62
+        )
+
+    elseif quality == 2 then
+        fontString:SetTextColor(
+            0.12,
+            1.00,
+            0.00
+        )
+
+    elseif quality == 3 then
+        fontString:SetTextColor(
+            0.00,
+            0.44,
+            0.87
+        )
+
+    elseif quality == 4 then
+        fontString:SetTextColor(
+            0.64,
+            0.21,
+            0.93
+        )
+
+    elseif quality == 5 then
+        fontString:SetTextColor(
+            1.00,
+            0.50,
             0.00
         )
 
@@ -696,6 +745,25 @@ dropMapButton:SetScript(
 
 dropMapButton:Hide()
 
+local lootHeader =
+    scrollChild:CreateFontString(
+        nil,
+        "OVERLAY",
+        "GameFontNormalSmall"
+    )
+
+lootHeader:SetText(
+    "Boss Loot Table"
+)
+
+lootHeader:SetTextColor(
+    1.00,
+    0.82,
+    0.00
+)
+
+lootHeader:Hide()
+
 --------------------------------------------------
 -- Dynamic Pools
 --------------------------------------------------
@@ -703,6 +771,7 @@ dropMapButton:Hide()
 local questCards = {}
 local connectors = {}
 local genericRows = {}
+local lootRows = {}
 
 local visibleQuestCards = 0
 local visibleConnectors = 0
@@ -2494,6 +2563,7 @@ local function ClearContent()
 
     dropMapButton:Hide()
     dropMapButton.source = nil
+    lootHeader:Hide()
 
     for i = 1,
         table.getn(
@@ -2520,6 +2590,14 @@ local function ClearContent()
         )
     do
         genericRows[i]:Hide()
+    end
+
+    for i = 1,
+        table.getn(
+            lootRows
+        )
+    do
+        lootRows[i]:Hide()
     end
 
     visibleQuestCards = 0
@@ -2730,6 +2808,29 @@ local function GetDropperIcon(source)
         "Interface\\TargetingFrame\\UI-TargetingFrame-Skull"
 end
 
+local function GetBossLoot(source)
+    if not source
+    or not PC.Data.BossLoot then
+        return nil
+    end
+
+    local lootNPCID =
+        source.lootNPCID
+
+    if not lootNPCID
+    and source.npcType == "Boss" then
+        lootNPCID =
+            source.npcID
+    end
+
+    if not lootNPCID then
+        return nil
+    end
+
+    return
+        PC.Data.BossLoot[lootNPCID]
+end
+
 local function BuildDropDetails(source)
     local instance =
         GetInstance(
@@ -2822,6 +2923,124 @@ local function BuildDropDetails(source)
                 source.dropChance
             )
         )
+    end
+
+    local loot =
+        GetBossLoot(
+            source
+        )
+
+    if loot
+    and table.getn(loot) > 0 then
+        lootHeader:ClearAllPoints()
+
+        lootHeader:SetPoint(
+            "TOPLEFT",
+            scrollChild,
+            "TOPLEFT",
+            CARD_PADDING,
+            y
+        )
+
+        lootHeader:Show()
+
+        y =
+            y -
+            LOOT_HEADER_HEIGHT
+
+        local i
+
+        for i = 1,
+            table.getn(loot)
+        do
+            local lootItem =
+                loot[i]
+
+            local row =
+                AcquireItemRow(
+                    lootRows,
+                    scrollChild,
+                    i
+                )
+
+            row:SetWidth(
+                CARD_WIDTH
+            )
+
+            row.name:SetWidth(
+                CARD_WIDTH - 92
+            )
+
+            row:ClearAllPoints()
+
+            row:SetPoint(
+                "TOPLEFT",
+                scrollChild,
+                "TOPLEFT",
+                CARD_PADDING,
+                y
+            )
+
+            row.itemID =
+                lootItem.itemID
+
+            row.icon:SetTexture(
+                PC.API.GetItemIcon(
+                    lootItem.itemID
+                )
+            )
+
+            local itemName =
+                PC.API.GetItemName(
+                    lootItem.itemID
+                )
+
+            if lootItem.name
+            and itemName ==
+                "Item " ..
+                tostring(
+                    lootItem.itemID
+                ) then
+                itemName =
+                    lootItem.name
+            end
+
+            row.name:SetText(
+                itemName
+            )
+
+            SetQualityColor(
+                row.name,
+                lootItem.quality
+            )
+
+            if lootItem.chance then
+                row.value:SetText(
+                    string.format(
+                        "%.2f%%",
+                        lootItem.chance
+                    )
+                )
+            else
+                row.value:SetText(
+                    "-"
+                )
+            end
+
+            row.value:SetTextColor(
+                0.85,
+                0.85,
+                0.85
+            )
+
+            row:Show()
+
+            y =
+                y -
+                ITEM_ROW_HEIGHT
+        end
+
+        y = y - 6
     end
 
     scrollChild:SetHeight(

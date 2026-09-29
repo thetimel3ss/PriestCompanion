@@ -44,7 +44,11 @@ ENTRANCE_ZONES={35:'Stormwind City',43:'The Barrens',47:'The Barrens',
  800:'Deadwind Pass',802:'Ashenvale',814:'Deadwind Pass',
  1581:'Westfall',1584:'Searing Gorge',2017:'Eastern Plaguelands',
  2057:'Western Plaguelands',2557:'Feralas',2677:'Burning Steppes',
-  2717:'Burning Steppes'}
+ 2717:'Burning Steppes'}
+# Verified outdoor entrance coordinates used when the client cannot expose a
+# reliable internal dungeon map or boss coordinate. These are entrance pins,
+# never fabricated boss positions.
+ENTRANCE_COORDS={533:('Eastern Plaguelands',39.0,26.0)}
 INSTANCE_SHORT={35:'SWV',43:'WC',47:'RFK',109:'ST',129:'RFD',
  209:'ZF',229:'BRS',269:'CoT',309:'ZG',349:'Mara',389:'RFC',
  509:'AQ20',531:'AQ40',532:'LK',533:'Naxx',718:'WC',721:'Gnomer',
@@ -121,10 +125,15 @@ write('OctoWands.lua','Wands',new_wands)
 instances=[]
 for id,(name,kind) in sorted(INSTANCES.items()):
     if id==719:continue
-    instances.append((id,{'name':name,'shortName':INSTANCE_SHORT.get(id,name),'type':kind,
+    row={'name':name,'shortName':INSTANCE_SHORT.get(id,name),'type':kind,
        'description':('Raid' if kind=='raid' else 'Dungeon')+' encounter in '+name+'.',
        'entranceZone':ENTRANCE_ZONES.get(id),
-       'icon':'Interface\\Icons\\INV_Misc_Map_01'}))
+       'icon':'Interface\\Icons\\INV_Misc_Map_01'}
+    if id in ENTRANCE_COORDS:
+        zone,x,y=ENTRANCE_COORDS[id]
+        row['entrance']={'zone':zone,'x':x,'y':y,
+                         'label':name+' entrance'}
+    instances.append((id,row))
 write('OctoInstances.lua','Instances',instances)
 
 def maps_for(actor):

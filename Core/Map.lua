@@ -695,7 +695,11 @@ function Map.ShowLocation(
     end
 
     if not resolved.x
-    or not resolved.y then
+    or not resolved.y
+    or (
+        resolved.x == 0
+        and resolved.y == 0
+    ) then
         Print(
             "Coordinates are not available for " ..
             tostring(
@@ -894,6 +898,27 @@ function Map.ShowNPC(
         if found then
             return true
         end
+    end
+
+    -- Use a verified instance map/entrance before asking pfQuest to open a
+    -- map by ID. pfQuest's map switch alone does not guarantee a visible
+    -- boss marker, while the native entrance fallback does.
+    local instance =
+        npc.instanceID
+        and PC.Data
+        and PC.Data.Instances
+        and PC.Data.Instances[npc.instanceID]
+
+    if instance
+    and (
+        instance.entrance
+        or instance.worldMap
+    )
+    and Map.ShowInstance(
+        npc.instanceID,
+        label
+    ) then
+        return true
     end
 
     --------------------------------------------------

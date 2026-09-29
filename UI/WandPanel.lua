@@ -105,9 +105,6 @@ local INSTANCE_ICON_Y = -8
 local INSTANCE_TEXT_X = 193
 local INSTANCE_TEXT_Y = -8
 
-local DETAILS_MARKER_X = 213
-local DETAILS_MARKER_Y = -8
-
 --------------------------------------------------
 -- Row State Colors
 --------------------------------------------------
@@ -702,27 +699,6 @@ local function GetAggregateInstanceID(sources)
     return foundID
 end
 
-local function AnySourceHasDetails(sources)
-    if not sources
-    or not PC.UI.SourceTooltip then
-        return false
-    end
-
-    local i
-
-    for i = 1,
-        table.getn(sources)
-    do
-        if PC.UI.SourceTooltip.HasDetails(
-            sources[i]
-        ) then
-            return true
-        end
-    end
-
-    return false
-end
-
 local function ItemPassesFilters(itemID)
     local item =
         PC.Data.Items[itemID]
@@ -1268,7 +1244,7 @@ description:SetPoint(
 )
 
 description:SetText(
-    "Hover for source status. Left-click items marked * for details."
+    "Hover for source status. Left-click any item for details."
 )
 
 --------------------------------------------------
@@ -2035,33 +2011,6 @@ local function CreateItemRow()
         instanceText
 
     --------------------------------------------------
-    -- Details Indicator
-    --------------------------------------------------
-
-    local detailsText =
-        row:CreateFontString(
-            nil,
-            "OVERLAY",
-            "GameFontNormal"
-        )
-
-    detailsText:SetText(
-        "|cffffd100*|r"
-    )
-
-    detailsText:SetPoint(
-        "LEFT",
-        row,
-        "LEFT",
-        DETAILS_MARKER_X,
-        DETAILS_MARKER_Y
-    )
-
-    detailsText:Hide()
-
-    row.detailsText = detailsText
-
-    --------------------------------------------------
     -- DPS
     --------------------------------------------------
 
@@ -2419,18 +2368,6 @@ local function RefreshItemRow(
     else
         row.instanceIcon:Hide()
         row.instanceText:Hide()
-    end
-
-    --------------------------------------------------
-    -- Details Indicator
-    --------------------------------------------------
-
-    if AnySourceHasDetails(
-        matchingSources
-    ) then
-        row.detailsText:Show()
-    else
-        row.detailsText:Hide()
     end
 
     ApplyRowState(

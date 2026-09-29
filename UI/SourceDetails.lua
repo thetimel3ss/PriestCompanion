@@ -748,20 +748,38 @@ bossMapButton:SetScript("OnClick", function()
     if not source then return end
     local npc = PC.Data.NPCs[source.npcID]
         or { id = source.npcID, name = source.npcName, zone = source.zone }
-    if PC.Map then
-        if PC.Map.ShowNPC(npc, "boss", nil) then return end
-        if source.instanceID
-        and PC.Map.ShowInstance
-        and PC.Map.ShowInstance(source.instanceID, source.npcName) then
-            return
-        end
-        local instance = source.instanceID and GetInstance(source.instanceID)
-        if instance and instance.entrance then
-            PC.Map.ShowLocation(instance.entrance, "unknown",
-                tostring(instance.name or "Dungeon") .. " entrance")
-        elseif instance and instance.entranceZone then
-            PC.Map.ShowZone(instance.entranceZone)
-        end
+    if not PC.Map then return end
+
+    -- Prefer a verified NPC position. Do not treat pfQuest's map switch as a
+    -- boss pin: when the catalog has no coordinates, use the dungeon
+    -- entrance fallback below instead.
+    local hasNPCMap =
+        npc
+        and npc.map
+        and npc.map.x ~= nil
+        and npc.map.y ~= nil
+        and (
+            npc.map.x ~= 0
+            or npc.map.y ~= 0
+        )
+
+    if hasNPCMap
+    and PC.Map.ShowNPC(
+        npc,
+        "boss",
+        nil
+    ) then
+        return
+    end
+
+    if source.instanceID
+    and PC.Map.ShowInstance
+    and PC.Map.ShowInstance(
+        source.instanceID,
+        tostring(source.npcName or "Boss") ..
+            " (instance entrance)"
+    ) then
+        return
     end
 end)
 bossMapButton:Hide()
@@ -3205,7 +3223,12 @@ local function BuildDropDetails(source)
         y = y - 32
     end
 
-    if source.mobs and table.getn(source.mobs) > 0 then
+    -- The boss and its acquisition chance are already shown above. The
+    -- useful expansion for a boss source is its loot table, not a repeated
+    -- "Dropped by" row containing the same boss and percentage.
+    if source.npcType ~= "Boss"
+    and source.mobs
+    and table.getn(source.mobs) > 0 then
         y = AddDropSection(
             y,
             source.mobCount and source.mobCount > 1
@@ -3240,7 +3263,7 @@ local function BuildDropDetails(source)
     if loot and table.getn(loot) > 0 then
         y = AddDropSection(
             y,
-            "Complete boss loot table"
+            "Boss Loot Table"
         )
 
         y = AddGenericRow(
@@ -3252,23 +3275,17 @@ local function BuildDropDetails(source)
         )
 
         local i
-        for i = 1, math.min(visibleLootLimit, table.getn(loot)) do
+        for i = 1, table.getn(loot) do
             local entry = loot[i]
             y = AddDropItemRow(
                 y,
                 entry.itemID,
                 entry.name,
-                entry.chance and FormatChance(entry.chance) or "",
+                entry.chance
+                and FormatChance(entry.chance)
+                or "Guaranteed",
                 entry.quality
             )
-        end
-        if table.getn(loot) > visibleLootLimit then
-            moreLootButton:ClearAllPoints()
-            moreLootButton:SetPoint("TOPLEFT", scrollChild, "TOPLEFT", 4, y - 4)
-            moreLootButton:SetText("Show More Loot (" ..
-                tostring(table.getn(loot) - visibleLootLimit) .. ")")
-            moreLootButton:Show()
-            y = y - 32
         end
     end
 

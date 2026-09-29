@@ -354,16 +354,19 @@ end
 local function ShowNPCOnMap(
     npc,
     questName,
-    label
+    label,
+    requestedMarkerType
 )
     if not npc then
         return
     end
 
     local markerType =
-        "questStart"
+        requestedMarkerType
+        or "questStart"
 
-    if label == "End" then
+    if not requestedMarkerType
+    and label == "End" then
         markerType =
             "questEnd"
     end
@@ -647,6 +650,51 @@ scrollChild:SetHeight(1)
 scrollFrame:SetScrollChild(
     scrollChild
 )
+
+local dropMapButton =
+    CreateFrame(
+        "Button",
+        nil,
+        scrollChild,
+        "UIPanelButtonTemplate"
+    )
+
+dropMapButton:SetWidth(
+    MAP_BUTTON_WIDTH
+)
+
+dropMapButton:SetHeight(
+    MAP_BUTTON_HEIGHT
+)
+
+dropMapButton:SetText(
+    "Show on Map"
+)
+
+dropMapButton:SetScript(
+    "OnClick",
+    function()
+        local source =
+            this.source
+
+        local npc = nil
+
+        if source then
+            npc = GetNPC(
+                source.npcID
+            )
+        end
+
+        ShowNPCOnMap(
+            npc,
+            nil,
+            "Drop",
+            "drop"
+        )
+    end
+)
+
+dropMapButton:Hide()
 
 --------------------------------------------------
 -- Dynamic Pools
@@ -2444,6 +2492,9 @@ end
 local function ClearContent()
     local i
 
+    dropMapButton:Hide()
+    dropMapButton.source = nil
+
     for i = 1,
         table.getn(
             questCards
@@ -2711,6 +2762,33 @@ local function BuildDropDetails(source)
             )
         )
     )
+
+    local dropNPC =
+        GetNPC(
+            source.npcID
+        )
+
+    if dropNPC then
+        dropMapButton.source =
+            source
+
+        dropMapButton:ClearAllPoints()
+
+        dropMapButton:SetPoint(
+            "TOPRIGHT",
+            scrollChild,
+            "TOPRIGHT",
+            -8,
+            y + 8
+        )
+
+        dropMapButton:Show()
+
+        y =
+            y -
+            MAP_BUTTON_HEIGHT -
+            8
+    end
 
     if instance then
         y = AddGenericRow(

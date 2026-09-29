@@ -3,7 +3,7 @@
 -- Vanilla 1.12 compatible
 --
 -- Provides a lightweight, pfQuest-independent way to open the world map
--- and highlight a quest start/end location with a pulsing marker.
+-- and highlight quest or drop locations with pulsing markers.
 
 local PC = PriestCompanion
 
@@ -28,6 +28,9 @@ local END_ICON =
 local UNKNOWN_ICON =
     "Interface\\Icons\\INV_Misc_QuestionMark"
 
+local DROP_ICON =
+    "Interface\\TargetingFrame\\UI-TargetingFrame-Skull"
+
 --------------------------------------------------
 -- Instance Map Metadata
 --------------------------------------------------
@@ -49,7 +52,7 @@ local UNKNOWN_ICON =
 -- Runtime State
 --------------------------------------------------
 
-local marker = nil
+local markers = {}
 local zoneCache = nil
 
 --------------------------------------------------
@@ -309,22 +312,32 @@ local function GetMarkerIcon(markerType)
         return START_ICON
     end
 
+    if markerType == "drop" then
+        return DROP_ICON
+    end
+
     return UNKNOWN_ICON
 end
 
 local function CreateMarker()
-    if marker then
-        return marker
-    end
-
     if not WorldMapButton then
         return nil
     end
 
-    marker =
+    local i
+
+    for i = 1,
+        table.getn(markers)
+    do
+        if not markers[i]:IsShown() then
+            return markers[i]
+        end
+    end
+
+    local marker =
         CreateFrame(
             "Button",
-            "PriestCompanionWorldMapMarker",
+            nil,
             WorldMapButton
         )
 
@@ -530,6 +543,11 @@ local function CreateMarker()
 
     marker:Hide()
 
+    table.insert(
+        markers,
+        marker
+    )
+
     return marker
 end
 
@@ -538,8 +556,12 @@ end
 --------------------------------------------------
 
 function Map.HideMarker()
-    if marker then
-        marker:Hide()
+    local i
+
+    for i = 1,
+        table.getn(markers)
+    do
+        markers[i]:Hide()
     end
 end
 
@@ -659,10 +681,15 @@ end
 function Map.ShowLocation(
     location,
     markerType,
-    label
+    label,
+    appendMarkers
 )
     if not location then
         return false
+    end
+
+    if not appendMarkers then
+        Map.HideMarker()
     end
 
     if not WorldMapFrame
@@ -785,6 +812,31 @@ function Map.ShowNPC(
             tostring(
                 questName
             )
+    end
+
+    if npc.locations
+    and table.getn(npc.locations) > 0 then
+        local shown = false
+        local i
+
+        Map.HideMarker()
+
+        for i = 1,
+            table.getn(npc.locations)
+        do
+            if Map.ShowLocation(
+                npc.locations[i],
+                markerType,
+                label,
+                true
+            ) then
+                shown = true
+            end
+        end
+
+        if shown then
+            return true
+        end
     end
 
     if npc.map then

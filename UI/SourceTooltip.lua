@@ -1032,6 +1032,17 @@ end
 -- Drop Tooltip
 --------------------------------------------------
 
+local function GetDropperIcon(source)
+    if source
+    and source.npcType == "Boss" then
+        return
+            "Interface\\TargetingFrame\\UI-TargetingFrame-Skull"
+    end
+
+    return
+        "Interface\\Icons\\INV_Misc_MonsterClaw_04"
+end
+
 local function BuildDrop(
     itemID,
     source
@@ -1039,13 +1050,13 @@ local function BuildDrop(
     title:SetText("Drop")
 
     AddRow(
-        "Interface\\Icons\\INV_Misc_Bag_10",
+        GetDropperIcon(source),
+        "Dropped by",
         source.npcName
         or (
             "NPC " ..
             tostring(source.npcID or "?")
         ),
-        source.npcType or "",
         "neutral"
     )
 

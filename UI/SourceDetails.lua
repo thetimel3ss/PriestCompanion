@@ -2674,6 +2674,17 @@ end
 -- Drop Details
 --------------------------------------------------
 
+local function GetDropperIcon(source)
+    if source
+    and source.npcType == "Boss" then
+        return
+            "Interface\\TargetingFrame\\UI-TargetingFrame-Skull"
+    end
+
+    return
+        "Interface\\Icons\\INV_Misc_MonsterClaw_04"
+end
+
 local function BuildDropDetails(source)
     local instance =
         GetInstance(
@@ -2695,16 +2706,16 @@ local function BuildDropDetails(source)
 
     y = AddGenericRow(
         y,
-        "Interface\\Icons\\INV_Misc_Bag_10",
+        GetDropperIcon(source),
         nil,
+        "Dropped by",
         source.npcName
         or (
             "NPC " ..
             tostring(
                 source.npcID or "?"
             )
-        ),
-        source.npcType or ""
+        )
     )
 
     if instance then

@@ -2048,9 +2048,11 @@ local function RefreshItemRow(
     )
 
     row.requiredLevelText:SetText(
-        tostring(
+        item.requiredLevel
+        and tostring(
             item.requiredLevel
         )
+        or "-"
     )
 
     row.recommendedText:SetText(

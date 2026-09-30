@@ -98,3 +98,65 @@ Instances[1581] = {
         zoneID = 1
     }
 }
+
+--------------------------------------------------
+-- Maraudon
+--------------------------------------------------
+
+Instances[349] = {
+    name =
+        "Maraudon",
+
+    shortName =
+        "Mara",
+
+    type =
+        "dungeon",
+
+    icon =
+        "Interface\\Icons\\INV_Misc_Map_01",
+
+    -- No native internal map pair has been verified yet.
+    -- Map navigation uses the physical entrance as fallback.
+    entrance = {
+        zone =
+            "Desolace",
+
+        x = 29.3,
+        y = 62.5,
+
+        label =
+            "Maraudon entrance"
+    }
+}
+
+--------------------------------------------------
+-- Sunken Temple
+--------------------------------------------------
+
+Instances[109] = {
+    name =
+        "Sunken Temple",
+
+    shortName =
+        "ST",
+
+    type =
+        "dungeon",
+
+    icon =
+        "Interface\\Icons\\INV_Misc_Map_01",
+
+    -- No native internal map pair has been verified yet.
+    -- Map navigation uses the physical entrance as fallback.
+    entrance = {
+        zone =
+            "Swamp of Sorrows",
+
+        x = 69.4,
+        y = 53.2,
+
+        label =
+            "Sunken Temple entrance"
+    }
+}

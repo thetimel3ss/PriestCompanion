@@ -344,6 +344,237 @@ Sources[5239] = {
 }
 
 --------------------------------------------------
+-- Noxious Shooter
+--------------------------------------------------
+
+Sources[17745] = {
+    {
+        type = "drop",
+
+        npcID = 13282,
+        npcName = "Noxxion",
+        npcType = "Boss",
+
+        instanceID = 349,
+        zone = "Maraudon",
+        dropChance = 33.33,
+
+        mobs = {
+            {
+                id = 13282,
+                chance = 33.33
+            }
+        },
+
+        mobCount = 1,
+        lootNPCID = 13282,
+        details = true,
+
+        faction = "Both",
+        requiredLevel = 46
+    }
+}
+
+--------------------------------------------------
+-- Rod of Corrosion
+--------------------------------------------------
+
+Sources[10836] = {
+    {
+        type = "drop",
+
+        npcID = 5709,
+        npcName = "Shade of Eranikus",
+        npcType = "Boss",
+
+        instanceID = 109,
+        zone = "Sunken Temple",
+        dropChance = 16.67,
+
+        mobs = {
+            {
+                id = 5709,
+                chance = 16.67
+            }
+        },
+
+        mobCount = 1,
+        lootNPCID = 5709,
+        details = true,
+
+        faction = "Both",
+        requiredLevel = 51
+    }
+}
+
+--------------------------------------------------
+-- Glowstar Rod
+--------------------------------------------------
+
+Sources[15281] = {
+    {
+        type = "drop",
+
+        npcName = "World drop",
+        zone = "Azeroth",
+
+        faction = "Both",
+        requiredLevel = 52
+    }
+}
+
+--------------------------------------------------
+-- Dragon Finger
+--------------------------------------------------
+
+Sources[15282] = {
+    {
+        type = "drop",
+
+        npcName = "World drop",
+        zone = "Azeroth",
+
+        faction = "Both",
+        requiredLevel = 55
+    }
+}
+
+--------------------------------------------------
+-- Noxxion Loot Table
+--------------------------------------------------
+
+BossLoot[13282] = {
+    {
+        itemID = 4791,
+        name = "Enchanted Water",
+        chance = 18,
+        quality = 1
+    },
+
+    {
+        itemID = 17684,
+        name = "Theradric Crystal Carving",
+        quality = 1
+    },
+
+    {
+        itemID = 17702,
+        name = "Celebrian Rod",
+        quality = 1
+    },
+
+    {
+        itemID = 17744,
+        name = "Heart of Noxxion",
+        chance = 33.33,
+        quality = 3
+    },
+
+    {
+        itemID = 17745,
+        name = "Noxious Shooter",
+        chance = 33.33,
+        quality = 3
+    },
+
+    {
+        itemID = 17746,
+        name = "Noxxion's Shackles",
+        chance = 33.33,
+        quality = 3
+    }
+}
+
+--------------------------------------------------
+-- Shade of Eranikus Loot Table
+--------------------------------------------------
+
+BossLoot[5709] = {
+    {
+        itemID = 4460,
+        name = "Ripped Wing Webbing",
+        chance = 11,
+        quality = 0
+    },
+
+    {
+        itemID = 6707,
+        name = "Proof of Reliance",
+        quality = 1
+    },
+
+    {
+        itemID = 10847,
+        name = "Dragon's Call",
+        chance = 0.5,
+        quality = 4
+    },
+
+    {
+        itemID = 10828,
+        name = "Dire Nail",
+        chance = 16.67,
+        quality = 3
+    },
+
+    {
+        itemID = 10829,
+        name = "Dragon's Eye",
+        chance = 16.67,
+        quality = 3
+    },
+
+    {
+        itemID = 10833,
+        name = "Horns of Eranikus",
+        chance = 16.67,
+        quality = 3
+    },
+
+    {
+        itemID = 10835,
+        name = "Crest of Supremacy",
+        chance = 16.67,
+        quality = 3
+    },
+
+    {
+        itemID = 10836,
+        name = "Rod of Corrosion",
+        chance = 16.67,
+        quality = 3
+    },
+
+    {
+        itemID = 10837,
+        name = "Tooth of Eranikus",
+        chance = 16.67,
+        quality = 3
+    },
+
+    {
+        itemID = 10454,
+        name = "Essence of Eranikus",
+        chance = 100,
+        quality = 2
+    },
+
+    {
+        itemID = 61791,
+        name = "Plans: Arcanite Belt Buckle",
+        chance = 0.25,
+        quality = 2
+    },
+
+    {
+        itemID = 70226,
+        name = "Ancient Warfare Text",
+        chance = 3,
+        quality = 3
+    }
+}
+
+--------------------------------------------------
 -- Future Drop Example
 --------------------------------------------------
 --

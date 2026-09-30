@@ -203,3 +203,91 @@ Items[5239] = {
         speed = 1.60
     }
 }
+
+--------------------------------------------------
+-- Noxious Shooter
+--------------------------------------------------
+
+Items[17745] = {
+    name = "Noxious Shooter",
+
+    quality = 3,
+    itemLevel = 51,
+    requiredLevel = 46,
+
+    itemType = "Wand",
+    equipSlot = "Ranged",
+
+    damage = {
+        min = 56,
+        max = 104,
+        school = "Nature",
+        speed = 1.60
+    }
+}
+
+--------------------------------------------------
+-- Rod of Corrosion
+--------------------------------------------------
+
+Items[10836] = {
+    name = "Rod of Corrosion",
+
+    quality = 3,
+    itemLevel = 56,
+    requiredLevel = 51,
+
+    itemType = "Wand",
+    equipSlot = "Ranged",
+
+    damage = {
+        min = 50,
+        max = 93,
+        school = "Nature",
+        speed = 1.30
+    }
+}
+
+--------------------------------------------------
+-- Glowstar Rod
+--------------------------------------------------
+
+Items[15281] = {
+    name = "Glowstar Rod",
+
+    quality = 4,
+    itemLevel = 57,
+    requiredLevel = 52,
+
+    itemType = "Wand",
+    equipSlot = "Ranged",
+
+    damage = {
+        min = 52,
+        max = 98,
+        school = "Arcane",
+        speed = 1.50
+    }
+}
+
+--------------------------------------------------
+-- Dragon Finger
+--------------------------------------------------
+
+Items[15282] = {
+    name = "Dragon Finger",
+
+    quality = 4,
+    itemLevel = 60,
+    requiredLevel = 55,
+
+    itemType = "Wand",
+    equipSlot = "Ranged",
+
+    damage = {
+        min = 52,
+        max = 97,
+        school = "Fire",
+        speed = 1.40
+    }
+}

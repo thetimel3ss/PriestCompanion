@@ -205,3 +205,59 @@ NPCs[645] = {
         }
     }
 }
+
+--------------------------------------------------
+-- Noxxion
+--------------------------------------------------
+
+NPCs[13282] = {
+    id = 13282,
+
+    name =
+        "Noxxion",
+
+    zone =
+        "Maraudon",
+
+    -- Boss coordinates are not published by the current map catalog.
+    -- Map.ShowNPC falls back to the Maraudon entrance.
+    locations = {
+        {
+            instanceID = 349,
+
+            zone =
+                "Maraudon",
+
+            label =
+                "Noxxion (entrance fallback)"
+        }
+    }
+}
+
+--------------------------------------------------
+-- Shade of Eranikus
+--------------------------------------------------
+
+NPCs[5709] = {
+    id = 5709,
+
+    name =
+        "Shade of Eranikus",
+
+    zone =
+        "Sunken Temple",
+
+    -- Boss coordinates are not published by the current map catalog.
+    -- Map.ShowNPC falls back to the Sunken Temple entrance.
+    locations = {
+        {
+            instanceID = 109,
+
+            zone =
+                "Sunken Temple",
+
+            label =
+                "Shade of Eranikus (entrance fallback)"
+        }
+    }
+}

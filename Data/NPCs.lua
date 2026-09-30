@@ -464,3 +464,92 @@ NPCs[14736] = {
     zone = "Hinterlands",
     map = { zone = "Hinterlands", x = 78.18, y = 81.14 }
 }
+
+--------------------------------------------------
+-- Terenthis
+--------------------------------------------------
+
+NPCs[3693] = {
+    id = 3693,
+    name = "Terenthis",
+    zone = "Darkshore",
+    map = { zone = "Darkshore", x = 39.3843, y = 43.4962 }
+}
+
+--------------------------------------------------
+-- Gnoarn
+--------------------------------------------------
+
+NPCs[6569] = {
+    id = 6569,
+    name = "Gnoarn",
+    zone = "Dun Morogh",
+    map = { zone = "Dun Morogh", x = 24.47, y = 30.39 }
+}
+
+--------------------------------------------------
+-- Additional quest-chain NPCs
+--------------------------------------------------
+
+NPCs[267] = {
+    id = 267,
+    name = "Clerk Daltry",
+    zone = "Duskwood",
+    map = { zone = "Duskwood", x = 72.49, y = 46.85 }
+}
+
+NPCs[2487] = {
+    id = 2487,
+    name = "Fleet Master Seahorn",
+    zone = "Stranglethorn Vale",
+    map = { zone = "Stranglethorn Vale", x = 27.19, y = 76.99 }
+}
+
+NPCs[2610] = {
+    id = 2610,
+    name = "Shakes O'Breen",
+    zone = "Arathi Highlands",
+    map = { zone = "Arathi Highlands", x = 32.26, y = 81.36 }
+}
+
+NPCs[2768] = {
+    id = 2768,
+    name = "Professor Phizzlethorpe",
+    zone = "Arathi Highlands",
+    map = { zone = "Arathi Highlands", x = 33.84, y = 80.53 }
+}
+
+NPCs[3453] = {
+    id = 3453,
+    name = "Wharfmaster Dizzywig",
+    zone = "The Barrens",
+    map = { zone = "The Barrens", x = 63.34, y = 38.45 }
+}
+
+NPCs[3880] = {
+    id = 3880,
+    name = "Sentinel Melyria Frostshadow",
+    zone = "Ashenvale",
+    map = { zone = "Ashenvale", x = 22.25, y = 52.99 }
+}
+
+NPCs[3945] = {
+    id = 3945,
+    name = "Caravaneer Ruzzgot",
+    zone = "Stranglethorn Vale",
+    map = { zone = "Stranglethorn Vale", x = 27.37, y = 74.07 }
+}
+
+NPCs[7763] = {
+    id = 7763,
+    name = "Curgle Cranklehop",
+    zone = "Tanaris",
+    map = { zone = "Tanaris", x = 52.35, y = 26.89 }
+}
+
+NPCs[7907] = {
+    id = 7907,
+    name = "Daryn Lightwind",
+    zone = "Teldrassil",
+    map = { zone = "Teldrassil", x = 55.42, y = 92.24 }
+}

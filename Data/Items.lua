@@ -720,3 +720,47 @@ Items[16993] = {
         speed = 1.90
     }
 }
+
+--------------------------------------------------
+-- Lesser Mystic Wand
+--------------------------------------------------
+
+Items[11289] = {
+    name = "Lesser Mystic Wand",
+
+    quality = 2,
+    itemLevel = 31,
+    requiredLevel = 26,
+
+    itemType = "Wand",
+    equipSlot = "Ranged",
+
+    damage = {
+        min = 23,
+        max = 43,
+        school = "Arcane",
+        speed = 1.30
+    }
+}
+
+--------------------------------------------------
+-- Greater Mystic Wand
+--------------------------------------------------
+
+Items[11290] = {
+    name = "Greater Mystic Wand",
+
+    quality = 2,
+    itemLevel = 35,
+    requiredLevel = 30,
+
+    itemType = "Wand",
+    equipSlot = "Ranged",
+
+    damage = {
+        min = 40,
+        max = 76,
+        school = "Arcane",
+        speed = 2.00
+    }
+}

@@ -582,6 +582,7 @@ Sources[12296] = {
     {
         type = "quest",
         questID = 14,
+        chainID = "peoples_militia",
         faction = "Alliance",
         zone = "Westfall",
         requiredLevel = 9,
@@ -597,6 +598,7 @@ Sources[15204] = {
     {
         type = "quest",
         questID = 4763,
+        chainID = "blackwood_corrupted",
         faction = "Alliance",
         zone = "Darkshore",
         requiredLevel = 15,
@@ -627,6 +629,7 @@ Sources[7607] = {
     {
         type = "quest",
         questID = 2040,
+        chainID = "sable_wand",
         faction = "Alliance",
         zone = "The Deadmines",
         requiredLevel = 15,
@@ -704,6 +707,7 @@ Sources[5246] = {
     {
         type = "quest",
         questID = 296,
+        chainID = "excavation_rod",
         faction = "Alliance",
         zone = "Wetlands",
         requiredLevel = 22,
@@ -719,6 +723,7 @@ Sources[5244] = {
     {
         type = "quest",
         questID = 223,
+        chainID = "consecrated_wand",
         faction = "Alliance",
         zone = "Duskwood",
         requiredLevel = 23,
@@ -734,6 +739,7 @@ Sources[5818] = {
     {
         type = "quest",
         questID = 1044,
+        chainID = "moonbeam_wand",
         faction = "Alliance",
         zone = "Ashenvale",
         requiredLevel = 25,
@@ -809,6 +815,7 @@ Sources[5249] = {
     {
         type = "quest",
         questID = 504,
+        chainID = "burning_sliver",
         faction = "Alliance",
         zone = "Alterac Mountains",
         requiredLevel = 30,
@@ -869,6 +876,7 @@ Sources[4547] = {
     {
         type = "quest",
         questID = 666,
+        chainID = "gnomish_zapper",
         faction = "Both",
         zone = "Arathi Highlands",
         requiredLevel = 35,
@@ -899,6 +907,7 @@ Sources[9654] = {
     {
         type = "quest",
         questID = 2942,
+        chainID = "cairnstone_sliver",
         faction = "Alliance",
         zone = "Feralas",
         requiredLevel = 42,
@@ -914,6 +923,7 @@ Sources[11860] = {
     {
         type = "quest",
         questID = 4450,
+        chainID = "charged_lightning_rod",
         faction = "Both",
         zone = "Searing Gorge",
         requiredLevel = 43,
@@ -945,9 +955,92 @@ Sources[16993] = {
     {
         type = "quest",
         questID = 6041,
+        chainID = "smokeys_fireshooter",
         faction = "Both",
         zone = "Eastern Plaguelands",
         requiredLevel = 54,
+        details = true
+    }
+}
+
+--------------------------------------------------
+-- Lesser Mystic Wand
+--------------------------------------------------
+
+Sources[11289] = {
+    {
+        type = "craft",
+
+        profession = "Enchanting",
+        skill = 155,
+        spellID = 14809,
+
+        reagents = {
+            {
+                itemID = 11291,
+                amount = 1
+            },
+
+            {
+                itemID = 11134,
+                amount = 1
+            },
+
+            {
+                itemID = 11083,
+                amount = 1
+            }
+        },
+
+        tools = {
+            {
+                itemID = 11130
+            }
+        },
+
+        requiredLevel = 26,
+        faction = "Both",
+        details = true
+    }
+}
+
+--------------------------------------------------
+-- Greater Mystic Wand
+--------------------------------------------------
+
+Sources[11290] = {
+    {
+        type = "craft",
+
+        profession = "Enchanting",
+        skill = 175,
+        spellID = 14810,
+
+        reagents = {
+            {
+                itemID = 11291,
+                amount = 1
+            },
+
+            {
+                itemID = 11135,
+                amount = 1
+            },
+
+            {
+                itemID = 11137,
+                amount = 1
+            }
+        },
+
+        tools = {
+            {
+                itemID = 11130
+            }
+        },
+
+        requiredLevel = 30,
+        faction = "Both",
         details = true
     }
 }

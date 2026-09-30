@@ -1204,3 +1204,750 @@ Quests[6041] = {
         }
     }
 }
+
+--------------------------------------------------
+-- Ormer's Revenge (1)
+--------------------------------------------------
+
+Quests[294] = {
+    name =
+        "Ormer's Revenge",
+
+    questLevel = 24,
+    requiredLevel = 22,
+
+    faction =
+        "Alliance",
+
+    startNPC = 1078,
+    endNPC = 1078,
+
+    objectiveText =
+        "Ormer Ironbraid at the Whelgar Excavation Site wants you to kill 10 Mottled Screechers and 10 Mottled Raptors.",
+
+    description =
+        "The situation is severe, that much is for sure. When we uncovered these bones it attracted the Raptors. These filthy beasts killed my brethren and trapped me, Merrin and the poor Prospector up here. Help clear the Wetlands of these Raptors, <name>. Mottled Raptors and Mottled Screechers are just West of the bluff there. Kill 10 of each, if you can. That will be a good start to the vengeance I have planned for them."
+}
+
+--------------------------------------------------
+-- Ormer's Revenge (2)
+--------------------------------------------------
+
+Quests[295] = {
+    name =
+        "Ormer's Revenge",
+
+    questLevel = 27,
+    requiredLevel = 22,
+
+    faction =
+        "Alliance",
+
+    startNPC = 1078,
+    endNPC = 1078,
+
+    objectiveText =
+        "Ormer Ironbraid wants you to kill 10 Mottled Scytheclaw raptors and 10 Mottled Razormaw raptors then return to him at the Whelgar Excavation Site.",
+
+    description =
+        "Now it's time to really make those dreaded Raptors regret their blood-thirst. Just down below there are scores of Mottled Scytheclaws and Mottled Razormaws. Make those rotten creatures pay by slaying 10 of each!"
+}
+
+--------------------------------------------------
+-- Worgen in the Woods (1)
+--------------------------------------------------
+
+Quests[173] = {
+    name =
+        "Worgen in the Woods",
+
+    questLevel = 28,
+    requiredLevel = 23,
+
+    faction =
+        "Alliance",
+
+    startNPC = 663,
+    endNPC = 663,
+
+    objectiveText =
+        "Kill 6 Nightbane Shadow Weaver worgen for Calor in Darkshire.",
+
+    description =
+        "Darkness seems drawn inexorably to Duskwood. Master Carevin's quest is the expulsion of evil and heresy. Through our efforts are the people of Darkshire kept safe. You believe yourself worthy to join us? I once thought as you. Disillusioned by the complacency of the Watch, I joined Master Carevin. If you wish to prove yourself, it will not be through words. Test your skills against the Nightbane Shadow Weaver worgen in Brightwood Grove--bright, hah!--and the Rotting Orchard."
+}
+
+--------------------------------------------------
+-- Worgen in the Woods (2)
+--------------------------------------------------
+
+Quests[221] = {
+    name =
+        "Worgen in the Woods",
+
+    questLevel = 29,
+    requiredLevel = 23,
+
+    faction =
+        "Alliance",
+
+    startNPC = 663,
+    endNPC = 663,
+
+    objectiveText =
+        "Kill 12 Nightbane Dark Runner worgen for Calor in Darkshire.",
+
+    description =
+        "You might have noticed some larger worgen wandering around with the Shadow Weavers in the woods? From what we can tell, these Dark Runners make up the bulk of the worgen numbers. On my rangings, I've also noticed that they have overrun the Rotting Orchard southwest of town. These worgen are a bit tougher than the last you faced. Be on your guard."
+}
+
+--------------------------------------------------
+-- Worgen in the Woods (3)
+--------------------------------------------------
+
+Quests[222] = {
+    name =
+        "Worgen in the Woods",
+
+    questLevel = 31,
+    requiredLevel = 23,
+
+    faction =
+        "Alliance",
+
+    startNPC = 663,
+    endNPC = 663,
+
+    objectiveText =
+        "Kill 8 Nightbane Vile Fang and 8 Nightbane Tainted One worgen for Calor in Darkshire.",
+
+    description =
+        "Your previous accomplishments have convinced me that you are ready to take on the toughest worgen infesting the woods. Of the worgen that have made their new home here, the Vile Fangs and the Tainted Ones have proven the most dangerous. They've settled down near some of the caves and in the mine to the south. From far away you can even see the light from their bonfires..."
+}
+
+--------------------------------------------------
+-- Crushridge Bounty
+--------------------------------------------------
+
+Quests[500] = {
+    name =
+        "Crushridge Bounty",
+
+    questLevel = 36,
+    requiredLevel = 30,
+
+    faction =
+        "Alliance",
+
+    startNPC = 2263,
+    endNPC = 2263,
+
+    objectiveText =
+        "Gather 9 Dirty Knucklebones from Crushridge ogres in the Alterac Mountains. Bring them to Marshal Redpath in Southshore.",
+
+    description =
+        "Crushridge ogres have dug an ogre mound up in the Alterac Mountains near the ruined city of Alterac. And my scouts tell me they've taken over those ruins as well. We can't let them get cozy up there; if they think they're safe where they are, then their next step will be to move down into the foothills, which will put them right at our front door! Go north to the Alterac Mountains and hunt ogres. Bring me the Dirty Knucklebones they carry and you will earn a nice bounty."
+}
+
+--------------------------------------------------
+-- Sunken Treasure (1)
+--------------------------------------------------
+
+Quests[665] = {
+    name =
+        "Sunken Treasure",
+
+    questLevel = 40,
+    requiredLevel = 35,
+
+    faction =
+        "Both",
+
+    startNPC = 2768,
+    endNPC = 2774,
+
+    objectiveText =
+        "Escort Professor Phizzlethorpe to the cave and back.",
+
+    description =
+        "Now that we are full-fledged Blackwater Raiders it is our job to help Mr. O'Breen locate the lost elven treasure. It is next to impossible to find the gems in the dark sea without aid. The doctor has constructed some goggles that will help. He needs the goggles charged with the energy derived from the enchanted stone in the cave just up the hill. But the cave is cursed! When we get close, we get ambushed. Defend me and I can harness the energy from the stone into the goggles."
+}
+
+--------------------------------------------------
+-- Caught!
+--------------------------------------------------
+
+Quests[4449] = {
+    name =
+        "Caught!",
+
+    questLevel = 45,
+    requiredLevel = 43,
+
+    faction =
+        "Both",
+
+    startNPC = {
+        id = 173265,
+        kind = "object",
+        name = "Wooden Outhouse",
+        zone = "Searing Gorge",
+        map = {
+            zone = "Searing Gorge",
+            x = 65.57,
+            y = 62.12
+        }
+    },
+
+    endNPC = {
+        id = 173265,
+        kind = "object",
+        name = "Wooden Outhouse",
+        zone = "Searing Gorge",
+        map = {
+            zone = "Searing Gorge",
+            x = 65.57,
+            y = 62.12
+        }
+    },
+
+    objectiveText =
+        "Kill 8 Dark Iron Geologists and bring 15 pieces of Silk Cloth to the person locked in the outhouse in Searing Gorge.",
+
+    description =
+        "Hey! Hey, you! Get over here! Ya gotta help me out. I was runnin' from them Dark Iron dwarves, and I hid in here to get out of sight. Damn bastard geologists and their magic ways! They musta seen me hide, cause next thing I knew, they locked the door and stuck me in here. Teach them geologists a lesson! Oh... an' can ya get me some pieces of silk cloth for... for... nothin'."
+}
+
+--------------------------------------------------
+-- That's Asking A Lot
+--------------------------------------------------
+
+Quests[6026] = {
+    name =
+        "That's Asking A Lot",
+
+    questLevel = 58,
+    requiredLevel = 54,
+
+    faction =
+        "Both",
+
+    startNPC = 11033,
+    endNPC = 11033,
+
+    objectiveText =
+        "Smokey LaRue wants you to get 2 Thorium Bars, 1 Golden Rod, 8 Hi-Explosive Bombs, and 8 Unstable Triggers.",
+
+    description =
+        "These here Argent Dawn people commissioned ol' Smokey to do a little demolition work for 'em. Smokey's mammy ain't raised no dummy. When gold coin is slapped on the table, Smokey's services are available. That's my motto! Now I'd be willing to split the commission with you if you're willing to do a little legwork. Here's the deal: I'm going to head over to Plaguewood and mark the buildings we need destroyed. You gather the components for the bombs. Meet back here when you've got everything. Deal?"
+}
+
+--------------------------------------------------
+-- The Howling Vale
+--------------------------------------------------
+
+Quests[1022] = {
+    name =
+        "The Howling Vale",
+
+    questLevel = 30,
+    requiredLevel = 25,
+
+    faction =
+        "Alliance",
+
+    startNPC = 3880,
+    endNPC = 3880,
+
+    objectiveText =
+        "Go to the Howling Vale and study the Tome of Mel'Thandris, then return to Sentinel Melyria Frostshadow at the Shrine of Aessina.",
+
+    description =
+        "Though we have put many resources and much effort into driving the remaining demons from the Felwood to the north, our successes have been few. We have been able to keep much of the demonic presence from Ashenvale. To the north, near the Felwood border, the ruined shrine of Mel'Thandris has been overtaken by mysterious wolf-men. Their chilling calls have led the area to be known as the Howling Vale. The Tome of Mel'Thandris kept at the shrine may shed some light on why these wolf-men have come."
+}
+
+--------------------------------------------------
+-- Velinde Starsong
+--------------------------------------------------
+
+Quests[1037] = {
+    name =
+        "Velinde Starsong",
+
+    questLevel = 30,
+    requiredLevel = 25,
+
+    faction =
+        "Alliance",
+
+    startNPC = 3880,
+    endNPC = 8026,
+
+    objectiveText =
+        "Speak with Thyn'tel Bladeweaver at the Warrior's Terrace in Darnassus.",
+
+    description =
+        "Velinde Starsong was my predecessor here in Ashenvale Forest. At first it seemed she had the situation in Felwood under control, but little by little her efforts faltered. One day, she simply disappeared. I was sent here to continue her work. I'm afraid I know nothing of the priestess, however. Perhaps Thyn'tel Bladeweaver, one of the commanders of the Sentinels, knows further details of her disappearance that I was not a party to. Surely she will understand the import of such information."
+}
+
+--------------------------------------------------
+-- Velinde's Effects
+--------------------------------------------------
+
+Quests[1038] = {
+    name =
+        "Velinde's Effects",
+
+    questLevel = 30,
+    requiredLevel = 25,
+
+    faction =
+        "Alliance",
+
+    startNPC = 8026,
+    endNPC = 8026,
+
+    objectiveText =
+        "Search through Velinde's chest for her journal, then return it along with the key to Thyn'tel Bladeweaver in Darnassus.",
+
+    description =
+        "The Tome of Mel'Thandris showed you this? I suppose there would be little harm in allowing you to examine her belongings. This key will allow you to open the chest where we stored her things in the Sentinels' bunkhouse. She kept a journal of her duties, if there is anything to be learned, it will be from that. I should tell you, the Sentinels believe that she had her own reasons for leaving, and expect that she could return at any time. The priestess has done much in the past to earn our trust."
+}
+
+--------------------------------------------------
+-- The Barrens Port
+--------------------------------------------------
+
+Quests[1039] = {
+    name =
+        "The Barrens Port",
+
+    questLevel = 30,
+    requiredLevel = 25,
+
+    faction =
+        "Alliance",
+
+    startNPC = 8026,
+    endNPC = 3453,
+
+    objectiveText =
+        "Speak with Wharfmaster Dizzywig in Ratchet.",
+
+    description =
+        "Ratchet is the only port in the Barrens. Most likely Velinde found a trading vessel in Ratchet to take her to Blackwater Cove in Azeroth. We've had limited dealings with the goblins that run the port, but the master of the dock should have information about the comings and goings of ship passengers. Follow the road southeast through Ashenvale and you will find yourself in the Barrens. Watch your step, <name>, warriors of the Horde patrol the land. You will be safe at the port, though."
+}
+
+--------------------------------------------------
+-- Passage to Booty Bay
+--------------------------------------------------
+
+Quests[1040] = {
+    name =
+        "Passage to Booty Bay",
+
+    questLevel = 30,
+    requiredLevel = 25,
+
+    faction =
+        "Alliance",
+
+    startNPC = 3453,
+    endNPC = 3945,
+
+    objectiveText =
+        "Take a boat to Booty Bay and speak with Caravaneer Ruzzgot.",
+
+    description =
+        "Ah yes, finally found it. Should have told me she passed through here that long ago. Let's see. Velinde. Booked passage to Booty Bay on the Black Osprey. I don't have anything here saying otherwise, so I'd assume it arrived in port safely. Not much more help I can be to you, but she asked about overland travel over on that side of the world, and I mentioned Ruzzgot, a caravan driver based out of Booty Bay. Might be that this Velinde traveled with him. Move along, now. I haven't all day for you."
+}
+
+--------------------------------------------------
+-- The Caravan Road
+--------------------------------------------------
+
+Quests[1041] = {
+    name =
+        "The Caravan Road",
+
+    questLevel = 30,
+    requiredLevel = 25,
+
+    faction =
+        "Alliance",
+
+    startNPC = 3945,
+    endNPC = 267,
+
+    objectiveText =
+        "Speak with Clerk Daltry in Darkshire.",
+
+    description =
+        "Turns out I was wrong about you, and that isn't something that happens everyday. It just so happens that I remember this Velinde you're looking for. Isn't every day that a night elf priestess that wants to travel with a dirty old--but great for your shipping needs!--caravan like my own. We split up on the way north, she was headed for Darkshire. The clerk there keeps all sorts of records. Might know something useful. Be careful in the jungle, it is a deadly place even at the best of times."
+}
+
+--------------------------------------------------
+-- The Carevin Family
+--------------------------------------------------
+
+Quests[1042] = {
+    name =
+        "The Carevin Family",
+
+    questLevel = 30,
+    requiredLevel = 25,
+
+    faction =
+        "Alliance",
+
+    startNPC = 267,
+    endNPC = 661,
+
+    objectiveText =
+        "Speak with Jonathan Carevin in Darkshire.",
+
+    description =
+        "No, I don't have any records of a Velinde Starsong staying in Darkshire... though, if you don't mind me saying, I can hardly imagine a night elf priestess taking a room in the inn, if you get my meaning? These wolf-men you mentioned though, that's something I've heard about. Just the other day, Calor came into town with a string of their heads. He works with the Carevin family. Hunters of demons, undead, and other monstrosities. Speak with Jonathan, he's the head of the household."
+}
+
+--------------------------------------------------
+-- The Scythe of Elune
+--------------------------------------------------
+
+Quests[1043] = {
+    name =
+        "The Scythe of Elune",
+
+    questLevel = 30,
+    requiredLevel = 25,
+
+    faction =
+        "Alliance",
+
+    startNPC = 661,
+    endNPC = 661,
+
+    objectiveText =
+        "Look for signs of the Scythe of Elune then return to Jonathan Carevin in Darkshire.",
+
+    description =
+        "Your story rings true... I do not entirely understand your motives, but if your business here in Duskwood involves ridding the forest of worgen in any number, then I can forgo understanding for results. There is a mine to the south that has been overrun with worgen... They appeared out of nowhere, but from what we know, that is where they first were found. Go about your business, but I would ask that if you find anything of import, you share it with me. We will accept any aid in our war against evil."
+}
+
+--------------------------------------------------
+-- In Search of Knowledge
+--------------------------------------------------
+
+Quests[2939] = {
+    name =
+        "In Search of Knowledge",
+
+    questLevel = 47,
+    requiredLevel = 42,
+
+    faction =
+        "Alliance",
+
+    startNPC = 7764,
+    endNPC = 7907,
+
+    objectiveText =
+        "Talk to Daryn Lightwind in Rut'theran Village.",
+
+    description =
+        "While the ruins of Feralas can be quite dangerous, they have much to tell of what has happened here. Searching through the rubble to the south a few days ago, I discovered what appears to be a normal stave. However, I just can't shake the feeling that there is something more to it. Angelas and I have been poring over our books here, but we can't find a thing about it. I have a colleague in Darnassus that may be able to tell us what this is, <name>. Why don't you go talk to her and see if she can help us?"
+}
+
+--------------------------------------------------
+-- Feralas: A History
+--------------------------------------------------
+
+Quests[2940] = {
+    name =
+        "Feralas: A History",
+
+    questLevel = 47,
+    requiredLevel = 42,
+
+    faction =
+        "Alliance",
+
+    startNPC = {
+        id = 142958,
+        kind = "object",
+        name = "Feralas: A History",
+        zone = "Teldrassil",
+        map = {
+            zone = "Teldrassil",
+            x = 55.239,
+            y = 91.4697
+        }
+    },
+
+    endNPC = 7907,
+
+    objectiveText =
+        "Ask Daryn Lightwind if you may borrow her book.",
+
+    description =
+        "This book looks as if no one has opened it for quite a long time. Its covers are quite worn, and its pages yellowed, but after examining it, you notice that it might be just what Troyas is looking for. You pick it up, but realize you should probably ask before borrowing it."
+}
+
+--------------------------------------------------
+-- The Borrower
+--------------------------------------------------
+
+Quests[2941] = {
+    name =
+        "The Borrower",
+
+    questLevel = 48,
+    requiredLevel = 42,
+
+    faction =
+        "Alliance",
+
+    startNPC = 7907,
+    endNPC = 7763,
+
+    objectiveText =
+        "Take the letter to Curgle Cranklehop in Tanaris.",
+
+    description =
+        "I have studied many subjects in my time, and my latest fascination is with the snapjaw that occupy the beach in the Hinterlands. There's one in particular I'd like to see, a giant snapjaw named Gammerita. I'd like to go myself, but my research keeps me here. I think a picture of her would be the next best thing. Take this letter to Curgle Cranklehop in Tanaris. She has created an invention for me that can capture a picture. She called it a \"snapshot,\" I think..."
+}
+
+--------------------------------------------------
+-- The Super Snapper FX
+--------------------------------------------------
+
+Quests[2944] = {
+    name =
+        "The Super Snapper FX",
+
+    questLevel = 48,
+    requiredLevel = 42,
+
+    faction =
+        "Alliance",
+
+    startNPC = 7763,
+    endNPC = 7907,
+
+    objectiveText =
+        "Use the Super Snapper FX to take a snapshot of Gammerita, then return to Daryn Lightwind in Rut'theran Village.",
+
+    description =
+        "Have the first look at my new invention, <name>. All you need to do is target whatever it is you'd like to take a picture of, and push the button. What was that creature from the Hinterlands that you mentioned? Gammerita? Well, good luck finding her. I'm sure Daryn will be quite pleased with the snapshot you return to her. In any case, here's the Super Snapper. Have fun!"
+}
+
+--------------------------------------------------
+-- Return to Troyas
+--------------------------------------------------
+
+Quests[2943] = {
+    name =
+        "Return to Troyas",
+
+    questLevel = 48,
+    requiredLevel = 42,
+
+    faction =
+        "Alliance",
+
+    startNPC = 7907,
+    endNPC = 7764,
+
+    objectiveText =
+        "Deliver the book to Troyas Moonbreeze in Feathermoon Stronghold.",
+
+    description =
+        "Here it is, <name>. Please, take care of my book. Now, hurry along. I'm sure Troyas is eager for your return."
+}
+
+--------------------------------------------------
+-- The Stave of Equinex
+--------------------------------------------------
+
+Quests[2879] = {
+    name =
+        "The Stave of Equinex",
+
+    questLevel = 50,
+    requiredLevel = 42,
+
+    faction =
+        "Alliance",
+
+    startNPC = 7764,
+    endNPC = {
+        id = 144063,
+        kind = "object",
+        name = "Equinex Monolith",
+        zone = "Feralas",
+        map = {
+            zone = "Feralas",
+            x = 38.8298,
+            y = 13.151
+        }
+    },
+
+    objectiveText =
+        "Energize Troyas' Stave and find the Equinex Monolith.",
+
+    description =
+        "This stave might be the Stave of Equinex! The Stave of Equinex is actually a key, used to unlock the Equinex Monolith in the Ruins of Ravenwind, on the mainland west of the Dream Bough. Find the four flames that still burn in those ruins: Samha, Imbel, Byltan, and Lahassa. Retrieve their essence and then while standing by the Equinex Monolith, use the essences to energize the stave. If this is truly is the Stave of Equinex, you will be able to unlock the Monolith and gather a sacred artifact from it.",
+
+    rewards = {
+        type =
+            "fixed",
+
+        items = {
+            9307
+        }
+    }
+}
+
+--------------------------------------------------
+-- The People's Militia (1)
+--------------------------------------------------
+
+Quests[12] = {
+    name =
+        "The People's Militia",
+
+    questLevel = 12,
+    requiredLevel = 9,
+
+    faction =
+        "Alliance",
+
+    startNPC = 234,
+    endNPC = 234,
+
+    objectiveText =
+        "Gryan Stoutmantle wants you to kill 15 Defias Trappers and 15 Defias Smugglers then return to him on Sentinel Hill.",
+
+    description =
+        "The People's Militia has but one goal: To defend the lands of Westfall and return peace to our surroundings. Unfortunately, the price of peace is often blood. One of my scouts has brought word of a band of Defias Trappers wreaking havoc nearby. I have reports of Defias Trapper sightings near the Jangolode Mine to the Northwest as well as at the Molsen Farm and Furlbrow's Pumpkin Farm. If you seek to join our ranks, slay 15 Defias Trappers and 15 Defias Smugglers then return to me."
+}
+
+--------------------------------------------------
+-- The People's Militia (2)
+--------------------------------------------------
+
+Quests[13] = {
+    name =
+        "The People's Militia",
+
+    questLevel = 14,
+    requiredLevel = 9,
+
+    faction =
+        "Alliance",
+
+    startNPC = 234,
+    endNPC = 234,
+
+    objectiveText =
+        "Gryan Stoutmantle wants you to kill 15 Defias Pillagers and 15 Defias Looters and return to him on Sentinel Hill.",
+
+    description =
+        "A band of vicious Defias Pillagers has been seen plundering the Gold Coast Quarry, Moonbrook and the Alexston Farmstead. The People's Militia will not stand for such behavior. Dispatch immediately, <name>, and make the Light's presence known in Westfall. The Gold Coast Quarry is near the shore, to the West of the tower. As the next step of your training, I want you to kill 15 of those foul Defias Pillagers and 15 Defias Looters."
+}
+
+--------------------------------------------------
+-- How Big a Threat?
+--------------------------------------------------
+
+Quests[984] = {
+    name =
+        "How Big a Threat?",
+
+    questLevel = 14,
+    requiredLevel = 10,
+
+    faction =
+        "Alliance",
+
+    startNPC = 3693,
+    endNPC = 3693,
+
+    objectiveText =
+        "Find a corrupt furbolg camp in Darkshore and return to Terenthis in Auberdine.",
+
+    description =
+        "Some of my brethren were rescued from a corrupt furbolg in Teldrassil, and I've vowed to stop any more atrocities before more of our kind are injured... or worse. I have seen a couple hints of corruption in Darkshore already, but I have yet to find any widespread signs. I think it would be logical if the investigation continued with the furbolgs. Would you find one of their camps, and return to me if you see any signs of corruption?"
+}
+
+--------------------------------------------------
+-- Thundris Windweaver
+--------------------------------------------------
+
+Quests[4761] = {
+    name =
+        "Thundris Windweaver",
+
+    questLevel = 15,
+    requiredLevel = 11,
+
+    faction =
+        "Alliance",
+
+    startNPC = 3693,
+    endNPC = 3649,
+
+    objectiveText =
+        "Speak with Thundris Windweaver in Auberdine.",
+
+    description =
+        "Your scouting of the furbolg camp is information that Thundris Windweaver should be made aware of. He graciously serves as the elder of Auberdine, offering sage and just stewardship of the day to day affairs of the village. Please - share with him your findings to date on the furbolg situation. I believe he has some ideas of his own on the reasons behind their corruption. Perhaps you can work with him to enact a plan to restore the balance of nature here!"
+}
+
+--------------------------------------------------
+-- The Cliffspring River
+--------------------------------------------------
+
+Quests[4762] = {
+    name =
+        "The Cliffspring River",
+
+    questLevel = 15,
+    requiredLevel = 11,
+
+    faction =
+        "Alliance",
+
+    startNPC = 3649,
+    endNPC = 3649,
+
+    objectiveText =
+        "Travel north of Auberdine to the first waterfall along the Cliffspring River and draw a sample from the pool there.",
+
+    description =
+        "The Cliffspring River has begun turning foul and corrupted. It empties into the Mist's Edge, and I fear the wash will affect Auberdine soon. I suspect the Blackwood furbolgs up-river are the cause of the taint, but I also suspect that they aren't the true root of it. Take this sampling tube and go to the mouth of the river to our north. Proceed inland to the first waterfall and draw a sample from the pool there. You'll see a bridge overhead. Once you have a sample, return to me in Auberdine."
+}
+
+--------------------------------------------------
+-- Speak with Shoni
+--------------------------------------------------
+
+Quests[2041] = {
+    name =
+        "Speak with Shoni",
+
+    questLevel = 15,
+    requiredLevel = 15,
+
+    faction =
+        "Alliance",
+
+    startNPC = 6569,
+    endNPC = 6579,
+
+    objectiveText =
+        "Speak with Shoni the Shilent in Stormwind.",
+
+    description =
+        "Perhaps... Perhaps you can help us in the battle for Gnomeregan. In Stormwind you will find the commander of our underground assault crew, Shoni the Shilent. Shoni needs assistance with her gyrodrillmatic excavationators. You will probably find her amongst the dwarves in Stormwind. Good luck, <name>."
+}

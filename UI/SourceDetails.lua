@@ -764,6 +764,44 @@ lootHeader:SetTextColor(
 
 lootHeader:Hide()
 
+local craftReagentsHeader =
+    scrollChild:CreateFontString(
+        nil,
+        "OVERLAY",
+        "GameFontNormalSmall"
+    )
+
+craftReagentsHeader:SetText(
+    "Reagents"
+)
+
+craftReagentsHeader:SetTextColor(
+    1.00,
+    0.82,
+    0.00
+)
+
+craftReagentsHeader:Hide()
+
+local craftToolsHeader =
+    scrollChild:CreateFontString(
+        nil,
+        "OVERLAY",
+        "GameFontNormalSmall"
+    )
+
+craftToolsHeader:SetText(
+    "Tools"
+)
+
+craftToolsHeader:SetTextColor(
+    1.00,
+    0.82,
+    0.00
+)
+
+craftToolsHeader:Hide()
+
 --------------------------------------------------
 -- Dynamic Pools
 --------------------------------------------------
@@ -772,10 +810,12 @@ local questCards = {}
 local connectors = {}
 local genericRows = {}
 local lootRows = {}
+local craftRows = {}
 
 local visibleQuestCards = 0
 local visibleConnectors = 0
 local visibleGenericRows = 0
+local visibleCraftRows = 0
 
 --------------------------------------------------
 -- Quest Card
@@ -2515,7 +2555,9 @@ local function AddGenericRow(
     icon,
     iconCoords,
     titleText,
-    valueText
+    valueText,
+    titleStatus,
+    valueStatus
 )
     visibleGenericRows =
         visibleGenericRows + 1
@@ -2545,9 +2587,35 @@ local function AddGenericRow(
         titleText or ""
     )
 
+    row.title:SetTextColor(
+        0.85,
+        0.85,
+        0.85
+    )
+
+    if titleStatus then
+        SetStatusColor(
+            row.title,
+            titleStatus
+        )
+    end
+
     row.value:SetText(
         valueText or ""
     )
+
+    row.value:SetTextColor(
+        0.85,
+        0.85,
+        0.85
+    )
+
+    if valueStatus then
+        SetStatusColor(
+            row.value,
+            valueStatus
+        )
+    end
 
     row:Show()
 
@@ -2564,6 +2632,8 @@ local function ClearContent()
     dropMapButton:Hide()
     dropMapButton.source = nil
     lootHeader:Hide()
+    craftReagentsHeader:Hide()
+    craftToolsHeader:Hide()
 
     for i = 1,
         table.getn(
@@ -2600,9 +2670,18 @@ local function ClearContent()
         lootRows[i]:Hide()
     end
 
+    for i = 1,
+        table.getn(
+            craftRows
+        )
+    do
+        craftRows[i]:Hide()
+    end
+
     visibleQuestCards = 0
     visibleConnectors = 0
     visibleGenericRows = 0
+    visibleCraftRows = 0
 end
 
 --------------------------------------------------
@@ -3057,6 +3136,270 @@ local function BuildDropDetails(source)
 end
 
 --------------------------------------------------
+-- Craft Details
+--------------------------------------------------
+
+local function BuildCraftDetails(
+    source
+)
+    sourceTitle:SetText(
+        "Crafting Details"
+    )
+
+    local y = 0
+
+    local skill
+    local maxSkill
+
+    skill,
+    maxSkill =
+        PC.API.GetProfessionSkill(
+            source.profession
+        )
+
+    local hasProfession =
+        skill ~= nil
+
+    local requiredSkill =
+        source.skill or 0
+
+    local skillReady =
+        hasProfession
+        and skill >= requiredSkill
+
+    local skillText =
+        tostring(requiredSkill)
+
+    if hasProfession then
+        skillText =
+            skillText ..
+            " (current " ..
+            tostring(skill) ..
+            ")"
+    end
+
+    y = AddGenericRow(
+        y,
+        "Interface\\Icons\\Trade_Engraving",
+        nil,
+        source.profession or "Profession",
+        skillText,
+        hasProfession
+        and "good"
+        or "bad",
+        skillReady
+        and "good"
+        or "bad"
+    )
+
+    if source.requiredLevel then
+        local levelReady =
+            PC.API.GetPlayerLevel() >=
+            source.requiredLevel
+
+        y = AddGenericRow(
+            y,
+            "Interface\\Icons\\INV_Misc_Book_09",
+            nil,
+            "Required Level",
+            tostring(
+                source.requiredLevel
+            ),
+            "neutral",
+            levelReady
+            and "good"
+            or "bad"
+        )
+    end
+
+    local function AddCraftItemRow(
+        y,
+        itemID,
+        valueText,
+        status
+    )
+        visibleCraftRows =
+            visibleCraftRows + 1
+
+        local row =
+            AcquireItemRow(
+                craftRows,
+                scrollChild,
+                visibleCraftRows
+            )
+
+        row:SetWidth(
+            CARD_WIDTH -
+            (CARD_PADDING * 2)
+        )
+
+        row.name:SetWidth(
+            CARD_WIDTH - 92
+        )
+
+        row:ClearAllPoints()
+
+        row:SetPoint(
+            "TOPLEFT",
+            scrollChild,
+            "TOPLEFT",
+            CARD_PADDING,
+            y
+        )
+
+        row.itemID = itemID
+
+        row.icon:SetTexture(
+            PC.API.GetItemIcon(
+                itemID
+            )
+        )
+
+        row.icon:SetTexCoord(
+            0,
+            1,
+            0,
+            1
+        )
+
+        row.name:SetText(
+            PC.API.GetItemName(
+                itemID
+            )
+        )
+
+        row.name:SetTextColor(
+            0.85,
+            0.85,
+            0.85
+        )
+
+        row.value:SetText(
+            valueText or ""
+        )
+
+        row.value:SetTextColor(
+            0.85,
+            0.85,
+            0.85
+        )
+
+        if status then
+            SetStatusColor(
+                row.name,
+                status
+            )
+
+            SetStatusColor(
+                row.value,
+                status
+            )
+        end
+
+        row:Show()
+
+        return y - ITEM_ROW_HEIGHT
+    end
+
+    if source.reagents
+    and table.getn(source.reagents) > 0 then
+        craftReagentsHeader:ClearAllPoints()
+
+        craftReagentsHeader:SetPoint(
+            "TOPLEFT",
+            scrollChild,
+            "TOPLEFT",
+            CARD_PADDING,
+            y
+        )
+
+        craftReagentsHeader:Show()
+
+        y =
+            y -
+            LOOT_HEADER_HEIGHT
+
+        local i
+
+        for i = 1,
+            table.getn(source.reagents)
+        do
+            local reagent =
+                source.reagents[i]
+
+            local owned =
+                PC.API.GetItemCount(
+                    reagent.itemID
+                )
+
+            local required =
+                reagent.amount or 1
+
+            y = AddCraftItemRow(
+                y,
+                reagent.itemID,
+                tostring(owned) ..
+                " / " ..
+                tostring(required),
+                owned >= required
+                and "good"
+                or "bad"
+            )
+        end
+
+        y = y - 6
+    end
+
+    if source.tools
+    and table.getn(source.tools) > 0 then
+        craftToolsHeader:ClearAllPoints()
+
+        craftToolsHeader:SetPoint(
+            "TOPLEFT",
+            scrollChild,
+            "TOPLEFT",
+            CARD_PADDING,
+            y
+        )
+
+        craftToolsHeader:Show()
+
+        y =
+            y -
+            LOOT_HEADER_HEIGHT
+
+        local i
+
+        for i = 1,
+            table.getn(source.tools)
+        do
+            local tool =
+                source.tools[i]
+
+            local ready =
+                PC.API.GetItemCount(
+                    tool.itemID
+                ) > 0
+
+            y = AddCraftItemRow(
+                y,
+                tool.itemID,
+                ready
+                and "Ready"
+                or "Missing",
+                ready
+                and "good"
+                or "bad"
+            )
+        end
+    end
+
+    scrollChild:SetHeight(
+        -y + CARD_PADDING
+    )
+end
+
+--------------------------------------------------
 -- Vendor Details
 --------------------------------------------------
 
@@ -3165,6 +3508,12 @@ Refresh =
         elseif activeSource.type ==
         "vendor" then
             BuildVendorDetails(
+                activeSource
+            )
+
+        elseif activeSource.type ==
+        "craft" then
+            BuildCraftDetails(
                 activeSource
             )
 

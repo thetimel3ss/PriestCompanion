@@ -219,8 +219,7 @@ NPCs[13282] = {
     zone =
         "Maraudon",
 
-    -- Boss coordinates are not published by the current map catalog.
-    -- Map.ShowNPC falls back to the Maraudon entrance.
+    -- Instance Journal internal-map coordinates.
     locations = {
         {
             instanceID = 349,
@@ -228,8 +227,11 @@ NPCs[13282] = {
             zone =
                 "Maraudon",
 
+            x = 32.3,
+            y = 4.7,
+
             label =
-                "Noxxion (entrance fallback)"
+                "Noxxion"
         }
     }
 }
@@ -247,8 +249,7 @@ NPCs[5709] = {
     zone =
         "Sunken Temple",
 
-    -- Boss coordinates are not published by the current map catalog.
-    -- Map.ShowNPC falls back to the Sunken Temple entrance.
+    -- Instance Journal internal-map coordinates.
     locations = {
         {
             instanceID = 109,
@@ -256,8 +257,11 @@ NPCs[5709] = {
             zone =
                 "Sunken Temple",
 
+            x = 66.5,
+            y = 87.7,
+
             label =
-                "Shade of Eranikus (entrance fallback)"
+                "Shade of Eranikus"
         }
     }
 }

@@ -116,8 +116,14 @@ Instances[349] = {
     icon =
         "Interface\\Icons\\INV_Misc_Map_01",
 
-    -- No native internal map pair has been verified yet.
-    -- Map navigation uses the physical entrance as fallback.
+    -- Instance Journal native map pair:
+    --   SetMapZoom(19, 1)
+    worldMap = {
+        mapID = 19,
+        zoneID = 1
+    },
+
+    -- Physical entrance fallback when the internal map is unavailable.
     entrance = {
         zone =
             "Desolace",
@@ -147,8 +153,14 @@ Instances[109] = {
     icon =
         "Interface\\Icons\\INV_Misc_Map_01",
 
-    -- No native internal map pair has been verified yet.
-    -- Map navigation uses the physical entrance as fallback.
+    -- Instance Journal native map pair:
+    --   SetMapZoom(6, 1)
+    worldMap = {
+        mapID = 6,
+        zoneID = 1
+    },
+
+    -- Physical entrance fallback when the internal map is unavailable.
     entrance = {
         zone =
             "Swamp of Sorrows",

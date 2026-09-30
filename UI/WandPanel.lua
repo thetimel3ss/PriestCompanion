@@ -1283,7 +1283,7 @@ recommendedCheck:SetScript(
             and true
             or false
 
-        RefreshWandList()
+        RefreshWandList(true)
     end
 )
 
@@ -1326,7 +1326,7 @@ UIDropDownMenu_Initialize(
                         sourceDropdown
                     )
 
-                    RefreshWandList()
+                    RefreshWandList(true)
                 end
 
             UIDropDownMenu_AddButton(info)
@@ -1377,7 +1377,7 @@ UIDropDownMenu_Initialize(
                         factionDropdown
                     )
 
-                    RefreshWandList()
+                    RefreshWandList(true)
                 end
 
             UIDropDownMenu_AddButton(info)
@@ -1419,7 +1419,7 @@ UIDropDownMenu_Initialize(
                         levelDropdown
                     )
 
-                    RefreshWandList()
+                    RefreshWandList(true)
                 end
 
             UIDropDownMenu_AddButton(info)
@@ -1579,6 +1579,50 @@ scrollChild:SetHeight(1)
 scrollFrame:SetScrollChild(
     scrollChild
 )
+
+--------------------------------------------------
+-- Scroll Region Refresh
+--------------------------------------------------
+
+local function RefreshScrollRegion(resetScroll)
+    local scroll = 0
+
+    if scrollFrame.GetVerticalScroll then
+        scroll =
+            scrollFrame:GetVerticalScroll()
+            or 0
+    end
+
+    if resetScroll then
+        scroll = 0
+    end
+
+    if scrollFrame.UpdateScrollChildRect then
+        scrollFrame:UpdateScrollChildRect()
+    end
+
+    if scrollFrame.SetVerticalScroll then
+        local maxScroll = scroll
+
+        if scrollFrame.GetVerticalScrollRange then
+            maxScroll =
+                scrollFrame:GetVerticalScrollRange()
+                or 0
+        end
+
+        if scroll > maxScroll then
+            scroll = maxScroll
+        end
+
+        if scroll < 0 then
+            scroll = 0
+        end
+
+        scrollFrame:SetVerticalScroll(
+            scroll
+        )
+    end
+end
 
 --------------------------------------------------
 -- Create Item Row
@@ -2229,7 +2273,7 @@ end
 --------------------------------------------------
 
 RefreshWandList =
-    function()
+    function(resetScroll)
         UpdatePlayerContext()
 
         --------------------------------------------------
@@ -2345,6 +2389,10 @@ RefreshWandList =
         end
 
         scrollChild:SetHeight(height)
+
+        RefreshScrollRegion(
+            resetScroll
+        )
     end
 
 --------------------------------------------------
@@ -2395,6 +2443,6 @@ eventFrame:SetScript(
 mainFrame:SetScript(
     "OnShow",
     function()
-        RefreshWandList()
+        RefreshWandList(true)
     end
 )

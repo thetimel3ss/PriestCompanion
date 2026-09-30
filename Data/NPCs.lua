@@ -265,3 +265,202 @@ NPCs[5709] = {
         }
     }
 }
+
+--------------------------------------------------
+-- Quest NPCs for the additional wand catalog
+--------------------------------------------------
+
+NPCs[234] = {
+    id = 234,
+    name = "Gryan Stoutmantle",
+    zone = "Westfall",
+    map = { zone = "Westfall", x = 56.33, y = 47.49 }
+}
+
+NPCs[392] = {
+    id = 392,
+    name = "Captain Grayson",
+    zone = "Westfall",
+    map = { zone = "Westfall", x = 30.02, y = 86.02 }
+}
+
+NPCs[661] = {
+    id = 661,
+    name = "Jonathan Carevin",
+    zone = "Duskwood",
+    map = { zone = "Duskwood", x = 75.31, y = 49.02 }
+}
+
+NPCs[663] = {
+    id = 663,
+    name = "Calor",
+    zone = "Duskwood",
+    map = { zone = "Duskwood", x = 75.31, y = 48.02 }
+}
+
+NPCs[1078] = {
+    id = 1078,
+    name = "Ormer Ironbraid",
+    zone = "Wetlands",
+    map = { zone = "Wetlands", x = 38.17, y = 50.87 }
+}
+
+NPCs[2121] = {
+    id = 2121,
+    name = "Shadow Priest Allister",
+    zone = "Silverpine Forest",
+    map = { zone = "Silverpine Forest", x = 44, y = 40.9525 }
+}
+
+NPCs[2215] = {
+    id = 2215,
+    name = "High Executor Darthalia",
+    zone = "Alterac Mountains",
+    map = { zone = "Alterac Mountains", x = 61.08, y = 82.29 }
+}
+
+NPCs[2263] = {
+    id = 2263,
+    name = "Marshal Redpath",
+    zone = "Hillsbrad Foothills",
+    map = { zone = "Hillsbrad Foothills", x = 49.4584, y = 58.6876 }
+}
+
+NPCs[2498] = {
+    id = 2498,
+    name = "Crank Fizzlebub",
+    zone = "Stranglethorn Vale",
+    map = { zone = "Stranglethorn Vale", x = 27.12, y = 77.2 }
+}
+
+NPCs[2700] = {
+    id = 2700,
+    name = "Captain Nials",
+    zone = "Arathi Highlands",
+    map = { zone = "Arathi Highlands", x = 45.81, y = 47.53 }
+}
+
+NPCs[2774] = {
+    id = 2774,
+    name = "Doctor Draxlegauge",
+    zone = "Arathi Highlands",
+    map = { zone = "Arathi Highlands", x = 33.84, y = 80.44 }
+}
+
+NPCs[2817] = {
+    id = 2817,
+    name = "Rigglefuzz",
+    zone = "Badlands",
+    map = { zone = "Badlands", x = 42.37, y = 52.91 }
+}
+
+NPCs[2986] = {
+    id = 2986,
+    name = "Dorn Plainstalker",
+    zone = "Thousand Needles",
+    map = { zone = "Thousand Needles", x = 53.92, y = 41.47 }
+}
+
+NPCs[3388] = {
+    id = 3388,
+    name = "Mahren Skyseer",
+    zone = "The Barrens",
+    map = { zone = "The Barrens", x = 65.83, y = 43.85 }
+}
+
+NPCs[3649] = {
+    id = 3649,
+    name = "Thundris Windweaver",
+    zone = "Darkshore",
+    map = { zone = "Darkshore", x = 37.4, y = 40.15 }
+}
+
+NPCs[4078] = {
+    id = 4078,
+    name = "Collin Mauren",
+    zone = "Stormwind City",
+    map = { zone = "Stormwind City", x = 43.1439, y = 80.3416 }
+}
+
+NPCs[4488] = {
+    id = 4488,
+    name = "Parqual Fintallas",
+    zone = "Undercity",
+    map = { zone = "Undercity", x = 57.8703, y = 65.4497 }
+}
+
+NPCs[4926] = {
+    id = 4926,
+    name = "Krog",
+    zone = "Dustwallow Marsh",
+    map = { zone = "Dustwallow Marsh", x = 36.42, y = 31.88 }
+}
+
+NPCs[4983] = {
+    id = 4983,
+    name = "Ogron",
+    zone = "Dustwallow Marsh",
+    map = { zone = "Dustwallow Marsh", x = 40.95, y = 36.68 }
+}
+
+NPCs[5411] = {
+    id = 5411,
+    name = "Krinkle Goodsteel",
+    zone = "Tanaris",
+    map = { zone = "Tanaris", x = 51.45, y = 28.8 }
+}
+
+NPCs[5768] = {
+    id = 5768,
+    name = "Ebru",
+    zone = "The Barrens",
+    map = { zone = "The Barrens", x = 46.01, y = 35.74 }
+}
+
+NPCs[6579] = {
+    id = 6579,
+    name = "Shoni the Shilent",
+    zone = "Stormwind City",
+    map = { zone = "Stormwind City", x = 55.57, y = 12.51 }
+}
+
+NPCs[7764] = {
+    id = 7764,
+    name = "Troyas Moonbreeze",
+    zone = "Feralas",
+    map = { zone = "Feralas", x = 31.79, y = 45.48 }
+}
+
+NPCs[8026] = {
+    id = 8026,
+    name = "Thyn'tel Bladeweaver",
+    zone = "Teldrassil",
+    map = { zone = "Teldrassil", x = 30.06, y = 55.11 }
+}
+
+NPCs[11033] = {
+    id = 11033,
+    name = "Smokey LaRue",
+    zone = "Eastern Plaguelands",
+    map = { zone = "Eastern Plaguelands", x = 80.592, y = 57.9952 }
+}
+
+NPCs[11596] = {
+    id = 11596,
+    name = "Smeed Scrabblescrew",
+    zone = "Desolace",
+    map = { zone = "Desolace", x = 60.86, y = 61.85 }
+}
+
+NPCs[11626] = {
+    id = 11626,
+    name = "Rigger Gizelton",
+    zone = "Desolace"
+}
+
+NPCs[14736] = {
+    id = 14736,
+    name = "Primal Torntusk",
+    zone = "Hinterlands",
+    map = { zone = "Hinterlands", x = 78.18, y = 81.14 }
+}

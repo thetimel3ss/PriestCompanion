@@ -575,6 +575,384 @@ BossLoot[5709] = {
 }
 
 --------------------------------------------------
+-- Spark of the People's Militia
+--------------------------------------------------
+
+Sources[12296] = {
+    {
+        type = "quest",
+        questID = 14,
+        faction = "Alliance",
+        zone = "Westfall",
+        requiredLevel = 9,
+        details = true
+    }
+}
+
+--------------------------------------------------
+-- Moonstone Wand
+--------------------------------------------------
+
+Sources[15204] = {
+    {
+        type = "quest",
+        questID = 4763,
+        faction = "Alliance",
+        zone = "Darkshore",
+        requiredLevel = 15,
+        details = true
+    }
+}
+
+--------------------------------------------------
+-- Torchlight Wand
+--------------------------------------------------
+
+Sources[5240] = {
+    {
+        type = "quest",
+        questID = 104,
+        faction = "Both",
+        zone = "Westfall",
+        requiredLevel = 15,
+        details = true
+    }
+}
+
+--------------------------------------------------
+-- Sable Wand
+--------------------------------------------------
+
+Sources[7607] = {
+    {
+        type = "quest",
+        questID = 2040,
+        faction = "Alliance",
+        zone = "The Deadmines",
+        requiredLevel = 15,
+        instanceID = 1581,
+        details = true
+    }
+}
+
+--------------------------------------------------
+-- Wand of Decay
+--------------------------------------------------
+
+Sources[5252] = {
+    {
+        type = "quest",
+        questID = 516,
+        faction = "Horde",
+        zone = "Silverpine Forest",
+        requiredLevel = 16,
+        details = true
+    }
+}
+
+--------------------------------------------------
+-- Sizzle Stick
+--------------------------------------------------
+
+Sources[8071] = {
+    {
+        type = "quest",
+        questID = 1487,
+        faction = "Both",
+        zone = "Wailing Caverns",
+        requiredLevel = 15,
+        instanceID = 43,
+        details = true
+    }
+}
+
+--------------------------------------------------
+-- Spellcrafter Wand
+--------------------------------------------------
+
+Sources[6677] = {
+    {
+        type = "quest",
+        questID = 1078,
+        faction = "Alliance",
+        zone = "Stonetalon Mountains",
+        requiredLevel = 17,
+        details = true
+    }
+}
+
+--------------------------------------------------
+-- Branding Rod
+--------------------------------------------------
+
+Sources[5356] = {
+    {
+        type = "quest",
+        questID = 873,
+        faction = "Horde",
+        zone = "The Barrens",
+        requiredLevel = 10,
+        details = true
+    }
+}
+
+--------------------------------------------------
+-- Excavation Rod
+--------------------------------------------------
+
+Sources[5246] = {
+    {
+        type = "quest",
+        questID = 296,
+        faction = "Alliance",
+        zone = "Wetlands",
+        requiredLevel = 22,
+        details = true
+    }
+}
+
+--------------------------------------------------
+-- Consecrated Wand
+--------------------------------------------------
+
+Sources[5244] = {
+    {
+        type = "quest",
+        questID = 223,
+        faction = "Alliance",
+        zone = "Duskwood",
+        requiredLevel = 23,
+        details = true
+    }
+}
+
+--------------------------------------------------
+-- Moonbeam Wand
+--------------------------------------------------
+
+Sources[5818] = {
+    {
+        type = "quest",
+        questID = 1044,
+        faction = "Alliance",
+        zone = "Ashenvale",
+        requiredLevel = 25,
+        details = true
+    }
+}
+
+--------------------------------------------------
+-- Charred Wand
+--------------------------------------------------
+
+Sources[5250] = {
+    {
+        type = "quest",
+        questID = 567,
+        faction = "Horde",
+        zone = "Hillsbrad Foothills",
+        requiredLevel = 19,
+        details = true
+    }
+}
+
+--------------------------------------------------
+-- Dancing Flame
+--------------------------------------------------
+
+Sources[6806] = {
+    {
+        type = "quest",
+        questID = 1394,
+        faction = "Horde",
+        zone = "Thousand Needles",
+        requiredLevel = 25,
+        details = true
+    }
+}
+
+--------------------------------------------------
+-- Captain Rackmore's Tiller
+--------------------------------------------------
+
+Sources[16789] = {
+    {
+        type = "quest",
+        questID = 6161,
+        faction = "Both",
+        zone = "Desolace",
+        requiredLevel = 30,
+        details = true
+    }
+}
+
+--------------------------------------------------
+-- Rod of Sorrow
+--------------------------------------------------
+
+Sources[5247] = {
+    {
+        type = "quest",
+        questID = 685,
+        faction = "Alliance",
+        zone = "Arathi Highlands",
+        requiredLevel = 30,
+        details = true
+    }
+}
+
+--------------------------------------------------
+-- Burning Sliver
+--------------------------------------------------
+
+Sources[5249] = {
+    {
+        type = "quest",
+        questID = 504,
+        faction = "Alliance",
+        zone = "Alterac Mountains",
+        requiredLevel = 30,
+        details = true
+    }
+}
+
+--------------------------------------------------
+-- Flash Wand
+--------------------------------------------------
+
+Sources[5248] = {
+    {
+        type = "quest",
+        questID = 705,
+        faction = "Both",
+        zone = "Badlands",
+        requiredLevel = 30,
+        details = true
+    }
+}
+
+--------------------------------------------------
+-- Eyepoker
+--------------------------------------------------
+
+Sources[6797] = {
+    {
+        type = "quest",
+        questID = 1273,
+        faction = "Horde",
+        zone = "Dustwallow Marsh",
+        requiredLevel = 30,
+        details = true
+    }
+}
+
+--------------------------------------------------
+-- Kodo Brander
+--------------------------------------------------
+
+Sources[15692] = {
+    {
+        type = "quest",
+        questID = 5943,
+        faction = "Both",
+        zone = "Desolace",
+        requiredLevel = 32,
+        details = true
+    }
+}
+
+--------------------------------------------------
+-- Gnomish Zapper
+--------------------------------------------------
+
+Sources[4547] = {
+    {
+        type = "quest",
+        questID = 666,
+        faction = "Both",
+        zone = "Arathi Highlands",
+        requiredLevel = 35,
+        details = true
+    }
+}
+
+--------------------------------------------------
+-- Goblin Igniter
+--------------------------------------------------
+
+Sources[5253] = {
+    {
+        type = "quest",
+        questID = 600,
+        faction = "Both",
+        zone = "Stranglethorn Vale",
+        requiredLevel = 30,
+        details = true
+    }
+}
+
+--------------------------------------------------
+-- Cairnstone Sliver
+--------------------------------------------------
+
+Sources[9654] = {
+    {
+        type = "quest",
+        questID = 2942,
+        faction = "Alliance",
+        zone = "Feralas",
+        requiredLevel = 42,
+        details = true
+    }
+}
+
+--------------------------------------------------
+-- Charged Lightning Rod
+--------------------------------------------------
+
+Sources[11860] = {
+    {
+        type = "quest",
+        questID = 4450,
+        faction = "Both",
+        zone = "Searing Gorge",
+        requiredLevel = 43,
+        details = true
+    }
+}
+
+--------------------------------------------------
+-- Nature's Breath
+--------------------------------------------------
+
+Sources[19118] = {
+    {
+        type = "quest",
+        questID = 7850,
+        faction = "Horde",
+        zone = "Hinterlands",
+        requiredLevel = 46,
+        instanceID = 47,
+        details = true
+    }
+}
+
+--------------------------------------------------
+-- Smokey's Fireshooter
+--------------------------------------------------
+
+Sources[16993] = {
+    {
+        type = "quest",
+        questID = 6041,
+        faction = "Both",
+        zone = "Eastern Plaguelands",
+        requiredLevel = 54,
+        details = true
+    }
+}
+
+--------------------------------------------------
 -- Future Drop Example
 --------------------------------------------------
 --

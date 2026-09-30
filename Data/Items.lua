@@ -74,6 +74,49 @@ Items[5208] = {
 }
 
 --------------------------------------------------
+-- Flaring Baton
+--------------------------------------------------
+
+Items[5326] = {
+    name = "Flaring Baton",
+
+    quality = 2,
+    itemLevel = 18,
+
+    itemType = "Wand",
+    equipSlot = "Ranged",
+
+    damage = {
+        min = 18,
+        max = 34,
+        school = "Fire",
+        speed = 1.90
+    }
+}
+
+--------------------------------------------------
+-- Dusk Wand
+--------------------------------------------------
+
+Items[5211] = {
+    name = "Dusk Wand",
+
+    quality = 1,
+    itemLevel = 25,
+    requiredLevel = 20,
+
+    itemType = "Wand",
+    equipSlot = "Ranged",
+
+    damage = {
+        min = 21,
+        max = 39,
+        school = "Shadow",
+        speed = 1.70
+    }
+}
+
+--------------------------------------------------
 -- Gravestone Scepter
 --------------------------------------------------
 
@@ -136,5 +179,27 @@ Items[5198] = {
         max = 38,
         school = "Arcane",
         speed = 1.30
+    }
+}
+
+--------------------------------------------------
+-- Blackbone Wand
+--------------------------------------------------
+
+Items[5239] = {
+    name = "Blackbone Wand",
+
+    quality = 1,
+    itemLevel = 46,
+    requiredLevel = 41,
+
+    itemType = "Wand",
+    equipSlot = "Ranged",
+
+    damage = {
+        min = 39,
+        max = 74,
+        school = "Shadow",
+        speed = 1.60
     }
 }

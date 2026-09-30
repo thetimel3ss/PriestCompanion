@@ -29,3 +29,20 @@ QuestChains[
         1200
     }
 }
+
+--------------------------------------------------
+-- Flaring Baton
+--------------------------------------------------
+
+QuestChains[
+    "flaring_baton"
+] = {
+    name = "The Escape",
+
+    rewardQuestID = 863,
+
+    steps = {
+        858,
+        863
+    }
+}

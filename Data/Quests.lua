@@ -64,6 +64,94 @@ Quests[1198] = {
 }
 
 --------------------------------------------------
+-- Ignition
+--------------------------------------------------
+
+Quests[858] = {
+    name =
+        "Ignition",
+
+    questLevel = 18,
+    requiredLevel = 13,
+
+    faction =
+        "Both",
+
+    startNPC = 3439,
+    endNPC = 3439,
+
+    objectiveText =
+        "Get the Ignition Key and bring it to Wizzlecrank.",
+
+    description =
+        "I don't suppose Sputtervalve sent you? I'm in a bind here. I hopped in without realizing that I need a key to unlock the shredder's movement column. One of the other shredder operators asked me if everything was okay, and I panicked! Instead of telling him that I was missing my key, I told him there was some sort of mechanical problem. We need to get out of here on the double. Go up to the control room at the top of the derrick, the supervisor should have a key for this shredder. Help me out here!",
+
+    gains = {
+        experience = 140,
+
+        reputation = {
+            {
+                name =
+                    "Ratchet",
+
+                amount = 100
+            }
+        }
+    }
+}
+
+--------------------------------------------------
+-- The Escape
+--------------------------------------------------
+
+Quests[863] = {
+    name =
+        "The Escape",
+
+    questLevel = 18,
+    requiredLevel = 13,
+
+    faction =
+        "Both",
+
+    startNPC = 3439,
+    endNPC = 3442,
+
+    requires = {
+        858
+    },
+
+    objectiveText =
+        "Protect Wizzlecrank and the stolen goblin shredder on the way to Sputtervalve in Ratchet.",
+
+    description =
+        "I suppose I'll learn as we go... Couldn't be too hard. Just some buttons here, and a lever or two... Well, are you ready to go?",
+
+    rewards = {
+        type =
+            "choice",
+
+        items = {
+            5326, -- Flaring Baton
+            5327  -- Greasy Tinker's Pants
+        }
+    },
+
+    gains = {
+        experience = 170,
+
+        reputation = {
+            {
+                name =
+                    "Ratchet",
+
+                amount = 150
+            }
+        }
+    }
+}
+
+--------------------------------------------------
 -- Blackfathom Villainy - Alliance
 --------------------------------------------------
 

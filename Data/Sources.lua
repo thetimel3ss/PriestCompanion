@@ -99,6 +99,41 @@ Sources[5208] = {
 }
 
 --------------------------------------------------
+-- Flaring Baton
+--------------------------------------------------
+
+Sources[5326] = {
+    {
+        type = "quest",
+
+        questID = 863,
+        chainID = "flaring_baton",
+
+        faction = "Both",
+        zone = "The Barrens",
+        requiredLevel = 13,
+
+        details = true
+    }
+}
+
+--------------------------------------------------
+-- Dusk Wand
+--------------------------------------------------
+
+Sources[5211] = {
+    {
+        type = "vendor",
+
+        npcName = "Wand merchants",
+        zone = "Stormwind, Ironforge, Orgrimmar, Undercity",
+
+        faction = "Both",
+        requiredLevel = 20
+    }
+}
+
+--------------------------------------------------
 -- Gravestone Scepter
 --------------------------------------------------
 
@@ -289,6 +324,22 @@ BossLoot[645] = {
         name = "Cookie's Apron",
         chance = 60,
         quality = 2
+    }
+}
+
+--------------------------------------------------
+-- Blackbone Wand
+--------------------------------------------------
+
+Sources[5239] = {
+    {
+        type = "vendor",
+
+        npcName = "Wand merchants",
+        zone = "Stormwind, Ironforge, Orgrimmar, Undercity",
+
+        faction = "Both",
+        requiredLevel = 41
     }
 }
 

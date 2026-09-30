@@ -255,7 +255,7 @@ Items[10836] = {
 Items[15281] = {
     name = "Glowstar Rod",
 
-    quality = 4,
+    quality = 2,
     itemLevel = 57,
     requiredLevel = 52,
 
@@ -277,7 +277,7 @@ Items[15281] = {
 Items[15282] = {
     name = "Dragon Finger",
 
-    quality = 4,
+    quality = 2,
     itemLevel = 60,
     requiredLevel = 55,
 

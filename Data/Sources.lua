@@ -258,7 +258,8 @@ BossLoot[645] = {
         itemID = 9338,
         name = "Murloc Eye on a String",
         chance = 100,
-        quality = 2
+        quality = 2,
+        note = "Level One Lunatic only"
     },
 
     {

@@ -3005,6 +3005,14 @@ local function BuildDropDetails(source)
                     lootItem.name
             end
 
+            if lootItem.note then
+                itemName =
+                    itemName ..
+                    " (" ..
+                    lootItem.note ..
+                    ")"
+            end
+
             row.name:SetText(
                 itemName
             )

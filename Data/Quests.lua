@@ -1951,3 +1951,591 @@ Quests[2041] = {
     description =
         "Perhaps... Perhaps you can help us in the battle for Gnomeregan. In Stormwind you will find the commander of our underground assault crew, Shoni the Shilent. Shoni needs assistance with her gyrodrillmatic excavationators. You will probably find her amongst the dwarves in Stormwind. Good luck, <name>."
 }
+
+--------------------------------------------------
+-- Branding Rod - Sergra Darkthorn chain
+--------------------------------------------------
+
+Quests[860] = {
+    name =
+        "Sergra Darkthorn",
+
+    questLevel = 10,
+    requiredLevel = 10,
+
+    faction =
+        "Horde",
+
+    startNPC = 3441,
+    endNPC = 3338,
+
+    objectiveText =
+        "Speak with Sergra Darkthorn at the Crossroads.",
+
+    description =
+        "Speak with Sergra Darkthorn at the Crossroads."
+}
+
+Quests[844] = {
+    name =
+        "Plainstrider Menace",
+
+    questLevel = 12,
+    requiredLevel = 10,
+
+    faction =
+        "Horde",
+
+    startNPC = 3338,
+    endNPC = 3338,
+
+    objectiveText =
+        "Collect 7 Plainstrider Beaks and return them to Sergra Darkthorn in the Crossroads.",
+
+    description =
+        "Collect 7 Plainstrider Beaks and return them to Sergra Darkthorn in the Crossroads."
+,
+
+    objectives = {
+        {
+            type =
+                "item",
+
+            itemID = 5087,
+            amount = 1
+        }
+    }
+}
+
+Quests[845] = {
+    name =
+        "The Zhevra",
+
+    questLevel = 13,
+    requiredLevel = 10,
+
+    faction =
+        "Horde",
+
+    startNPC = 3338,
+    endNPC = 3338,
+
+    objectiveText =
+        "Slay Zhevra Runners to collect 4 Zhevra Hooves for Sergra Darkthorn in the Crossroads.",
+
+    description =
+        "Slay Zhevra Runners to collect 4 Zhevra Hooves for Sergra Darkthorn in the Crossroads."
+,
+
+    objectives = {
+        {
+            type =
+                "item",
+
+            itemID = 5086,
+            amount = 1
+        }
+    }
+}
+
+Quests[903] = {
+    name =
+        "Prowlers of the Barrens",
+
+    questLevel = 15,
+    requiredLevel = 10,
+
+    faction =
+        "Horde",
+
+    startNPC = 3338,
+    endNPC = 3338,
+
+    objectiveText =
+        "Collect 7 Prowler Claws from Savannah Prowlers for Sergra Darkthorn in the Crossroads.",
+
+    description =
+        "Collect 7 Prowler Claws from Savannah Prowlers for Sergra Darkthorn in the Crossroads."
+,
+
+    objectives = {
+        {
+            type =
+                "item",
+
+            itemID = 5096,
+            amount = 1
+        }
+    }
+}
+
+Quests[881] = {
+    name =
+        "Echeyakee",
+
+    questLevel = 16,
+    requiredLevel = 10,
+
+    faction =
+        "Horde",
+
+    startNPC = 3338,
+    endNPC = 3338,
+
+    objectiveText =
+        "Bring Echeyakee's Hide to Sergra Darkthorn at the Crossroads.",
+
+    description =
+        "Bring Echeyakee's Hide to Sergra Darkthorn at the Crossroads."
+,
+
+    objectives = {
+        {
+            type =
+                "item",
+
+            itemID = 5100,
+            amount = 1
+        }
+    }
+}
+
+Quests[905] = {
+    name =
+        "The Angry Scytheclaws",
+
+    questLevel = 17,
+    requiredLevel = 10,
+
+    faction =
+        "Horde",
+
+    startNPC = 3338,
+    endNPC = 3338,
+
+    objectiveText =
+        "Kill Sunscale raptors and collect their feathers. Use the feathers on the 3 Scytheclaw nests. Return to Sergra Darkthorn in the Crossroads.",
+
+    description =
+        "Kill Sunscale raptors and collect their feathers. Use the feathers on the 3 Scytheclaw nests. Return to Sergra Darkthorn in the Crossroads."
+}
+
+Quests[3261] = {
+    name =
+        "Jorn Skyseer",
+
+    questLevel = 18,
+    requiredLevel = 10,
+
+    faction =
+        "Horde",
+
+    startNPC = 3338,
+    endNPC = 3387,
+
+    objectiveText =
+        "Speak with Jorn Skyseer at Camp Taurajo.",
+
+    description =
+        "Speak with Jorn Skyseer at Camp Taurajo."
+}
+
+Quests[882] = {
+    name =
+        "Ishamuhale",
+
+    questLevel = 19,
+    requiredLevel = 10,
+
+    faction =
+        "Horde",
+
+    startNPC = 3387,
+    endNPC = 3387,
+
+    objectiveText =
+        "Bring Ishamuhale's Fang to Jorn at Camp Taurajo.",
+
+    description =
+        "Bring Ishamuhale's Fang to Jorn at Camp Taurajo."
+,
+
+    objectives = {
+        {
+            type =
+                "item",
+
+            itemID = 5101,
+            amount = 1
+        }
+    }
+}
+
+Quests[907] = {
+    name =
+        "Enraged Thunder Lizards",
+
+    questLevel = 18,
+    requiredLevel = 10,
+
+    faction =
+        "Horde",
+
+    startNPC = 3387,
+    endNPC = 3387,
+
+    objectiveText =
+        "Bring 3 Thunder Lizard Blood to Jorn Skyseer at Camp Taurajo.",
+
+    description =
+        "Bring 3 Thunder Lizard Blood to Jorn Skyseer at Camp Taurajo."
+,
+
+    objectives = {
+        {
+            type =
+                "item",
+
+            itemID = 5143,
+            amount = 1
+        }
+    }
+}
+
+Quests[913] = {
+    name =
+        "Cry of the Thunderhawk",
+
+    questLevel = 20,
+    requiredLevel = 10,
+
+    faction =
+        "Horde",
+
+    startNPC = 3387,
+    endNPC = 3387,
+
+    objectiveText =
+        "Find and slay a Thunderhawk, return its wings to Jorn Skyseer at Camp Taurajo.",
+
+    description =
+        "Find and slay a Thunderhawk, return its wings to Jorn Skyseer at Camp Taurajo."
+,
+
+    objectives = {
+        {
+            type =
+                "item",
+
+            itemID = 5164,
+            amount = 1
+        }
+    }
+,
+
+    rewards = {
+        type =
+            "choice",
+
+        items = {
+            5302,
+            5299,
+            5306
+        }
+    }
+}
+
+Quests[874] = {
+    name =
+        "Mahren Skyseer",
+
+    questLevel = 27,
+    requiredLevel = 9,
+
+    faction =
+        "Horde",
+
+    startNPC = 3387,
+    endNPC = 3388,
+
+    objectiveText =
+        "Speak with Mahren Skyseer.",
+
+    description =
+        "Speak with Mahren Skyseer."
+}
+
+
+--------------------------------------------------
+-- Dancing Flame - Test of Faith chain
+--------------------------------------------------
+
+Quests[1149] = {
+    name =
+        "Test of Faith",
+
+    questLevel = 26,
+    requiredLevel = 25,
+
+    faction =
+        "Horde",
+
+    startNPC = 2986,
+    endNPC = 2986,
+
+    objectiveText =
+        "If you have faith, leap from the planks overlooking Thousand Needles.",
+
+    description =
+        "If you have faith, leap from the planks overlooking Thousand Needles."
+}
+
+Quests[1150] = {
+    name =
+        "Test of Endurance",
+
+    questLevel = 30,
+    requiredLevel = 25,
+
+    faction =
+        "Horde",
+
+    startNPC = 2986,
+    endNPC = 2986,
+
+    objectiveText =
+        "Bring Grenka's Claw to Dorn Plainstalker in Thousand Needles.",
+
+    description =
+        "Bring Grenka's Claw to Dorn Plainstalker in Thousand Needles."
+,
+
+    objectives = {
+        {
+            type =
+                "item",
+
+            itemID = 5843,
+            amount = 1
+        }
+    }
+}
+
+Quests[1151] = {
+    name =
+        "Test of Strength",
+
+    questLevel = 30,
+    requiredLevel = 25,
+
+    faction =
+        "Horde",
+
+    startNPC = 2986,
+    endNPC = 2986,
+
+    objectiveText =
+        "Bring Fragments of Rok'Alim to Dorn Plainstalker in Thousand Needles.",
+
+    description =
+        "Bring Fragments of Rok'Alim to Dorn Plainstalker in Thousand Needles."
+,
+
+    objectives = {
+        {
+            type =
+                "item",
+
+            itemID = 5844,
+            amount = 1
+        }
+    }
+}
+
+Quests[1152] = {
+    name =
+        "Test of Lore",
+
+    questLevel = 30,
+    requiredLevel = 25,
+
+    faction =
+        "Horde",
+
+    startNPC = 2986,
+    endNPC = 4489,
+
+    objectiveText =
+        "Find Braug Dimspirit near the entrance to Talondeep Path in Stonetalon Mountains.",
+
+    description =
+        "Find Braug Dimspirit near the entrance to Talondeep Path in Stonetalon Mountains."
+}
+
+Quests[1154] = {
+    name =
+        "Test of Lore",
+
+    questLevel = 30,
+    requiredLevel = 25,
+
+    faction =
+        "Horde",
+
+    startNPC = 4489,
+    endNPC = 4489,
+
+    objectiveText =
+        "Find the Legacy of the Aspects and return it to Braug Dimspirit near the entrance to Talondeep Path in Stonetalon Mountains.",
+
+    description =
+        "Find the Legacy of the Aspects and return it to Braug Dimspirit near the entrance to Talondeep Path in Stonetalon Mountains."
+,
+
+    objectives = {
+        {
+            type =
+                "item",
+
+            itemID = 5860,
+            amount = 1
+        }
+    }
+}
+
+Quests[6627] = {
+    name =
+        "Test of Lore",
+
+    questLevel = 30,
+    requiredLevel = 25,
+
+    faction =
+        "Horde",
+
+    startNPC = 4489,
+    endNPC = 4489,
+
+    objectiveText =
+        "Answer Braug Dimspirit's question successfully and then speak to him again. He will remain in Stonetalon Mountains when you are ready.",
+
+    description =
+        "Answer Braug Dimspirit's question successfully and then speak to him again. He will remain in Stonetalon Mountains when you are ready."
+}
+
+Quests[1159] = {
+    name =
+        "Test of Lore",
+
+    questLevel = 30,
+    requiredLevel = 25,
+
+    faction =
+        "Horde",
+
+    startNPC = 4489,
+    endNPC = 4488,
+
+    objectiveText =
+        "Find Parqual Fintallas in Undercity.",
+
+    description =
+        "Find Parqual Fintallas in Undercity."
+}
+
+Quests[1160] = {
+    name =
+        "Test of Lore",
+
+    questLevel = 36,
+    requiredLevel = 25,
+
+    faction =
+        "Horde",
+
+    startNPC = 4488,
+    endNPC = 4488,
+
+    objectiveText =
+        "Find The Beginnings of the Undead Threat, and return it to Parqual Fintallas in Undercity.",
+
+    description =
+        "Find The Beginnings of the Undead Threat, and return it to Parqual Fintallas in Undercity."
+,
+
+    objectives = {
+        {
+            type =
+                "item",
+
+            itemID = 5861,
+            amount = 1
+        }
+    }
+}
+
+Quests[6628] = {
+    name =
+        "Test of Lore",
+
+    questLevel = 30,
+    requiredLevel = 25,
+
+    faction =
+        "Horde",
+
+    startNPC = 4488,
+    endNPC = 4488,
+
+    objectiveText =
+        "Answer Parqual Fintallas' question successfully and then speak to him again. He will remain in the Undercity until you are ready.",
+
+    description =
+        "Answer Parqual Fintallas' question successfully and then speak to him again. He will remain in the Undercity until you are ready."
+}
+
+
+--------------------------------------------------
+-- Eyepoker - Lieutenant Paval Reethe chain
+--------------------------------------------------
+
+Quests[1269] = {
+    name =
+        "Lieutenant Paval Reethe",
+
+    questLevel = 37,
+    requiredLevel = 30,
+
+    faction =
+        "Horde",
+
+    startNPC = {
+        id = 21042,
+        kind = "object",
+        name = "Theramore Guard Badge",
+        zone = "Dustwallow Marsh",
+        map = {
+            zone = "Dustwallow Marsh",
+            x = 29.8,
+            y = 48.2
+        }
+    },
+    endNPC = 4926,
+
+    objectiveText =
+        "Bring Reethe's Badge to Krog in Brackenwall Village.",
+
+    description =
+        "Bring Reethe's Badge to Krog in Brackenwall Village."
+,
+
+    objectives = {
+        {
+            type =
+                "item",
+
+            itemID = 5950,
+            amount = 1
+        }
+    }
+}

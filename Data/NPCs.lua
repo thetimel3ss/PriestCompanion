@@ -361,11 +361,32 @@ NPCs[2986] = {
     map = { zone = "Thousand Needles", x = 53.92, y = 41.47 }
 }
 
+NPCs[3338] = {
+    id = 3338,
+    name = "Sergra Darkthorn",
+    zone = "The Barrens",
+    map = { zone = "The Barrens", x = 52.0, y = 31.0 }
+}
+
+NPCs[3387] = {
+    id = 3387,
+    name = "Jorn Skyseer",
+    zone = "The Barrens",
+    map = { zone = "The Barrens", x = 45.0, y = 59.0 }
+}
+
 NPCs[3388] = {
     id = 3388,
     name = "Mahren Skyseer",
     zone = "The Barrens",
     map = { zone = "The Barrens", x = 65.83, y = 43.85 }
+}
+
+NPCs[3441] = {
+    id = 3441,
+    name = "Melor Stonehoof",
+    zone = "Thunder Bluff",
+    map = { zone = "Thunder Bluff", x = 61.0, y = 80.0 }
 }
 
 NPCs[3649] = {
@@ -387,6 +408,13 @@ NPCs[4488] = {
     name = "Parqual Fintallas",
     zone = "Undercity",
     map = { zone = "Undercity", x = 57.8703, y = 65.4497 }
+}
+
+NPCs[4489] = {
+    id = 4489,
+    name = "Braug Dimspirit",
+    zone = "Stonetalon Mountains",
+    map = { zone = "Stonetalon Mountains", x = 78.0, y = 45.0 }
 }
 
 NPCs[4926] = {

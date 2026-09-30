@@ -42,7 +42,10 @@ Sources[11287] = {
             {
                 itemID = 6218
             }
-        }
+        },
+
+        requiredLevel = 5,
+        details = true
     }
 }
 
@@ -78,7 +81,10 @@ Sources[11288] = {
             {
                 itemID = 6218
             }
-        }
+        },
+
+        requiredLevel = 13,
+        details = true
     }
 }
 
@@ -692,6 +698,7 @@ Sources[5356] = {
     {
         type = "quest",
         questID = 873,
+        chainID = "branding_rod",
         faction = "Horde",
         zone = "The Barrens",
         requiredLevel = 10,
@@ -770,6 +777,7 @@ Sources[6806] = {
     {
         type = "quest",
         questID = 1394,
+        chainID = "dancing_flame",
         faction = "Horde",
         zone = "Thousand Needles",
         requiredLevel = 25,
@@ -846,6 +854,7 @@ Sources[6797] = {
     {
         type = "quest",
         questID = 1273,
+        chainID = "eyepoker",
         faction = "Horde",
         zone = "Dustwallow Marsh",
         requiredLevel = 30,

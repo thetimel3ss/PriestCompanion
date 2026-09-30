@@ -52,6 +52,28 @@ Items[11288] = {
 }
 
 --------------------------------------------------
+-- Smoldering Wand
+--------------------------------------------------
+
+Items[5208] = {
+    name = "Smoldering Wand",
+
+    quality = 1,
+    itemLevel = 20,
+    requiredLevel = 15,
+
+    itemType = "Wand",
+    equipSlot = "Ranged",
+
+    damage = {
+        min = 15,
+        max = 28,
+        school = "Fire",
+        speed = 1.60
+    }
+}
+
+--------------------------------------------------
 -- Gravestone Scepter
 --------------------------------------------------
 

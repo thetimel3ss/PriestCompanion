@@ -83,6 +83,22 @@ Sources[11288] = {
 }
 
 --------------------------------------------------
+-- Smoldering Wand
+--------------------------------------------------
+
+Sources[5208] = {
+    {
+        type = "vendor",
+
+        npcName = "Wand merchants",
+        zone = "Stormwind, Ironforge, Orgrimmar, Undercity",
+
+        faction = "Both",
+        requiredLevel = 15
+    }
+}
+
+--------------------------------------------------
 -- Gravestone Scepter
 --------------------------------------------------
 

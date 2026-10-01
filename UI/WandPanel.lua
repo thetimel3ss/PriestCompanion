@@ -2486,21 +2486,11 @@ end
 --------------------------------------------------
 -- Sorting
 --------------------------------------------------
--- DPS is the primary ascending key. Recommended level keeps equal-DPS
--- entries in progression order; non-curated entries use required level.
+-- Normal entries are ordered by required level,
+-- recommended range, DPS, and then name. Challenge-only
+-- entries remain after the normal progression list.
 
-local function GetRecommendedSortLevel(itemID)
-    local wand =
-        PC.Data.Wands[itemID]
-
-    if wand
-    and wand.recommended
-    and wand.recommendedLevel
-    and wand.recommendedLevel.min then
-        return
-            wand.recommendedLevel.min
-    end
-
+local function GetRequiredSortLevel(itemID)
     local item =
         PC.Data.Items[itemID]
 
@@ -2516,6 +2506,22 @@ local function GetRecommendedSortLevel(itemID)
 
     return 0
 end
+
+local function GetRecommendedSortLevel(itemID)
+    local wand =
+        PC.Data.Wands[itemID]
+
+    if wand
+    and wand.recommended
+    and wand.recommendedLevel
+    and wand.recommendedLevel.min then
+        return
+            wand.recommendedLevel.min
+    end
+
+    return nil
+end
+
 local function SortWands(
     firstID,
     secondID
@@ -2548,6 +2554,42 @@ local function SortWands(
         return not firstChallengeOnly
     end
 
+    local firstRequiredLevel =
+        GetRequiredSortLevel(
+            firstID
+        )
+
+    local secondRequiredLevel =
+        GetRequiredSortLevel(
+            secondID
+        )
+
+    if firstRequiredLevel ~= secondRequiredLevel then
+        return firstRequiredLevel < secondRequiredLevel
+    end
+
+    local firstRecommendedLevel =
+        GetRecommendedSortLevel(
+            firstID
+        )
+
+    local secondRecommendedLevel =
+        GetRecommendedSortLevel(
+            secondID
+        )
+
+    if firstRecommendedLevel ~= secondRecommendedLevel then
+        if not firstRecommendedLevel then
+            return false
+        end
+
+        if not secondRecommendedLevel then
+            return true
+        end
+
+        return firstRecommendedLevel < secondRecommendedLevel
+    end
+
     local firstDPS =
         GetItemDPS(firstItem)
 
@@ -2556,20 +2598,6 @@ local function SortWands(
 
     if firstDPS ~= secondDPS then
         return firstDPS < secondDPS
-    end
-
-    local firstLevel =
-        GetRecommendedSortLevel(
-            firstID
-        )
-
-    local secondLevel =
-        GetRecommendedSortLevel(
-            secondID
-        )
-
-    if firstLevel ~= secondLevel then
-        return firstLevel < secondLevel
     end
 
     local firstName =

@@ -345,7 +345,7 @@ Wands[5213] = { order = 30 }
 Wands[5214] = { order = 27 }
 Wands[5215] = { order = 36 }
 Wands[5216] = { order = 40 }
-Wands[5235] = { order = 2 }
+Wands[5235] = { order = 2, challengeOnly = "Level One Lunatic" }
 Wands[5236] = { order = 29 }
 Wands[5238] = { order = 40 }
 Wands[5241] = { order = 13 }

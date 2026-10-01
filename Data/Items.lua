@@ -774,7 +774,7 @@ Items[5213] = { name = "Scorching Wand", quality = 2, itemLevel = 35, requiredLe
 Items[5214] = { name = "Wand of Eventide", quality = 2, itemLevel = 32, requiredLevel = 27, itemType = "Wand", equipSlot = "Ranged", damage = { min = 23, max = 44, school = "Arcane", speed = 1.3 } }
 Items[5215] = { name = "Ember Wand", quality = 2, itemLevel = 41, requiredLevel = 36, itemType = "Wand", equipSlot = "Ranged", damage = { min = 35, max = 66, school = "Fire", speed = 1.5 } }
 Items[5216] = { name = "Umbral Wand", quality = 2, itemLevel = 45, requiredLevel = 40, itemType = "Wand", equipSlot = "Ranged", damage = { min = 37, max = 70, school = "Shadow", speed = 1.5 } }
-Items[5235] = { name = "Cultist's Firestick", quality = 1, itemLevel = 7, itemType = "Wand", equipSlot = "Ranged", damage = { min = 5, max = 11, school = "Fire", speed = 1.8 } }
+Items[5235] = { name = "Cultist's Firestick", quality = 1, itemLevel = 7, requiredLevel = 1, itemType = "Wand", equipSlot = "Ranged", damage = { min = 5, max = 11, school = "Fire", speed = 1.8 } }
 Items[5236] = { name = "Combustible Wand", quality = 1, itemLevel = 34, requiredLevel = 29, itemType = "Wand", equipSlot = "Ranged", damage = { min = 29, max = 54, school = "Fire", speed = 1.6 } }
 Items[5238] = { name = "Pitchwood Wand", quality = 1, itemLevel = 45, requiredLevel = 40, itemType = "Wand", equipSlot = "Ranged", damage = { min = 41, max = 77, school = "Fire", speed = 1.7 } }
 Items[5241] = { name = "Dwarven Flamestick", quality = 2, itemLevel = 18, itemType = "Wand", equipSlot = "Ranged", damage = { min = 17, max = 32, school = "Fire", speed = 1.8 } }

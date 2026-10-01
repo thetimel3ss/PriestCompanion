@@ -2526,6 +2526,28 @@ local function SortWands(
     local secondItem =
         PC.Data.Items[secondID]
 
+    local firstWand =
+        PC.Data.Wands[firstID]
+
+    local secondWand =
+        PC.Data.Wands[secondID]
+
+    local firstChallengeOnly =
+        firstWand
+        and firstWand.challengeOnly
+        and true
+        or false
+
+    local secondChallengeOnly =
+        secondWand
+        and secondWand.challengeOnly
+        and true
+        or false
+
+    if firstChallengeOnly ~= secondChallengeOnly then
+        return not firstChallengeOnly
+    end
+
     local firstDPS =
         GetItemDPS(firstItem)
 

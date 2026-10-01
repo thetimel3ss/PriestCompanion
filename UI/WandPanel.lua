@@ -136,7 +136,7 @@ local playerFaction = nil
 local filters = {
     source = "All",
     faction = "Auto",
-    level = "Usable",
+    level = "All",
     recommendedOnly = true,
     search = ""
 }
@@ -145,6 +145,7 @@ local rows = {}
 local activeRow = nil
 
 local RefreshWandList
+local GetEffectiveRequiredLevel
 
 --------------------------------------------------
 -- Player Context
@@ -263,15 +264,23 @@ local function IsRecommendedNow(wand)
     return true
 end
 
-local function IsUsable(item)
-    if not item
-    or not item.requiredLevel then
+local function IsUsable(
+    itemID,
+    item
+)
+    local requiredLevel =
+        GetEffectiveRequiredLevel(
+            itemID,
+            item
+        )
+
+    if not requiredLevel then
         return true
     end
 
     return
         playerLevel >=
-        item.requiredLevel
+        requiredLevel
 end
 
 --------------------------------------------------
@@ -446,6 +455,69 @@ local function GetMatchingSources(itemID)
     return result
 end
 
+--------------------------------------------------
+-- Effective Required Level
+--
+-- Item data is authoritative when it contains an
+-- equip requirement. Quest rewards without an item
+-- requirement use the minimum level required by
+-- their currently matching quest source.
+--------------------------------------------------
+
+GetEffectiveRequiredLevel =
+    function(
+        itemID,
+        item
+    )
+        if item
+        and item.requiredLevel then
+            return item.requiredLevel
+        end
+
+        local sources =
+            GetMatchingSources(itemID)
+
+        local minimumLevel = nil
+        local i
+
+        for i = 1,
+            table.getn(sources)
+        do
+            local source =
+                sources[i]
+
+            if source.type == "quest" then
+                local requiredLevel =
+                    source.requiredLevel
+
+                if source.questID
+                and PC.Data.Quests then
+                    local quest =
+                        PC.Data.Quests[
+                            source.questID
+                        ]
+
+                    if quest
+                    and quest.requiredLevel then
+                        requiredLevel =
+                            quest.requiredLevel
+                    end
+                end
+
+                if requiredLevel
+                and (
+                    not minimumLevel
+                    or requiredLevel < minimumLevel
+                ) then
+                    minimumLevel =
+                        requiredLevel
+                end
+            end
+        end
+
+        return minimumLevel
+    end
+
 local function GetPrimarySource(sources)
     if not sources
     or table.getn(sources) == 0 then
@@ -616,12 +688,18 @@ local function ItemPassesFilters(itemID)
     end
 
     if filters.level == "Usable" then
-        if not IsUsable(item) then
+        if not IsUsable(
+            itemID,
+            item
+        ) then
             return false
         end
 
     elseif filters.level == "Future" then
-        if IsUsable(item) then
+        if IsUsable(
+            itemID,
+            item
+        ) then
             return false
         end
 
@@ -1591,7 +1669,7 @@ UIDropDownMenu_SetText(
 )
 
 UIDropDownMenu_SetText(
-    "Usable Now",
+    "All",
     levelDropdown
 )
 
@@ -2137,11 +2215,15 @@ end
 
 local function ApplyRowState(
     row,
+    itemID,
     item,
     wand
 )
     local usable =
-        IsUsable(item)
+        IsUsable(
+            itemID,
+            item
+        )
 
     row.requiredLevelText:SetTextColor(
         0.85,
@@ -2244,10 +2326,16 @@ local function RefreshItemRow(
         )
     )
 
+    local requiredLevel =
+        GetEffectiveRequiredLevel(
+            itemID,
+            item
+        )
+
     row.requiredLevelText:SetText(
-        item.requiredLevel
+        requiredLevel
         and tostring(
-            item.requiredLevel
+            requiredLevel
         )
         or "-"
     )
@@ -2387,6 +2475,7 @@ local function RefreshItemRow(
 
     ApplyRowState(
         row,
+        itemID,
         item,
         wand
     )
@@ -2415,14 +2504,18 @@ local function GetRecommendedSortLevel(itemID)
     local item =
         PC.Data.Items[itemID]
 
-    if item
-    and item.requiredLevel then
-        return item.requiredLevel
+    local requiredLevel =
+        GetEffectiveRequiredLevel(
+            itemID,
+            item
+        )
+
+    if requiredLevel then
+        return requiredLevel
     end
 
     return 0
 end
-
 local function SortWands(
     firstID,
     secondID

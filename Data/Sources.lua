@@ -1084,7 +1084,7 @@ Sources[5235] = { { type = "drop", npcID = 11520, npcName = "Taragaman the Hunge
 Sources[5236] = { { type = "vendor", npcID = 5754, npcName = "Zane Bradford", faction = "Both", details = true }, { type = "vendor", npcID = 5816, npcName = "Katis", faction = "Both", details = true }, { type = "vendor", npcID = 5133, npcName = "Harick Boulderdrum", faction = "Both", details = true }, { type = "vendor", npcID = 1312, npcName = "Ardwyn Cailen", faction = "Both", details = true } }
 Sources[5238] = { { type = "vendor", npcID = 5754, npcName = "Zane Bradford", faction = "Both", details = true }, { type = "vendor", npcID = 5816, npcName = "Katis", faction = "Both", details = true }, { type = "vendor", npcID = 5133, npcName = "Harick Boulderdrum", faction = "Both", details = true }, { type = "vendor", npcID = 1312, npcName = "Ardwyn Cailen", faction = "Both", details = true } }
 Sources[5241] = { { type = "quest", questID = 297, questName = "Gathering Idols", faction = "Alliance", requiredLevel = 13, zone = "Loch Modan", chainID = "octo:297", details = true } }
-Sources[5242] = { { type = "quest", questID = 99, questName = "Arugal's Folly", faction = "Horde", requiredLevel = 9, zone = "Silverpine Forrest", chainID = "octo:99", details = true } }
+Sources[5242] = { { type = "quest", questID = 99, questName = "Arugal's Folly", faction = "Horde", requiredLevel = 9, zone = "Silverpine Forrest", chainID = "99", details = true } }
 Sources[5243] = { { type = "drop", npcID = 5912, npcName = "Deviate Faerie Dragon", npcType = "Boss", instanceID = 43, zone = "Wailing Caverns", dropChance = 50, mobs = { { id = 5912, chance = 50 } }, mobCount = 1, details = true, lootNPCID = 5912 } }
 Sources[5245] = { { type = "drop", npcID = 2358, npcName = "Dalaran Summoner", npcType = "Named creature", zone = "Alterac Mountains", dropChance = 0.54, mobs = { { id = 2358, chance = 0.54 } }, mobCount = 1, details = true }, { type = "drop", npcID = 91350, npcName = "Magus Bromley", npcType = "Named creature", zone = "Aszhara", dropChance = 0.54, mobs = { { id = 91350, chance = 0.54 } }, mobCount = 1, details = true } }
 Sources[5347] = { { type = "vendor", npcID = 5754, npcName = "Zane Bradford", faction = "Both", details = true }, { type = "vendor", npcID = 5816, npcName = "Katis", faction = "Both", details = true }, { type = "vendor", npcID = 5133, npcName = "Harick Boulderdrum", faction = "Both", details = true }, { type = "vendor", npcID = 1312, npcName = "Ardwyn Cailen", faction = "Both", details = true } }
@@ -1143,7 +1143,17 @@ Sources[23009] = { { type = "drop", npcID = 16061, npcName = "Instructor Razuvio
 Sources[23177] = { { type = "drop", npcID = 14686, npcName = "Lady Falther'ess", npcType = "Boss", instanceID = 129, zone = "Razorfen Downs", dropChance = 50, mobs = { { id = 14686, chance = 50 } }, mobCount = 1, details = true, lootNPCID = 14686 } }
 Sources[33200] = { { type = "drop", npcID = 63032, npcName = "Glurgill", npcType = "Rare creature", zone = "Kalimdor", dropChance = 50, mobs = { { id = 63032, chance = 50 } }, mobCount = 1, details = true } }
 Sources[33352] = { { type = "quest", questID = 41945, questName = "Respect the Elderly", faction = "Both", requiredLevel = 49, details = true } }
-Sources[41117] = { { type = "quest", questID = 41196, questName = "Maddening Hunger", faction = "Alliance", requiredLevel = 3, zone = "Eastern Plaguelands", details = true } }
+Sources[41117] = { 
+    { 
+        type = "quest", 
+        questID = 41196, 
+        questName = "Maddening Hunger", 
+        faction = "Alliance", 
+        requiredLevel = 3, 
+        zone = "Thalassian Highlands", 
+        details = true 
+    } 
+}
 Sources[42365] = { { type = "quest", questID = 42000, questName = "Highborne Burden", faction = "Horde", requiredLevel = 48, zone = "Winterspring", details = true } }
 Sources[51735] = { { type = "drop", npcID = 16184, npcName = "Nerubian Overseer", npcType = "Boss", zone = "Western Plaguelands", dropChance = 20, mobs = { { id = 16184, chance = 20 } }, mobCount = 1, details = true, lootNPCID = 16184 } }
 Sources[51816] = { { type = "quest", questID = 60110, questName = "Githyiss the Vile", faction = "Alliance", requiredLevel = 3, zone = "Teldrassil", chainID = "octo:60110", details = true } }

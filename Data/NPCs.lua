@@ -668,7 +668,15 @@ NPCs[59991] = { id = 59991, name = "Kruul", zone = "Tower of Karazhan" }
 NPCs[61222] = { id = 61222, name = "Lord Blackwald II", zone = "Lower Karazhan Halls" }
 NPCs[61316] = { id = 61316, name = "Drifting Avatar of Sand", zone = "Caverns of Time" }
 NPCs[61517] = { id = 61517, name = "Ruk'thok the Pyromancer", zone = "Azeroth", map = { zone = "Azeroth", x = 35, y = 81.22 } }
-NPCs[61850] = { id = 61850, name = "Ranathir", zone = "Eastern Plaguelands", map = { zone = "Eastern Plaguelands", x = 6.603, y = 24.83 } }
+NPCs[61850] = { 
+    id = 61850, 
+    name = "Ranathir", 
+    zone = "Thalassian Highlands", 
+    map = { 
+        zone = "Thalassian Highlands", 
+        continent = 2, 
+        zoneIndex = 31, 
+        x = 46.5, y = 87.2 } }
 NPCs[61946] = { id = 61946, name = "Ley-Watcher Incantagos", zone = "Tower of Karazhan" }
 NPCs[62007] = { id = 62007, name = "Al'Dorel", zone = "Winterspring", map = { zone = "Winterspring", x = 56.19, y = 44.61 } }
 NPCs[62069] = { id = 62069, name = "Halgan Redbrand", zone = "Dragonmaw Retreat" }

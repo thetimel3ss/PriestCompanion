@@ -355,4 +355,9 @@ QuestChains["octo:8257"] = { name = "Blood of Morphaz", rewardQuestID = 8257, st
 QuestChains["octo:863"] = { name = "The Escape", rewardQuestID = 863, steps = { 858, 863 } }
 QuestChains["octo:873"] = { name = "Isha Awak", rewardQuestID = 873, steps = { 861, 860, 844, 845, 903, 881, 905, 3261, 882, 907, 913, 874, 873 } }
 QuestChains["octo:957"] = { name = "Bashal'Aran", rewardQuestID = 957, steps = { 954, 955, 956, 957 } }
-QuestChains["octo:99"] = { name = "Arugal's Folly", rewardQuestID = 99, steps = { 421, 422, 423, 424, 99 } }
+QuestChains[
+    "99"
+    ] = { 
+        name = "Arugal's Folly", 
+        rewardQuestID = 99, 
+        steps = { 421, 422, 423, 424, 99 } }

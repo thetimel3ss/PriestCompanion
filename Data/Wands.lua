@@ -443,7 +443,9 @@ Wands[60805] = { order = 58 }
 Wands[61019] = { order = 60 }
 Wands[61020] = { order = 60 }
 Wands[61286] = { order = 60 }
-Wands[61374] = { order = 5 }
+-- Grungy Firestick (61374) is kept in Data/Items.lua and Data/Sources.lua
+-- for reference, but is omitted from the in-game wand list because its
+-- acquisition source could not be confirmed.
 Wands[61615] = { order = 53 }
 Wands[80544] = { order = 60 }
 Wands[80545] = { order = 60 }

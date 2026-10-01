@@ -1426,9 +1426,11 @@ recommendedCheck:SetScript(
     "OnClick",
     function()
         filters.recommendedOnly =
-            this:GetChecked()
-            and true
-            or false
+            not filters.recommendedOnly
+
+        recommendedCheck:SetChecked(
+            filters.recommendedOnly
+        )
 
         RefreshWandList(true)
     end

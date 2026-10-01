@@ -16,32 +16,20 @@ PC.Data.Instances =
 local Instances =
     PC.Data.Instances
 
+
+--------------------------------------------------
+-- Easy: /script DEFAULT_CHAT_FRAME:AddMessage("Continent="..GetCurrentMapContinent().." Zone="..GetCurrentMapZone())
+--------------------------------------------------
+
 --------------------------------------------------
 -- Blackfathom Deeps
 --------------------------------------------------
 
 Instances[719] = {
-    name =
-        "Blackfathom Deeps",
-
-    shortName =
-        "BFD",
-
-    type =
-        "dungeon",
-
-    icon =
-        "Interface\\Icons\\INV_Misc_Map_01",
-
-    --------------------------------------------------
-    -- Vanilla World Map
-    --------------------------------------------------
-    --
-    -- Confirmed in-game:
-    --   SetMapZoom(7, 1)
-    --   GetCurrentMapContinent() -> 7
-    --   GetCurrentMapZone()      -> 1
-    --------------------------------------------------
+    name = "Blackfathom Deeps",
+    shortName = "BFD",
+    type = "dungeon",
+    icon = "Interface\\Icons\\INV_Misc_Map_01",
 
     worldMap = {
         mapID = 7,
@@ -54,9 +42,7 @@ Instances[719] = {
     -- Used only when an internal WorldMap entry is unavailable.
 
     entrance = {
-        zone =
-            "Ashenvale",
-
+        zone = "Ashenvale",
         x = 13.9,
         y = 14.3,
 
@@ -70,28 +56,11 @@ Instances[719] = {
 --------------------------------------------------
 
 Instances[1581] = {
-    name =
-        "The Deadmines",
-
-    shortName =
-        "DM",
-
-    type =
-        "dungeon",
-
-    description =
-        "Dungeon encounter in The Deadmines.",
-
-    icon =
-        "Interface\\Icons\\INV_Misc_Map_01",
-
-    --------------------------------------------------
-    -- Vanilla World Map
-    --------------------------------------------------
-    --
-    -- Confirmed in the Instance Journal map catalog:
-    --   SetMapZoom(21, 1)
-    --
+    name = "The Deadmines",
+    shortName = "DM",
+    type = "dungeon",
+    description = "Dungeon encounter in The Deadmines.",
+    icon = "Interface\\Icons\\INV_Misc_Map_01",
 
     worldMap = {
         mapID = 21,
@@ -104,20 +73,11 @@ Instances[1581] = {
 --------------------------------------------------
 
 Instances[349] = {
-    name =
-        "Maraudon",
+    name = "Maraudon",
+    shortName = "Mara",
+    type = "dungeon",
+    icon = "Interface\\Icons\\INV_Misc_Map_01",
 
-    shortName =
-        "Mara",
-
-    type =
-        "dungeon",
-
-    icon =
-        "Interface\\Icons\\INV_Misc_Map_01",
-
-    -- Instance Journal native map pair:
-    --   SetMapZoom(19, 1)
     worldMap = {
         mapID = 19,
         zoneID = 1
@@ -125,9 +85,7 @@ Instances[349] = {
 
     -- Physical entrance fallback when the internal map is unavailable.
     entrance = {
-        zone =
-            "Desolace",
-
+        zone = "Desolace",
         x = 29.3,
         y = 62.5,
 
@@ -141,20 +99,11 @@ Instances[349] = {
 --------------------------------------------------
 
 Instances[109] = {
-    name =
-        "Sunken Temple",
+    name = "Sunken Temple",
+    shortName = "ST",
+    type = "dungeon",
+    icon = "Interface\\Icons\\INV_Misc_Map_01",
 
-    shortName =
-        "ST",
-
-    type =
-        "dungeon",
-
-    icon =
-        "Interface\\Icons\\INV_Misc_Map_01",
-
-    -- Instance Journal native map pair:
-    --   SetMapZoom(6, 1)
     worldMap = {
         mapID = 6,
         zoneID = 1
@@ -162,17 +111,31 @@ Instances[109] = {
 
     -- Physical entrance fallback when the internal map is unavailable.
     entrance = {
-        zone =
-            "Swamp of Sorrows",
-
+        zone = "Swamp of Sorrows",
         x = 69.4,
         y = 53.2,
 
-        label =
-            "Sunken Temple entrance"
+        label = "Sunken Temple entrance"
     }
 }
-Instances[35] = { name = "Stormwind Vault", shortName = "SWV", type = "dungeon", description = "Dungeon encounter in Stormwind Vault.", entranceZone = "Stormwind City", icon = "Interface\\Icons\\INV_Misc_Map_01" }
+
+--------------------------------------------------
+-- Stormwind Vault
+--------------------------------------------------
+
+Instances[35] = { 
+    name = "Stormwind Vault", 
+    shortName = "SWV", 
+    type = "dungeon",
+    description = "Dungeon encounter in Stormwind Vault.",  
+    icon = "Interface\\Icons\\INV_Misc_Map_01",
+
+    worldMap - {
+        mapID = 37,
+        zoneID = 1
+    },
+}
+
 Instances[43] = { name = "Wailing Caverns", shortName = "WC", type = "dungeon", description = "Dungeon encounter in Wailing Caverns.", entranceZone = "The Barrens", icon = "Interface\\Icons\\INV_Misc_Map_01" }
 Instances[47] = { name = "Razorfen Kraul", shortName = "RFK", type = "dungeon", description = "Dungeon encounter in Razorfen Kraul.", entranceZone = "The Barrens", icon = "Interface\\Icons\\INV_Misc_Map_01" }
 Instances[48] = { name = "Blackfathom Deeps", shortName = "Blackfathom Deeps", type = "dungeon", description = "Dungeon encounter in Blackfathom Deeps.", icon = "Interface\\Icons\\INV_Misc_Map_01" }

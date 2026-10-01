@@ -676,7 +676,9 @@ NPCs[61850] = {
         zone = "Thalassian Highlands", 
         continent = 2, 
         zoneIndex = 31, 
-        x = 46.5, y = 87.2 } }
+        x = 46.5, y = 87.2 
+    } 
+}
 NPCs[61946] = { id = 61946, name = "Ley-Watcher Incantagos", zone = "Tower of Karazhan" }
 NPCs[62007] = { id = 62007, name = "Al'Dorel", zone = "Winterspring", map = { zone = "Winterspring", x = 56.19, y = 44.61 } }
 NPCs[62069] = { id = 62069, name = "Halgan Redbrand", zone = "Dragonmaw Retreat" }
@@ -695,7 +697,17 @@ NPCs[70022] = { id = 70022, name = "Norvok Hawkspear", zone = "Ashenvale", map =
 NPCs[70023] = { id = 70023, name = "Commander Grushak", zone = "Ashenvale", map = { zone = "Ashenvale", x = 87.23, y = 64.7 } }
 NPCs[70027] = { id = 70027, name = "Farseer Grimeye", zone = "Ashenvale", map = { zone = "Ashenvale", x = 90.68, y = 58.14 } }
 NPCs[80116] = { id = 80116, name = "Risen Oilblaze" }
-NPCs[80830] = { id = 80830, name = "Nazorna" }
+NPCs[80854] = { 
+    id = 80854, 
+    name = "Damian",
+    zone = "Stormwind Vault",
+    map = {
+        zone = "Stormwind Vault",
+        instanceID = 35,
+        x = 46.4, y = 43.1
+    }
+
+}
 NPCs[80854] = { id = 80854, name = "Damian", zone = "Stormwind Vault" }
 NPCs[91214] = { id = 91214, name = "" }
 NPCs[91234] = { id = 91234, name = "" }

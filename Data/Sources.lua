@@ -1168,7 +1168,36 @@ Sources[58137] = { { type = "drop", npcID = 62548, npcName = "Oronok Torn-Heart"
 Sources[58205] = { { type = "drop", npcID = 52145, npcName = "Incindis", npcType = "Boss", instanceID = 2717, zone = "Molten Core (Raid)", dropChance = 20, mobs = { { id = 52145, chance = 20 } }, mobCount = 1, details = true, lootNPCID = 52145 } }
 Sources[58253] = { { type = "vendor", npcID = 80945, npcName = "Elisandra Spellbinder", faction = "Both", details = true } }
 Sources[58277] = { { type = "quest", questID = 41841, questName = "Artifact of the Dark Lady", faction = "Horde", requiredLevel = 32, zone = "Silverpine Forrest", chainID = "octo:41841", details = true } }
-Sources[60427] = { { type = "drop", npcID = 80830, npcName = "Nazorna", npcType = "Boss", instanceID = 35, dropChance = 20, mobs = { { id = 80830, chance = 20 } }, mobCount = 1, details = true, lootNPCID = 80830 }, { type = "drop", npcID = 80854, npcName = "Damian", npcType = "Boss", instanceID = 35, zone = "Stormwind Vault", dropChance = 20, mobs = { { id = 80854, chance = 20 } }, mobCount = 1, details = true, lootNPCID = 80854 } }
+Sources[60427] = { 
+    { type = "drop", 
+    npcID = 80854, 
+    npcName = "Damian", 
+    npcType = "Boss", 
+    instanceID = 35, 
+    dropChance = 20, 
+    mobs = { 
+        { 
+            id = 80854, 
+            chance = 20 
+        } 
+    }, 
+    mobCount = 1, 
+    details = true, 
+    lootNPCID = 80854 
+}, 
+{ 
+    type = "drop", 
+    npcID = 80854, 
+    npcName = "Damian", 
+    npcType = "Boss", 
+    instanceID = 35, 
+    zone = "Stormwind Vault", 
+    dropChance = 20, 
+    mobs = { 
+        { id = 80854, chance = 20 } }, 
+        mobCount = 1, 
+        details = true, 
+        lootNPCID = 80854 } }
 Sources[60805] = { { type = "drop", npcID = 91910, npcName = "Multiple creatures", npcType = "Creatures", instanceID = 800, mobs = { { id = 91910, chance = 0.02 }, { id = 91911, chance = 0.02 }, { id = 91912, chance = 0.02 }, { id = 91913, chance = 0.02 }, { id = 91914, chance = 0.02 }, { id = 91915, chance = 0.02 }, { id = 91918, chance = 0.02 }, { id = 91919, chance = 0.02 }, { id = 91922, chance = 0.02 }, { id = 91923, chance = 0.02 }, { id = 91924, chance = 0.02 }, { id = 91925, chance = 0.02 }, { id = 91926, chance = 0.02 }, { id = 91932, chance = 0.02 }, { id = 91930, chance = 0.02 } }, mobCount = 15, details = true } }
 Sources[61019] = { { type = "drop", npcID = 65113, npcName = "Chronar", npcType = "Boss", instanceID = 269, zone = "Caverns of Time", dropChance = 16.7, mobs = { { id = 65113, chance = 16.7 } }, mobCount = 1, details = true, lootNPCID = 65113 } }
 Sources[61020] = { { type = "drop", npcID = 61316, npcName = "Drifting Avatar of Sand", npcType = "Named creature", instanceID = 269, zone = "Caverns of Time", dropChance = 2, mobs = { { id = 61316, chance = 2 } }, mobCount = 1, details = true }, { type = "drop", npcID = 65114, npcName = "Harbinger Aph'ygth", npcType = "Named creature", instanceID = 269, dropChance = 2, mobs = { { id = 65114, chance = 2 } }, mobCount = 1, details = true } }

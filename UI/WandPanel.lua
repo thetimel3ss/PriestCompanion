@@ -2397,8 +2397,8 @@ end
 --------------------------------------------------
 -- Sorting
 --------------------------------------------------
--- Recommended level is the primary ascending key so the list remains a
--- progression. DPS breaks level ties; non-curated entries use required level.
+-- DPS is the primary ascending key. Recommended level keeps equal-DPS
+-- entries in progression order; non-curated entries use required level.
 
 local function GetRecommendedSortLevel(itemID)
     local wand =
@@ -2433,6 +2433,16 @@ local function SortWands(
     local secondItem =
         PC.Data.Items[secondID]
 
+    local firstDPS =
+        GetItemDPS(firstItem)
+
+    local secondDPS =
+        GetItemDPS(secondItem)
+
+    if firstDPS ~= secondDPS then
+        return firstDPS < secondDPS
+    end
+
     local firstLevel =
         GetRecommendedSortLevel(
             firstID
@@ -2445,16 +2455,6 @@ local function SortWands(
 
     if firstLevel ~= secondLevel then
         return firstLevel < secondLevel
-    end
-
-    local firstDPS =
-        GetItemDPS(firstItem)
-
-    local secondDPS =
-        GetItemDPS(secondItem)
-
-    if firstDPS ~= secondDPS then
-        return firstDPS < secondDPS
     end
 
     local firstName =
@@ -2481,7 +2481,6 @@ local function SortWands(
 
     return firstID < secondID
 end
-
 --------------------------------------------------
 -- Refresh List
 --------------------------------------------------

@@ -99,6 +99,12 @@
 - Added unified quest history providers while keeping pfQuest and ClassicAPI optional.
 - Added instance-owned WorldMap metadata and entrance fallbacks.
 
+### Changed
+- Sorted the wand list by ascending recommended level, using DPS as a tie-breaker.
+- Added a case-insensitive wand search field.
+- Defaulted the list to `Usable Now` with the curated `Recommended` filter enabled.
+- Limited recommended highlighting to the explicitly curated progression wands.
+
 ### Data
 - Added Lesser Magic Wand.
 - Added Greater Magic Wand.

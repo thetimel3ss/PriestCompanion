@@ -42,14 +42,7 @@ Wands[11288] = {
 --------------------------------------------------
 
 Wands[5208] = {
-    order = 3,
-
-    recommended = true,
-
-    recommendedLevel = {
-        min = 15,
-        max = 19
-    }
+    order = 3
 }
 
 --------------------------------------------------
@@ -57,14 +50,7 @@ Wands[5208] = {
 --------------------------------------------------
 
 Wands[5326] = {
-    order = 4,
-
-    recommended = true,
-
-    recommendedLevel = {
-        min = 17,
-        max = 19
-    }
+    order = 4
 }
 
 --------------------------------------------------
@@ -72,14 +58,7 @@ Wands[5326] = {
 --------------------------------------------------
 
 Wands[5211] = {
-    order = 8,
-
-    recommended = true,
-
-    recommendedLevel = {
-        min = 20,
-        max = 24
-    }
+    order = 8
 }
 
 --------------------------------------------------
@@ -102,14 +81,7 @@ Wands[7001] = {
 --------------------------------------------------
 
 Wands[5092] = {
-    order = 7,
-
-    recommended = true,
-
-    recommendedLevel = {
-        min = 18,
-        max = 20
-    }
+    order = 7
 }
 
 --------------------------------------------------
@@ -132,14 +104,7 @@ Wands[5198] = {
 --------------------------------------------------
 
 Wands[5239] = {
-    order = 9,
-
-    recommended = true,
-
-    recommendedLevel = {
-        min = 41,
-        max = 47
-    }
+    order = 9
 }
 
 --------------------------------------------------
@@ -177,14 +142,7 @@ Wands[10836] = {
 --------------------------------------------------
 
 Wands[15281] = {
-    order = 12,
-
-    recommended = true,
-
-    recommendedLevel = {
-        min = 52,
-        max = 60
-    }
+    order = 12
 }
 
 --------------------------------------------------
@@ -192,14 +150,7 @@ Wands[15281] = {
 --------------------------------------------------
 
 Wands[15282] = {
-    order = 13,
-
-    recommended = true,
-
-    recommendedLevel = {
-        min = 55,
-        max = 60
-    }
+    order = 13
 }
 
 --------------------------------------------------
@@ -207,91 +158,35 @@ Wands[15282] = {
 --------------------------------------------------
 
 Wands[12296] = {
-    order = 3.5,
-
-    recommended = true,
-
-    recommendedLevel = {
-        min = 15,
-        max = 17
-    }
+    order = 3.5
 }
 
 Wands[15204] = {
-    order = 4.5,
-
-    recommended = true,
-
-    recommendedLevel = {
-        min = 17,
-        max = 19
-    }
+    order = 4.5
 }
 
 Wands[5240] = {
-    order = 5.5,
-
-    recommended = true,
-
-    recommendedLevel = {
-        min = 18,
-        max = 20
-    }
+    order = 5.5
 }
 
 Wands[5252] = {
-    order = 5.6,
-
-    recommended = true,
-
-    recommendedLevel = {
-        min = 18,
-        max = 20
-    }
+    order = 5.6
 }
 
 Wands[5356] = {
-    order = 7.5,
-
-    recommended = true,
-
-    recommendedLevel = {
-        min = 19,
-        max = 26
-    }
+    order = 7.5
 }
 
 Wands[7607] = {
-    order = 8.1,
-
-    recommended = true,
-
-    recommendedLevel = {
-        min = 20,
-        max = 24
-    }
+    order = 8.1
 }
 
 Wands[8071] = {
-    order = 8.2,
-
-    recommended = true,
-
-    recommendedLevel = {
-        min = 20,
-        max = 24
-    }
+    order = 8.2
 }
 
 Wands[6677] = {
-    order = 8.3,
-
-    recommended = true,
-
-    recommendedLevel = {
-        min = 25,
-        max = 27
-    }
+    order = 8.3
 }
 
 Wands[5250] = {
@@ -306,25 +201,11 @@ Wands[5250] = {
 }
 
 Wands[5246] = {
-    order = 8.5,
-
-    recommended = true,
-
-    recommendedLevel = {
-        min = 28,
-        max = 30
-    }
+    order = 8.5
 }
 
 Wands[5818] = {
-    order = 8.6,
-
-    recommended = true,
-
-    recommendedLevel = {
-        min = 28,
-        max = 31
-    }
+    order = 8.6
 }
 
 Wands[5244] = {
@@ -361,69 +242,27 @@ Wands[16789] = {
 }
 
 Wands[5248] = {
-    order = 8.91,
-
-    recommended = true,
-
-    recommendedLevel = {
-        min = 35,
-        max = 37
-    }
+    order = 8.91
 }
 
 Wands[5247] = {
-    order = 8.92,
-
-    recommended = true,
-
-    recommendedLevel = {
-        min = 36,
-        max = 38
-    }
+    order = 8.92
 }
 
 Wands[5249] = {
-    order = 8.93,
-
-    recommended = true,
-
-    recommendedLevel = {
-        min = 37,
-        max = 38
-    }
+    order = 8.93
 }
 
 Wands[6797] = {
-    order = 8.94,
-
-    recommended = true,
-
-    recommendedLevel = {
-        min = 38,
-        max = 41
-    }
+    order = 8.94
 }
 
 Wands[15692] = {
-    order = 8.95,
-
-    recommended = true,
-
-    recommendedLevel = {
-        min = 38,
-        max = 40
-    }
+    order = 8.95
 }
 
 Wands[4547] = {
-    order = 8.96,
-
-    recommended = true,
-
-    recommendedLevel = {
-        min = 38,
-        max = 40
-    }
+    order = 8.96
 }
 
 Wands[5253] = {
@@ -486,14 +325,7 @@ Wands[16993] = {
 --------------------------------------------------
 
 Wands[11289] = {
-    order = 8.35,
-
-    recommended = true,
-
-    recommendedLevel = {
-        min = 26,
-        max = 30
-    }
+    order = 8.35
 }
 
 --------------------------------------------------
@@ -501,14 +333,7 @@ Wands[11289] = {
 --------------------------------------------------
 
 Wands[11290] = {
-    order = 8.75,
-
-    recommended = true,
-
-    recommendedLevel = {
-        min = 30,
-        max = 34
-    }
+    order = 8.75
 }
 Wands[5069] = { order = 7 }
 Wands[5071] = { order = 9 }

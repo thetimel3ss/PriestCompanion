@@ -408,11 +408,26 @@ Wands[23009] = { order = 60 }
 Wands[23177] = { order = 36 }
 Wands[33200] = { order = 54 }
 Wands[33352] = { order = 53 }
-Wands[41117] = { order = 2 }
+Wands[41117] = { order = 2,
+    recommended = true,
+    recommendedLevel = {
+        min = 3,
+        max = 6
+    } }
 Wands[42365] = { order = 49 }
 Wands[51735] = { order = 60 }
-Wands[51816] = { order = 2 }
-Wands[51820] = { order = 2 }
+Wands[51816] = { order = 2,
+    recommended = true,
+    recommendedLevel = {
+        min = 3,
+        max = 6
+    }}
+Wands[51820] = { order = 2,
+    recommended = true,
+    recommendedLevel = {
+        min = 3,
+        max = 6
+    } }
 Wands[55134] = { order = 60 }
 Wands[55511] = { order = 60 }
 Wands[58009] = { order = 33 }

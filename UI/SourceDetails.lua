@@ -29,7 +29,29 @@ local CONTENT_WIDTH = 414
 local CARD_WIDTH = 410
 local CARD_PADDING = 10
 local CHAIN_INDENT = 20
+local MAX_CHAIN_INDENT = 80
+local CHAIN_WIDTH_PADDING = 8
 local CONNECTOR_HEIGHT = 25
+
+local function GetChainLayout(depth)
+    local indent =
+        depth * CHAIN_INDENT
+
+    if indent > MAX_CHAIN_INDENT then
+        indent = MAX_CHAIN_INDENT
+    end
+
+    local width =
+        CONTENT_WIDTH -
+        indent -
+        CHAIN_WIDTH_PADDING
+
+    if width < 300 then
+        width = 300
+    end
+
+    return indent, width
+end
 
 local HEADER_HEIGHT = 52
 local MIN_EXPANDED_HEIGHT = 120
@@ -1621,13 +1643,11 @@ local function PopulateQuestCard(
     -- Dynamic width from chain indentation
     --------------------------------------------------
 
-    local cardWidth =
-        CARD_WIDTH -
-        (depth * CHAIN_INDENT)
-
-    if cardWidth < 300 then
-        cardWidth = 300
-    end
+    local _,
+        cardWidth =
+        GetChainLayout(
+            depth
+        )
 
     local bodyWidth =
         cardWidth -
@@ -2776,9 +2796,11 @@ local function BuildQuestDetails(
                     visibleQuestCards
                 )
 
-            local indent =
-                displayDepth *
-                CHAIN_INDENT
+            local indent,
+                cardWidth =
+                GetChainLayout(
+                    displayDepth
+                )
 
             card:ClearAllPoints()
 
@@ -2823,8 +2845,7 @@ local function BuildQuestDetails(
                 )
 
                 connector:SetWidth(
-                    CARD_WIDTH -
-                    indent
+                    cardWidth
                 )
 
                 connector:SetHeight(

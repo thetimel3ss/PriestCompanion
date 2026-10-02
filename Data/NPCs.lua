@@ -587,7 +587,16 @@ NPCs[1345] = { id = 1345, name = "Magmar Fellhew", zone = "Loch Modan", map = { 
 NPCs[1661] = { id = 1661, name = "Novice Elreth", zone = "Tirisfal Glades", map = { zone = "Tirisfal Glades", x = 30.88, y = 66.07 } }
 NPCs[1748] = { id = 1748, name = "Highlord Bolvar Fordragon", zone = "Stormwind City", map = { zone = "Stormwind City", x = 78.26, y = 17.87 } }
 NPCs[1853] = { id = 1853, name = "Darkmaster Gandling" }
-NPCs[1938] = { id = 1938, name = "Dalar Dawnweaver", zone = "Silverpine Forrest", map = { zone = "Silverpine Forrest", x = 44.21, y = 39.81 } }
+NPCs[1938] = { 
+    id = 1938, 
+    name = "Dalar Dawnweaver", 
+    zone = "Silverpine Forest", 
+    map = { 
+        zone = "Silverpine Forest", 
+        x = 44.21, 
+        y = 39.81 
+        } 
+}
 NPCs[2082] = { id = 2082, name = "Gilshalan Windwalker", zone = "Teldrassil", map = { zone = "Teldrassil", x = 57.81, y = 41.67 } }
 NPCs[2358] = { id = 2358, name = "Dalaran Summoner", zone = "Alterac Mountains", map = { zone = "Alterac Mountains", x = 10.98, y = 78.7 } }
 NPCs[2410] = { id = 2410, name = "Magus Wordeen Voidglare", zone = "Alterac Mountains", map = { zone = "Alterac Mountains", x = 60.26, y = 82.71 } }

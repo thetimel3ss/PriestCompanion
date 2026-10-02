@@ -2888,7 +2888,8 @@ local function BuildQuestDetails(
     end
 
     local totalHeight =
-        -y
+        -y +
+        CARD_PADDING
 
     if totalHeight < 1 then
         totalHeight = 1

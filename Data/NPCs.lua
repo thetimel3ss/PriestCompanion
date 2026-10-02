@@ -183,25 +183,14 @@ NPCs[3458] = {
 
 NPCs[645] = {
     id = 645,
-
-    name =
-        "Cookie",
-
-    zone =
-        "The Deadmines",
-
-    locations = {
-        {
-            instanceID = 1581,
-
-            zone =
-                "The Deadmines",
-
-            x = 81.0,
-            y = 24.5,
-
-            label =
-                "Cookie"
+    name = "Cookie",
+    zone = "The Deadmines",
+    locations = { {
+        instanceID = 1581,
+        zone = "The Deadmines",
+        x = 81.0,
+        y = 24.5,
+        label = "Cookie"
         }
     }
 }
@@ -449,7 +438,7 @@ NPCs[6579] = {
     id = 6579,
     name = "Shoni the Shilent",
     zone = "Stormwind City",
-    map = { zone = "Stormwind City", x = 55.57, y = 12.51 }
+    map = { zone = "Stormwind City", x = 62.5, y = 33.9 }
 }
 
 NPCs[7764] = {
@@ -612,7 +601,20 @@ NPCs[4501] = { id = 4501, name = "Draz'Zilb", zone = "Dustwallow Marsh", map = {
 NPCs[4568] = { id = 4568, name = "Anastasia Hartwell", zone = "Tirisfal Glades", map = { zone = "Tirisfal Glades", x = 65.89, y = 67.2 } }
 NPCs[4618] = { id = 4618, name = "Martek the Exiled", zone = "Badlands", map = { zone = "Badlands", x = 42.2, y = 52.67 } }
 NPCs[5489] = { id = 5489, name = "Brother Joshua", zone = "Stormwind City", map = { zone = "Stormwind City", x = 38.53, y = 26.79 } }
-NPCs[5912] = { id = 5912, name = "Deviate Faerie Dragon", zone = "Wailing Caverns" }
+
+NPCs[5912] = {
+    id = 5912,
+    name = "Deviate Faerie Dragon",
+    zone = "Wailing Caverns",
+    locations = {
+        {
+            instanceID = 43,
+            x = 73.8,
+            y = 29.9,
+            label = "Deviate Faerie Dragon"
+        }
+    }
+}
 NPCs[6109] = { id = 6109, name = "Azuregos", zone = "Aszhara", map = { zone = "Aszhara", x = 56.83, y = 78.72 } }
 NPCs[6490] = { id = 6490, name = "Azshir the Sleepless", zone = "Scarlet Monastery (Dungeon)", map = { zone = "Scarlet Monastery (Dungeon)", x = 0, y = 0 } }
 NPCs[6546] = { id = 6546, name = "Tabetha", zone = "Dustwallow Marsh", map = { zone = "Dustwallow Marsh", x = 46.02, y = 57.1 } }

@@ -130,13 +130,25 @@ Instances[35] = {
     description = "Dungeon encounter in Stormwind Vault.",  
     icon = "Interface\\Icons\\INV_Misc_Map_01",
 
-    worldMap - {
+    worldMap = {
         mapID = 37,
         zoneID = 1
     },
 }
 
-Instances[43] = { name = "Wailing Caverns", shortName = "WC", type = "dungeon", description = "Dungeon encounter in Wailing Caverns.", entranceZone = "The Barrens", icon = "Interface\\Icons\\INV_Misc_Map_01" }
+Instances[43] = {
+    name = "Wailing Caverns",
+    shortName = "WC",
+    type = "dungeon",
+    description = "Dungeon encounter in Wailing Caverns.",
+    entranceZone = "The Barrens",
+    icon = "Interface\\Icons\\INV_Misc_Map_01",
+
+    worldMap = {
+        mapID = 18,
+        zoneID = 1
+    }
+}
 Instances[47] = { name = "Razorfen Kraul", shortName = "RFK", type = "dungeon", description = "Dungeon encounter in Razorfen Kraul.", entranceZone = "The Barrens", icon = "Interface\\Icons\\INV_Misc_Map_01" }
 Instances[48] = { name = "Blackfathom Deeps", shortName = "Blackfathom Deeps", type = "dungeon", description = "Dungeon encounter in Blackfathom Deeps.", icon = "Interface\\Icons\\INV_Misc_Map_01" }
 Instances[129] = { name = "Razorfen Downs", shortName = "RFD", type = "dungeon", description = "Dungeon encounter in Razorfen Downs.", entranceZone = "The Barrens", icon = "Interface\\Icons\\INV_Misc_Map_01" }

@@ -13,9 +13,7 @@ local Wands = PC.Data.Wands
 
 Wands[11287] = {
     order = 1,
-
     recommended = true,
-
     recommendedLevel = {
         min = 5,
         max = 12
@@ -28,9 +26,7 @@ Wands[11287] = {
 
 Wands[11288] = {
     order = 2,
-
     recommended = true,
-
     recommendedLevel = {
         min = 13,
         max = 17
@@ -67,9 +63,7 @@ Wands[5211] = {
 
 Wands[7001] = {
     order = 5,
-
     recommended = true,
-
     recommendedLevel = {
         min = 18,
         max = 29

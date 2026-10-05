@@ -17,15 +17,11 @@ local BossLoot = PC.Data.BossLoot
 Sources[11287] = {
     {
         type = "craft",
-
         profession = "Enchanting",
         skill = 10,
-
         faction = "Both",
-
         spellID = 14293,
         taughtBy = "trainer",
-
         reagents = {
             {
                 itemID = 4470,
@@ -56,15 +52,11 @@ Sources[11287] = {
 Sources[11288] = {
     {
         type = "craft",
-
         profession = "Enchanting",
         skill = 70,
-
         faction = "Both",
-
         spellID = 14807,
         taughtBy = "trainer",
-
         reagents = {
             {
                 itemID = 4470,
@@ -95,10 +87,8 @@ Sources[11288] = {
 Sources[5208] = {
     {
         type = "vendor",
-
         npcName = "Wand merchants",
         zone = "Stormwind, Ironforge, Orgrimmar, Undercity",
-
         faction = "Both",
         requiredLevel = 15
     }
@@ -111,14 +101,11 @@ Sources[5208] = {
 Sources[5326] = {
     {
         type = "quest",
-
         questID = 863,
         chainID = "flaring_baton",
-
         faction = "Both",
         zone = "The Barrens",
         requiredLevel = 13,
-
         details = true
     }
 }
@@ -130,10 +117,8 @@ Sources[5326] = {
 Sources[5211] = {
     {
         type = "vendor",
-
         npcName = "Wand merchants",
         zone = "Stormwind, Ironforge, Orgrimmar, Undercity",
-
         faction = "Both",
         requiredLevel = 20
     }
@@ -150,14 +135,10 @@ Sources[7001] = {
 
     {
         type = "quest",
-
         questID = 1200,
-        chainID =
-            "gravestone_scepter_alliance",
-
+        chainID = "gravestone_scepter_alliance",
         faction = "Alliance",
         instanceID = 719,
-
         details = true
     },
 
@@ -167,12 +148,9 @@ Sources[7001] = {
 
     {
         type = "quest",
-
         questID = 6561,
-
         faction = "Horde",
         instanceID = 719,
-
         details = true
     }
 }
@@ -184,14 +162,11 @@ Sources[7001] = {
 Sources[5092] = {
     {
         type = "drop",
-
         npcID = 3458,
         npcName = "Razormane Seer",
         npcType = "Named creature",
-
         zone = "The Barrens",
         dropChance = 29.94,
-
         faction = "Both",
         requiredLevel = 18
     }
@@ -204,26 +179,22 @@ Sources[5092] = {
 Sources[5198] = {
     {
         type = "drop",
-
         npcID = 645,
         npcName = "Cookie",
         npcType = "Boss",
-
         instanceID = 1581,
         zone = "The Deadmines",
         dropChance = 35,
-
         mobs = {
             {
                 id = 645,
                 chance = 35
             }
         },
-
+        
         mobCount = 1,
         lootNPCID = 645,
         details = true,
-
         faction = "Both",
         requiredLevel = 17
     }
@@ -340,10 +311,8 @@ BossLoot[645] = {
 Sources[5239] = {
     {
         type = "vendor",
-
         npcName = "Wand merchants",
         zone = "Stormwind, Ironforge, Orgrimmar, Undercity",
-
         faction = "Both",
         requiredLevel = 41
     }
@@ -356,15 +325,12 @@ Sources[5239] = {
 Sources[17745] = {
     {
         type = "drop",
-
         npcID = 13282,
         npcName = "Noxxion",
         npcType = "Boss",
-
         instanceID = 349,
         zone = "Maraudon",
         dropChance = 33.33,
-
         mobs = {
             {
                 id = 13282,
@@ -375,7 +341,6 @@ Sources[17745] = {
         mobCount = 1,
         lootNPCID = 13282,
         details = true,
-
         faction = "Both",
         requiredLevel = 46
     }
@@ -388,15 +353,12 @@ Sources[17745] = {
 Sources[10836] = {
     {
         type = "drop",
-
         npcID = 5709,
         npcName = "Shade of Eranikus",
         npcType = "Boss",
-
         instanceID = 109,
         zone = "Sunken Temple",
         dropChance = 16.67,
-
         mobs = {
             {
                 id = 5709,
@@ -407,7 +369,6 @@ Sources[10836] = {
         mobCount = 1,
         lootNPCID = 5709,
         details = true,
-
         faction = "Both",
         requiredLevel = 51
     }

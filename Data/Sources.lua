@@ -862,6 +862,7 @@ Sources[5253] = {
     {
         type = "quest",
         questID = 600,
+        chainID = "octo:600",
         faction = "Both",
         zone = "Stranglethorn Vale",
         requiredLevel = 30,

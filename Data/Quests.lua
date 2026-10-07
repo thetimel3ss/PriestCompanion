@@ -620,10 +620,14 @@ Quests[705] = {
     objectiveText = "Bring 9 Blue Pearls to Rigglefuzz in the Badlands.",
     description = "The Badlands is a harsh place, filled with vicious predators and bold scavengers. Scary, especially for a short little goblin. To survive, I have to be tricky! I know the recipe for flash bombs. I use those to scare away wildlife. But I'm running low on one of the ingredients: crushed blue pearl powder. Get me some and I'll make it worth your efforts. Heh, and I hope you have good boots on. The Blue Pearls I need are found from clams at the Vile Reef. Yep, the Vile Reef in Stranglethorn!",
     rewards = {
-        type = "choice",
-        items = {
+        type = "mixed",
+        guaranteed = {
+            4852
+        },
+
+        choice = {
             4086,
-            5248
+            5248 -- Flash wand
         }
     }
 }

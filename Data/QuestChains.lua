@@ -261,23 +261,11 @@ QuestChains["eyepoker"] = {
     }
 }
 
-QuestChains["octo:1044"] = { 
-    name = "Answered Questions", 
-    rewardQuestID = 1044, 
-    steps = { 
-        1022, 
-        1037, 
-        1038, 
-        1039, 
-        1040, 
-        1041, 
-        1042, 
-        1043, 
-        1044 
-    } 
-}
+--------------------------------------------------
+-- Fizzle's Zippy Lighter
+--------------------------------------------------
 
-QuestChains["octo:1137"] = { 
+QuestChains["fizzles_zippy_lighter"] = { 
     name = "News for Fizzle", 
     rewardQuestID = 1137, 
     steps = { 
@@ -484,7 +472,7 @@ QuestChains["octo:55006"] = {
     } 
 }
 
-QuestChains["octo:600"] = { 
+QuestChains["goblin_igniter"] = { 
     name = "Venture Company Mining", 
     rewardQuestID = 600, 
     steps = { 

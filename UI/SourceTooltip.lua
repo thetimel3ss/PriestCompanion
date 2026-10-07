@@ -1071,7 +1071,7 @@ local function BuildDrop(
             "Interface\\Icons\\INV_Misc_Bag_10",
             "Drop Chance",
             string.format(
-                "%.2f%%",
+                "%.4f%%",
                 source.dropChance
             ),
             "neutral"

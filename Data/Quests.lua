@@ -416,12 +416,17 @@ Quests[223] = {
     objectiveText = "Bring Calor's note to Jonathan Carevin.",
     description = "Here you go, <name>. Bring this message to Master Carevin. <He quickly removes a piece of faded parchment and offers it to you.> A few more like you, and we will outnumber the Night Watch! Perhaps then we could complete the work that we few carry on today.",
     rewards = {
-        type = "choice",
-        items = {
-            2902,
-            1547
-        }
+    type = "mixed",
+
+    guaranteed = {
+        5244 -- Consecrated Wand
+    },
+
+    choice = {
+        2902,
+        1547
     }
+}
 }
 
 --------------------------------------------------

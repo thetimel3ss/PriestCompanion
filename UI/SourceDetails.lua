@@ -1290,6 +1290,19 @@ local function AcquireQuestCard(index)
         0.72
     )
 
+    card.choiceRewardMode =
+    card:CreateFontString(
+        nil,
+        "OVERLAY",
+        "GameFontHighlightSmall"
+    )
+
+    card.choiceRewardMode:SetTextColor(
+    0.72,
+    0.72,
+    0.72
+    )
+
     --------------------------------------------------
     -- Gains
     --------------------------------------------------
@@ -1525,6 +1538,8 @@ local function HideCardContent(card)
     card.rewardMode:Hide()
 
     card.gainsHeader:Hide()
+
+    card.choiceRewardMode:Hide()
 
     local i
 
@@ -2139,32 +2154,72 @@ local function PopulateQuestCard(
     -- Rewards
     --------------------------------------------------
 
-    local rewardCount = 0
+    local guaranteedItems = {}
+local choiceItems = {}
 
-    if quest
+local rewards =
+    quest
     and quest.rewards
-    and quest.rewards.items then
-        rewardCount =
-            table.getn(
-                quest.rewards.items
-            )
+
+if rewards then
+    if rewards.type == "mixed" then
+        guaranteedItems =
+            rewards.guaranteed or {}
+
+        choiceItems =
+            rewards.choice or {}
+
+    elseif rewards.type == "fixed" then
+        guaranteedItems =
+            rewards.items or {}
+
+    elseif rewards.type == "choice" then
+        choiceItems =
+            rewards.items or {}
+
+    elseif rewards.guaranteed
+    or rewards.choice then
+        guaranteedItems =
+            rewards.guaranteed or {}
+
+        choiceItems =
+            rewards.choice or {}
     end
+end
 
-    if rewardCount > 0 then
-        card.rewardsHeader:ClearAllPoints()
+local guaranteedCount =
+    table.getn(
+        guaranteedItems
+    )
 
-        card.rewardsHeader:SetPoint(
-            "TOPLEFT",
-            card,
-            "TOPLEFT",
-            CARD_PADDING,
-            y
-        )
+local choiceCount =
+    table.getn(
+        choiceItems
+    )
 
-        card.rewardsHeader:Show()
+local rewardCount =
+    guaranteedCount +
+    choiceCount
 
-        y = y - 17
+if rewardCount > 0 then
+    card.rewardsHeader:ClearAllPoints()
 
+    card.rewardsHeader:SetPoint(
+        "TOPLEFT",
+        card,
+        "TOPLEFT",
+        CARD_PADDING,
+        y
+    )
+
+    card.rewardsHeader:Show()
+
+    y = y - 17
+
+    local rowIndex = 0
+    local i
+
+    if guaranteedCount > 0 then
         card.rewardMode:ClearAllPoints()
 
         card.rewardMode:SetPoint(
@@ -2175,33 +2230,27 @@ local function PopulateQuestCard(
             y
         )
 
-        if quest.rewards.type ==
-        "choice" then
-            card.rewardMode:SetText(
-                "Choose one:"
-            )
-        else
-            card.rewardMode:SetText(
-                "You receive:"
-            )
-        end
+        card.rewardMode:SetText(
+            "Guaranteed reward:"
+        )
 
         card.rewardMode:Show()
 
         y = y - 18
 
-        local i
-
         for i = 1,
-            rewardCount
+            guaranteedCount
         do
+            rowIndex =
+                rowIndex + 1
+
             local rewardItemID =
-                quest.rewards.items[i]
+                guaranteedItems[i]
 
             local row =
                 AcquireRewardRow(
                     card,
-                    i
+                    rowIndex
                 )
 
             row:SetWidth(
@@ -2260,9 +2309,114 @@ local function PopulateQuestCard(
                 y -
                 ITEM_ROW_HEIGHT
         end
-
-        y = y - 6
     end
+
+    if choiceCount > 0 then
+        if guaranteedCount > 0 then
+            y = y - 4
+        end
+
+        local mode =
+            card.choiceRewardMode
+
+        if guaranteedCount == 0 then
+            mode =
+                card.rewardMode
+        end
+
+        mode:ClearAllPoints()
+
+        mode:SetPoint(
+            "TOPLEFT",
+            card,
+            "TOPLEFT",
+            CARD_PADDING,
+            y
+        )
+
+        mode:SetText(
+            "Choose one:"
+        )
+
+        mode:Show()
+
+        y = y - 18
+
+        for i = 1,
+            choiceCount
+        do
+            rowIndex =
+                rowIndex + 1
+
+            local rewardItemID =
+                choiceItems[i]
+
+            local row =
+                AcquireRewardRow(
+                    card,
+                    rowIndex
+                )
+
+            row:SetWidth(
+                bodyWidth
+            )
+
+            row.name:SetWidth(
+                bodyWidth - 70
+            )
+
+            row:ClearAllPoints()
+
+            row:SetPoint(
+                "TOPLEFT",
+                card,
+                "TOPLEFT",
+                CARD_PADDING,
+                y
+            )
+
+            row.itemID =
+                rewardItemID
+
+            row.icon:SetTexture(
+                PC.API.GetItemIcon(
+                    rewardItemID
+                )
+            )
+
+            row.name:SetText(
+                PC.API.GetItemName(
+                    rewardItemID
+                )
+            )
+
+            row.value:SetText("")
+
+            if rewardItemID ==
+            activeItemID then
+                row.name:SetTextColor(
+                    0.25,
+                    1.00,
+                    0.25
+                )
+            else
+                row.name:SetTextColor(
+                    0.85,
+                    0.85,
+                    0.85
+                )
+            end
+
+            row:Show()
+
+            y =
+                y -
+                ITEM_ROW_HEIGHT
+        end
+    end
+
+    y = y - 6
+end
 
     --------------------------------------------------
     -- Gains
@@ -3020,7 +3174,7 @@ local function BuildDropDetails(source)
             nil,
             "Drop Chance",
             string.format(
-                "%.2f%%",
+                "%.4f%%",
                 source.dropChance
             )
         )
@@ -3126,7 +3280,7 @@ local function BuildDropDetails(source)
             if lootItem.chance then
                 row.value:SetText(
                     string.format(
-                        "%.2f%%",
+                        "%.4f%%",
                         lootItem.chance
                     )
                 )

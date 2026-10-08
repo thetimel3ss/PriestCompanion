@@ -87,10 +87,24 @@ local REP_B = 0.25
 --------------------------------------------------
 
 local activeItemID = nil
-local activeSource = {}
+local activeSources = {}
 local expandedQuests = {}
 
 local Refresh
+
+local function NormalizeSources(sourceOrSources)
+    if not sourceOrSources then
+        return {}
+    end
+
+    if sourceOrSources[1] then
+        return sourceOrSources
+    end
+
+    return {
+        sourceOrSources
+    }
+end
 
 --------------------------------------------------
 -- Helpers
@@ -751,8 +765,18 @@ dropMapButton:SetScript(
         local npc = nil
 
         if source then
-            npc = GetNPC(
+            local npcID =
                 source.npcID
+
+            if not npcID
+            and source.mobs
+            and table.getn(source.mobs) == 1 then
+                npcID =
+                    source.mobs[1].id
+            end
+
+            npc = GetNPC(
+                npcID
             )
         end
 
@@ -766,6 +790,12 @@ dropMapButton:SetScript(
 )
 
 dropMapButton:Hide()
+
+local dropMapButtons = {
+    dropMapButton
+}
+
+local visibleDropMapButtons = 0
 
 local lootHeader =
     scrollChild:CreateFontString(
@@ -785,6 +815,12 @@ lootHeader:SetTextColor(
 )
 
 lootHeader:Hide()
+
+local lootHeaders = {
+    lootHeader
+}
+
+local visibleLootHeaders = 0
 
 local craftReagentsHeader =
     scrollChild:CreateFontString(
@@ -2796,6 +2832,101 @@ local function AddGenericRow(
     return y - 36
 end
 
+local function AcquireDropMapButton(index)
+    local button =
+        dropMapButtons[index]
+
+    if button then
+        return button
+    end
+
+    button =
+        CreateFrame(
+            "Button",
+            nil,
+            scrollChild,
+            "UIPanelButtonTemplate"
+        )
+
+    button:SetWidth(
+        MAP_BUTTON_WIDTH
+    )
+
+    button:SetHeight(
+        MAP_BUTTON_HEIGHT
+    )
+
+    button:SetText(
+        "Show on Map"
+    )
+
+    button:SetScript(
+        "OnClick",
+        function()
+            local source =
+                this.source
+
+            local npcID =
+                source
+                and source.npcID
+
+            if not npcID
+            and source
+            and source.mobs
+            and table.getn(source.mobs) == 1 then
+                npcID =
+                    source.mobs[1].id
+            end
+
+            local npc =
+                GetNPC(npcID)
+
+            ShowNPCOnMap(
+                npc,
+                nil,
+                "Drop",
+                "drop"
+            )
+        end
+    )
+
+    dropMapButtons[index] =
+        button
+
+    return button
+end
+
+local function AcquireLootHeader(index)
+    local header =
+        lootHeaders[index]
+
+    if header then
+        return header
+    end
+
+    header =
+        scrollChild:CreateFontString(
+            nil,
+            "OVERLAY",
+            "GameFontNormalSmall"
+        )
+
+    header:SetText(
+        "Boss Loot Table"
+    )
+
+    header:SetTextColor(
+        1.00,
+        0.82,
+        0.00
+    )
+
+    lootHeaders[index] =
+        header
+
+    return header
+end
+
 --------------------------------------------------
 -- Clear Dynamic Content
 --------------------------------------------------
@@ -2803,9 +2934,23 @@ end
 local function ClearContent()
     local i
 
-    dropMapButton:Hide()
-    dropMapButton.source = nil
-    lootHeader:Hide()
+    for i = 1,
+        table.getn(
+            dropMapButtons
+        )
+    do
+        dropMapButtons[i]:Hide()
+        dropMapButtons[i].source = nil
+    end
+
+    for i = 1,
+        table.getn(
+            lootHeaders
+        )
+    do
+        lootHeaders[i]:Hide()
+    end
+
     craftReagentsHeader:Hide()
     craftToolsHeader:Hide()
 
@@ -2856,6 +3001,8 @@ local function ClearContent()
     visibleConnectors = 0
     visibleGenericRows = 0
     visibleCraftRows = 0
+    visibleDropMapButtons = 0
+    visibleLootHeaders = 0
 end
 
 --------------------------------------------------
@@ -3063,6 +3210,34 @@ local function GetDropperIcon(source)
         "Interface\\TargetingFrame\\UI-TargetingFrame-Skull"
 end
 
+local function GetDropNPC(source)
+    if not source then
+        return nil
+    end
+
+    if source.npcName == "Multiple creatures"
+    and (
+        source.mobCount
+        and source.mobCount > 1
+        or source.mobs
+        and table.getn(source.mobs) > 1
+    ) then
+        return nil
+    end
+
+    local npcID =
+        source.npcID
+
+    if not npcID
+    and source.mobs
+    and table.getn(source.mobs) == 1 then
+        npcID =
+            source.mobs[1].id
+    end
+
+    return GetNPC(npcID)
+end
+
 local function GetBossLoot(source)
     if not source
     or not PC.Data.BossLoot then
@@ -3086,149 +3261,151 @@ local function GetBossLoot(source)
         PC.Data.BossLoot[lootNPCID]
 end
 
-local function BuildDropDetails(source)
-    local instance =
-        GetInstance(
-            source.instanceID
-        )
+local function BuildDropDetails(sources)
+    local sourceCount =
+        table.getn(sources)
 
-    if instance then
-        sourceTitle:SetText(
-            "Drop  |  " ..
-            instance.name
-        )
+    if sourceCount == 0 then
+        return
+    end
+
+    if sourceCount == 1 then
+        local instance =
+            GetInstance(
+                sources[1].instanceID
+            )
+
+        if instance then
+            sourceTitle:SetText(
+                "Drop  |  " ..
+                instance.name
+            )
+        else
+            sourceTitle:SetText(
+                "Drop Details"
+            )
+        end
     else
         sourceTitle:SetText(
-            "Drop Details"
+            "Drop Sources  |  " ..
+            tostring(sourceCount)
         )
     end
 
     local y = 0
+    local lootRowIndex = 0
+    local i
 
-    y = AddGenericRow(
-        y,
-        GetDropperIcon(source),
-        nil,
-        "Dropped by",
-        source.npcName
-        or (
-            "NPC " ..
-            tostring(
-                source.npcID or "?"
+    for i = 1,
+        sourceCount
+    do
+        local source =
+            sources[i]
+
+        local instance =
+            GetInstance(
+                source.instanceID
+            )
+
+        y = AddGenericRow(
+            y,
+            GetDropperIcon(source),
+            nil,
+            "Dropped by",
+            source.npcName
+            or (
+                "NPC " ..
+                tostring(
+                    source.npcID or "?"
+                )
             )
         )
-    )
 
-    local dropNPC =
-        GetNPC(
-            source.npcID
-        )
+        local dropNPC =
+            GetDropNPC(source)
 
-    if dropNPC then
-        dropMapButton.source =
-            source
+        if dropNPC then
+            visibleDropMapButtons =
+                visibleDropMapButtons + 1
 
-        dropMapButton:ClearAllPoints()
-
-        dropMapButton:SetPoint(
-            "TOPRIGHT",
-            scrollChild,
-            "TOPRIGHT",
-            -8,
-            y + 8
-        )
-
-        dropMapButton:Show()
-
-        y =
-            y -
-            MAP_BUTTON_HEIGHT -
-            8
-    end
-
-    if instance then
-        y = AddGenericRow(
-            y,
-            instance.icon,
-            instance.iconCoords,
-            instance.type == "raid"
-            and "Raid"
-            or "Dungeon",
-            instance.name
-        )
-
-    elseif source.zone then
-        y = AddGenericRow(
-            y,
-            "Interface\\Icons\\INV_Misc_Map_01",
-            nil,
-            "Location",
-            source.zone
-        )
-    end
-
-    if source.dropChance then
-        y = AddGenericRow(
-            y,
-            "Interface\\Icons\\INV_Misc_Bag_10",
-            nil,
-            "Drop Chance",
-            string.format(
-                "%.4f%%",
-                source.dropChance
-            )
-        )
-    end
-
-    local loot =
-        GetBossLoot(
-            source
-        )
-
-    if loot
-    and table.getn(loot) > 0 then
-        lootHeader:ClearAllPoints()
-
-        lootHeader:SetPoint(
-            "TOPLEFT",
-            scrollChild,
-            "TOPLEFT",
-            CARD_PADDING,
-            y
-        )
-
-        lootHeader:Show()
-
-        y =
-            y -
-            LOOT_HEADER_HEIGHT
-
-        local i
-
-        for i = 1,
-            table.getn(loot)
-        do
-            local lootItem =
-                loot[i]
-
-            local row =
-                AcquireItemRow(
-                    lootRows,
-                    scrollChild,
-                    i
+            local mapButton =
+                AcquireDropMapButton(
+                    visibleDropMapButtons
                 )
 
-            row:SetWidth(
-                CARD_WIDTH
+            mapButton.source =
+                source
+
+            mapButton:ClearAllPoints()
+
+            mapButton:SetPoint(
+                "TOPRIGHT",
+                scrollChild,
+                "TOPRIGHT",
+                -8,
+                y + 8
             )
 
-            row.name:SetWidth(
-                CARD_WIDTH - 92
+            mapButton:Show()
+
+            y =
+                y -
+                MAP_BUTTON_HEIGHT -
+                8
+        end
+
+        if instance then
+            y = AddGenericRow(
+                y,
+                instance.icon,
+                instance.iconCoords,
+                instance.type == "raid"
+                and "Raid"
+                or "Dungeon",
+                instance.name
             )
 
-            row:ClearAllPoints()
+        elseif source.zone then
+            y = AddGenericRow(
+                y,
+                "Interface\\Icons\\INV_Misc_Map_01",
+                nil,
+                "Location",
+                source.zone
+            )
+        end
 
-            row:SetPoint(
+        if source.dropChance then
+            y = AddGenericRow(
+                y,
+                "Interface\\Icons\\INV_Misc_Bag_10",
+                nil,
+                "Drop Chance",
+                string.format(
+                    "%.4f%%",
+                    source.dropChance
+                )
+            )
+        end
+
+        local loot =
+            GetBossLoot(
+                source
+            )
+
+        if loot
+        and table.getn(loot) > 0 then
+            visibleLootHeaders =
+                visibleLootHeaders + 1
+
+            local header =
+                AcquireLootHeader(
+                    visibleLootHeaders
+                )
+
+            header:ClearAllPoints()
+
+            header:SetPoint(
                 "TOPLEFT",
                 scrollChild,
                 "TOPLEFT",
@@ -3236,74 +3413,121 @@ local function BuildDropDetails(source)
                 y
             )
 
-            row.itemID =
-                lootItem.itemID
-
-            row.icon:SetTexture(
-                PC.API.GetItemIcon(
-                    lootItem.itemID
-                )
-            )
-
-            local itemName =
-                PC.API.GetItemName(
-                    lootItem.itemID
-                )
-
-            if lootItem.name
-            and itemName ==
-                "Item " ..
-                tostring(
-                    lootItem.itemID
-                ) then
-                itemName =
-                    lootItem.name
-            end
-
-            if lootItem.note then
-                itemName =
-                    itemName ..
-                    " (" ..
-                    lootItem.note ..
-                    ")"
-            end
-
-            row.name:SetText(
-                itemName
-            )
-
-            SetQualityColor(
-                row.name,
-                lootItem.quality
-            )
-
-            if lootItem.chance then
-                row.value:SetText(
-                    string.format(
-                        "%.4f%%",
-                        lootItem.chance
-                    )
-                )
-            else
-                row.value:SetText(
-                    "-"
-                )
-            end
-
-            row.value:SetTextColor(
-                0.85,
-                0.85,
-                0.85
-            )
-
-            row:Show()
+            header:Show()
 
             y =
                 y -
-                ITEM_ROW_HEIGHT
+                LOOT_HEADER_HEIGHT
+
+            local lootIndex
+
+            for lootIndex = 1,
+                table.getn(loot)
+            do
+                local lootItem =
+                    loot[lootIndex]
+
+                lootRowIndex =
+                    lootRowIndex + 1
+
+                local row =
+                    AcquireItemRow(
+                        lootRows,
+                        scrollChild,
+                        lootRowIndex
+                    )
+
+                row:SetWidth(
+                    CARD_WIDTH
+                )
+
+                row.name:SetWidth(
+                    CARD_WIDTH - 92
+                )
+
+                row:ClearAllPoints()
+
+                row:SetPoint(
+                    "TOPLEFT",
+                    scrollChild,
+                    "TOPLEFT",
+                    CARD_PADDING,
+                    y
+                )
+
+                row.itemID =
+                    lootItem.itemID
+
+                row.icon:SetTexture(
+                    PC.API.GetItemIcon(
+                        lootItem.itemID
+                    )
+                )
+
+                local itemName =
+                    PC.API.GetItemName(
+                        lootItem.itemID
+                    )
+
+                if lootItem.name
+                and itemName ==
+                    "Item " ..
+                    tostring(
+                        lootItem.itemID
+                    ) then
+                    itemName =
+                        lootItem.name
+                end
+
+                if lootItem.note then
+                    itemName =
+                        itemName ..
+                        " (" ..
+                        lootItem.note ..
+                        ")"
+                end
+
+                row.name:SetText(
+                    itemName
+                )
+
+                SetQualityColor(
+                    row.name,
+                    lootItem.quality
+                )
+
+                if lootItem.chance then
+                    row.value:SetText(
+                        string.format(
+                            "%.4f%%",
+                            lootItem.chance
+                        )
+                    )
+                else
+                    row.value:SetText(
+                        "-"
+                    )
+                end
+
+                row.value:SetTextColor(
+                    0.85,
+                    0.85,
+                    0.85
+                )
+
+                row:Show()
+
+                y =
+                    y -
+                    ITEM_ROW_HEIGHT
+            end
+
+            y = y - 6
         end
 
-        y = y - 6
+        if i < sourceCount then
+            y = y - 8
+        end
     end
 
     scrollChild:SetHeight(
@@ -3642,9 +3866,13 @@ end
 Refresh =
     function()
         if not activeItemID
-        or not activeSource then
+        or not activeSources
+        or not activeSources[1] then
             return
         end
+
+        local primarySource =
+            activeSources[1]
 
         local oldScroll = 0
 
@@ -3668,34 +3896,34 @@ Refresh =
             )
         )
 
-        if activeSource.type ==
+        if primarySource.type ==
         "quest" then
             BuildQuestDetails(
-                activeSource,
+                primarySource,
                 activeItemID
             )
 
-        elseif activeSource.type ==
+        elseif primarySource.type ==
         "drop" then
             BuildDropDetails(
-                activeSource
+                activeSources
             )
 
-        elseif activeSource.type ==
+        elseif primarySource.type ==
         "vendor" then
             BuildVendorDetails(
-                activeSource
+                primarySource
             )
 
-        elseif activeSource.type ==
+        elseif primarySource.type ==
         "craft" then
             BuildCraftDetails(
-                activeSource
+                primarySource
             )
 
         else
             BuildGenericDetails(
-                activeSource
+                primarySource
             )
         end
 
@@ -3740,15 +3968,18 @@ Refresh =
 
 function SourceDetails.Open(
     itemID,
-    source
+    sourceOrSources
 )
     if not itemID
-    or not source then
+    or not sourceOrSources then
         return
     end
 
     activeItemID = itemID
-    activeSource = source
+    activeSources =
+        NormalizeSources(
+            sourceOrSources
+        )
     expandedQuests = {}
 
     GameTooltip:Hide()

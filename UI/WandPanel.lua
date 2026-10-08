@@ -1035,6 +1035,41 @@ local function HideItemTooltips()
     end
 end
 
+local function GetDetailSources(row)
+    local result = {}
+
+    if not row
+    or not row.source then
+        return result
+    end
+
+    local sourceType =
+        row.source.type
+
+    if row.sources then
+        local i
+
+        for i = 1,
+            table.getn(row.sources)
+        do
+            local source =
+                row.sources[i]
+
+            if source.type == sourceType then
+                result[
+                    table.getn(result) + 1
+                ] = source
+            end
+        end
+    end
+
+    if table.getn(result) == 0 then
+        result[1] = row.source
+    end
+
+    return result
+end
+
 local function OnItemClick()
     local row = this
 
@@ -1051,9 +1086,14 @@ local function OnItemClick()
     )
     and PC.UI.SourceDetails then
 
+        local detailSources =
+            GetDetailSources(
+                row
+            )
+
         PC.UI.SourceDetails.Open(
             row.itemID,
-            row.source
+            detailSources
         )
     end
 end

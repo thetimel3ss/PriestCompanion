@@ -390,7 +390,7 @@ QuestChains["octo:296"] = {
     } 
 }
 
-QuestChains["octo:297"] = { 
+QuestChains["dwarven_firestick"] = { 
     name = "Gathering Idols", 
     rewardQuestID = 297, 
     steps = { 
@@ -620,7 +620,7 @@ QuestChains["octo:957"] = {
 }
 
 QuestChains[
-    "99"
+    "cinder_wand"
     ] = { 
         name = "Arugal's Folly", 
         rewardQuestID = 99, 

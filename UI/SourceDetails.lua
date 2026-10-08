@@ -87,7 +87,7 @@ local REP_B = 0.25
 --------------------------------------------------
 
 local activeItemID = nil
-local activeSource = nil
+local activeSource = {}
 local expandedQuests = {}
 
 local Refresh

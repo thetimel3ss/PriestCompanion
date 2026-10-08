@@ -303,6 +303,65 @@ local function ResolveInstanceWorldMap(location)
 end
 
 --------------------------------------------------
+-- Instance Map Only
+--------------------------------------------------
+--
+-- Opens an internal dungeon/raid map without placing
+-- a marker. This is useful when a source represents
+-- many creatures spread throughout an instance.
+
+function Map.ShowInstanceMap(
+    instanceID,
+    instanceZoneID,
+    label
+)
+    if not instanceID then
+        return false
+    end
+
+    if not WorldMapFrame
+    or type(SetMapZoom) ~= "function" then
+        Print(
+            "World map API is not available."
+        )
+
+        return false
+    end
+
+    local resolved =
+        ResolveInstanceWorldMap({
+            instanceID = instanceID,
+            instanceZoneID = instanceZoneID
+        })
+
+    if not resolved then
+        Print(
+            "Map location is not available for " ..
+            tostring(
+                label or
+                "this instance"
+            ) ..
+            "."
+        )
+
+        return false
+    end
+
+    Map.HideMarker()
+
+    if not WorldMapFrame:IsShown() then
+        WorldMapFrame:Show()
+    end
+
+    SetMapZoom(
+        resolved.continent,
+        resolved.zone
+    )
+
+    return true
+end
+
+--------------------------------------------------
 -- Marker
 --------------------------------------------------
 

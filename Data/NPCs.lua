@@ -779,6 +779,17 @@ NPCs[5489] = {
         y = 26.79 } 
 }
 
+NPCs[5497] = {
+    id = 5497,
+    name = "Jennea Cannon",
+    zone = "Stormwind City",
+    map = {
+        zone = "Stormwind City",
+        x = 49.6,
+        y = 85.8
+    }
+}
+
 NPCs[5912] = {
     id = 5912,
     name = "Deviate Faerie Dragon",

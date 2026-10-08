@@ -1466,10 +1466,10 @@ Sources[9381] = {
         type = "drop", 
         npcName = "Multiple creatures", 
         npcType = "Creatures", 
+        instanceID = 70,
         requiredLevel = 33,
         dropChance = 0.02,
         faction = "Both",
-     -- instanceID = , -- Uldaman
         details = true
     }
 }

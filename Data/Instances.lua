@@ -95,6 +95,24 @@ Instances[349] = {
 }
 
 --------------------------------------------------
+-- Uldaman
+--------------------------------------------------
+
+Instances[70] = {
+    name = "Uldaman",
+    shortName = "Ulda",
+    type = "dungeon",
+    description = "Dungeon encounter in Uldaman.",
+    entranceZone = "Badlands",
+    icon = "Interface\\Icons\\INV_Misc_Map_01",
+
+    worldMap = {
+        mapID = 10,
+        zoneID = 35
+    }
+}
+
+--------------------------------------------------
 -- Sunken Temple
 --------------------------------------------------
 

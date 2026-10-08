@@ -339,6 +339,96 @@ local function GetNPC(npcReference)
     return PC.Data.NPCs[npcID]
 end
 
+local function ResolveQuestNPC(
+    quest,
+    role
+)
+    if not quest then
+        return nil
+    end
+
+    --------------------------------------------------
+    -- Some quests are offered by different NPCs for
+    -- each faction. Prefer the faction-specific record
+    -- while retaining the legacy singular field below.
+    --------------------------------------------------
+
+    local factionNPCs
+
+    if role == "start" then
+        factionNPCs = quest.startNPCByFaction
+    else
+        factionNPCs = quest.endNPCByFaction
+    end
+
+    if factionNPCs then
+        local faction = nil
+
+        if PC.API
+        and type(
+            PC.API.GetPlayerFaction
+        ) == "function" then
+            faction =
+                PC.API.GetPlayerFaction()
+        end
+
+        local npcReference =
+            faction
+            and factionNPCs[faction]
+
+        if not npcReference then
+            npcReference =
+                factionNPCs.Both
+        end
+
+        if npcReference then
+            if type(npcReference) == "table"
+            and npcReference.id then
+                local npc =
+                    GetNPC(npcReference)
+
+                if npc then
+                    return npc
+                end
+
+            elseif type(npcReference) == "table" then
+                local i
+
+                for i = 1,
+                    table.getn(npcReference)
+                do
+                    local npc =
+                        GetNPC(
+                            npcReference[i]
+                        )
+
+                    if npc then
+                        return npc
+                    end
+                end
+
+            else
+                local npc =
+                    GetNPC(npcReference)
+
+                if npc then
+                    return npc
+                end
+            end
+        end
+    end
+
+    local legacyNPC
+
+    if role == "start" then
+        legacyNPC = quest.startNPC
+    else
+        legacyNPC = quest.endNPC
+    end
+
+    return GetNPC(legacyNPC)
+end
+
 --------------------------------------------------
 -- Quest Status
 --------------------------------------------------
@@ -1636,15 +1726,15 @@ local function PopulateQuestCard(
 
     card.questName = questName
     card.startNPC =
-        quest
-        and GetNPC(
-            quest.startNPC
+        ResolveQuestNPC(
+            quest,
+            "start"
         )
 
     card.endNPC =
-        quest
-        and GetNPC(
-            quest.endNPC
+        ResolveQuestNPC(
+            quest,
+            "end"
         )
 
     card.headerButton.questID =
@@ -2881,12 +2971,26 @@ local function AcquireDropMapButton(index)
             local npc =
                 GetNPC(npcID)
 
-            ShowNPCOnMap(
-                npc,
-                nil,
-                "Drop",
-                "drop"
-            )
+            if npc then
+                ShowNPCOnMap(
+                    npc,
+                    nil,
+                    "Drop",
+                    "drop"
+                )
+
+            elseif source
+            and source.instanceID
+            and PC.Map
+            and type(
+                PC.Map.ShowInstanceMap
+            ) == "function" then
+                PC.Map.ShowInstanceMap(
+                    source.instanceID,
+                    source.instanceZoneID,
+                    source.zone
+                )
+            end
         end
     )
 
@@ -3324,7 +3428,13 @@ local function BuildDropDetails(sources)
         local dropNPC =
             GetDropNPC(source)
 
-        if dropNPC then
+        local instanceMapAvailable =
+            instance
+            and instance.worldMap
+            and instance.worldMap.mapID
+
+        if dropNPC
+        or instanceMapAvailable then
             visibleDropMapButtons =
                 visibleDropMapButtons + 1
 

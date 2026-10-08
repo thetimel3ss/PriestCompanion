@@ -2049,6 +2049,10 @@ Quests[1947] = {
     faction = "Both", 
     description = "Now it is time for you to earn your mage's wand. To begin this quest, speak with the human hermit Tabetha in Dustwallow Marsh. You will find her shack deep in the marsh, west of Theramore. Speak with her, for her knowledge is vast. You will find Tabetha's cottage west of Theramore, and just north of the Stonemaul Ruins.", 
     objectiveText = "Speak with Tabetha.", 
+    startNPCByFaction = {
+        Alliance = 5497,
+        Horde = 4568
+    },
     startNPC = 4568, 
     endNPC = 6546 
 }

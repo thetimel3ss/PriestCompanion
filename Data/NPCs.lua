@@ -807,12 +807,15 @@ NPCs[6109] = {
 NPCs[6490] = { 
     id = 6490, 
     name = "Azshir the Sleepless", 
-    zone = "Scarlet Monastery (Dungeon)", 
-    map = { 
-        zone = "Scarlet Monastery (Dungeon)", 
-        x = 0, 
-        y = 0 
-    } 
+    zone = "Scarlet Monastery", 
+    locations = { {
+        instanceID = 796,
+        instanceZoneID = 3,
+        zone = "Scarlet Monastery",
+        x = 40.8, 
+        y = 46.7,
+        label = "Azshir the Sleepless"
+    } }
 }
 
 NPCs[6546] = { 
@@ -1560,9 +1563,9 @@ NPCs[91234] = {
 NPCs[91350] = { 
     id = 91350, 
     name = "Magus Bromley", 
-    zone = "Aszhara", 
+    zone = "Azshara", 
     map = { 
-        zone = "Aszhara", 
+        zone = "Azshara", 
         x = 37.507, 
         y = 65.6169 } 
 }

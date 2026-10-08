@@ -333,7 +333,7 @@ QuestChains["octo:14"] = {
     } 
 }
 
-QuestChains["octo:1952"] = { 
+QuestChains["mages_wand"] = { 
     name = "Mage's Wand", 
     rewardQuestID = 1952, 
     steps = { 
@@ -608,7 +608,7 @@ QuestChains["octo:873"] = {
     } 
 }
 
-QuestChains["octo:957"] = { 
+QuestChains["elven_wand"] = { 
     name = "Bashal'Aran", 
     rewardQuestID = 957, 
     steps = { 

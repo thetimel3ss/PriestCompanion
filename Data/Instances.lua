@@ -331,13 +331,18 @@ Instances[721] = {
 --------------------------------------------------
 -- Scarlet Monastery
 --------------------------------------------------
-Instances[796] = { 
-    name = "Scarlet Monastery", 
-    shortName = "SM", 
-    type = "dungeon", 
-    description = "Dungeon encounter in Scarlet Monastery.", 
-    entranceZone = "Tirisfal Glades", 
-    icon = "Interface\\Icons\\INV_Misc_Map_01" 
+
+Instances[796] = {
+    name = "Scarlet Monastery",
+    shortName = "SM",
+    type = "dungeon",
+    entranceZone = "Tirisfal Glades",
+    icon = "Interface\\Icons\\INV_Misc_Map_01",
+
+    worldMap = {
+        mapID = 24,
+        zoneID = 1
+    }
 }
 
 --------------------------------------------------

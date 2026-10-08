@@ -108,7 +108,7 @@ Instances[70] = {
 
     worldMap = {
         mapID = 10,
-        zoneID = 35
+        zoneID = 1
     }
 }
 

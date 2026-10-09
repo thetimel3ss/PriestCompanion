@@ -870,12 +870,26 @@ dropMapButton:SetScript(
             )
         end
 
-        ShowNPCOnMap(
-            npc,
-            nil,
-            "Drop",
-            "drop"
-        )
+        if npc then
+            ShowNPCOnMap(
+                npc,
+                nil,
+                "Drop",
+                "drop"
+            )
+
+        elseif source
+        and source.instanceID
+        and PC.Map
+        and type(
+            PC.Map.ShowInstanceMap
+        ) == "function" then
+            PC.Map.ShowInstanceMap(
+                source.instanceID,
+                source.instanceZoneID,
+                source.zone
+            )
+        end
     end
 )
 

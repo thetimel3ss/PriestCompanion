@@ -620,7 +620,15 @@ NPCs[1748] = {
 
 NPCs[1853] = { 
     id = 1853, 
-    name = "Darkmaster Gandling" 
+    name = "Darkmaster Gandling",
+    zone = "Scholomance",
+    map = {
+        instanceID = 2057,
+        zone = "Scholomance",
+        -- instance map does not show the bosses positions correctly.
+        x = 0,
+        y = 0
+    }
 }
 
 NPCs[1938] = { 
@@ -667,9 +675,9 @@ NPCs[2410] = {
 NPCs[2425] = { 
     id = 2425, 
     name = "Varimathras", 
-    zone = "Silverpine Forrest", 
+    zone = "Silverpine Forest", 
     map = { 
-        zone = "Silverpine Forrest", 
+        zone = "Silverpine Forest", 
         x = 74.21, 
         y = 13.56 } 
 }
@@ -971,9 +979,9 @@ NPCs[9476] = {
 NPCs[10181] = { 
     id = 10181, 
     name = "Lady Sylvanas Windrunner", 
-    zone = "Silverpine Forrest", 
+    zone = "Silverpine Forest", 
     map = { 
-        zone = "Silverpine Forrest", 
+        zone = "Silverpine Forest", 
         x = 74.62, 
         y = 13.45 
     } 
@@ -1073,28 +1081,103 @@ NPCs[10929] = {
 
 NPCs[11480] = { 
     id = 11480, 
-    name = "Arcane Aberration" 
+    name = "Arcane Aberration",
+    zone = "Dire Maul",
+    locations = {
+        {
+            instanceID = 2557,
+            zone = "Dire Maul",
+            x = 38.4,
+            y = 75.2
+        }, {
+            instanceID = 2557,
+            zone = "Dire Maul",
+            x = 29,
+            y = 83
+        }, {
+            instanceID = 2557,
+            zone = "Dire Maul",
+            x = 28.7,
+            y = 68
+        }, {
+            instanceID = 2557,
+            zone = "Dire Maul",
+            x = 11.1,
+            y = 88.8
+        }, {
+            instanceID = 2557,
+            zone = "Dire Maul",
+            x = 11.3,
+            y = 69
+        }
+    }
 }
 
 NPCs[11483] = { 
     id = 11483, 
     name = "Mana Remnant", 
-    zone = "Dire Maul (Dungeon)", 
-    map = { 
-        zone = "Dire Maul (Dungeon)", 
-        x = 0, 
-        y = 0 
+    zone = "Dire Maul", 
+    locations = {
+        {
+            instanceID = 2557,
+            zone = "Dire Maul", 
+            x = 16, 
+            y = 74 
+        }, {
+            instanceID = 2557,
+            zone = "Dire Maul",
+            x = 6,
+            y = 87.5
+        }, {
+            instanceID = 2557,
+            zone = "Dire Maul",
+            x = 4.2,
+            y = 74.7
+        }, {
+            instanceID = 2557,
+            zone = "Dire Maul",
+            x = 10,
+            y = 69.2
+        }, {
+            instanceID = 2557,
+            zone = "Dire Maul",
+            x = 14.6,
+            y = 87
+        }
     } 
 }
 
 NPCs[11484] = { 
     id = 11484, 
     name = "Residual Monstrosity", 
-    zone = "Dire Maul (Dungeon)", 
-    map = { 
-        zone = "Dire Maul (Dungeon)", 
-        x = 0, 
-        y = 0 
+    zone = "Dire Maul", 
+    locations = {
+        {
+            instanceID = 2557,
+            zone = "Dire Maul", 
+            x = 16, 
+            y = 74 
+        }, {
+            instanceID = 2557,
+            zone = "Dire Maul",
+            x = 6,
+            y = 87.5
+        }, {
+            instanceID = 2557,
+            zone = "Dire Maul",
+            x = 4.2,
+            y = 74.7
+        }, {
+            instanceID = 2557,
+            zone = "Dire Maul",
+            x = 10,
+            y = 69.2
+        }, {
+            instanceID = 2557,
+            zone = "Dire Maul",
+            x = 14.6,
+            y = 87
+        }
     } 
 }
 
@@ -1151,22 +1234,22 @@ NPCs[11981] = {
 NPCs[12098] = { 
     id = 12098, 
     name = "Sulfuron Harbinger", 
-    zone = "Molten Core (Raid)", 
+    zone = "Molten Core", 
     map = { 
-        zone = "Molten Core (Raid)", 
-        x = 0, 
-        y = 0 
+        zone = "Molten Core", 
+        x = 78, 
+        y = 85 
     } 
 }
 
 NPCs[12118] = { 
     id = 12118, 
     name = "Lucifron", 
-    zone = "Molten Core (Raid)", 
+    zone = "Molten Core", 
     map = { 
-        zone = "Molten Core (Raid)", 
-        x = 0, 
-        y = 0 
+        zone = "Molten Core", 
+        x = 63.6, 
+        y = 44.7 
     } 
 }
 
@@ -1181,19 +1264,14 @@ NPCs[12159] = {
     } 
 }
 
-NPCs[12259] = { 
-    id = 12259, 
-    name = "Gehennas" 
-}
-
 NPCs[12264] = { 
     id = 12264, 
     name = "Shazzrah", 
-    zone = "Molten Core (Raid)", 
+    zone = "Molten Core", 
     map = { 
-        zone = "Molten Core (Raid)", 
-        x = 0, 
-        y = 0 
+        zone = "Molten Core", 
+        x = 54.1, 
+        y = 85.5 
     } 
 }
 
@@ -1293,33 +1371,58 @@ NPCs[13841] = {
 NPCs[14324] = { 
     id = 14324, 
     name = "Cho'Rush the Observer", 
-    zone = "Dire Maul (Dungeon)", 
+    zone = "Dire Maul", 
     map = { 
-        zone = "Dire Maul (Dungeon)", 
-        x = 0, 
-        y = 0 
+        instanceID = 2557,
+        zone = "Dire Maul", 
+        x = 25.5, 
+        y = 9.4 
     } 
 }
 
 NPCs[14327] = { 
     id = 14327, 
     name = "Lethtendris", 
-    zone = "Dire Maul (Dungeon)", 
+    zone = "Dire Maul", 
     map = { 
-        zone = "Dire Maul (Dungeon)", 
-        x = 0, 
-        y = 0 
+        instanceID = 2557,
+        zone = "Dire Maul", 
+        x = 74.3, 
+        y = 76.7 
     } 
 }
 
 NPCs[14399] = { 
     id = 14399, 
     name = "Arcane Torrent", 
-    zone = "Dire Maul (Dungeon)", 
-    map = { 
-        zone = "Dire Maul (Dungeon)", 
-        x = 0, 
-        y = 0 
+    zone = "Dire Maul", 
+    locations = {
+        {
+            instanceID = 2557,
+            zone = "Dire Maul", 
+            x = 16, 
+            y = 74 
+        }, {
+            instanceID = 2557,
+            zone = "Dire Maul",
+            x = 6,
+            y = 87.5
+        }, {
+            instanceID = 2557,
+            zone = "Dire Maul",
+            x = 4.2,
+            y = 74.7
+        }, {
+            instanceID = 2557,
+            zone = "Dire Maul",
+            x = 10,
+            y = 69.2
+        }, {
+            instanceID = 2557,
+            zone = "Dire Maul",
+            x = 14.6,
+            y = 87
+        }
     } 
 }
 
@@ -1331,7 +1434,14 @@ NPCs[14510] = {
 
 NPCs[14516] = { 
     id = 14516, 
-    name = "Death Knight Darkreaver" 
+    name = "Death Knight Darkreaver",
+    zone = "Scholomance",
+    map = {
+        instanceID = 2057,
+        zone = "Scholomance",
+        x = 0,
+        y = 0
+    }
 }
 
 NPCs[14686] = { 
@@ -1394,11 +1504,11 @@ NPCs[16184] = {
 NPCs[52145] = { 
     id = 52145, 
     name = "Incindis", 
-    zone = "Molten Core (Raid)", 
+    zone = "Molten Core", 
     map = { 
-        zone = "Molten Core (Raid)", 
-        x = 0, 
-        y = 0 
+        zone = "Molten Core", 
+        x = 55.1, 
+        y = 11.1 
     } 
 }
 

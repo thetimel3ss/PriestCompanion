@@ -452,7 +452,7 @@ QuestChains["octo:504"] = {
     } 
 }
 
-QuestChains["octo:5088"] = { 
+QuestChains["stingshot_wand"] = { 
     name = "Arikara", 
     rewardQuestID = 5088, 
     steps = { 
@@ -511,7 +511,7 @@ QuestChains["octo:6041"] = {
     } 
 }
 
-QuestChains["octo:6148"] = { 
+QuestChains["stormrager_horde"] = { 
     name = "The Scarlet Oracle, Demetria", 
     rewardQuestID = 6148, 
     steps = { 
@@ -525,7 +525,7 @@ QuestChains["octo:6148"] = {
     } 
 }
 
-QuestChains["octo:6187"] = { 
+QuestChains["stormrager_alliance"] = { 
     name = "Order Must Be Restored", 
     rewardQuestID = 6187, 
     steps = { 

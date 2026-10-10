@@ -249,7 +249,7 @@ Instances[229] = {
     worldMap = {
         mapID = 17,
         zoneID = 1
-        -- instance map does not show the bosses positions correctly.
+        -- Instance map does not show the bosses positions correctly.
     }
 }
 
@@ -470,7 +470,13 @@ Instances[2057] = {
     type = "dungeon", 
     description = "Dungeon encounter in Scholomance.", 
     entranceZone = "Western Plaguelands", 
-    icon = "Interface\\Icons\\INV_Misc_Map_01" 
+    icon = "Interface\\Icons\\INV_Misc_Map_01",
+
+    worldMap = {
+        mapID = 25,
+        zoneID = 1
+        -- Instance map does not show the bosses positions correctly.
+    }
 }
 
 --------------------------------------------------
@@ -483,7 +489,12 @@ Instances[2557] = {
     type = "dungeon", 
     description = "Dungeon encounter in Dire Maul.", 
     entranceZone = "Feralas", 
-    icon = "Interface\\Icons\\INV_Misc_Map_01" 
+    icon = "Interface\\Icons\\INV_Misc_Map_01",
+    
+    worldMap = {
+        mapID = 13,
+        zoneID = 1
+    }
 }
 
 --------------------------------------------------
@@ -509,6 +520,11 @@ Instances[2717] = {
     type = "raid", 
     description = "Raid encounter in Molten Core.", 
     entranceZone = "Burning Steppes", 
-    icon = "Interface\\Icons\\INV_Misc_Map_01" 
+    icon = "Interface\\Icons\\INV_Misc_Map_01",
+
+    worldMap = {
+        mapID = 11,
+        zoneID = 1
+    }
 }
 

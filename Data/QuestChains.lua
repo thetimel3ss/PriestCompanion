@@ -276,7 +276,7 @@ QuestChains["fizzles_zippy_lighter"] = {
     } 
 }
 
-QuestChains["octo:1173"] = { 
+QuestChains["chillnail_splinter"] = { 
     name = "Challenge Overlord Mok'Morokk", 
     rewardQuestID = 1173, 
     steps = { 

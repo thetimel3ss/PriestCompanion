@@ -1568,8 +1568,47 @@ Sources[10572] = {
     } 
 }
 
-Sources[10704] = { { type = "quest", questID = 1173, questName = "Challenge Overlord Mok'Morokk", faction = "Horde", requiredLevel = 38, zone = "Dustwallow Marsh", chainID = "octo:1173", details = true } }
-Sources[10766] = { { type = "drop", npcID = 7356, npcName = "Plaguemaw the Rotting", npcType = "Boss", instanceID = 129, dropChance = 33.3333333, mobs = { { id = 7356, chance = 33.3333333 } }, mobCount = 1, details = true, lootNPCID = 7356 } }
+--------------------------------------------------
+-- Chillnail Splinter
+--------------------------------------------------
+
+Sources[10704] = { 
+    { 
+        type = "quest", 
+        questID = 1173, 
+        questName = "Challenge Overlord Mok'Morokk", 
+        faction = "Horde", 
+        requiredLevel = 38, 
+        zone = "Dustwallow Marsh", 
+        chainID = "chillnail_splinter", 
+        details = true 
+    } 
+}
+
+--------------------------------------------------
+-- Plaguerot Sprint
+--------------------------------------------------
+
+Sources[10766] = { 
+    { 
+        type = "drop", 
+        npcID = 7356, 
+        npcName = "Plaguemaw the Rotting", 
+        npcType = "Boss", 
+        instanceID = 129, 
+        dropChance = 33.3333333, 
+        mobs = { 
+            { 
+                id = 7356, 
+                chance = 33.3333333 
+            } 
+        }, 
+        mobCount = 1, 
+        details = true, 
+        lootNPCID = 7356 
+    } 
+}
+
 Sources[11263] = { { type = "quest", questID = 1952, questName = "Mage's Wand", faction = "Both", requiredLevel = 30, zone = "Dustwallow Marsh", chainID = "octo:1952", details = true } }
 Sources[11748] = { { type = "drop", npcID = 9024, npcName = "Pyromancer Loregrain", npcType = "Boss", instanceID = 1584, zone = "BRD (Dungeon)", dropChance = 25, mobs = { { id = 9024, chance = 25 } }, mobCount = 1, details = true, lootNPCID = 9024 } }
 Sources[12468] = { { type = "drop", npcID = 12159, npcName = "Korrak the Bloodrager", npcType = "Boss", zone = "Alterac Valley", dropChance = 5, mobs = { { id = 12159, chance = 5 } }, mobCount = 1, details = true, lootNPCID = 12159 } }

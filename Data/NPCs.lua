@@ -865,7 +865,16 @@ NPCs[7274] = {
 
 NPCs[7356] = { 
     id = 7356, 
-    name = "Plaguemaw the Rotting" 
+    name = "Plaguemaw the Rotting" ,
+    zone = "Razorfen Downs",
+    locations = { {
+        instanceID = 129,
+        zone = "Razorfen Downs",
+        x = 36.3,
+        y = 17.4,
+        label = "Plaguemaw the Rotting"
+        } }
+
 }
 
 NPCs[7795] = { 

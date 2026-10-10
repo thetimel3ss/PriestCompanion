@@ -244,7 +244,13 @@ Instances[229] = {
     type = "dungeon", 
     description = "Dungeon encounter in Blackrock Spire.", 
     entranceZone = "Burning Steppes", 
-    icon = "Interface\\Icons\\INV_Misc_Map_01" 
+    icon = "Interface\\Icons\\INV_Misc_Map_01",
+
+    worldMap = {
+        mapID = 17,
+        zoneID = 1
+        -- instance map does not show the bosses positions correctly.
+    }
 }
 
 --------------------------------------------------

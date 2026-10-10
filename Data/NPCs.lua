@@ -1032,7 +1032,16 @@ NPCs[10440] = {
 NPCs[10509] = { 
     id = 10509, 
     name = "Jed Runewatcher", 
-    zone = "Blackrock Spire" 
+    zone = "Blackrock Spire",
+    locations ={
+        {
+            instanceID = 229,
+            zone = "Blackrock Spire",
+            x = 0,
+            y = 0,
+            label = "Jed Runewatcher"
+        }
+    }
 }
 
 NPCs[10539] = { 
@@ -1436,7 +1445,8 @@ NPCs[61850] = {
         zone = "Thalassian Highlands", 
         continent = 2, 
         zoneIndex = 31, 
-        x = 46.5, y = 87.2 
+        x = 46.5, 
+        y = 87.2 
     } 
 }
 NPCs[61946] = { 

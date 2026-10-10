@@ -64,24 +64,22 @@ NPCs[3439] = {
     id = 3439,
     name = "Wizzlecrank's Shredder",
     zone = "The Barrens",
-    locations = {
-        {
+    map = {
             zone = "The Barrens",
             x = 56.52,
             y = 7.452
-        } }
+        }
 }
 
 NPCs[3442] = {
     id = 3442,
     name = "Sputtervalve",
     zone = "The Barrens",
-    locations = {
-        {
+    map = {
             zone = "The Barrens",
             x = 62.98,
             y = 37.22
-        } }
+        }
 }
 
 NPCs[3458] = {
@@ -93,48 +91,55 @@ NPCs[3458] = {
             zone = "The Barrens",
             x = 40.45,
             y = 80.78
-        } }
+        }, {
+            zone = "The Barrens",
+            x = 43.9,
+            y = 82.5
+        }, {
+            zone = "The Barrens",
+            x = 41.9,
+            y = 78
+        }
+    }
 }
 
 NPCs[645] = {
     id = 645,
     name = "Cookie",
     zone = "The Deadmines",
-    locations = { {
+    map = { 
         instanceID = 1581,
         zone = "The Deadmines",
         x = 81.0,
         y = 24.5,
         label = "Cookie"
-        } }
+        } 
 }
 
 NPCs[13282] = {
     id = 13282,
     name = "Noxxion",
     zone = "Maraudon",
-    locations = {
-        {
+    map = {
             instanceID = 349,
             zone = "Maraudon",
             x = 32.3,
             y = 4.7,
             label = "Noxxion"
-        } }
+        } 
 }
 
 NPCs[5709] = {
     id = 5709,
     name = "Shade of Eranikus",
     zone = "Sunken Temple",
-    locations = {
-        {
+    map = {
             instanceID = 109,
             zone = "Sunken Temple",
             x = 66.5,
             y = 87.7,
             label = "Shade of Eranikus"
-        } }
+        } 
 }
 
 NPCs[234] = {
@@ -794,14 +799,12 @@ NPCs[5912] = {
     id = 5912,
     name = "Deviate Faerie Dragon",
     zone = "Wailing Caverns",
-    locations = {
-        {
+    map = {
             instanceID = 43,
             x = 73.8,
             y = 29.9,
             label = "Deviate Faerie Dragon"
         }
-    }
 }
 
 NPCs[6109] = { 
@@ -819,14 +822,14 @@ NPCs[6490] = {
     id = 6490, 
     name = "Azshir the Sleepless", 
     zone = "Scarlet Monastery", 
-    locations = { {
+    map = { 
         instanceID = 796,
         instanceZoneID = 3,
         zone = "Scarlet Monastery",
         x = 40.8, 
         y = 46.7,
         label = "Azshir the Sleepless"
-    } }
+    } 
 }
 
 NPCs[6546] = { 
@@ -855,44 +858,38 @@ NPCs[7272] = {
     id = 7272, 
     name = "Theka the Martyr", 
     zone = "Zul'Farrak",
-    locations = { 
-        {
-            instanceID = 209,
-            zone = "Zul'Farrak",
-            x = 52.8,
-            y = 25.9,
-            label = "Theka the Martyr",
+    map = { 
+        instanceID = 209,
+        zone = "Zul'Farrak",
+        x = 52.8,
+        y = 25.9,
+        label = "Theka the Martyr",
         }
-    }
 }
 
 NPCs[7274] = { 
     id = 7274, 
     name = "Sandfury Executioner", 
     zone = "Zul'Farrak",
-    locations = { 
-        {
-            instanceID = 209,
-            zone = "Zul'Farrak",
-            x = 23.6,
-            y = 17.6,
-            label = "Sandfury Executioner",
+    map = {
+        instanceID = 209,
+        zone = "Zul'Farrak",
+        x = 23.6,
+        y = 17.6,
+        label = "Sandfury Executioner",
         }
-    }
 }
 
 NPCs[7356] = { 
     id = 7356, 
     name = "Plaguemaw the Rotting" ,
     zone = "Razorfen Downs",
-    locations = { 
-        {
+    map = { 
         instanceID = 129,
         zone = "Razorfen Downs",
         x = 36.3,
         y = 17.4,
         label = "Plaguemaw the Rotting"
-        } 
     }
 }
 
@@ -900,15 +897,13 @@ NPCs[7795] = {
     id = 7795, 
     name = "Hydromancer Velratha", 
     zone = "Zul'Farrak",
-    locations = { 
-        {
+    map = { 
         instanceID = 209,
         zone = "Zul'Farrak",
         x = 34,
         y = 41.4,
         label = "Hydromancer Velratha",
         }
-    }
 }
 
 NPCs[8405] = { 
@@ -959,14 +954,13 @@ NPCs[9024] = {
     id = 9024, 
     name = "Pyromancer Loregrain", 
     zone = "Blackrock Depths", 
-    locations = { {
+    map = {
         instanceID = 1584,
         zone = "Blackroch Depths", 
         x = 57.2, 
         y = 75.9,
         label = "Pyromancer Loregrain"
-        } 
-    }
+        }
 }
 
 NPCs[9476] = { 
@@ -988,11 +982,12 @@ NPCs[10181] = {
 NPCs[10393] = { 
     id = 10393, 
     name = "Skul", 
-    zone = "Stratholme (Dungeon)", 
-    map = { 
-        zone = "Stratholme (Dungeon)", 
-        x = 0, 
-        y = 0 
+    zone = "Stratholme", 
+    map = {
+        instanceID = 2017, 
+        zone = "Stratholme", 
+        x = 56.2, 
+        y = 85 
     } 
 }
 
@@ -1010,9 +1005,9 @@ NPCs[10428] = {
 NPCs[10436] = { 
     id = 10436, 
     name = "Baroness Anastari", 
-    zone = "Stratholme (Dungeon)", 
+    zone = "Stratholme", 
     map = { 
-        zone = "Stratholme (Dungeon)", 
+        zone = "Stratholme", 
         x = 0, 
         y = 0 
     } 
@@ -1033,15 +1028,13 @@ NPCs[10509] = {
     id = 10509, 
     name = "Jed Runewatcher", 
     zone = "Blackrock Spire",
-    locations ={
-        {
+    map = {
             instanceID = 229,
             zone = "Blackrock Spire",
             x = 0,
             y = 0,
             label = "Jed Runewatcher"
         }
-    }
 }
 
 NPCs[10539] = { 

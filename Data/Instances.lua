@@ -452,7 +452,12 @@ Instances[2017] = {
     type = "dungeon", 
     description = "Dungeon encounter in Stratholme.", 
     entranceZone = "Eastern Plaguelands", 
-    icon = "Interface\\Icons\\INV_Misc_Map_01" 
+    icon = "Interface\\Icons\\INV_Misc_Map_01",
+
+    worldMap = {
+        mapID = 27,
+        zoneID = 1
+    }
 }
 
 --------------------------------------------------

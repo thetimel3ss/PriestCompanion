@@ -854,33 +854,61 @@ NPCs[6548] = {
 NPCs[7272] = { 
     id = 7272, 
     name = "Theka the Martyr", 
-    zone = "Zul'Farrak" 
+    zone = "Zul'Farrak",
+    locations = { 
+        {
+            instanceID = 209,
+            zone = "Zul'Farrak",
+            x = 52.8,
+            y = 25.9,
+            label = "Theka the Martyr",
+        }
+    }
 }
 
 NPCs[7274] = { 
     id = 7274, 
     name = "Sandfury Executioner", 
-    zone = "Zul'Farrak" 
+    zone = "Zul'Farrak",
+    locations = { 
+        {
+            instanceID = 209,
+            zone = "Zul'Farrak",
+            x = 23.6,
+            y = 17.6,
+            label = "Sandfury Executioner",
+        }
+    }
 }
 
 NPCs[7356] = { 
     id = 7356, 
     name = "Plaguemaw the Rotting" ,
     zone = "Razorfen Downs",
-    locations = { {
+    locations = { 
+        {
         instanceID = 129,
         zone = "Razorfen Downs",
         x = 36.3,
         y = 17.4,
         label = "Plaguemaw the Rotting"
-        } }
-
+        } 
+    }
 }
 
 NPCs[7795] = { 
     id = 7795, 
     name = "Hydromancer Velratha", 
-    zone = "Zul'Farrak" 
+    zone = "Zul'Farrak",
+    locations = { 
+        {
+        instanceID = 209,
+        zone = "Zul'Farrak",
+        x = 34,
+        y = 41.4,
+        label = "Hydromancer Velratha",
+        }
+    }
 }
 
 NPCs[8405] = { 

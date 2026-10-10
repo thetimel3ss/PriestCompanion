@@ -210,7 +210,7 @@ Instances[129] = {
     entranceZone = "The Barrens", 
     icon = "Interface\\Icons\\INV_Misc_Map_01",
 
-    worldMap ={
+    worldMap = {
         mapID = 22,
         zoneID = 1
     }
@@ -226,7 +226,12 @@ Instances[209] = {
     type = "dungeon", 
     description = "Dungeon encounter in Zul'Farrak.", 
     entranceZone = "Tanaris", 
-    icon = "Interface\\Icons\\INV_Misc_Map_01" 
+    icon = "Interface\\Icons\\INV_Misc_Map_01", 
+
+    worldMap = {
+        mapID = 5,
+        zoneID = 1
+    }
 }
 
 --------------------------------------------------

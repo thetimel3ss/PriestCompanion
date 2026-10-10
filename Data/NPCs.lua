@@ -1006,10 +1006,11 @@ NPCs[10436] = {
     id = 10436, 
     name = "Baroness Anastari", 
     zone = "Stratholme", 
-    map = { 
+    map = {
+        instanceID = 2017, 
         zone = "Stratholme", 
-        x = 0, 
-        y = 0 
+        x = 90.1, 
+        y = 39.2 
     } 
 }
 

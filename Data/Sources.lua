@@ -1530,8 +1530,44 @@ Sources[9483] = {
     } 
 }
 
-Sources[9489] = { { type = "drop", npcID = 6211, npcName = "Multiple creatures", npcType = "Creatures", mobs = { { id = 6211, chance = 0.02 }, { id = 6212, chance = 0.04 }, { id = 6220, chance = 0.02 }, { id = 6223, chance = 0.02 }, { id = 6225, chance = 0.06 }, { id = 6226, chance = 0.02 }, { id = 6227, chance = 0.04 }, { id = 6230, chance = 0.04 }, { id = 6232, chance = 0.04 }, { id = 6233, chance = 0.04 }, { id = 6234, chance = 0.02 } }, mobCount = 11, details = true } }
-Sources[10572] = { { type = "drop", npcID = 7328, npcName = "Multiple creatures", npcType = "Creatures", instanceID = 129, mobs = { { id = 7328, chance = 0.02 }, { id = 7329, chance = 0.02 }, { id = 62678, chance = 0.02 }, { id = 7335, chance = 0.02 }, { id = 62676, chance = 0.02 }, { id = 62677, chance = 0.02 }, { id = 7337, chance = 0.02 }, { id = 7341, chance = 0.02 }, { id = 7342, chance = 0.02 }, { id = 7345, chance = 0.04 }, { id = 7347, chance = 0.02 }, { id = 7348, chance = 0.02 }, { id = 7352, chance = 0.02 }, { id = 7353, chance = 0.02 } }, mobCount = 14, details = true } }
+--------------------------------------------------
+-- Gyromatic Icemaker
+--------------------------------------------------
+
+Sources[9489] = { 
+    { 
+        type = "drop", 
+        npcID = 6211, 
+        npcName = "Multiple creatures", 
+        npcType = "Creatures",
+        instanceID = 721,
+        mobCount = 11,
+        requiredLevel = 26,
+        dropChance = 0.02,
+        faction = "Both", 
+        details = true
+    } 
+}
+
+--------------------------------------------------
+-- Freezing Shard
+--------------------------------------------------
+
+Sources[10572] = { 
+    { 
+        type = "drop", 
+        npcID = 7328, 
+        npcName = "Multiple creatures", 
+        npcType = "Creatures", 
+        instanceID = 129, 
+        mobCount = 14, 
+        requiredLevel = 34,
+        dropChance = 0.02,
+        faction = "Both",
+        details = true 
+    } 
+}
+
 Sources[10704] = { { type = "quest", questID = 1173, questName = "Challenge Overlord Mok'Morokk", faction = "Horde", requiredLevel = 38, zone = "Dustwallow Marsh", chainID = "octo:1173", details = true } }
 Sources[10766] = { { type = "drop", npcID = 7356, npcName = "Plaguemaw the Rotting", npcType = "Boss", instanceID = 129, dropChance = 33.3333333, mobs = { { id = 7356, chance = 33.3333333 } }, mobCount = 1, details = true, lootNPCID = 7356 } }
 Sources[11263] = { { type = "quest", questID = 1952, questName = "Mage's Wand", faction = "Both", requiredLevel = 30, zone = "Dustwallow Marsh", chainID = "octo:1952", details = true } }

@@ -19,6 +19,7 @@ local Instances =
 
 --------------------------------------------------
 -- Easy: /script DEFAULT_CHAT_FRAME:AddMessage("Continent="..GetCurrentMapContinent().." Zone="..GetCurrentMapZone())
+    -- /run DEFAULT_CHAT_FRAME:AddMessage("mapID="..tostring(GetCurrentMapContinent()).." zoneID="..tostring(GetCurrentMapZone()))
 --------------------------------------------------
 
 --------------------------------------------------
@@ -207,7 +208,12 @@ Instances[129] = {
     type = "dungeon", 
     description = "Dungeon encounter in Razorfen Downs.", 
     entranceZone = "The Barrens", 
-    icon = "Interface\\Icons\\INV_Misc_Map_01" 
+    icon = "Interface\\Icons\\INV_Misc_Map_01",
+
+    worldMap ={
+        mapID = 22,
+        zoneID = 1
+    }
 }
 
 --------------------------------------------------
@@ -343,7 +349,12 @@ Instances[721] = {
     type = "dungeon", 
     description = "Dungeon encounter in Gnomeregan.", 
     entranceZone = "Dun Morogh", 
-    icon = "Interface\\Icons\\INV_Misc_Map_01" 
+    icon = "Interface\\Icons\\INV_Misc_Map_01",
+
+    worldMap = {
+        mapID = 9,
+        zoneID = 1,
+    }
 }
 
 --------------------------------------------------

@@ -422,8 +422,13 @@ Instances[1584] = {
     shortName = "BRD", 
     type = "dungeon", 
     description = "Dungeon encounter in Blackrock Depths.", 
-    entranceZone = "Searing Gorge", 
-    icon = "Interface\\Icons\\INV_Misc_Map_01" 
+    entranceZone = "Blackrock Mountain", 
+    icon = "Interface\\Icons\\INV_Misc_Map_01", 
+
+    worldMap = {
+        mapID = 14,
+        zoneID = 1
+    }
 }
 
 --------------------------------------------------

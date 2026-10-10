@@ -930,12 +930,15 @@ NPCs[8905] = {
 NPCs[9024] = { 
     id = 9024, 
     name = "Pyromancer Loregrain", 
-    zone = "BRD (Dungeon)", 
-    map = { 
-        zone = "BRD (Dungeon)", 
-        x = 22.0909, 
-        y = 64.6667 
-    } 
+    zone = "Blackrock Depths", 
+    locations = { {
+        instanceID = 1584,
+        zone = "Blackroch Depths", 
+        x = 57.2, 
+        y = 75.9,
+        label = "Pyromancer Loregrain"
+        } 
+    }
 }
 
 NPCs[9476] = { 

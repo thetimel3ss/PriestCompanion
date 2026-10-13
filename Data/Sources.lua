@@ -2355,10 +2355,75 @@ Sources[19861] = {
     } 
 }
 
+--------------------------------------------------
+-- Mar'li's Touce
+--------------------------------------------------
 
-Sources[19927] = { { type = "drop", npcID = 14510, npcName = "High Priestess Mar'li", npcType = "Boss", instanceID = 309, zone = "Zul'Gurub", dropChance = 16.67, mobs = { { id = 14510, chance = 16.67 } }, mobCount = 1, details = true, lootNPCID = 14510 } }
-Sources[19967] = { { type = "drop", npcID = 15083, npcName = "Hazza'rah", npcType = "Boss", instanceID = 309, dropChance = 45, mobs = { { id = 15083, chance = 45 } }, mobCount = 1, details = true, lootNPCID = 15083 } }
-Sources[20082] = { { type = "quest", questID = 8257, questName = "Blood of Morphaz", faction = "Both", requiredLevel = 50, zone = "Azshara", instanceID = 109, chainID = "octo:8257", details = true } }
+Sources[19927] = { 
+    { 
+        type = "drop", 
+        npcID = 14510, 
+        npcName = "High Priestess Mar'li", 
+        npcType = "Boss", 
+        instanceID = 309, 
+        zone = "Zul'Gurub", 
+        dropChance = 16.67, 
+        mobs = { 
+            { 
+                id = 14510, 
+                chance = 16.67 
+            } 
+        }, 
+        mobCount = 1, 
+        details = true, 
+        lootNPCID = 14510 
+    } 
+}
+
+--------------------------------------------------
+-- Thoughtblighter
+--------------------------------------------------
+
+Sources[19967] = { 
+    { 
+        type = "drop", 
+        npcID = 15083, 
+        npcName = "Hazza'rah", 
+        npcType = "Boss", 
+        instanceID = 309, 
+        dropChance = 45, 
+        mobs = { 
+            { 
+                id = 15083, 
+                chance = 45 
+            } 
+        }, 
+        mobCount = 1, 
+        details = true, 
+        lootNPCID = 15083 
+    } 
+}
+
+--------------------------------------------------
+-- Woestave
+--------------------------------------------------
+
+Sources[20082] = { 
+    { 
+        type = "quest", 
+        questID = 8257, 
+        questName = "Blood of Morphaz", 
+        faction = "Both", 
+        requiredLevel = 50, 
+        zone = "Azshara", 
+        instanceID = 109, 
+        chainID = "woestave", 
+        details = true 
+    } 
+}
+
+
+
 Sources[20672] = { { type = "drop", npcID = 15208, npcName = "The Duke of Shards", npcType = "Named creature", dropChance = 30, mobs = { { id = 15208, chance = 30 } }, mobCount = 1, details = true } }
 Sources[21603] = { { type = "drop", npcID = 15511, npcName = "Lord Kri", npcType = "Boss", instanceID = 531, zone = "Ahn'Qiraj Temple", dropChance = 25, mobs = { { id = 15511, chance = 25 } }, mobCount = 1, details = true, lootNPCID = 15511 } }
 Sources[21801] = { { type = "drop", npcID = 15319, npcName = "Multiple creatures", npcType = "Raid creatures", instanceID = 509, mobs = { { id = 15319, chance = 0.06 }, { id = 15320, chance = 0.05 }, { id = 15323, chance = 0.06 }, { id = 15324, chance = 0.4 }, { id = 15325, chance = 0.09 }, { id = 15327, chance = 0.04 }, { id = 15333, chance = 0.06 }, { id = 15335, chance = 0.05 }, { id = 15336, chance = 0.16 }, { id = 15338, chance = 0.07 }, { id = 15343, chance = 0.07 }, { id = 15355, chance = 0.17 }, { id = 15385, chance = 0.16 }, { id = 15386, chance = 0.03 }, { id = 15387, chance = 0.04 }, { id = 15388, chance = 0.09 }, { id = 15389, chance = 0.03 }, { id = 15391, chance = 0.02 }, { id = 15392, chance = 0.02 }, { id = 15461, chance = 0.1 }, { id = 15462, chance = 0.28 } }, mobCount = 21, details = true } }

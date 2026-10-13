@@ -699,7 +699,8 @@ NPCs[3650] = {
     map = { 
         zone = "Darkshore", 
         x = 44.18, 
-        y = 36.31 } 
+        y = 36.31 
+    } 
 }
 
 NPCs[3995] = { 
@@ -709,7 +710,8 @@ NPCs[3995] = {
     map = { 
         zone = "Stonetalon Mountains", 
         x = 74.54, 
-        y = 97.92 } 
+        y = 97.92 
+    } 
 }
 
 NPCs[4046] = { 
@@ -719,7 +721,8 @@ NPCs[4046] = {
     map = { 
         zone = "Mulgore", 
         x = 43.9887, 
-        y = 23.1264 } 
+        y = 23.1264 
+    } 
 }
 
 NPCs[4066] = { 
@@ -729,7 +732,8 @@ NPCs[4066] = {
     map = { 
         zone = "Stonetalon Mountains", 
         x = 25.57, 
-        y = 11.51 } 
+        y = 11.51 
+    } 
 }
 
 NPCs[4454] = { 
@@ -739,7 +743,8 @@ NPCs[4454] = {
     map = { 
         zone = "Thousand Needles", 
         x = 78.06, 
-        y = 77.12 } 
+        y = 77.12 
+    } 
 }
 
 NPCs[4500] = { 
@@ -749,7 +754,8 @@ NPCs[4500] = {
     map = { 
         zone = "Dustwallow Marsh", 
         x = 36.29, 
-        y = 31.39 } 
+        y = 31.39 
+    } 
 }
 
 NPCs[4501] = { 
@@ -759,7 +765,8 @@ NPCs[4501] = {
     map = { 
         zone = "Dustwallow Marsh", 
         x = 37.14, 
-        y = 33.08 } 
+        y = 33.08 
+    } 
 }
 
 NPCs[4568] = { 
@@ -769,7 +776,8 @@ NPCs[4568] = {
     map = { 
         zone = "Tirisfal Glades", 
         x = 65.89, 
-        y = 67.2 } 
+        y = 67.2 
+    } 
 }
 
 NPCs[4618] = { 
@@ -779,7 +787,8 @@ NPCs[4618] = {
     map = { 
         zone = "Badlands", 
         x = 42.2, 
-        y = 52.67 } 
+        y = 52.67 
+    } 
 }
 
 NPCs[5489] = { 
@@ -788,8 +797,9 @@ NPCs[5489] = {
     zone = "Stormwind City", 
     map = { 
         zone = "Stormwind City", 
-        x = 38.53, 
-        y = 26.79 } 
+        x = 49.5, 
+        y = 44.9 
+    } 
 }
 
 NPCs[5497] = {
@@ -1473,7 +1483,13 @@ NPCs[14399] = {
 NPCs[14510] = { 
     id = 14510, 
     name = "High Priestess Mar'li", 
-    zone = "Zul'Gurub" 
+    zone = "Zul'Gurub",
+    map = {
+        instanceID = 309,
+        zone = "Zul'Gurub",
+        x = 48.8,
+        y = 79
+    }
 }
 
 NPCs[14516] = { 
@@ -1508,7 +1524,14 @@ NPCs[14834] = {
 
 NPCs[15083] = { 
     id = 15083, 
-    name = "Hazza'rah" 
+    name = "Hazza'rah",
+    zone = "Zul'Gurub",
+    map = {
+        instanceID = 309,
+        zone = "Zul'Gurub",
+        x = 59.9,
+        y = 46.4
+    }
 }
 
 NPCs[15208] = { 

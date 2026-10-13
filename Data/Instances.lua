@@ -187,18 +187,6 @@ Instances[47] = {
 }
 
 --------------------------------------------------
--- Blackfathom Deeps
---------------------------------------------------
-
-Instances[48] = { 
-    name = "Blackfathom Deeps", 
-    shortName = "Blackfathom Deeps", 
-    type = "dungeon", 
-    description = "Dungeon encounter in Blackfathom Deeps.", 
-    icon = "Interface\\Icons\\INV_Misc_Map_01" 
-}
-
---------------------------------------------------
 -- Razorfen Downs
 --------------------------------------------------
 

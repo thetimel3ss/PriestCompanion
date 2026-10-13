@@ -4199,6 +4199,10 @@ eventFrame:RegisterEvent(
     "BAG_UPDATE"
 )
 
+eventFrame:RegisterEvent(
+    "SKILL_LINES_CHANGED"
+)
+
 if PC.Capabilities.classicAPI then
     eventFrame:RegisterEvent(
         "ITEM_DATA_LOAD_RESULT"

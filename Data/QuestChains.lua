@@ -568,7 +568,7 @@ QuestChains["octo:70033"] = {
     } 
 }
 
-QuestChains["octo:8257"] = { 
+QuestChains["woestave"] = { 
     name = "Blood of Morphaz", 
     rewardQuestID = 8257, 
     steps = { 

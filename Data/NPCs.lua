@@ -1536,7 +1536,13 @@ NPCs[15083] = {
 
 NPCs[15208] = { 
     id = 15208, 
-    name = "The Duke of Shards" 
+    name = "The Duke of Shards",
+    zone = "Silithus",
+    map = {
+        zone = "Silithus",
+        x = 0,
+        y = 0
+    }
 }
 
 NPCs[15511] = { 
@@ -1814,11 +1820,6 @@ NPCs[92111] = {
     zone = "Crescent Grove" 
 }
 
---------------------------------------------------
--- Alternative Cenarion Aid starters (quest 8254)
--- Coordinates from the OctoWoW NPC database.
---------------------------------------------------
-
 NPCs[11406] = {
     id = 11406,
     name = "High Priest Rohan",
@@ -1833,10 +1834,10 @@ NPCs[11406] = {
 NPCs[6018] = {
     id = 6018,
     name = "Ur'kyo",
-    zone = "Durotar",
+    zone = "Orgrimmar",
     map = {
-        zone = "Durotar",
-        x = 41.92,
-        y = 10.11
+        zone = "Orgrimmar",
+        x = 35.6,
+        y = 87.5
     }
 }

@@ -339,94 +339,50 @@ local function GetNPC(npcReference)
     return PC.Data.NPCs[npcID]
 end
 
-local function ResolveQuestNPC(
-    quest,
-    role
-)
+local function ResolveQuestNPCs(quest, role)
+    local result = {}
     if not quest then
-        return nil
+        return result
     end
-
-    --------------------------------------------------
-    -- Some quests are offered by different NPCs for
-    -- each faction. Prefer the faction-specific record
-    -- while retaining the legacy singular field below.
-    --------------------------------------------------
 
     local factionNPCs
-
+    local legacyNPC
     if role == "start" then
         factionNPCs = quest.startNPCByFaction
-    else
-        factionNPCs = quest.endNPCByFaction
-    end
-
-    if factionNPCs then
-        local faction = nil
-
-        if PC.API
-        and type(
-            PC.API.GetPlayerFaction
-        ) == "function" then
-            faction =
-                PC.API.GetPlayerFaction()
-        end
-
-        local npcReference =
-            faction
-            and factionNPCs[faction]
-
-        if not npcReference then
-            npcReference =
-                factionNPCs.Both
-        end
-
-        if npcReference then
-            if type(npcReference) == "table"
-            and npcReference.id then
-                local npc =
-                    GetNPC(npcReference)
-
-                if npc then
-                    return npc
-                end
-
-            elseif type(npcReference) == "table" then
-                local i
-
-                for i = 1,
-                    table.getn(npcReference)
-                do
-                    local npc =
-                        GetNPC(
-                            npcReference[i]
-                        )
-
-                    if npc then
-                        return npc
-                    end
-                end
-
-            else
-                local npc =
-                    GetNPC(npcReference)
-
-                if npc then
-                    return npc
-                end
-            end
-        end
-    end
-
-    local legacyNPC
-
-    if role == "start" then
         legacyNPC = quest.startNPC
     else
+        factionNPCs = quest.endNPCByFaction
         legacyNPC = quest.endNPC
     end
 
-    return GetNPC(legacyNPC)
+    local reference = legacyNPC
+    if factionNPCs then
+        local faction = PC.API and PC.API.GetPlayerFaction
+            and PC.API.GetPlayerFaction()
+        reference = (faction and factionNPCs[faction]) or factionNPCs.Both
+        -- Never fall back to the other faction's legacy starter.
+    end
+
+    local references = { reference }
+    if type(reference) == "table" and not reference.id and not reference.name then
+        references = reference
+    end
+
+    local seen = {}
+    local i
+    for i = 1, table.getn(references) do
+        local npc = GetNPC(references[i])
+        if npc and not seen[npc.id or npc] then
+            seen[npc.id or npc] = true
+            table.insert(result, npc)
+        end
+    end
+    return result
+end
+
+local function ResolveQuestNPC(quest, role)
+    local npcs = ResolveQuestNPCs(quest, role)
+    return npcs[1]
 end
 
 --------------------------------------------------
@@ -537,7 +493,7 @@ local function ShowNPCOnMap(
     requestedMarkerType
 )
     if not npc then
-        return
+        return false
     end
 
     local markerType =
@@ -562,7 +518,7 @@ local function ShowNPCOnMap(
             )
 
         if success then
-            return
+            return true
         end
     end
 
@@ -584,6 +540,31 @@ local function ShowNPCOnMap(
     DEFAULT_CHAT_FRAME:AddMessage(
         text
     )
+    return false
+end
+
+-- Both the initial drop button and pooled buttons use this same fallback path.
+local function ShowDropOnMap(source)
+    if not source then
+        return false
+    end
+    local npcID = source.npcID
+    if not npcID and source.mobs and table.getn(source.mobs) == 1 then
+        npcID = source.mobs[1].id
+    end
+    local npc = GetNPC(npcID)
+    if npc and ShowNPCOnMap(npc, nil, "Drop", "drop") then
+        return true
+    end
+    if source.instanceID and PC.Map
+    and type(PC.Map.ShowInstanceMap) == "function" then
+        return PC.Map.ShowInstanceMap(
+            source.instanceID,
+            source.instanceZoneID,
+            source.zone
+        )
+    end
+    return false
 end
 
 --------------------------------------------------
@@ -853,47 +834,7 @@ dropMapButton:SetText(
 dropMapButton:SetScript(
     "OnClick",
     function()
-        local source =
-            this.source
-
-        local npc = nil
-
-        if source then
-            local npcID =
-                source.npcID
-
-            if not npcID
-            and source.mobs
-            and table.getn(source.mobs) == 1 then
-                npcID =
-                    source.mobs[1].id
-            end
-
-            npc = GetNPC(
-                npcID
-            )
-        end
-
-        if npc then
-            ShowNPCOnMap(
-                npc,
-                nil,
-                "Drop",
-                "drop"
-            )
-
-        elseif source
-        and source.instanceID
-        and PC.Map
-        and type(
-            PC.Map.ShowInstanceMap
-        ) == "function" then
-            PC.Map.ShowInstanceMap(
-                source.instanceID,
-                source.instanceZoneID,
-                source.zone
-            )
-        end
+        ShowDropOnMap(this.source)
     end
 )
 
@@ -1314,12 +1255,16 @@ local function AcquireQuestCard(index)
                 button:GetParent()
 
             ShowNPCOnMap(
-                parent.startNPC,
+                button.npc,
                 parent.questName,
                 "Start"
             )
         end
     )
+
+    card.startRows = {
+        { label = card.startLabel, button = card.showStart }
+    }
 
     card.showEnd =
         CreateFrame(
@@ -1666,7 +1611,34 @@ local function AcquireGainRow(
     return row
 end
 
+local function AcquireStartRow(card, index)
+    local row = card.startRows[index]
+    if row then
+        return row
+    end
+
+    row = {}
+    row.label = card:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+    row.label:SetJustifyH("LEFT")
+    row.button = CreateFrame("Button", nil, card, "UIPanelButtonTemplate")
+    row.button:SetWidth(MAP_BUTTON_WIDTH)
+    row.button:SetHeight(MAP_BUTTON_HEIGHT)
+    row.button:SetText("Show Start")
+    row.button:SetScript("OnClick", function()
+        ShowNPCOnMap(this.npc, this:GetParent().questName, "Start")
+    end)
+    card.startRows[index] = row
+    return row
+end
+
 local function HideCardContent(card)
+    local startIndex
+    for startIndex = 1, table.getn(card.startRows) do
+        local row = card.startRows[startIndex]
+        row.label:Hide()
+        row.button:Hide()
+        row.button.npc = nil
+    end
     card.startLabel:Hide()
     card.endLabel:Hide()
     card.showStart:Hide()
@@ -1743,8 +1715,8 @@ local function PopulateQuestCard(
         )
 
     card.questName = questName
-    card.startNPC =
-        ResolveQuestNPC(
+    card.startNPCs =
+        ResolveQuestNPCs(
             quest,
             "start"
         )
@@ -1943,58 +1915,29 @@ local function PopulateQuestCard(
     -- Start
     --------------------------------------------------
 
-    if card.startNPC then
-        card.startLabel:ClearAllPoints()
+    local startIndex
+    for startIndex = 1, table.getn(card.startNPCs) do
+        local npc = card.startNPCs[startIndex]
+        local row = AcquireStartRow(card, startIndex)
+        row.label:ClearAllPoints()
+        row.label:SetPoint("TOPLEFT", card, "TOPLEFT", CARD_PADDING, y)
+        row.label:SetWidth(bodyWidth - MAP_BUTTON_WIDTH - 8)
 
-        card.startLabel:SetPoint(
-            "TOPLEFT",
-            card,
-            "TOPLEFT",
-            CARD_PADDING,
-            y
-        )
-
-        card.startLabel:SetWidth(
-            bodyWidth -
-            MAP_BUTTON_WIDTH -
-            8
-        )
-
-        local startText =
-            "Starts: " ..
-            tostring(
-                card.startNPC.name or
-                "Unknown"
-            )
-
-        if card.startNPC.zone then
-            startText =
-                startText ..
-                " - " ..
-                tostring(
-                    card.startNPC.zone
-                )
+        local prefix = "Starts: "
+        if table.getn(card.startNPCs) > 1 then
+            prefix = "Start option " .. tostring(startIndex) .. ": "
         end
-
-        card.startLabel:SetText(
-            startText
-        )
-
-        card.startLabel:Show()
-
-        card.showStart:ClearAllPoints()
-
-        card.showStart:SetPoint(
-            "TOPRIGHT",
-            card,
-            "TOPRIGHT",
-            -CARD_PADDING,
-            y + 4
-        )
-
-        card.showStart:Show()
-
-        y = y - 25
+        local text = prefix .. tostring(npc.name or "Unknown")
+        if npc.zone then
+            text = text .. " - " .. tostring(npc.zone)
+        end
+        row.label:SetText(text)
+        row.label:Show()
+        row.button.npc = npc
+        row.button:ClearAllPoints()
+        row.button:SetPoint("TOPRIGHT", card, "TOPRIGHT", -CARD_PADDING, y + 4)
+        row.button:Show()
+        y = y - math.max(25, GetTextHeight(row.label) + 8)
     end
 
     --------------------------------------------------
@@ -2988,44 +2931,7 @@ local function AcquireDropMapButton(index)
     button:SetScript(
         "OnClick",
         function()
-            local source =
-                this.source
-
-            local npcID =
-                source
-                and source.npcID
-
-            if not npcID
-            and source
-            and source.mobs
-            and table.getn(source.mobs) == 1 then
-                npcID =
-                    source.mobs[1].id
-            end
-
-            local npc =
-                GetNPC(npcID)
-
-            if npc then
-                ShowNPCOnMap(
-                    npc,
-                    nil,
-                    "Drop",
-                    "drop"
-                )
-
-            elseif source
-            and source.instanceID
-            and PC.Map
-            and type(
-                PC.Map.ShowInstanceMap
-            ) == "function" then
-                PC.Map.ShowInstanceMap(
-                    source.instanceID,
-                    source.instanceZoneID,
-                    source.zone
-                )
-            end
+            ShowDropOnMap(this.source)
         end
     )
 

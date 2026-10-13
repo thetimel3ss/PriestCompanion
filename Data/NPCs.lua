@@ -1813,3 +1813,30 @@ NPCs[92111] = {
     name = "Fenektis the Deceiver", 
     zone = "Crescent Grove" 
 }
+
+--------------------------------------------------
+-- Alternative Cenarion Aid starters (quest 8254)
+-- Coordinates from the OctoWoW NPC database.
+--------------------------------------------------
+
+NPCs[11406] = {
+    id = 11406,
+    name = "High Priest Rohan",
+    zone = "Ironforge",
+    map = {
+        zone = "Ironforge",
+        x = 24.72,
+        y = 8.104
+    }
+}
+
+NPCs[6018] = {
+    id = 6018,
+    name = "Ur'kyo",
+    zone = "Durotar",
+    map = {
+        zone = "Durotar",
+        x = 41.92,
+        y = 10.11
+    }
+}

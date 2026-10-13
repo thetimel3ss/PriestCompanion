@@ -2448,7 +2448,10 @@ Quests[8254] = {
     faction = "Both", 
     description = "It is the way of the divine to help those in need. The how is insignificant -- only the why matters. The Cenarion Circle has such a need. Speak with Ogtinc to lend aid to their plight. He resides atop the cliffs to the northeast of the Ruins of Eldarath in Azshara.", 
     objectiveText = "Seek out Ogtinc in Azshara.", 
-    startNPC = 5489, 
+    startNPCByFaction = {
+        Alliance = { 5489, 11406 },
+        Horde = { 6018 }
+    },
     endNPC = 8405 
 }
 

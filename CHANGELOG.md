@@ -2,7 +2,7 @@
 
 ## [Unreleased]
 
-Updated through 2026-10-13 (`3cef848`). This section describes the current development branch; no new release version has been assigned.
+Updated through 2026-10-13 (including fixes based on `798d8ba`). This section describes the current development branch; no new release version has been assigned.
 
 ### Added
 - Added Wand Progression module foundation.
@@ -124,7 +124,7 @@ Updated through 2026-10-13 (`3cef848`). This section describes the current devel
 - Limited recommended highlighting to the explicitly curated progression wands.
 
 ### Data
-- Expanded the current catalog to 147 item records, 146 progression entries, 147 item-source lists, 175 quests, 48 quest chains, 165 NPCs, 30 instances, and 45 boss loot tables.
+- Expanded item, wand, source, quest, chain, NPC, instance, and boss-loot catalogs; added the alternate Cenarion Aid starter records.
 - Added OctoWoW custom items, quests, NPCs, and instance references alongside Vanilla content.
 - Expanded curated recommendations, including Webwood Branch, Withered Wand, and Bhartec's Lost Wand.
 - Added Lesser Mystic Wand and Greater Mystic Wand crafting sources and materials.
@@ -163,6 +163,13 @@ Updated through 2026-10-13 (`3cef848`). This section describes the current devel
 - Changed dungeon map metadata to live in `Data/Instances.lua` instead of map core logic.
 
 ### Fixed
+- Opened dungeon maps without NPC pins when coordinates are missing or use the `(0, 0)` placeholder; invalid/out-of-range coordinates are not plotted.
+- Verified the selected WorldMap indices after `SetMapZoom()` and caught invalid-target errors before placing markers. Unsupported internal maps fall back to configured entrances, explicitly labeled as entrances.
+- Continued to the optional pfQuest lookup when a native `npc.map` cannot be shown.
+- Shared drop-button navigation between the first and additional source buttons; failed NPC navigation now retries the source's instance map and configured entrance.
+- Displayed all faction-compatible starters for Cenarion Aid (8254) within the existing Woestave chain: Brother Joshua and High Priest Rohan for Alliance, Ur'kyo for Horde, each with a Show Start button.
+- Reused and hid starter rows correctly across quest expansion and faction changes, including their contribution to card and scroll height.
+- Preserved recent user changes: corrected Azshara/dungeon names, removed duplicate BFD record, updated ZG/BWL map metadata and NPC positions, renamed the Woestave chain, and registered `SKILL_LINES_CHANGED` in Source Details.
 - Fixed Wand list failing to load when adding multiple entries.
 - Fixed ClassicAPI item icons displaying the unknown-item icon while item data was still loading.
 - Fixed UnitXP SP3 detection when loaded through environments that do not expose `Vanilla1121mod.UnitXP_SP3`.
@@ -178,16 +185,13 @@ Updated through 2026-10-13 (`3cef848`). This section describes the current devel
 - Fixed Blackfathom Deeps quest markers to use the native dungeon map and correct Thaelrid coordinates.
 
 ### Known Limitations (code review, 2026-10-13)
-- Several NPC records still use placeholder coordinates `(0, 0)`. These are accepted as real coordinates; Jed Runewatcher and Darkmaster Gandling can therefore receive misleading corner markers.
-- Blackfathom Deeps is registered under both 719 and 48, but only 719 has map metadata. Name-only instance resolution iterates unordered records and can select the incomplete entry.
-- Map lookup compares zone names literally after case/space normalization. `Aszhara` and dungeon names containing an unmatched `(Dungeon)` or `(Raid)` suffix can fail to resolve without explicit map metadata.
-- Drop buttons do not retry the source's instance map when an existing NPC record fails map navigation. An existing but unresolved `npc.map` also prevents the later pfQuest fallback in `Map.ShowNPC`.
-- Twelve source references point to ten NPC IDs not present in the NPC database. Inline source names can still display, and multi-creature sources may use an instance-only map, but these records do not provide native NPC coordinates.
+- Several NPC records still lack precise coordinates. Their dungeon map can be opened without a marker, or a configured entrance used when the internal map is unavailable.
+- Map lookup still requires matching zone names or explicit map metadata. Selected indices can be checked, but correct dungeon artwork, floor alignment and NPC positions still need in-game verification.
+- Some sources still reference NPCs without centralized records. Inline names can display and instance fallbacks can be used, but native NPC coordinates require completing the database.
 - The detail panel still renders only the primary vendor or crafting source, and only the selected source type. The current catalog has no mixed source types or multiple vendors per item; these remain limitations for future data.
-- Crafting details do not subscribe to `SKILL_LINES_CHANGED`, although the source tooltip does. The open detail panel can remain stale until another refresh event.
 - Quest-history event registration uses the ClassicAPI environment flag, while other panels use capability detection. Standard-TOC ClassicAPI detection does not load the ClassicAPI API overrides or enable turn-in tracking.
 - Item names can fall back to local data, but icons and full item tooltips still depend on game-provided item data.
-- Automated review checked syntax with Lua 5.4, TOC paths, database references, and exclusion relationships. This is not a substitute for testing the Vanilla 1.12 client, custom map indices, or actual server quest availability.
+- All Lua files passed syntax loading in Lua 5.0.3. In-memory tests covered map fallback/error paths, faction-specific starters, quest-card reuse/height, and both drop-button handlers with mocked WoW APIs. Actual Vanilla 1.12 rendering, custom maps and server behavior still require in-game testing.
 
 ### Planned
 - Complete the Wand Progression item database.

@@ -501,6 +501,10 @@ local function GetQuestStatus(
             "bad"
     end
 
+    if historyStatus == "blocked" then
+        return "Unavailable", "bad"
+    end
+
     local requiredLevel =
         quest
         and quest.requiredLevel
@@ -2086,6 +2090,23 @@ local function PopulateQuestCard(
             descriptionText
         )
 
+    if quest and quest.exclusiveWith then
+        local alternativeNames = {}
+        local i
+        for i = 1, table.getn(quest.exclusiveWith) do
+            local alternativeID = quest.exclusiveWith[i]
+            local alternative = PC.Data.Quests[alternativeID]
+            table.insert(alternativeNames,
+                alternative and alternative.name or tostring(alternativeID))
+        end
+        local note = "Alternative to: " .. table.concat(alternativeNames, ", ") ..
+            ". Completing one makes the other unavailable."
+        if statusText == "Unavailable" then
+            note = "Unavailable: an alternative quest has already been completed.\n" .. note
+        end
+        descriptionText = note .. "\n\n" .. descriptionText
+    end
+
     card.descriptionHeader:ClearAllPoints()
 
     card.descriptionHeader:SetPoint(
@@ -3129,7 +3150,8 @@ end
 
 local function BuildQuestDetails(
     source,
-    itemID
+    itemID,
+    startY
 )
     local chain = nil
 
@@ -3191,7 +3213,7 @@ local function BuildQuestDetails(
         }
     end
 
-    local y = 0
+    local y = startY or 0
     local i
     local displayDepth = 0
 
@@ -3317,6 +3339,30 @@ local function BuildQuestDetails(
     scrollChild:SetHeight(
         totalHeight
     )
+
+    return y - CARD_PADDING
+end
+
+-- Each alternative starts a separate chain, without a connector between routes.
+local function BuildQuestAlternatives(sources, itemID)
+    local y = 0
+    local seen = {}
+    local count = 0
+    local i
+
+    for i = 1, table.getn(sources) do
+        local source = sources[i]
+        if source.type == "quest" and source.questID
+        and not seen[source.questID] then
+            seen[source.questID] = true
+            y = BuildQuestDetails(source, itemID, y)
+            count = count + 1
+        end
+    end
+
+    if count > 1 then
+        sourceTitle:SetText("Alternative Quest Sources")
+    end
 end
 
 --------------------------------------------------
@@ -4022,8 +4068,8 @@ Refresh =
 
         if primarySource.type ==
         "quest" then
-            BuildQuestDetails(
-                primarySource,
+            BuildQuestAlternatives(
+                activeSources,
                 activeItemID
             )
 

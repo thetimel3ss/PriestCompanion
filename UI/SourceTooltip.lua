@@ -942,6 +942,14 @@ local function BuildQuest(
             "warn"
         )
 
+    elseif questStatus == "blocked" then
+        AddRow(
+            "Interface\\GossipFrame\\AvailableQuestIcon",
+            "Quest Status",
+            "Unavailable (alternative completed)",
+            "bad"
+        )
+
     else
         AddRow(
             "Interface\\GossipFrame\\AvailableQuestIcon",

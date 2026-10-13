@@ -2389,7 +2389,8 @@ Quests[6187] = {
     } 
 }
 
-Quests[7181] = { 
+Quests[7181] = {
+    exclusiveWith = { 8272 }, -- Completing either quest blocks the other.
     name = "The Legend of Korrak", 
     questLevel = 60, 
     requiredLevel = 51, 
@@ -2414,7 +2415,8 @@ Quests[7181] = {
     } 
 }
 
-Quests[7202] = { 
+Quests[7202] = {
+    exclusiveWith = { 8271 }, -- Completing either quest blocks the other.
     name = "Korrak the Bloodrager", 
     questLevel = 60, 
     requiredLevel = 51, 
@@ -2492,7 +2494,8 @@ Quests[8257] = {
     } 
 }
 
-Quests[8271] = { 
+Quests[8271] = {
+    exclusiveWith = { 7202 }, -- Completing either quest blocks the other.
     name = "Hero of the Stormpike", 
     questLevel = 60, 
     requiredLevel = 51, 
@@ -2517,7 +2520,8 @@ Quests[8271] = {
     } 
 }
 
-Quests[8272] = { 
+Quests[8272] = {
+    exclusiveWith = { 7181 }, -- Completing either quest blocks the other.
     name = "Hero of the Frostwolf", 
     questLevel = 60, 
     requiredLevel = 51, 

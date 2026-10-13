@@ -2431,7 +2431,8 @@ Sources[20672] = {
         type = "drop", 
         npcID = 15208, 
         npcName = "The Duke of Shards", 
-        npcType = "Named creature", 
+        npcType = "Named creature",
+        note = "Summoned at multiple locations in Silithus. The summon result is random, so The Duke of Shards is not guaranteed to appear. Show on Map opens Silithus without a fixed NPC marker.",
         dropChance = 30, 
         mobs = { 
             { 

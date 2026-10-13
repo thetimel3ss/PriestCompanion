@@ -2823,6 +2823,13 @@ local function AcquireGenericRow(index)
     row.value:SetWidth(105)
     row.value:SetJustifyH("RIGHT")
 
+    row.note = row:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+    row.note:SetPoint("TOPLEFT", row, "TOPLEFT", CARD_PADDING, -4)
+    row.note:SetWidth(CARD_WIDTH - CARD_PADDING * 2)
+    row.note:SetJustifyH("LEFT")
+    row.note:SetTextColor(1.00, 0.82, 0.00)
+    row.note:Hide()
+
     genericRows[index] = row
 
     return row
@@ -2845,6 +2852,11 @@ local function AddGenericRow(
             visibleGenericRows
         )
 
+    row:SetHeight(36)
+    row.note:Hide()
+    row.icon:Show()
+    row.title:Show()
+    row.value:Show()
     row:ClearAllPoints()
 
     row:SetPoint(
@@ -2898,6 +2910,23 @@ local function AddGenericRow(
     row:Show()
 
     return y - 36
+end
+
+-- Acquisition notes are separate, wrapping rows rather than fixed-height values.
+local function AddDropNote(y, note)
+    visibleGenericRows = visibleGenericRows + 1
+    local row = AcquireGenericRow(visibleGenericRows)
+    row:ClearAllPoints()
+    row:SetPoint("TOPLEFT", scrollChild, "TOPLEFT", 0, y)
+    row.icon:Hide()
+    row.title:Hide()
+    row.value:Hide()
+    row.note:SetText(note)
+    row.note:Show()
+    local height = GetTextHeight(row.note) + 12
+    row:SetHeight(height)
+    row:Show()
+    return y - height
 end
 
 local function AcquireDropMapButton(index)
@@ -3462,6 +3491,10 @@ local function BuildDropDetails(sources)
                     source.dropChance
                 )
             )
+        end
+
+        if type(source.note) == "string" and source.note ~= "" then
+            y = AddDropNote(y, source.note)
         end
 
         local loot =

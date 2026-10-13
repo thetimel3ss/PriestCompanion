@@ -1540,6 +1540,7 @@ NPCs[15208] = {
     zone = "Silithus",
     map = {
         zone = "Silithus",
+        message = "The Duke of Shards is summoned in Silithus. The summon result is random; no fixed position is marked.",
         x = 0,
         y = 0
     }

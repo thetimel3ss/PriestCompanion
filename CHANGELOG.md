@@ -2,7 +2,7 @@
 
 ## [Unreleased]
 
-Updated through 2026-10-13 (including fixes based on `798d8ba`). This section describes the current development branch; no new release version has been assigned.
+Updated through 2026-10-13 (including fixes based on `5ff74e8`). This section describes the current development branch; no new release version has been assigned.
 
 ### Added
 - Added Wand Progression module foundation.
@@ -163,6 +163,9 @@ Updated through 2026-10-13 (including fixes based on `798d8ba`). This section de
 - Changed dungeon map metadata to live in `Data/Instances.lua` instead of map core logic.
 
 ### Fixed
+- Extended map-only navigation to outdoor zones when coordinates are absent, invalid or `(0, 0)`, keeping map-target verification and fallback handling.
+- Added optional `map.message` text for successful map-only navigation and wrapping `source.note` text in drop details.
+- Configured The Duke of Shards / Sparkling Crystal Wand to explain random summoning in its drop details and when opening Silithus without a marker.
 - Opened dungeon maps without NPC pins when coordinates are missing or use the `(0, 0)` placeholder; invalid/out-of-range coordinates are not plotted.
 - Verified the selected WorldMap indices after `SetMapZoom()` and caught invalid-target errors before placing markers. Unsupported internal maps fall back to configured entrances, explicitly labeled as entrances.
 - Continued to the optional pfQuest lookup when a native `npc.map` cannot be shown.

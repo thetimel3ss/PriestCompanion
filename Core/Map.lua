@@ -819,11 +819,14 @@ function Map.ShowLocation(
 
     local hasCoordinates = HasCoordinates(resolved)
 
-    if (hasCoordinates or resolved.isInstanceMap)
-    and OpenResolvedMap(resolved) then
+    if OpenResolvedMap(resolved) then
         if not hasCoordinates then
-            Print("Showing instance map only; exact position is unavailable for " ..
-                tostring(label or resolved.label or "this NPC") .. ".")
+            local message = location.message
+            if type(message) ~= "string" or message == "" then
+                message = "Showing map only; exact position is unavailable for " ..
+                    tostring(label or resolved.label or "this NPC") .. "."
+            end
+            Print(message)
             return true
         end
     else

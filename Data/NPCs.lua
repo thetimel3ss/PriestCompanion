@@ -818,9 +818,9 @@ NPCs[5912] = {
 NPCs[6109] = { 
     id = 6109, 
     name = "Azuregos", 
-    zone = "Aszhara", 
+    zone = "Azshara", 
     map = { 
-        zone = "Aszhara", 
+        zone = "Azshara", 
         x = 56.83, 
         y = 78.72 
     } 
@@ -917,9 +917,9 @@ NPCs[7795] = {
 NPCs[8405] = { 
     id = 8405, 
     name = "Ogtinc", 
-    zone = "Aszhara", 
+    zone = "Azshara", 
     map = { 
-        zone = "Aszhara", 
+        zone = "Azshara", 
         x = 42.4, 
         y = 42.64 
     } 
@@ -950,9 +950,9 @@ NPCs[8584] = {
 NPCs[8905] = { 
     id = 8905, 
     name = "Warbringer Construct", 
-    zone = "BRD (Dungeon)", 
+    zone = "BRD", 
     map = { 
-        zone = "BRD (Dungeon)", 
+        zone = "BRD", 
         x = 30.8182, 
         y = 35.5333 
     } 
@@ -1025,9 +1025,9 @@ NPCs[10436] = {
 NPCs[10440] = { 
     id = 10440, 
     name = "Baron Rivendare", 
-    zone = "Stratholme (Dungeon)", 
+    zone = "Stratholme", 
     map = { 
-        zone = "Stratholme (Dungeon)", 
+        zone = "Stratholme", 
         x = 0, 
         y = 0 
     } 
@@ -1223,11 +1223,11 @@ NPCs[11898] = {
 NPCs[11981] = { 
     id = 11981, 
     name = "Flamegor", 
-    zone = "Blackwing Lair (Raid)", 
+    zone = "Blackwing Lair", 
     map = { 
-        zone = "Blackwing Lair (Raid)", 
-        x = 0, 
-        y = 0 
+        zone = "Blackwing Lair", 
+        x = 45.8, 
+        y = 22.2 
     } 
 }
 
@@ -1289,34 +1289,78 @@ NPCs[12425] = {
 NPCs[12457] = { 
     id = 12457, 
     name = "Blackwing Spellbinder", 
-    zone = "Blackwing Lair (Raid)", 
-    map = { 
-        zone = "Blackwing Lair (Raid)", 
-        x = 0, 
-        y = 0 
-    } 
+    zone = "Blackwing Lair", 
+    locations = { 
+        {
+        instanceID = 2677,
+        zone = "Blackwing Lair", 
+        x = 42.9, 
+        y = 53.2        
+        }, {
+        instanceID = 2677,
+        zone = "Blackwing Lair",
+        x = 40.8,
+        y = 44.9
+        }, {
+        instanceID = 2677,
+        zone = "Blackwing Lair",
+        x = 34.8,
+        y = 48.9
+        }, {
+        instanceID = 2677,
+        zone = "Blackwing Lair",
+        x = 28.5,
+        y = 41.7
+        }
+    }
 }
 
 NPCs[12459] = { 
     id = 12459, 
     name = "Blackwing Warlock", 
-    zone = "Blackwing Lair (Raid)", 
-    map = { 
-        zone = "Blackwing Lair (Raid)", 
-        x = 0, 
-        y = 0 
-    } 
+    zone = "Blackwing Lair", 
+    locations = { 
+        {
+        instanceID = 2677,
+        zone = "Blackwing Lair", 
+        x = 42.1, 
+        y = 53 
+        }, {
+        instanceID = 2677,
+        zone = "Blackwing Lair",
+        x = 44.2,
+        y = 42.2
+        }, {
+        instanceID = 2677,
+        zone = "Blackwing Lair",
+        x = 51.1,
+        y = 55
+        } 
+    }
 }
 
 NPCs[12461] = { 
     id = 12461, 
     name = "Death Talon Overseer", 
-    zone = "Blackwing Lair (Raid)", 
-    map = { 
-        zone = "Blackwing Lair (Raid)", 
-        x = 0, 
-        y = 0 
-    } 
+    zone = "Blackwing Lair", 
+    locations = {
+        { 
+        instanceID = 2677,
+        zone = "Blackwing Lair", 
+        x = 42.1, 
+        y = 53 
+        }, {
+        instanceID = 2677,
+        zone = "Blackwing Lair",
+        x = 44.2,
+        y = 42.2
+        }, {
+        instanceID = 2677,
+        zone = "Blackwing Lair",
+        x = 51.1,
+        y = 55
+        } 
+    }
 }
 
 NPCs[13456] = { 
@@ -1453,7 +1497,13 @@ NPCs[14686] = {
 NPCs[14834] = { 
     id = 14834, 
     name = "Hakkar", 
-    zone = "Zul'Gurub" 
+    zone = "Zul'Gurub",
+    map = {
+        instanceID = 309,
+        zone = "Zul'Gurub",
+        x = 49.9,
+        y = 39.9
+    }
 }
 
 NPCs[15083] = { 
@@ -1636,11 +1686,6 @@ NPCs[63032] = {
         x = 59.76, 
         y = 13.98 
     } 
-}
-
-NPCs[63107] = { 
-    id = 63107, 
-    name = "Azuregos" 
 }
 
 NPCs[65113] = { 

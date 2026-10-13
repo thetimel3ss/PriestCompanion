@@ -2225,19 +2225,145 @@ Sources[19108] = {
     } 
 }
 
+--------------------------------------------------
+-- Cold Snap
+--------------------------------------------------
 
-Sources[19130] = { { type = "drop", npcID = 6109, npcName = "Azuregos", npcType = "Boss", zone = "Aszhara", dropChance = 10, mobs = { { id = 6109, chance = 10 } }, mobCount = 1, details = true, lootNPCID = 6109 }, { type = "drop", npcID = 63107, npcName = "Azuregos", npcType = "Boss", dropChance = 10, mobs = { { id = 63107, chance = 10 } }, mobCount = 1, details = true, lootNPCID = 63107 } }
-Sources[19367] = { { type = "drop", npcID = 11981, npcName = "Flamegor", npcType = "Boss", instanceID = 2677, zone = "Blackwing Lair (Raid)", dropChance = 16.6666667, mobs = { { id = 11981, chance = 16.6666667 } }, mobCount = 1, details = true, lootNPCID = 11981 } }
-Sources[19435] = { { type = "drop", npcID = 12457, npcName = "Blackwing Spellbinder", npcType = "Named creature", instanceID = 2677, zone = "Blackwing Lair (Raid)", dropChance = 2, mobs = { { id = 12457, chance = 2 } }, mobCount = 1, details = true }, { type = "drop", npcID = 12459, npcName = "Blackwing Warlock", npcType = "Named creature", instanceID = 2677, zone = "Blackwing Lair (Raid)", dropChance = 2, mobs = { { id = 12459, chance = 2 } }, mobCount = 1, details = true }, { type = "drop", npcID = 12461, npcName = "Death Talon Overseer", npcType = "Named creature", instanceID = 2677, zone = "Blackwing Lair (Raid)", dropChance = 2, mobs = { { id = 12461, chance = 2 } }, mobCount = 1, details = true } }
-Sources[19861] = { { type = "drop", npcID = 14834, npcName = "Hakkar", npcType = "Boss", instanceID = 309, zone = "Zul'Gurub", dropChance = 14.29, mobs = { { id = 14834, chance = 14.29 } }, mobCount = 1, details = true, lootNPCID = 14834 } }
+Sources[19130] = { 
+    { 
+        type = "drop", 
+        npcID = 6109, 
+        npcName = "Azuregos", 
+        npcType = "Boss", 
+        zone = "Azshara", 
+        dropChance = 10, 
+        mobs = { 
+            { 
+                id = 6109, 
+                chance = 10 
+            } 
+        }, 
+        mobCount = 1, 
+        details = true, 
+        lootNPCID = 6109 
+    },
+}
+
+--------------------------------------------------
+-- Dragon's Touch
+--------------------------------------------------
+
+Sources[19367] = { 
+    { 
+        type = "drop", 
+        npcID = 11981, 
+        npcName = "Flamegor", 
+        npcType = "Boss", 
+        instanceID = 2677, 
+        zone = "Blackwing Lair", 
+        dropChance = 16.6666667, 
+        mobs = { 
+            { 
+                id = 11981, 
+                chance = 16.6666667 
+            } 
+        }, 
+        mobCount = 1, 
+        details = true, 
+        lootNPCID = 11981 
+    } 
+}
+
+--------------------------------------------------
+-- Essence Gatherer
+--------------------------------------------------
+
+Sources[19435] = { 
+    { 
+        type = "drop", 
+        npcID = 12457, 
+        npcName = "Blackwing Spellbinder", 
+        npcType = "Named creature", 
+        instanceID = 2677, 
+        zone = "Blackwing Lair", 
+        dropChance = 2, 
+        mobs = { 
+            { 
+                id = 12457, 
+                chance = 2 
+            } 
+        }, 
+        mobCount = 1, 
+        details = true 
+    }, { 
+        type = "drop", 
+        npcID = 12459, 
+        npcName = "Blackwing Warlock", 
+        npcType = "Named creature", 
+        instanceID = 2677, 
+        zone = "Blackwing Lair", 
+        dropChance = 2, 
+        mobs = { 
+            { 
+                id = 12459, 
+                chance = 2 
+            } 
+        }, 
+        mobCount = 1, 
+        details = true 
+    }, { 
+        type = "drop", 
+        npcID = 12461, 
+        npcName = "Death Talon Overseer", 
+        npcType = "Named creature", 
+        instanceID = 2677, 
+        zone = "Blackwing Lair", 
+        dropChance = 2, 
+        mobs = { 
+            { 
+                id = 12461, 
+                chance = 2 
+            } 
+        }, 
+        mobCount = 1, 
+        details = true 
+    } 
+}
+
+--------------------------------------------------
+-- Touch of Chaos
+--------------------------------------------------
+
+Sources[19861] = { 
+    { 
+        type = "drop", 
+        npcID = 14834, 
+        npcName = "Hakkar", 
+        npcType = "Boss", 
+        instanceID = 309, 
+        zone = "Zul'Gurub", 
+        dropChance = 14.29, 
+        mobs = { 
+            { 
+                id = 14834, 
+                chance = 14.29 
+            } 
+        }, 
+        mobCount = 1, 
+        details = true, 
+        lootNPCID = 14834 
+    } 
+}
+
+
 Sources[19927] = { { type = "drop", npcID = 14510, npcName = "High Priestess Mar'li", npcType = "Boss", instanceID = 309, zone = "Zul'Gurub", dropChance = 16.67, mobs = { { id = 14510, chance = 16.67 } }, mobCount = 1, details = true, lootNPCID = 14510 } }
 Sources[19967] = { { type = "drop", npcID = 15083, npcName = "Hazza'rah", npcType = "Boss", instanceID = 309, dropChance = 45, mobs = { { id = 15083, chance = 45 } }, mobCount = 1, details = true, lootNPCID = 15083 } }
-Sources[20082] = { { type = "quest", questID = 8257, questName = "Blood of Morphaz", faction = "Both", requiredLevel = 50, zone = "Aszhara", instanceID = 109, chainID = "octo:8257", details = true } }
+Sources[20082] = { { type = "quest", questID = 8257, questName = "Blood of Morphaz", faction = "Both", requiredLevel = 50, zone = "Azshara", instanceID = 109, chainID = "octo:8257", details = true } }
 Sources[20672] = { { type = "drop", npcID = 15208, npcName = "The Duke of Shards", npcType = "Named creature", dropChance = 30, mobs = { { id = 15208, chance = 30 } }, mobCount = 1, details = true } }
 Sources[21603] = { { type = "drop", npcID = 15511, npcName = "Lord Kri", npcType = "Boss", instanceID = 531, zone = "Ahn'Qiraj Temple", dropChance = 25, mobs = { { id = 15511, chance = 25 } }, mobCount = 1, details = true, lootNPCID = 15511 } }
 Sources[21801] = { { type = "drop", npcID = 15319, npcName = "Multiple creatures", npcType = "Raid creatures", instanceID = 509, mobs = { { id = 15319, chance = 0.06 }, { id = 15320, chance = 0.05 }, { id = 15323, chance = 0.06 }, { id = 15324, chance = 0.4 }, { id = 15325, chance = 0.09 }, { id = 15327, chance = 0.04 }, { id = 15333, chance = 0.06 }, { id = 15335, chance = 0.05 }, { id = 15336, chance = 0.16 }, { id = 15338, chance = 0.07 }, { id = 15343, chance = 0.07 }, { id = 15355, chance = 0.17 }, { id = 15385, chance = 0.16 }, { id = 15386, chance = 0.03 }, { id = 15387, chance = 0.04 }, { id = 15388, chance = 0.09 }, { id = 15389, chance = 0.03 }, { id = 15391, chance = 0.02 }, { id = 15392, chance = 0.02 }, { id = 15461, chance = 0.1 }, { id = 15462, chance = 0.28 } }, mobCount = 21, details = true } }
-Sources[22254] = { { type = "drop", npcID = 8905, npcName = "Warbringer Construct", npcType = "Named creature", instanceID = 1584, zone = "BRD (Dungeon)", dropChance = 0.09, mobs = { { id = 8905, chance = 0.09 } }, mobCount = 1, details = true }, { type = "drop", npcID = 9476, npcName = "Watchman Doomgrip", npcType = "Boss", instanceID = 1584, dropChance = 0.75, mobs = { { id = 9476, chance = 0.75 } }, mobCount = 1, details = true, lootNPCID = 9476 } }
-Sources[22408] = { { type = "drop", npcID = 10440, npcName = "Baron Rivendare", npcType = "Boss", instanceID = 2017, zone = "Stratholme (Dungeon)", dropChance = 20, mobs = { { id = 10440, chance = 20 } }, mobCount = 1, details = true, lootNPCID = 10440 } }
+Sources[22254] = { { type = "drop", npcID = 8905, npcName = "Warbringer Construct", npcType = "Named creature", instanceID = 1584, zone = "BRD", dropChance = 0.09, mobs = { { id = 8905, chance = 0.09 } }, mobCount = 1, details = true }, { type = "drop", npcID = 9476, npcName = "Watchman Doomgrip", npcType = "Boss", instanceID = 1584, dropChance = 0.75, mobs = { { id = 9476, chance = 0.75 } }, mobCount = 1, details = true, lootNPCID = 9476 } }
+Sources[22408] = { { type = "drop", npcID = 10440, npcName = "Baron Rivendare", npcType = "Boss", instanceID = 2017, zone = "Stratholme", dropChance = 20, mobs = { { id = 10440, chance = 20 } }, mobCount = 1, details = true, lootNPCID = 10440 } }
 Sources[22820] = { { type = "drop", npcID = 16028, npcName = "Patchwerk", npcType = "Boss", instanceID = 533, zone = "Naxxramas", dropChance = 20, mobs = { { id = 16028, chance = 20 } }, mobCount = 1, details = true, lootNPCID = 16028 } }
 Sources[22821] = { { type = "drop", npcID = 15990, npcName = "Kel'Thuzad", npcType = "Boss", instanceID = 533, zone = "Naxxramas", dropChance = 9.091, mobs = { { id = 15990, chance = 9.091 } }, mobCount = 1, details = true, lootNPCID = 15990 } }
 Sources[23009] = { { type = "drop", npcID = 16061, npcName = "Instructor Razuvious", npcType = "Boss", instanceID = 533, zone = "Naxxramas", dropChance = 16.67, mobs = { { id = 16061, chance = 16.67 } }, mobCount = 1, details = true, lootNPCID = 16061 } }
@@ -2266,7 +2392,7 @@ Sources[58026] = { { type = "quest", questID = 41667, questName = "In Need of Sh
 Sources[58047] = { { type = "drop", npcID = 62069, npcName = "Halgan Redbrand", npcType = "Named creature", zone = "Dragonmaw Retreat", dropChance = 25, mobs = { { id = 62069, chance = 25 } }, mobCount = 1, details = true } }
 Sources[58089] = { { type = "drop", npcID = 62503, npcName = "Rotthorn", npcType = "Boss", instanceID = 47, zone = "Razorfen Kraul", dropChance = 25, mobs = { { id = 62503, chance = 25 } }, mobCount = 1, details = true, lootNPCID = 62503 } }
 Sources[58137] = { { type = "drop", npcID = 62548, npcName = "Oronok Torn-Heart", npcType = "Named creature", zone = "Stormwrought Ruins", dropChance = 25, mobs = { { id = 62548, chance = 25 } }, mobCount = 1, details = true } }
-Sources[58205] = { { type = "drop", npcID = 52145, npcName = "Incindis", npcType = "Boss", instanceID = 2717, zone = "Molten Core (Raid)", dropChance = 20, mobs = { { id = 52145, chance = 20 } }, mobCount = 1, details = true, lootNPCID = 52145 } }
+Sources[58205] = { { type = "drop", npcID = 52145, npcName = "Incindis", npcType = "Boss", instanceID = 2717, zone = "Molten Core", dropChance = 20, mobs = { { id = 52145, chance = 20 } }, mobCount = 1, details = true, lootNPCID = 52145 } }
 Sources[58253] = { { type = "vendor", npcID = 80945, npcName = "Elisandra Spellbinder", faction = "Both", details = true } }
 Sources[58277] = { { type = "quest", questID = 41841, questName = "Artifact of the Dark Lady", faction = "Horde", requiredLevel = 32, zone = "Silverpine Forest", chainID = "octo:41841", details = true } }
 Sources[60427] = { 

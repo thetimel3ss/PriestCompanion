@@ -276,7 +276,12 @@ Instances[309] = {
     type = "raid", 
     description = "Raid encounter in Zul'Gurub.", 
     entranceZone = "Stranglethorn Vale", 
-    icon = "Interface\\Icons\\INV_Misc_Map_01" 
+    icon = "Interface\\Icons\\INV_Misc_Map_01",
+
+    worldMap = {
+        mapID = 12,
+        zoneID = 1
+    }
 }
 
 --------------------------------------------------
@@ -507,7 +512,12 @@ Instances[2677] = {
     type = "raid", 
     description = "Raid encounter in Blackwing Lair.", 
     entranceZone = "Burning Steppes", 
-    icon = "Interface\\Icons\\INV_Misc_Map_01" 
+    icon = "Interface\\Icons\\INV_Misc_Map_01",
+
+    worldMap = {
+        mapID = 20,
+        zoneID = 1
+    }
 }
 
 --------------------------------------------------

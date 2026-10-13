@@ -2185,7 +2185,47 @@ Sources[18761] = {
     } 
 }
 
-Sources[19108] = { { type = "quest", questID = 7181, questName = "The Legend of Korrak", faction = "Horde", requiredLevel = 51, zone = "Alterac Mountains", details = true }, { type = "quest", questID = 7202, questName = "Korrak the Bloodrager", faction = "Alliance", requiredLevel = 51, zone = "Alterac Mountains", details = true }, { type = "quest", questID = 8271, questName = "Hero of the Stormpike", faction = "Alliance", requiredLevel = 51, zone = "Alterac Mountains", details = true }, { type = "quest", questID = 8272, questName = "Hero of the Frostwolf", faction = "Horde", requiredLevel = 51, zone = "Alterac Mountains", details = true } }
+--------------------------------------------------
+-- Wand of Biting Cold
+--------------------------------------------------
+
+Sources[19108] = { 
+    { 
+        type = "quest", 
+        questID = 7181, 
+        questName = "The Legend of Korrak", 
+        faction = "Horde", 
+        requiredLevel = 51, 
+        zone = "Alterac Mountains", 
+        details = true 
+    }, { 
+        type = "quest", 
+        questID = 7202, 
+        questName = "Korrak the Bloodrager", 
+        faction = "Alliance", 
+        requiredLevel = 51, 
+        zone = "Alterac Mountains", 
+        details = true 
+    }, { 
+        type = "quest", 
+        questID = 8271, 
+        questName = "Hero of the Stormpike", 
+        faction = "Alliance", 
+        requiredLevel = 51, 
+        zone = "Alterac Mountains", 
+        details = true 
+    }, { 
+        type = "quest", 
+        questID = 8272, 
+        questName = "Hero of the Frostwolf", 
+        faction = "Horde", 
+        requiredLevel = 51, 
+        zone = "Alterac Mountains", 
+        details = true 
+    } 
+}
+
+
 Sources[19130] = { { type = "drop", npcID = 6109, npcName = "Azuregos", npcType = "Boss", zone = "Aszhara", dropChance = 10, mobs = { { id = 6109, chance = 10 } }, mobCount = 1, details = true, lootNPCID = 6109 }, { type = "drop", npcID = 63107, npcName = "Azuregos", npcType = "Boss", dropChance = 10, mobs = { { id = 63107, chance = 10 } }, mobCount = 1, details = true, lootNPCID = 63107 } }
 Sources[19367] = { { type = "drop", npcID = 11981, npcName = "Flamegor", npcType = "Boss", instanceID = 2677, zone = "Blackwing Lair (Raid)", dropChance = 16.6666667, mobs = { { id = 11981, chance = 16.6666667 } }, mobCount = 1, details = true, lootNPCID = 11981 } }
 Sources[19435] = { { type = "drop", npcID = 12457, npcName = "Blackwing Spellbinder", npcType = "Named creature", instanceID = 2677, zone = "Blackwing Lair (Raid)", dropChance = 2, mobs = { { id = 12457, chance = 2 } }, mobCount = 1, details = true }, { type = "drop", npcID = 12459, npcName = "Blackwing Warlock", npcType = "Named creature", instanceID = 2677, zone = "Blackwing Lair (Raid)", dropChance = 2, mobs = { { id = 12459, chance = 2 } }, mobCount = 1, details = true }, { type = "drop", npcID = 12461, npcName = "Death Talon Overseer", npcType = "Named creature", instanceID = 2677, zone = "Blackwing Lair (Raid)", dropChance = 2, mobs = { { id = 12461, chance = 2 } }, mobCount = 1, details = true } }

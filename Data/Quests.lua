@@ -2399,8 +2399,13 @@ Quests[7181] = {
     startNPC = 13840, 
     endNPC = 13840, 
     rewards = { 
-        type = "choice", 
-        items = { 
+        type = "mixed",
+        
+        guaranteed = {
+            50743
+        },
+
+        choice = { 
             19107, 
             19106, 
             19108, 
@@ -2419,8 +2424,13 @@ Quests[7202] = {
     startNPC = 13841, 
     endNPC = 13841, 
     rewards = { 
-        type = "choice", 
-        items = { 
+        type = "mixed", 
+
+        guaranteed = {
+            50743
+        },
+
+        choice = { 
             19107, 
             19106, 
             19108, 
@@ -2492,8 +2502,13 @@ Quests[8271] = {
     startNPC = 13816, 
     endNPC = 13816, 
     rewards = { 
-        type = "choice", 
-        items = { 
+        type = "mixed", 
+
+        guaranteed = {
+            50743
+        },
+
+        choice = { 
             19107, 
             19106, 
             19108, 
@@ -2512,8 +2527,13 @@ Quests[8272] = {
     startNPC = 13817, 
     endNPC = 13817, 
     rewards = { 
-        type = "choice", 
-        items = { 
+        type = "mixed", 
+
+        guaranteed = {
+            50743
+        },
+
+        choice = { 
             19107, 
             19106, 
             19108, 

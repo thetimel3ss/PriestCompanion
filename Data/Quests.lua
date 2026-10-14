@@ -4,6 +4,13 @@
 -- Quest records contain only quest-specific data.
 -- NPC identity and locations are stored separately
 -- in Data/NPCs.lua.
+-- Quest starters may use startNPC / startNPCByFaction (ordinary quests)
+-- or startItem = itemID (quests activated by an item).
+-- For startItem, dropped-item locations are read from Data/Sources.lua
+-- when that item has a drop source. Otherwise startDropNPC = npcID
+-- (or a list of NPC IDs) may supply the dropper, with optional
+-- startInstanceID / startInstanceZoneID / startZone map fallback.
+-- startItemName can label an item not present in Data/Items.lua.
 --
 -- Full quest text is read from the player's quest
 -- log when possible; otherwise the summary stored

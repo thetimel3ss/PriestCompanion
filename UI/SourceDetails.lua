@@ -387,6 +387,157 @@ local function ResolveQuestNPC(quest, role)
 end
 
 --------------------------------------------------
+-- Quest starters from dropped items
+--------------------------------------------------
+
+local function GetQuestStartItem(quest)
+    if not quest or not quest.startItem then
+        return nil, nil
+    end
+
+    local reference = quest.startItem
+    local itemID = reference
+    local itemName = quest.startItemName
+
+    if type(reference) == "table" then
+        itemID = reference.itemID or reference.id
+        itemName = itemName or reference.name
+    end
+
+    itemID = tonumber(itemID)
+    if not itemID then
+        return nil, nil
+    end
+
+    if not itemName and PC.Data.Items
+    and PC.Data.Items[itemID] then
+        itemName = PC.Data.Items[itemID].name
+    end
+
+    if not itemName and type(GetItemInfo) == "function" then
+        itemName = GetItemInfo(itemID)
+    end
+
+    return itemID, itemName or ("Item " .. tostring(itemID))
+end
+
+local function ResolveQuestStartLocations(quest)
+    local result = {}
+    local npcs = ResolveQuestNPCs(quest, "start")
+    local i
+
+    for i = 1, table.getn(npcs) do
+        table.insert(result, {
+            npc = npcs[i],
+            kind = "npc"
+        })
+    end
+
+    local itemID, itemName = GetQuestStartItem(quest)
+    if not itemID then
+        return result
+    end
+
+    local seen = {}
+    local hasDrop = false
+
+    local function AddItemDrop(reference, source, sourceName)
+        local npc = GetNPC(reference)
+        local npcID = npc and npc.id or tonumber(reference)
+        local instanceID = source and source.instanceID
+        local name = (npc and npc.name) or sourceName
+
+        if not name and npcID then
+            name = "NPC " .. tostring(npcID)
+        end
+
+        if not reference and not instanceID then
+            return
+        end
+
+        local key = tostring(npcID or name or "instance") ..
+            ":" .. tostring(instanceID or "")
+        if seen[key] then
+            return
+        end
+        seen[key] = true
+
+        table.insert(result, {
+            kind = "item",
+            itemID = itemID,
+            itemName = itemName,
+            npc = npc,
+            npcName = name,
+            instanceID = instanceID,
+            instanceZoneID = source and source.instanceZoneID,
+            zone = (npc and npc.zone) or (source and source.zone)
+        })
+        hasDrop = true
+    end
+
+    -- Prefer the shared item source database when the starter item
+    -- already has drop information. Do not duplicate that data in quests.
+    local sources = PC.Data.Sources and PC.Data.Sources[itemID]
+    local playerFaction = PC.API and PC.API.GetPlayerFaction
+        and PC.API.GetPlayerFaction()
+
+    if sources then
+        sources = NormalizeSources(sources)
+        for i = 1, table.getn(sources) do
+            local source = sources[i]
+            if source.type == "drop"
+            and (not source.faction or source.faction == "Both"
+                or not playerFaction or source.faction == playerFaction) then
+                local mobs = source.mobs
+                if mobs and table.getn(mobs) > 0 then
+                    local j
+                    for j = 1, table.getn(mobs) do
+                        AddItemDrop(
+                            mobs[j].id or mobs[j].npcID,
+                            source,
+                            source.npcName
+                        )
+                    end
+                else
+                    AddItemDrop(source.npcID, source, source.npcName)
+                end
+            end
+        end
+    end
+
+    -- Fallback for starter items not registered in Data/Sources.lua.
+    if not hasDrop and quest.startDropNPC then
+        local references = quest.startDropNPC
+        if type(references) ~= "table"
+        or references.id or references.name then
+            references = { references }
+        end
+
+        for i = 1, table.getn(references) do
+            AddItemDrop(references[i], {
+                instanceID = quest.startInstanceID,
+                instanceZoneID = quest.startInstanceZoneID,
+                zone = quest.startZone
+            })
+        end
+    end
+
+    -- Keep the starter visible even when its drop location is unknown.
+    if not hasDrop then
+        table.insert(result, {
+            kind = "item",
+            itemID = itemID,
+            itemName = itemName,
+            instanceID = quest.startInstanceID,
+            instanceZoneID = quest.startInstanceZoneID,
+            zone = quest.startZone
+        })
+    end
+
+    return result
+end
+
+--------------------------------------------------
 -- Quest Status
 --------------------------------------------------
 
@@ -541,6 +692,38 @@ local function ShowNPCOnMap(
     DEFAULT_CHAT_FRAME:AddMessage(
         text
     )
+    return false
+end
+
+-- A quest-starting item points to the creature that drops it, not
+-- to the NPC where the quest is turned in.
+local function ShowQuestStartOnMap(start, questName)
+    if not start then
+        return false
+    end
+
+    if start.npc
+    and ShowNPCOnMap(start.npc, questName, "Start") then
+        return true
+    end
+
+    if start.instanceID and PC.Map
+    and type(PC.Map.ShowInstanceMap) == "function" then
+        return PC.Map.ShowInstanceMap(
+            start.instanceID,
+            start.instanceZoneID,
+            start.zone
+        )
+    end
+
+    if not start.npc then
+        DEFAULT_CHAT_FRAME:AddMessage(
+            "|cff66ccffPriest Companion:|r " ..
+            "Quest starter location is not configured for " ..
+            tostring(start.itemName or questName or "this quest") .. "."
+        )
+    end
+
     return false
 end
 
@@ -1255,10 +1438,9 @@ local function AcquireQuestCard(index)
             local parent =
                 button:GetParent()
 
-            ShowNPCOnMap(
-                button.npc,
-                parent.questName,
-                "Start"
+            ShowQuestStartOnMap(
+                button.startLocation,
+                parent.questName
             )
         end
     )
@@ -1626,7 +1808,7 @@ local function AcquireStartRow(card, index)
     row.button:SetHeight(MAP_BUTTON_HEIGHT)
     row.button:SetText("Show Start")
     row.button:SetScript("OnClick", function()
-        ShowNPCOnMap(this.npc, this:GetParent().questName, "Start")
+        ShowQuestStartOnMap(this.startLocation, this:GetParent().questName)
     end)
     card.startRows[index] = row
     return row
@@ -1639,6 +1821,7 @@ local function HideCardContent(card)
         row.label:Hide()
         row.button:Hide()
         row.button.npc = nil
+        row.button.startLocation = nil
     end
     card.startLabel:Hide()
     card.endLabel:Hide()
@@ -1716,11 +1899,8 @@ local function PopulateQuestCard(
         )
 
     card.questName = questName
-    card.startNPCs =
-        ResolveQuestNPCs(
-            quest,
-            "start"
-        )
+    card.startLocations =
+        ResolveQuestStartLocations(quest)
 
     card.endNPC =
         ResolveQuestNPC(
@@ -1917,27 +2097,48 @@ local function PopulateQuestCard(
     --------------------------------------------------
 
     local startIndex
-    for startIndex = 1, table.getn(card.startNPCs) do
-        local npc = card.startNPCs[startIndex]
+    for startIndex = 1, table.getn(card.startLocations) do
+        local start = card.startLocations[startIndex]
         local row = AcquireStartRow(card, startIndex)
         row.label:ClearAllPoints()
         row.label:SetPoint("TOPLEFT", card, "TOPLEFT", CARD_PADDING, y)
         row.label:SetWidth(bodyWidth - MAP_BUTTON_WIDTH - 8)
 
         local prefix = "Starts: "
-        if table.getn(card.startNPCs) > 1 then
+        if table.getn(card.startLocations) > 1 then
             prefix = "Start option " .. tostring(startIndex) .. ": "
         end
-        local text = prefix .. tostring(npc.name or "Unknown")
-        if npc.zone then
-            text = text .. " - " .. tostring(npc.zone)
+
+        local text
+        local zone
+        if start.kind == "item" then
+            text = prefix .. tostring(start.itemName)
+            if start.npcName then
+                text = text .. " (dropped by " ..
+                    tostring(start.npcName) .. ")"
+            elseif not start.instanceID then
+                text = text .. " (drop location not configured)"
+            end
+            zone = start.zone
+        else
+            text = prefix .. tostring(start.npc.name or "Unknown")
+            zone = start.npc.zone
         end
+
+        if zone then
+            text = text .. " - " .. tostring(zone)
+        end
+
         row.label:SetText(text)
         row.label:Show()
-        row.button.npc = npc
+        row.button.startLocation = start
         row.button:ClearAllPoints()
         row.button:SetPoint("TOPRIGHT", card, "TOPRIGHT", -CARD_PADDING, y + 4)
-        row.button:Show()
+        if start.npc or start.instanceID then
+            row.button:Show()
+        else
+            row.button:Hide()
+        end
         y = y - math.max(25, GetTextHeight(row.label) + 8)
     end
 

@@ -295,7 +295,12 @@ Instances[509] = {
     type = "raid", 
     description = "Raid encounter in Ruins of Ahn'Qiraj.", 
     entranceZone = "Silithus", 
-    icon = "Interface\\Icons\\INV_Misc_Map_01" 
+    icon = "Interface\\Icons\\INV_Misc_Map_01",
+
+    worldMap = {
+        mapID = 15,
+        zoneID = 1
+    }
 }
 
 --------------------------------------------------
@@ -308,7 +313,12 @@ Instances[531] = {
     type = "raid", 
     description = "Raid encounter in Temple of Ahn'Qiraj.", 
     entranceZone = "Silithus", 
-    icon = "Interface\\Icons\\INV_Misc_Map_01" 
+    icon = "Interface\\Icons\\INV_Misc_Map_01",
+    
+    worldMap = {
+        mapID = 28,
+        zoneID = 1
+    }
 }
 
 --------------------------------------------------
@@ -340,7 +350,12 @@ Instances[533] = {
         y = 26, 
         label = "Naxxramas entrance" 
     }, 
-    icon = "Interface\\Icons\\INV_Misc_Map_01" 
+    icon = "Interface\\Icons\\INV_Misc_Map_01",
+    
+    worldMap = {
+        mapID = 33,
+        zoneID = 1
+    }
 }
 
 --------------------------------------------------
@@ -414,7 +429,12 @@ Instances[814] = {
     type = "raid", 
     description = "Raid encounter in Tower of Karazhan.", 
     entranceZone = "Deadwind Pass", 
-    icon = "Interface\\Icons\\INV_Misc_Map_01" 
+    icon = "Interface\\Icons\\INV_Misc_Map_01",
+    
+    worldMap = {
+        mapID = 40,
+        zoneID = 1
+    }
 }
 
 --------------------------------------------------

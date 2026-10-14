@@ -2711,21 +2711,17 @@ Quests[41945] = {
     faction = "Both", 
     description = "All this riffraff! To think an imbecile like Bhu’robi is the cause for all this chaos. He was always a nuisance, radical ideas and delusional aspirations walked hand in hand with this fool of a man! You would assume our chieftain would have realized this sooner, but he got blinded by his feelings of compassion to his ‘old friend’. Pah, to the nether with it I say. Bhu’robi is no longer a Draenei in my eyes, let alone a Moro’gai. Parash’ka! You made me ramble on about this again! Now my blood is boiling and my head is ready to burst. I will have you remedy this, scoundrel! Go to the Lunarclaw Den east of the village and bring me some brains of the featherfolk around there. I want only the gooiest you can find!", 
     objectiveText = "Fena Ma’dar in Moro’gai Village wants Lunarclaw brains to help with her headache.", 
-    startNPC = { 
-        name = "Fena Ma'dar", 
-        zone = "Moro'gai Village" }, 
-        endNPC = { 
-            name = "Fena Ma'dar", 
-            zone = "Moro'gai Village" }, 
-            rewards = { 
-                type = "choice", 
-                items = { 
-                    33352, 
-                    33353, 
-                    33354 
-                } 
-            } 
-        }
+    startNPC = 62852,
+    endNPC = 62852,
+    rewards = { 
+        type = "choice", 
+        items = { 
+            33352, 
+            33353, 
+            33354 
+        } 
+    } 
+}
 
 Quests[42000] = { 
     name = "Highborne Burden", 

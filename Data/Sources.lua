@@ -85,12 +85,26 @@ Sources[11288] = {
 --------------------------------------------------
 
 Sources[5208] = {
-    {
+    { 
         type = "vendor",
-        npcName = "Wand merchants",
-        zone = "Stormwind, Ironforge, Orgrimmar, Undercity",
-        faction = "Both",
-        requiredLevel = 15
+        npcID = 1312,
+        faction = "Alliance",
+        priceText = "33s 40c"
+    }, {
+        type = "vendor",
+        npcID = 5133,
+        faction = "Alliance",
+        priceText = "33s 40c"
+    }, {
+        type = "vendor",
+        npcID = 5816,
+        faction = "Horde",
+        priceText = "33s 40c"
+    }, {
+        type = "vendor",
+        npcID = 5754,
+        faction = "Horde",
+        priceText = "33s 40c"
     }
 }
 
@@ -115,12 +129,26 @@ Sources[5326] = {
 --------------------------------------------------
 
 Sources[5211] = {
-    {
+    { 
         type = "vendor",
-        npcName = "Wand merchants",
-        zone = "Stormwind, Ironforge, Orgrimmar, Undercity",
-        faction = "Both",
-        requiredLevel = 20
+        npcID = 1312,
+        faction = "Alliance",
+        priceText = "58s 30c"
+    }, {
+        type = "vendor",
+        npcID = 5133,
+        faction = "Alliance",
+        priceText = "58s 30c"
+    }, {
+        type = "vendor",
+        npcID = 5816,
+        faction = "Horde",
+        priceText = "58s 30c"
+    }, {
+        type = "vendor",
+        npcID = 5754,
+        faction = "Horde",
+        priceText = "58s 30c"
     }
 }
 
@@ -309,12 +337,26 @@ BossLoot[645] = {
 --------------------------------------------------
 
 Sources[5239] = {
-    {
+    { 
         type = "vendor",
-        npcName = "Wand merchants",
-        zone = "Stormwind, Ironforge, Orgrimmar, Undercity",
-        faction = "Both",
-        requiredLevel = 41
+        npcID = 1312,
+        faction = "Alliance",
+        priceText = "3g 87s 31c"
+    }, {
+        type = "vendor",
+        npcID = 5133,
+        faction = "Alliance",
+        priceText = "3g 87s 31c"
+    }, {
+        type = "vendor",
+        npcID = 5816,
+        faction = "Horde",
+        priceText = "3g 87s 31c"
+    }, {
+        type = "vendor",
+        npcID = 5754,
+        faction = "Horde",
+        priceText = "3g 87s 31c"
     }
 }
 
@@ -1065,12 +1107,26 @@ Sources[5207] = {
 --------------------------------------------------
 
 Sources[5209] = { 
-    {
+    { 
         type = "vendor",
-        npcName = "Wand merchants",
-        zone = "Stormwind, Ironforge, Orgrimmar, Undercity",
-        faction = "Both",
-        requiredLevel = 16
+        npcID = 1312,
+        faction = "Alliance",
+        priceText = "38s 55c"
+    }, {
+        type = "vendor",
+        npcID = 5133,
+        faction = "Alliance",
+        priceText = "38s 55c"
+    }, {
+        type = "vendor",
+        npcID = 5816,
+        faction = "Horde",
+        priceText = "38s 55c"
+    }, {
+        type = "vendor",
+        npcID = 5754,
+        faction = "Horde",
+        priceText = "38s 55c"
     }
 }
 
@@ -1079,12 +1135,26 @@ Sources[5209] = {
 --------------------------------------------------
 
 Sources[5210] = { 
-    {
+    { 
         type = "vendor",
-        npcName = "Wand merchants",
-        zone = "Stormwind, Ironforge, Orgrimmar, Undercity",
-        faction = "Both",
-        requiredLevel = 20
+        npcID = 1312,
+        faction = "Alliance",
+        priceText = "58s 8c"
+    }, {
+        type = "vendor",
+        npcID = 5133,
+        faction = "Alliance",
+        priceText = "58s 8c"
+    }, {
+        type = "vendor",
+        npcID = 5816,
+        faction = "Horde",
+        priceText = "58s 8c"
+    }, {
+        type = "vendor",
+        npcID = 5754,
+        faction = "Horde",
+        priceText = "58s 8c"
     }
 } 
 
@@ -1200,10 +1270,24 @@ Sources[5235] = {
 Sources[5236] = { 
     { 
         type = "vendor",
-        npcName = "Wand merchants",
-        zone = "Stormwind, Ironforge, Orgrimmar, Undercity",
-        faction = "Both",
-        requiredLevel = 29
+        npcID = 1312,
+        faction = "Alliance",
+        priceText = "1g 43s 94c"
+    }, {
+        type = "vendor",
+        npcID = 5133,
+        faction = "Alliance",
+        priceText = "1g 43s 94c"
+    }, {
+        type = "vendor",
+        npcID = 5816,
+        faction = "Horde",
+        priceText = "1g 43s 94c"
+    }, {
+        type = "vendor",
+        npcID = 5754,
+        faction = "Horde",
+        priceText = "1g 43s 94c"
     }
 } 
 
@@ -1214,10 +1298,24 @@ Sources[5236] = {
 Sources[5238] = { 
     { 
         type = "vendor",
-        npcName = "Wand merchants",
-        zone = "Stormwind, Ironforge, Orgrimmar, Undercity",
-        faction = "Both",
-        requiredLevel = 40
+        npcID = 1312,
+        faction = "Alliance",
+        priceText = "3g 57s 27c"
+    }, {
+        type = "vendor",
+        npcID = 5133,
+        faction = "Alliance",
+        priceText = "3g 57s 27c"
+    }, {
+        type = "vendor",
+        npcID = 5816,
+        faction = "Horde",
+        priceText = "3g 57s 27c"
+    }, {
+        type = "vendor",
+        npcID = 5754,
+        faction = "Horde",
+        priceText = "3g 57s 27c"
     }
 } 
 
@@ -1325,10 +1423,24 @@ Sources[5245] = {
 Sources[5347] = { 
     { 
         type = "vendor",
-        npcName = "Wand merchants",
-        zone = "Stormwind, Ironforge, Orgrimmar, Undercity",
-        faction = "Both",
-        requiredLevel = 30
+        npcID = 1312,
+        faction = "Alliance",
+        priceText = "1g 57s 13c"
+    }, {
+        type = "vendor",
+        npcID = 5133,
+        faction = "Alliance",
+        priceText = "1g 57s 13c"
+    }, {
+        type = "vendor",
+        npcID = 5816,
+        faction = "Horde",
+        priceText = "1g 57s 13c"
+    }, {
+        type = "vendor",
+        npcID = 5754,
+        faction = "Horde",
+        priceText = "1g 57s 13c"
     }
 } 
 
@@ -2445,18 +2557,255 @@ Sources[20672] = {
     } 
 }
 
+--------------------------------------------------
+-- Wand of Qiraji Nobility
+--------------------------------------------------
 
+Sources[21603] = { 
+    { 
+        type = "drop", 
+        npcID = 15511, 
+        npcName = "Lord Kri", 
+        npcType = "Boss", 
+        instanceID = 531, 
+        zone = "Ahn'Qiraj Temple", 
+        dropChance = 25, 
+        mobs = { 
+            { 
+                id = 15511, 
+                chance = 25 
+            } 
+        }, 
+        mobCount = 1, 
+        details = true, 
+        lootNPCID = 15511 
+    } 
+}
 
-Sources[21603] = { { type = "drop", npcID = 15511, npcName = "Lord Kri", npcType = "Boss", instanceID = 531, zone = "Ahn'Qiraj Temple", dropChance = 25, mobs = { { id = 15511, chance = 25 } }, mobCount = 1, details = true, lootNPCID = 15511 } }
-Sources[21801] = { { type = "drop", npcID = 15319, npcName = "Multiple creatures", npcType = "Raid creatures", instanceID = 509, mobs = { { id = 15319, chance = 0.06 }, { id = 15320, chance = 0.05 }, { id = 15323, chance = 0.06 }, { id = 15324, chance = 0.4 }, { id = 15325, chance = 0.09 }, { id = 15327, chance = 0.04 }, { id = 15333, chance = 0.06 }, { id = 15335, chance = 0.05 }, { id = 15336, chance = 0.16 }, { id = 15338, chance = 0.07 }, { id = 15343, chance = 0.07 }, { id = 15355, chance = 0.17 }, { id = 15385, chance = 0.16 }, { id = 15386, chance = 0.03 }, { id = 15387, chance = 0.04 }, { id = 15388, chance = 0.09 }, { id = 15389, chance = 0.03 }, { id = 15391, chance = 0.02 }, { id = 15392, chance = 0.02 }, { id = 15461, chance = 0.1 }, { id = 15462, chance = 0.28 } }, mobCount = 21, details = true } }
-Sources[22254] = { { type = "drop", npcID = 8905, npcName = "Warbringer Construct", npcType = "Named creature", instanceID = 1584, zone = "BRD", dropChance = 0.09, mobs = { { id = 8905, chance = 0.09 } }, mobCount = 1, details = true }, { type = "drop", npcID = 9476, npcName = "Watchman Doomgrip", npcType = "Boss", instanceID = 1584, dropChance = 0.75, mobs = { { id = 9476, chance = 0.75 } }, mobCount = 1, details = true, lootNPCID = 9476 } }
-Sources[22408] = { { type = "drop", npcID = 10440, npcName = "Baron Rivendare", npcType = "Boss", instanceID = 2017, zone = "Stratholme", dropChance = 20, mobs = { { id = 10440, chance = 20 } }, mobCount = 1, details = true, lootNPCID = 10440 } }
-Sources[22820] = { { type = "drop", npcID = 16028, npcName = "Patchwerk", npcType = "Boss", instanceID = 533, zone = "Naxxramas", dropChance = 20, mobs = { { id = 16028, chance = 20 } }, mobCount = 1, details = true, lootNPCID = 16028 } }
-Sources[22821] = { { type = "drop", npcID = 15990, npcName = "Kel'Thuzad", npcType = "Boss", instanceID = 533, zone = "Naxxramas", dropChance = 9.091, mobs = { { id = 15990, chance = 9.091 } }, mobCount = 1, details = true, lootNPCID = 15990 } }
-Sources[23009] = { { type = "drop", npcID = 16061, npcName = "Instructor Razuvious", npcType = "Boss", instanceID = 533, zone = "Naxxramas", dropChance = 16.67, mobs = { { id = 16061, chance = 16.67 } }, mobCount = 1, details = true, lootNPCID = 16061 } }
-Sources[23177] = { { type = "drop", npcID = 14686, npcName = "Lady Falther'ess", npcType = "Boss", instanceID = 129, zone = "Razorfen Downs", dropChance = 50, mobs = { { id = 14686, chance = 50 } }, mobCount = 1, details = true, lootNPCID = 14686 } }
-Sources[33200] = { { type = "drop", npcID = 63032, npcName = "Glurgill", npcType = "Rare creature", zone = "Kalimdor", dropChance = 50, mobs = { { id = 63032, chance = 50 } }, mobCount = 1, details = true } }
-Sources[33352] = { { type = "quest", questID = 41945, questName = "Respect the Elderly", faction = "Both", requiredLevel = 49, details = true } }
+--------------------------------------------------
+-- Antenna of Invigoration
+--------------------------------------------------
+
+Sources[21801] = { 
+    { 
+        type = "drop", 
+        npcID = 15319, 
+        npcName = "Multiple creatures", 
+        npcType = "Raid creatures", 
+        instanceID = 509,
+        dropChance = 0.06,
+        mobCount = 21, 
+        details = true 
+    } 
+}
+
+--------------------------------------------------
+-- Wand of Eternal Light
+--------------------------------------------------
+
+Sources[22254] = { 
+    { 
+        type = "drop", 
+        npcID = 8905, 
+        npcName = "Warbringer Construct", 
+        npcType = "Named creature", 
+        instanceID = 1584, 
+        zone = "Blackrock Depths", 
+        dropChance = 0.09, 
+        mobs = { 
+            { 
+                id = 8905, 
+                chance = 0.09 
+            } 
+        }, 
+        mobCount = 1, 
+        details = true 
+    }, { 
+        type = "drop", 
+        npcID = 9476, 
+        npcName = "Watchman Doomgrip", 
+        npcType = "Named creature", 
+        instanceID = 1584, 
+        dropChance = 0.75, 
+        mobs = { 
+            { 
+                id = 9476, 
+                chance = 0.75 
+            } 
+        }, 
+        mobCount = 1, 
+        details = true, 
+    } 
+}
+
+--------------------------------------------------
+-- Ritssyn's Wand of Bad Mojo
+--------------------------------------------------
+
+Sources[22408] = { 
+    { 
+        type = "drop", 
+        npcID = 10440, 
+        npcName = "Baron Rivendare", 
+        npcType = "Boss", 
+        instanceID = 2017, 
+        zone = "Stratholme", 
+        dropChance = 20, 
+        mobs = { 
+            { 
+                id = 10440, 
+                chance = 20 
+            } 
+        }, 
+        mobCount = 1, 
+        details = true, 
+        lootNPCID = 10440 
+    } 
+}
+
+--------------------------------------------------
+-- Wand of Fates
+--------------------------------------------------
+
+Sources[22820] = { 
+    { 
+        type = "drop", 
+        npcID = 16028, 
+        npcName = "Patchwerk", 
+        npcType = "Boss", 
+        instanceID = 533, 
+        zone = "Naxxramas", 
+        dropChance = 20, 
+        mobs = { 
+            { 
+                id = 16028, 
+                chance = 20 
+            } 
+        }, 
+        mobCount = 1, 
+        details = true, 
+        lootNPCID = 16028 
+    } 
+}
+
+--------------------------------------------------
+-- Doomfinger
+--------------------------------------------------
+
+Sources[22821] = { 
+    { 
+        type = "drop", 
+        npcID = 15990, 
+        npcName = "Kel'Thuzad", 
+        npcType = "Boss", 
+        instanceID = 533, 
+        zone = "Naxxramas", 
+        dropChance = 9.091, 
+        mobs = { 
+            { 
+                id = 15990, 
+                chance = 9.091 
+            } 
+        }, 
+        mobCount = 1, 
+        details = true, 
+        lootNPCID = 15990 
+    } 
+}
+
+--------------------------------------------------
+-- Wand of the Whispering Dead
+--------------------------------------------------
+
+Sources[23009] = { 
+    { 
+        type = "drop", 
+        npcID = 16061, 
+        npcName = "Instructor Razuvious", 
+        npcType = "Boss", 
+        instanceID = 533, 
+        zone = "Naxxramas", 
+        dropChance = 16.67, 
+        mobs = { 
+            { 
+                id = 16061, 
+                chance = 16.67 
+            } 
+        }, 
+        mobCount = 1, 
+        details = true, 
+        lootNPCID = 16061 
+    } 
+}
+
+--------------------------------------------------
+-- Lady Falther'ess' Finger
+--------------------------------------------------
+
+Sources[23177] = { 
+    { 
+        type = "drop", 
+        npcID = 14686, 
+        npcName = "Lady Falther'ess", 
+        npcType = "Boss", 
+        instanceID = 129, 
+        zone = "Razorfen Downs", 
+        dropChance = 50, 
+        mobs = { 
+            { 
+                id = 14686, 
+                chance = 50 
+            } 
+        }, 
+        mobCount = 1, 
+        details = true, 
+        lootNPCID = 14686,
+        note = "This NPC only spawns during the Scourge Invasion (Naxxramas opening event)"
+    } 
+}
+
+--------------------------------------------------
+-- Spine of a Shipwrecked Pirate
+--------------------------------------------------
+
+Sources[33200] = { 
+    { 
+        type = "drop", 
+        npcID = 63032, 
+        npcName = "Glurgill", 
+        npcType = "Rare creature", 
+        zone = "Moonwhisper Coast", 
+        dropChance = 50, 
+        mobs = { 
+            { 
+                id = 63032, 
+                chance = 50 
+            } 
+        }, 
+        mobCount = 1, 
+        details = true 
+    } 
+}
+
+--------------------------------------------------
+-- Elder Wand
+--------------------------------------------------
+
+Sources[33352] = { 
+    { 
+        type = "quest", 
+        questID = 41945, 
+        questName = "Respect the Elderly", 
+        faction = "Both", 
+        requiredLevel = 49, 
+        details = true 
+    } 
+}
+
+--------------------------------------------------
+-- Withered Wand
+--------------------------------------------------
+
 Sources[41117] = { 
     { 
         type = "quest", 
@@ -2468,11 +2817,100 @@ Sources[41117] = {
         details = true 
     } 
 }
-Sources[42365] = { { type = "quest", questID = 42000, questName = "Highborne Burden", faction = "Horde", requiredLevel = 48, zone = "Winterspring", details = true } }
-Sources[51735] = { { type = "drop", npcID = 16184, npcName = "Nerubian Overseer", npcType = "Boss", zone = "Western Plaguelands", dropChance = 20, mobs = { { id = 16184, chance = 20 } }, mobCount = 1, details = true, lootNPCID = 16184 } }
-Sources[51816] = { { type = "quest", questID = 60110, questName = "Githyiss the Vile", faction = "Alliance", requiredLevel = 3, zone = "Teldrassil", chainID = "octo:60110", details = true } }
-Sources[51820] = { { type = "quest", questID = 60112, questName = "Fallen Adventurers", faction = "Horde", requiredLevel = 3, zone = "Tirisfal Glades", chainID = "octo:60112", details = true } }
-Sources[55134] = { { type = "quest", questID = 41360, questName = "Warm is the Day", faction = "Both", requiredLevel = 60, zone = "Winterspring", chainID = "octo:41360", details = true } }
+
+--------------------------------------------------
+-- Star of Maras'ethil
+--------------------------------------------------
+
+Sources[42365] = { 
+    { 
+        type = "quest", 
+        questID = 42000, 
+        questName = "Highborne Burden", 
+        faction = "Horde", 
+        requiredLevel = 48, 
+        zone = "Winterspring", 
+        details = true 
+    } 
+}
+
+--------------------------------------------------
+-- Scourgelord's Fang
+--------------------------------------------------
+
+Sources[51735] = { 
+    { 
+        type = "drop", 
+        npcID = 16184, 
+        npcName = "Nerubian Overseer", 
+        npcType = "Boss", 
+        zone = "Western Plaguelands", 
+        dropChance = 20, 
+        mobs = { 
+            { 
+                id = 16184, 
+                chance = 20 
+            } 
+        }, 
+        mobCount = 1, 
+        details = true, 
+        lootNPCID = 16184 
+    } 
+}
+
+--------------------------------------------------
+-- Webwood Branch
+--------------------------------------------------
+
+Sources[51816] = { 
+    { 
+        type = "quest", 
+        questID = 60110, 
+        questName = "Githyiss the Vile", 
+        faction = "Alliance", 
+        requiredLevel = 3, 
+        zone = "Teldrassil", 
+        chainID = "webwood_branch", 
+        details = true 
+    } 
+}
+
+--------------------------------------------------
+-- Bhartec's Lost Wand
+--------------------------------------------------
+
+Sources[51820] = { 
+    { 
+        type = "quest", 
+        questID = 60112, 
+        questName = "Fallen Adventurers", 
+        faction = "Horde", 
+        requiredLevel = 3, 
+        zone = "Tirisfal Glades", 
+        chainID = "bhartecs_lost_wand", 
+        details = true 
+    } 
+}
+
+--------------------------------------------------
+-- Rod of Permafrost
+--------------------------------------------------
+
+Sources[55134] = { 
+    { 
+        type = "quest", 
+        questID = 41360, 
+        questName = "Warm is the Day", 
+        faction = "Both", 
+        requiredLevel = 60, 
+        zone = "Winterspring", 
+        chainID = "rod_of_permafrost", 
+        details = true 
+    } 
+}
+
+
+
 Sources[55511] = { { type = "drop", npcID = 59991, npcName = "Kruul", npcType = "Boss", instanceID = 814, zone = "Tower of Karazhan", dropChance = 11.2, mobs = { { id = 59991, chance = 11.2 } }, mobCount = 1, details = true, lootNPCID = 59991 } }
 Sources[58009] = { { type = "drop", npcID = 62193, npcName = "Quistis the Malign", npcType = "Rare creature", zone = "Dun Morogh", dropChance = 50, mobs = { { id = 62193, chance = 50 } }, mobCount = 1, details = true } }
 Sources[58026] = { { type = "quest", questID = 41667, questName = "In Need of Shoes", faction = "Alliance", requiredLevel = 25, zone = "Azeroth", details = true } }

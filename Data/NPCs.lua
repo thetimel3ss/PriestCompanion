@@ -960,9 +960,10 @@ NPCs[8584] = {
 NPCs[8905] = { 
     id = 8905, 
     name = "Warbringer Construct", 
-    zone = "BRD", 
-    map = { 
-        zone = "BRD", 
+    zone = "Blackrock Depths", 
+    map = {
+        instanceID = 1584,
+        zone = "Blackrock Depths", 
         x = 30.8182, 
         y = 35.5333 
     } 
@@ -974,7 +975,7 @@ NPCs[9024] = {
     zone = "Blackrock Depths", 
     map = {
         instanceID = 1584,
-        zone = "Blackroch Depths", 
+        zone = "Blackrock Depths", 
         x = 57.2, 
         y = 75.9,
         label = "Pyromancer Loregrain"
@@ -983,7 +984,14 @@ NPCs[9024] = {
 
 NPCs[9476] = { 
     id = 9476, 
-    name = "Watchman Doomgrip" 
+    name = "Watchman Doomgrip",
+    zone = "Blackrock Depths",
+    map = {
+        instanceID = 1584,
+        zone = "Blackrock Depths",
+        x = 0,
+        y = 0
+    }
 }
 
 NPCs[10181] = { 
@@ -1038,8 +1046,8 @@ NPCs[10440] = {
     zone = "Stratholme", 
     map = { 
         zone = "Stratholme", 
-        x = 0, 
-        y = 0 
+        x = 60.2, 
+        y = 16.4
     } 
 }
 
@@ -1507,7 +1515,14 @@ NPCs[14516] = {
 NPCs[14686] = { 
     id = 14686, 
     name = "Lady Falther'ess", 
-    zone = "Razorfen Downs" 
+    zone = "Razorfen Downs",
+    message = "This NPC only spawns during the Scourge Invasion (Naxxramas opening event)",
+    map = {
+        instanceID = 129,
+        zone = "Razorfen Downs",
+        x = 0,
+        y = 0
+    } 
 }
 
 NPCs[14834] = { 
@@ -1549,35 +1564,60 @@ NPCs[15208] = {
 NPCs[15511] = { 
     id = 15511, 
     name = "Lord Kri", 
-    zone = "Ahn'Qiraj Temple" 
+    zone = "Ahn'Qiraj Temple",
+    map = {
+        instanceID = 531,
+        zone = "Ahn'Qiraj Temple",
+        x = 28.5,
+        y = 49.4
+    }
 }
 
 NPCs[15990] = { 
     id = 15990, 
     name = "Kel'Thuzad", 
-    zone = "Naxxramas" 
+    zone = "Naxxramas",
+    map = {
+        instanceID = 533,
+        instanceZoneID = 2,
+        zone = "Naxxramas",
+        x = 36.5,
+        y = 22.9
+    }
 }
 
 NPCs[16028] = { 
     id = 16028, 
     name = "Patchwerk", 
-    zone = "Naxxramas" 
+    zone = "Naxxramas",
+    map = {
+        instanceID = 533,
+        zone = "Naxxramas",
+        x = 38.4,
+        y = 45.9
+    }
 }
 
 NPCs[16061] = { 
     id = 16061, 
     name = "Instructor Razuvious", 
-    zone = "Naxxramas" 
+    zone = "Naxxramas",
+    map = {
+        instanceID = 533,
+        zone = "Naxxramas",
+        x = 36.2,
+        y = 67
+    } 
 }
 
 NPCs[16184] = { 
     id = 16184, 
     name = "Nerubian Overseer", 
-    zone = "Western Plaguelands", 
+    zone = "Eastern Plaguelands", 
     map = { 
-        zone = "Western Plaguelands", 
-        x = 67.18, 
-        y = 21.65 
+        zone = "Eastern Plaguelands", 
+        x = 9.7, 
+        y = 35.4 
     } 
 }
 
@@ -1636,7 +1676,14 @@ NPCs[61850] = {
 NPCs[61946] = { 
     id = 61946, 
     name = "Ley-Watcher Incantagos", 
-    zone = "Tower of Karazhan" 
+    zone = "Tower of Karazhan",
+    map = {
+        instanceID = 814,
+        instanceZoneID = 2,
+        zone = "Tower of Karazhan",
+        x = 49.5,
+        y = 81.2
+    }
 }
 
 NPCs[62007] = { 
@@ -1699,22 +1746,22 @@ NPCs[62671] = {
 NPCs[62976] = { 
     id = 62976, 
     name = "Mhulf Nighthorn", 
-    zone = "Winterspring", 
+    zone = "Moonwhisper Coast", 
     map = { 
-        zone = "Winterspring", 
-        x = 89.06, 
-        y = 10.89 
+        zone = "Moonwhisper Coast", 
+        x = 67.3, 
+        y = 41.7 
     } 
 }
 
 NPCs[63032] = { 
     id = 63032, 
     name = "Glurgill", 
-    zone = "Kalimdor", 
+    zone = "Moonwhisper Coast", 
     map = { 
-        zone = "Kalimdor", 
-        x = 59.76, 
-        y = 13.98 
+        zone = "Moonwhisper Coast", 
+        x = 45.5, 
+        y = 15.9 
     } 
 }
 
@@ -1840,5 +1887,60 @@ NPCs[6018] = {
         zone = "Orgrimmar",
         x = 35.6,
         y = 87.5
+    }
+}
+
+NPCs[1312] = {
+    id = 1312,
+    name = "Ardwyn Cailen",
+    zone = "Stormwind City",
+    map = {
+        zone = "Stormwind City",
+        x = 42.8,
+        y = 65.2
+    }
+}
+
+NPCs[5133] = {
+    id = 5133,
+    name = "Harick Boulderdrum",
+    zone = "Ironforge",
+    map = {
+        zone = "Ironforge",
+        x = 23.1,
+        y = 15.9
+    }
+}
+
+NPCs[5816] = {
+    id = 5816,
+    name = "Katis",
+    zone = "Orgrimmar",
+    map = {
+        zone = "Orgrimmar",
+        x = 44.2,
+        y = 48.5
+    }
+}
+
+NPCs[5754] = {
+    id = 5754,
+    name = "Zane Bradford",
+    zone = "Undercity",
+    map = {
+        zone = "Undercity",
+        x = 69.7,
+        y = 27
+    }
+}
+
+NPCs[62852] = {
+    id = 62852,
+    name = "Fena Ma'dar",
+    zone = "Moonwhisper Coast",
+    map = {
+        zone = "Moonwhisper Coast",
+        x = 60.9,
+        y = 65.7
     }
 }

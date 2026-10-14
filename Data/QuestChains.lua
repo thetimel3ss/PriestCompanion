@@ -399,7 +399,7 @@ QuestChains["dwarven_firestick"] = {
     } 
 }
 
-QuestChains["octo:41360"] = { 
+QuestChains["rod_of_permafrost"] = { 
     name = "Warm is the Day", 
     rewardQuestID = 41360, 
     steps = { 
@@ -481,7 +481,7 @@ QuestChains["goblin_igniter"] = {
     } 
 }
 
-QuestChains["octo:60110"] = { 
+QuestChains["webwood_branch"] = { 
     name = "Githyiss the Vile", 
     rewardQuestID = 60110, 
     steps = { 
@@ -493,7 +493,7 @@ QuestChains["octo:60110"] = {
     } 
 }
 
-QuestChains["octo:60112"] = { 
+QuestChains["bhartecs_lost_wand"] = { 
     name = "Fallen Adventurers", 
     rewardQuestID = 60112, 
     steps = { 

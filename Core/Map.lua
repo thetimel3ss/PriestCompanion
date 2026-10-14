@@ -414,6 +414,10 @@ local function GetMarkerIcon(markerType)
         return DROP_ICON
     end
 
+    if markerType == "vendor" then
+        return "Interface\\Icons\\INV_Misc_Coin_01"
+    end
+
     return UNKNOWN_ICON
 end
 

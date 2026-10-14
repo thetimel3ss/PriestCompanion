@@ -90,7 +90,7 @@ Updated through 2026-10-13 (including fixes based on `5ff74e8`). This section de
 - Added multiple drop-source sections and Show on Map actions.
 - Added instance-only map navigation for sources without an individual NPC record when instance map metadata is available.
 - Added crafting detail rows with required skill, reagents, tools, and bag counts.
-- Added basic vendor details with vendor name, location, and optional price text.
+- Added multiple vendor details with NPC-backed names, locations, map buttons, optional price text and notes.
 - Added Back navigation to return to the Wand list.
 
 ### Architecture
@@ -163,6 +163,9 @@ Updated through 2026-10-13 (including fixes based on `5ff74e8`). This section de
 - Changed dungeon map metadata to live in `Data/Instances.lua` instead of map core logic.
 
 ### Fixed
+- Display all filtered vendor sources in Source Details, with a separate Show on Map button for each registered NPC, optional prices and wrapping acquisition notes.
+- Reuse vendor map buttons safely across items and refreshes; resolve vendor names/locations from NPC records and use coin markers with existing NPC messages and map fallbacks.
+- Vendor navigation change reviewed statically; the local execution environment was unavailable, so this change still requires Lua runtime and in-game verification.
 - Show NPC chat tips once per navigation from drop or quest start/end buttons, with or without coordinates, including instance maps, multiple locations and fallback paths.
 - Prefer `npc.message` over legacy `npc.map.message`; absent, empty or whitespace-only messages produce no tip. Removed the automatic map-only notice when no custom message is configured; map errors still report normally.
 - Extended map-only navigation to outdoor zones when coordinates are absent, invalid or `(0, 0)`, keeping map-target verification and fallback handling.
@@ -193,7 +196,7 @@ Updated through 2026-10-13 (including fixes based on `5ff74e8`). This section de
 - Several NPC records still lack precise coordinates. Their dungeon map can be opened without a marker, or a configured entrance used when the internal map is unavailable.
 - Map lookup still requires matching zone names or explicit map metadata. Selected indices can be checked, but correct dungeon artwork, floor alignment and NPC positions still need in-game verification.
 - Some sources still reference NPCs without centralized records. Inline names can display and instance fallbacks can be used, but native NPC coordinates require completing the database.
-- The detail panel still renders only the primary vendor or crafting source, and only the selected source type. The current catalog has no mixed source types or multiple vendors per item; these remain limitations for future data.
+- The detail panel still renders only the primary crafting source and only the selected source type. Vendor map buttons require an NPC record; source-only names/prices can display before the NPC database is completed.
 - Quest-history event registration uses the ClassicAPI environment flag, while other panels use capability detection. Standard-TOC ClassicAPI detection does not load the ClassicAPI API overrides or enable turn-in tracking.
 - Item names can fall back to local data, but icons and full item tooltips still depend on game-provided item data.
 - All Lua files passed syntax loading in Lua 5.0.3. In-memory tests covered map fallback/error paths, faction-specific starters, quest-card reuse/height, and both drop-button handlers with mocked WoW APIs. Actual Vanilla 1.12 rendering, custom maps and server behavior still require in-game testing.

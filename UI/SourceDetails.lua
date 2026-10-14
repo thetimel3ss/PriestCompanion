@@ -89,6 +89,7 @@ local REP_B = 0.25
 local activeItemID = nil
 local activeSources = {}
 local expandedQuests = {}
+local vendorMapButtons = {}
 
 local Refresh
 
@@ -2913,7 +2914,7 @@ local function AddGenericRow(
 end
 
 -- Acquisition notes are separate, wrapping rows rather than fixed-height values.
-local function AddDropNote(y, note)
+local function AddSourceNote(y, note)
     visibleGenericRows = visibleGenericRows + 1
     local row = AcquireGenericRow(visibleGenericRows)
     row:ClearAllPoints()
@@ -2970,6 +2971,30 @@ local function AcquireDropMapButton(index)
     return button
 end
 
+local function AcquireVendorMapButton(index)
+    local button = vendorMapButtons[index]
+    if button then
+        return button
+    end
+
+    button = CreateFrame(
+        "Button", nil, scrollChild, "UIPanelButtonTemplate"
+    )
+    button:SetWidth(MAP_BUTTON_WIDTH)
+    button:SetHeight(MAP_BUTTON_HEIGHT)
+    button:SetText("Show on Map")
+    button:SetScript("OnClick", function()
+        local source = this.source
+        if source then
+            ShowNPCOnMap(
+                GetNPC(source.npcID), nil, "Vendor", "vendor"
+            )
+        end
+    end)
+    vendorMapButtons[index] = button
+    return button
+end
+
 local function AcquireLootHeader(index)
     local header =
         lootHeaders[index]
@@ -3007,6 +3032,11 @@ end
 
 local function ClearContent()
     local i
+
+    for i = 1, table.getn(vendorMapButtons) do
+        vendorMapButtons[i]:Hide()
+        vendorMapButtons[i].source = nil
+    end
 
     for i = 1,
         table.getn(
@@ -3494,7 +3524,7 @@ local function BuildDropDetails(sources)
         end
 
         if type(source.note) == "string" and source.note ~= "" then
-            y = AddDropNote(y, source.note)
+            y = AddSourceNote(y, source.note)
         end
 
         local loot =
@@ -3912,34 +3942,65 @@ end
 -- Vendor Details
 --------------------------------------------------
 
-local function BuildVendorDetails(source)
-    sourceTitle:SetText(
-        "Vendor Details"
-    )
+local function BuildVendorDetails(sources)
+    -- WandPanel has already applied the selected faction/source filters.
+    local count = table.getn(sources)
+    if count > 1 then
+        sourceTitle:SetText("Vendor Sources  |  " .. tostring(count))
+    else
+        sourceTitle:SetText("Vendor Details")
+    end
 
     local y = 0
+    local buttonIndex = 0
+    local i
+    for i = 1, count do
+        local source = sources[i]
+        local npc = GetNPC(source.npcID)
+        local name = (npc and npc.name) or source.npcName
+            or ("NPC " .. tostring(source.npcID or "?"))
+        local zone = (npc and npc.zone) or source.zone or ""
 
-    y = AddGenericRow(
-        y,
-        "Interface\\Icons\\INV_Misc_Coin_01",
-        nil,
-        source.npcName or "Vendor",
-        source.zone or ""
-    )
-
-    if source.priceText then
         y = AddGenericRow(
             y,
             "Interface\\Icons\\INV_Misc_Coin_01",
             nil,
-            "Price",
-            source.priceText
+            name,
+            zone
         )
+
+        if npc then
+            buttonIndex = buttonIndex + 1
+            local button = AcquireVendorMapButton(buttonIndex)
+            button.source = source
+            button:ClearAllPoints()
+            button:SetPoint(
+                "TOPRIGHT", scrollChild, "TOPRIGHT", -8, y + 8
+            )
+            button:Show()
+            y = y - MAP_BUTTON_HEIGHT - 8
+        end
+
+        if source.priceText then
+            y = AddGenericRow(
+                y,
+                "Interface\\Icons\\INV_Misc_Coin_01",
+                nil,
+                "Price",
+                source.priceText
+            )
+        end
+
+        if type(source.note) == "string" and source.note ~= "" then
+            y = AddSourceNote(y, source.note)
+        end
+
+        if i < count then
+            y = y - 12
+        end
     end
 
-    scrollChild:SetHeight(
-        -y
-    )
+    scrollChild:SetHeight(-y + CARD_PADDING)
 end
 
 --------------------------------------------------
@@ -4021,7 +4082,7 @@ Refresh =
         elseif primarySource.type ==
         "vendor" then
             BuildVendorDetails(
-                primarySource
+                activeSources
             )
 
         elseif primarySource.type ==

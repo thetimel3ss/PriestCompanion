@@ -53,6 +53,10 @@ Updated through 2026-10-13 (including fixes based on `5ff74e8`). This section de
 - Added visual indication for sources with additional details.
 
 ### Quest Sources
+- Added item-started quest support via `startItem` with optional `startItemName` and `startDropNPC` fallback.
+- Resolved quest-start item drops from shared `Data/Sources.lua` records (including multiple NPCs), retaining faction filtering.
+- Added `Show Start` navigation to item droppers or the associated instance map, while preserving NPC-started quests and `Show End`.
+- Displayed the starter item and its dropper in expanded quest details, with clear messaging when the location is unknown.
 - Added quest reward source support.
 - Added faction-specific quest sources.
 - Added quest chain support.

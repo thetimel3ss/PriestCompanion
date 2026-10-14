@@ -821,12 +821,6 @@ function Map.ShowLocation(
 
     if OpenResolvedMap(resolved) then
         if not hasCoordinates then
-            local message = location.message
-            if type(message) ~= "string" or message == "" then
-                message = "Showing map only; exact position is unavailable for " ..
-                    tostring(label or resolved.label or "this NPC") .. "."
-            end
-            Print(message)
             return true
         end
     else
@@ -897,6 +891,16 @@ function Map.ShowNPC(
 )
     if not npc then
         return false
+    end
+
+    -- One tip per NPC navigation, shared by drop and quest buttons.
+    -- Keep existing map.message records working; npc.message takes priority.
+    local message = npc.message
+    if message == nil and npc.map then
+        message = npc.map.message
+    end
+    if type(message) == "string" and string.find(message, "%S") then
+        Print(message)
     end
 
     local label =

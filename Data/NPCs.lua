@@ -2059,13 +2059,13 @@ NPCs[80807] = {
     }
 }
 
-NPCs[80943] = [
+NPCs[80943] = {
     id = 80943,
     name = "Dronormu",
-    zone = "Cavern of Time",
+    zone = "Caverns of Time",
     map = {
-        zone = "Cavern of Time",
+        zone = "Caverns of Time",
         x = 67.3,
         y = 57
     }
-]
+}

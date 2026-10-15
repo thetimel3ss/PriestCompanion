@@ -709,8 +709,8 @@ NPCs[3995] = {
     zone = "Stonetalon Mountains", 
     map = { 
         zone = "Stonetalon Mountains", 
-        x = 74.54, 
-        y = 97.92 
+        x = 72.2, 
+        y = 92.6 
     } 
 }
 
@@ -731,8 +731,8 @@ NPCs[4066] = {
     zone = "Stonetalon Mountains", 
     map = { 
         zone = "Stonetalon Mountains", 
-        x = 25.57, 
-        y = 11.51 
+        x = 32.4, 
+        y = 22.4 
     } 
 }
 
@@ -997,11 +997,11 @@ NPCs[9476] = {
 NPCs[10181] = { 
     id = 10181, 
     name = "Lady Sylvanas Windrunner", 
-    zone = "Silverpine Forest", 
+    zone = "Undercity", 
     map = { 
-        zone = "Silverpine Forest", 
-        x = 74.62, 
-        y = 13.45 
+        zone = "Undercity", 
+        x = 58.2, 
+        y = 91.8 
     } 
 }
 
@@ -1625,7 +1625,8 @@ NPCs[52145] = {
     id = 52145, 
     name = "Incindis", 
     zone = "Molten Core", 
-    map = { 
+    map = {
+        instanceID = 2717, 
         zone = "Molten Core", 
         x = 55.1, 
         y = 11.1 
@@ -1635,29 +1636,48 @@ NPCs[52145] = {
 NPCs[59991] = { 
     id = 59991, 
     name = "Kruul", 
-    zone = "Tower of Karazhan" 
+    zone = "Tower of Karazhan",
+    map = {
+        instanceID = 814,
+        zone = "Tower of Karazhan",
+        x = 48.9,
+        y = 75.7
+    } 
 }
 
 NPCs[61222] = { 
     id = 61222, 
     name = "Lord Blackwald II", 
-    zone = "Lower Karazhan Halls" 
+    zone = "Lower Karazhan Halls",
+    map = {
+        instanceID = 532,
+        zone = "Tower of Karazhan",
+        x = 69.2,
+        y = 74.5
+    } 
 }
 
 NPCs[61316] = { 
     id = 61316, 
     name = "Drifting Avatar of Sand", 
-    zone = "Caverns of Time" 
+    zone = "The Black Morass" ,
+    map = {
+        instanceID = 269,
+        instanceZoneID = 2,
+        zone = "The Black Morass",
+        x = 32.8,
+        y = 10.9
+    }
 }
 
 NPCs[61517] = { 
     id = 61517, 
     name = "Ruk'thok the Pyromancer", 
-    zone = "Azeroth", 
+    zone = "Lapidis Isle", 
     map = { 
-        zone = "Azeroth", 
-        x = 35, 
-        y = 81.22 
+        zone = "Lapidis Isle", 
+        x = 43.2, 
+        y = 28.7 
     } 
 }
 
@@ -1700,47 +1720,71 @@ NPCs[62007] = {
 NPCs[62069] = { 
     id = 62069, 
     name = "Halgan Redbrand", 
-    zone = "Dragonmaw Retreat" 
+    zone = "Dragonmaw Retreat",
+    map = {
+        instanceID = 5601,
+        zone = "Dragonmaw Retreat",
+        x = 34.5,
+        y = 92.8
+    }
 }
 
 NPCs[62193] = { 
     id = 62193, 
     name = "Quistis the Malign", 
-    zone = "Dun Morogh", 
+    zone = "Northwind", 
     map = { 
-        zone = "Dun Morogh", 
-        x = 15.53, 
-        y = 99.01 
+        zone = "Northwind", 
+        x = 37.7, 
+        y = 37.1 
     } 
 }
 
 NPCs[62477] = { 
     id = 62477, 
     name = "Commander Leder", 
-    zone = "Azeroth", 
+    zone = "Northwind", 
     map = { 
-        zone = "Azeroth", 
-        x = 42.68, 
-        y = 63.68 
+        zone = "Northwind", 
+        x = 39.6, 
+        y = 53.3 
     } 
 }
 
 NPCs[62503] = { 
     id = 62503, 
     name = "Rotthorn", 
-    zone = "Razorfen Kraul" 
+    zone = "Razorfen Kraul",
+    map = {
+        instanceID = 47,
+        zone = "Razorfen Kraul",
+        x = 31,
+        y = 76.5
+    } 
 }
 
 NPCs[62548] = { 
     id = 62548, 
     name = "Oronok Torn-Heart", 
-    zone = "Stormwrought Ruins" 
+    zone = "Stormwrought Ruins",
+    map = {
+        instanceID = 5628,
+        zone = "Stormwrought Ruins",
+        x = 45.1,
+        y = 25.7
+    }
 }
 
 NPCs[62671] = { 
     id = 62671, 
     name = "Ighal'for", 
-    zone = "Stormwrought Ruins" 
+    zone = "Stormwrought Ruins",
+    map = {
+        instanceID = 5628,
+        zone = "Stormwrought Ruins",
+        x = 30.5,
+        y = 5.2
+    }
 }
 
 NPCs[62976] = { 
@@ -1768,7 +1812,14 @@ NPCs[63032] = {
 NPCs[65113] = { 
     id = 65113, 
     name = "Chronar", 
-    zone = "Caverns of Time" 
+    zone = "The Black Morass",
+    map = {
+        instanceID = 269,
+        instanceZoneID = 2,
+        zone = "The Black Morass",
+        x = 32.1,
+        y = 27.4
+    }
 }
 
 NPCs[65114] = { 
@@ -1820,6 +1871,10 @@ NPCs[70027] = {
     } 
 }
 
+-- Grungy Firestick (61374) is kept in Data/Items.lua and Data/Sources.lua
+-- for reference, but is omitted from the in-game wand list because its
+-- acquisition source could not be confirmed.
+
 NPCs[80116] = { 
     id = 80116, 
     name = "Risen Oilblaze" 
@@ -1832,19 +1887,32 @@ NPCs[80854] = {
     map = {
         zone = "Stormwind Vault",
         instanceID = 35,
-        x = 46.4, y = 43.1
+        x = 46.4, 
+        y = 43.1
     }
 
 }
 
 NPCs[91214] = { 
     id = 91214, 
-    name = "" 
+    name = "Technician Spuzzle",
+    zone = "Durotar",
+    map = {
+        zone = "Durotar",
+        x = 57.4,
+        y = 25.8
+    }
 }
 
 NPCs[91234] = { 
     id = 91234, 
-    name = "" 
+    name = "Technician Grimzlow",
+    zone = "Durotar",
+    map = {
+        zone = "Durotar",
+        x = 57.4,
+        y = 25.7
+    }
 }
 
 NPCs[91350] = { 
@@ -1859,13 +1927,26 @@ NPCs[91350] = {
 
 NPCs[91928] = { 
     id = 91928, 
-    name = "Alarus" 
+    name = "Alarus",
+    zone = "Karazhan Crypt",
+    map = {
+        instanceID = 800,
+        zone = "Karazhan Crypt",
+        x = 85.6,
+        y = 44.2
+    }
 }
 
 NPCs[92111] = { 
     id = 92111, 
     name = "Fenektis the Deceiver", 
-    zone = "Crescent Grove" 
+    zone = "Crescent Grove",
+    map = {
+        instanceID = 802,
+        zone = "Crescent Grove",
+        x = 44.2,
+        y = 79.2
+    }
 }
 
 NPCs[11406] = {
@@ -1944,3 +2025,47 @@ NPCs[62852] = {
         y = 65.7
     }
 }
+
+NPCs[80945] = {
+    id = 80945,
+    name = "Elisandra Spellbinder",
+    zone = "Dire Maul",
+    map = {
+        instanceID = 2557,
+        x = 0,
+        y = 0
+    }
+}
+
+NPCs[80266] = {
+    id = 80266,
+    name = "Soalara Dawnstar",
+    zone = "Alah'Thalas",
+    map = {
+        zone = "Alah'Thalas",
+        x = 60.2,
+        y = 62
+    }
+}
+
+NPCs[80807] = {
+    id = 80807,
+    name = "Reolis Riptusk",
+    zone = "Stonetalon Mountains",
+    map = {
+        zone = "Stonetalon Mountains",
+        x = 25,
+        y = 12.2
+    }
+}
+
+NPCs[80943] = [
+    id = 80943,
+    name = "Dronormu",
+    zone = "Cavern of Time",
+    map = {
+        zone = "Cavern of Time",
+        x = 67.3,
+        y = 57
+    }
+]

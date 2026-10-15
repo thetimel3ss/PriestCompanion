@@ -2909,65 +2909,588 @@ Sources[55134] = {
     } 
 }
 
+--------------------------------------------------
+-- Hellflame
+--------------------------------------------------
 
-
-Sources[55511] = { { type = "drop", npcID = 59991, npcName = "Kruul", npcType = "Boss", instanceID = 814, zone = "Tower of Karazhan", dropChance = 11.2, mobs = { { id = 59991, chance = 11.2 } }, mobCount = 1, details = true, lootNPCID = 59991 } }
-Sources[58009] = { { type = "drop", npcID = 62193, npcName = "Quistis the Malign", npcType = "Rare creature", zone = "Dun Morogh", dropChance = 50, mobs = { { id = 62193, chance = 50 } }, mobCount = 1, details = true } }
-Sources[58026] = { { type = "quest", questID = 41667, questName = "In Need of Shoes", faction = "Alliance", requiredLevel = 25, zone = "Azeroth", details = true } }
-Sources[58047] = { { type = "drop", npcID = 62069, npcName = "Halgan Redbrand", npcType = "Named creature", zone = "Dragonmaw Retreat", dropChance = 25, mobs = { { id = 62069, chance = 25 } }, mobCount = 1, details = true } }
-Sources[58089] = { { type = "drop", npcID = 62503, npcName = "Rotthorn", npcType = "Boss", instanceID = 47, zone = "Razorfen Kraul", dropChance = 25, mobs = { { id = 62503, chance = 25 } }, mobCount = 1, details = true, lootNPCID = 62503 } }
-Sources[58137] = { { type = "drop", npcID = 62548, npcName = "Oronok Torn-Heart", npcType = "Named creature", zone = "Stormwrought Ruins", dropChance = 25, mobs = { { id = 62548, chance = 25 } }, mobCount = 1, details = true } }
-Sources[58205] = { { type = "drop", npcID = 52145, npcName = "Incindis", npcType = "Boss", instanceID = 2717, zone = "Molten Core", dropChance = 20, mobs = { { id = 52145, chance = 20 } }, mobCount = 1, details = true, lootNPCID = 52145 } }
-Sources[58253] = { { type = "vendor", npcID = 80945, npcName = "Elisandra Spellbinder", faction = "Both", details = true } }
-Sources[58277] = { { type = "quest", questID = 41841, questName = "Artifact of the Dark Lady", faction = "Horde", requiredLevel = 32, zone = "Silverpine Forest", chainID = "octo:41841", details = true } }
-Sources[60427] = { 
-    { type = "drop", 
-    npcID = 80854, 
-    npcName = "Damian", 
-    npcType = "Boss", 
-    instanceID = 35, 
-    dropChance = 20, 
-    mobs = { 
-        { 
-            id = 80854, 
-            chance = 20 
-        } 
-    }, 
-    mobCount = 1, 
-    details = true, 
-    lootNPCID = 80854 
-}, 
-{ 
-    type = "drop", 
-    npcID = 80854, 
-    npcName = "Damian", 
-    npcType = "Boss", 
-    instanceID = 35, 
-    zone = "Stormwind Vault", 
-    dropChance = 20, 
-    mobs = { 
-        { id = 80854, chance = 20 } }, 
+Sources[55511] = { 
+    { 
+        type = "drop", 
+        npcID = 59991, 
+        npcName = "Kruul", 
+        npcType = "Boss", 
+        instanceID = 814, 
+        zone = "Tower of Karazhan", 
+        dropChance = 11.2, 
+        mobs = { 
+            { 
+                id = 59991, 
+                chance = 11.2 
+            } 
+        }, 
         mobCount = 1, 
         details = true, 
-        lootNPCID = 80854 } }
-Sources[60805] = { { type = "drop", npcID = 91910, npcName = "Multiple creatures", npcType = "Creatures", instanceID = 800, mobs = { { id = 91910, chance = 0.02 }, { id = 91911, chance = 0.02 }, { id = 91912, chance = 0.02 }, { id = 91913, chance = 0.02 }, { id = 91914, chance = 0.02 }, { id = 91915, chance = 0.02 }, { id = 91918, chance = 0.02 }, { id = 91919, chance = 0.02 }, { id = 91922, chance = 0.02 }, { id = 91923, chance = 0.02 }, { id = 91924, chance = 0.02 }, { id = 91925, chance = 0.02 }, { id = 91926, chance = 0.02 }, { id = 91932, chance = 0.02 }, { id = 91930, chance = 0.02 } }, mobCount = 15, details = true } }
-Sources[61019] = { { type = "drop", npcID = 65113, npcName = "Chronar", npcType = "Boss", instanceID = 269, zone = "Caverns of Time", dropChance = 16.7, mobs = { { id = 65113, chance = 16.7 } }, mobCount = 1, details = true, lootNPCID = 65113 } }
-Sources[61020] = { { type = "drop", npcID = 61316, npcName = "Drifting Avatar of Sand", npcType = "Named creature", instanceID = 269, zone = "Caverns of Time", dropChance = 2, mobs = { { id = 61316, chance = 2 } }, mobCount = 1, details = true }, { type = "drop", npcID = 65114, npcName = "Harbinger Aph'ygth", npcType = "Named creature", instanceID = 269, dropChance = 2, mobs = { { id = 65114, chance = 2 } }, mobCount = 1, details = true } }
-Sources[61286] = { { type = "drop", npcID = 61222, npcName = "Lord Blackwald II", npcType = "Boss", instanceID = 532, zone = "Lower Karazhan Halls", dropChance = 14, mobs = { { id = 61222, chance = 14 } }, mobCount = 1, details = true, lootNPCID = 61222 } }
-Sources[61374] = { { type = "drop", npcID = 80116, npcName = "Risen Oilblaze", npcType = "Named creature", dropChance = 0.2, mobs = { { id = 80116, chance = 0.2 } }, mobCount = 1, details = true } }
-Sources[61615] = { { type = "drop", npcID = 61517, npcName = "Ruk'thok the Pyromancer", npcType = "Rare creature", zone = "Azeroth", dropChance = 33.33, mobs = { { id = 61517, chance = 33.33 } }, mobCount = 1, details = true } }
-Sources[80544] = { { type = "vendor", npcID = 80266, npcName = "Soalara Dawnstar", faction = "Both", details = true } }
-Sources[80545] = { { type = "vendor", npcID = 80266, npcName = "Soalara Dawnstar", faction = "Both", details = true } }
-Sources[80644] = { { type = "vendor", npcID = 80807, npcName = "Reolis Riptusk", faction = "Both", details = true } }
-Sources[80645] = { { type = "vendor", npcID = 80807, npcName = "Reolis Riptusk", faction = "Both", details = true } }
-Sources[80748] = { { type = "drop", npcID = 11783, npcName = "Multiple creatures", npcType = "Creatures", instanceID = 349, mobs = { { id = 11783, chance = 0.01 }, { id = 11784, chance = 0.01 }, { id = 11790, chance = 0.01 }, { id = 11791, chance = 0.01 }, { id = 11792, chance = 0.01 }, { id = 11793, chance = 0.01 }, { id = 11794, chance = 0.01 }, { id = 12206, chance = 0.01 }, { id = 12219, chance = 0.01 }, { id = 12220, chance = 0.01 }, { id = 12221, chance = 0.01 }, { id = 12222, chance = 0.01 }, { id = 12223, chance = 0.01 }, { id = 12224, chance = 0.01 }, { id = 13141, chance = 0.01 }, { id = 13142, chance = 0.01 }, { id = 13323, chance = 0.01 }, { id = 62879, chance = 0.01 }, { id = 62880, chance = 0.01 } }, mobCount = 19, details = true }, { type = "drop", npcID = 60841, npcName = "Enraged Cave Rumbler", npcType = "Named creature", dropChance = 0.01, mobs = { { id = 60841, chance = 0.01 } }, mobCount = 1, details = true } }
-Sources[80799] = { { type = "drop", npcID = 4287, npcName = "Multiple creatures", npcType = "Creatures", instanceID = 796, mobs = { { id = 4287, chance = 0.005 }, { id = 4288, chance = 0.005 }, { id = 4291, chance = 0.005 }, { id = 4296, chance = 0.02 }, { id = 4299, chance = 0.02 }, { id = 4304, chance = 0.005 }, { id = 4540, chance = 0.005 } }, mobCount = 7, details = true }, { type = "drop", npcID = 4285, npcName = "Scarlet Disciple", npcType = "Named creature", dropChance = 0.02, mobs = { { id = 4285, chance = 0.02 } }, mobCount = 1, details = true } }
-Sources[80829] = { { type = "drop", npcID = 4066, npcName = "Nal'taszar", npcType = "Rare creature", zone = "Stonetalon Mountains", dropChance = 35, mobs = { { id = 4066, chance = 35 } }, mobCount = 1, details = true } }
-Sources[81290] = { { type = "quest", questID = 70033, questName = "The Seeker's Demise", faction = "Horde", requiredLevel = 27, zone = "Ashenvale", chainID = "octo:70033", details = true } }
-Sources[81320] = { { type = "quest", questID = 55006, questName = "Backup Capacitor", faction = "Horde", requiredLevel = 29, instanceID = 721, chainID = "octo:55006", details = true } }
-Sources[83215] = { { type = "drop", npcID = 92111, npcName = "Fenektis the Deceiver", npcType = "Boss", instanceID = 802, zone = "Crescent Grove", dropChance = 25, mobs = { { id = 92111, chance = 25 } }, mobCount = 1, details = true, lootNPCID = 92111 } }
-Sources[83467] = { { type = "drop", npcID = 91928, npcName = "Alarus", npcType = "Boss", instanceID = 800, dropChance = 25, mobs = { { id = 91928, chance = 25 } }, mobCount = 1, details = true, lootNPCID = 91928 } }
-Sources[84602] = { { type = "vendor", npcID = 80943, npcName = "Dronormu", faction = "Both", details = true } }
+        lootNPCID = 59991 
+    } 
+}
+
+--------------------------------------------------
+-- Quistis' Wand
+--------------------------------------------------
+
+Sources[58009] = { 
+    { 
+        type = "drop", 
+        npcID = 62193, 
+        npcName = "Quistis the Malign", 
+        npcType = "Rare creature", 
+        zone = "Northwind", 
+        dropChance = 50, 
+        mobs = { 
+            { 
+                id = 62193, 
+                chance = 50 
+            } 
+        }, 
+        mobCount = 1, 
+        details = true 
+    } 
+}
+
+--------------------------------------------------
+-- Rod of Stromgarde
+--------------------------------------------------
+
+Sources[58026] = { 
+    { 
+        type = "quest", 
+        questID = 41667, 
+        questName = "In Need of Shoes", 
+        faction = "Alliance", 
+        requiredLevel = 25, 
+        zone = "Azeroth", 
+        details = true 
+    } 
+}
+
+--------------------------------------------------
+-- Grasp of Ancestors
+--------------------------------------------------
+
+Sources[58047] = { 
+    { 
+        type = "drop", 
+        npcID = 62069, 
+        npcName = "Halgan Redbrand", 
+        npcType = "Boss",
+        instanceID = 5601, 
+        zone = "Dragonmaw Retreat", 
+        dropChance = 25, 
+        mobs = { 
+            { 
+                id = 62069, 
+                chance = 25 
+            } 
+        }, 
+        mobCount = 1, 
+        details = true,
+        lootNPCID = 62069
+    } 
+}
+
+--------------------------------------------------
+-- Thornlash Branch
+--------------------------------------------------
+
+Sources[58089] = { 
+    { 
+        type = "drop", 
+        npcID = 62503, 
+        npcName = "Rotthorn", 
+        npcType = "Boss", 
+        instanceID = 47, 
+        zone = "Razorfen Kraul", 
+        dropChance = 25, 
+        mobs = { 
+            { 
+                id = 62503, 
+                chance = 25 
+            } 
+        }, 
+        mobCount = 1, 
+        details = true, 
+        lootNPCID = 62503 
+    } 
+}
+
+--------------------------------------------------
+-- Netherbranch
+--------------------------------------------------
+
+Sources[58137] = { 
+    { 
+        type = "drop", 
+        npcID = 62548, 
+        npcName = "Oronok Torn-Heart", 
+        npcType = "Boss",
+        instanceID = 5628,
+        zone = "Stormwrought Ruins", 
+        dropChance = 25, 
+        mobs = { 
+            { 
+                id = 62548, 
+                chance = 25 
+            } 
+        }, 
+        mobCount = 1, 
+        details = true,
+        lootNPCID = 62548
+    } 
+}
+
+--------------------------------------------------
+-- Primal Flameslinger
+--------------------------------------------------
+
+Sources[58205] = { 
+    { 
+        type = "drop", 
+        npcID = 52145, 
+        npcName = "Incindis", 
+        npcType = "Boss", 
+        instanceID = 2717, 
+        zone = "Molten Core", 
+        dropChance = 20, 
+        mobs = { 
+            { 
+                id = 52145, 
+                chance = 20 
+            } 
+        }, 
+        mobCount = 1, 
+        details = true, 
+        lootNPCID = 52145 
+    } 
+}
+
+--------------------------------------------------
+-- Lector's Baton
+--------------------------------------------------
+
+Sources[58253] = { 
+    { 
+        type = "vendor", 
+        npcID = 80945, 
+        faction = "Both",
+        priceText = "9g 36s 19c",
+        note = "Requires Honored reputation with Shen'dralar to purchase."
+    } 
+}
+
+--------------------------------------------------
+-- Lady Winter's Touch
+--------------------------------------------------
+
+Sources[58277] = { 
+    { 
+        type = "quest", 
+        questID = 41841, 
+        questName = "Artifact of the Dark Lady", 
+        faction = "Horde", 
+        requiredLevel = 32, 
+        zone = "Silverpine Forest", 
+        chainID = "lady_winter_touch", 
+        details = true 
+    } 
+}
+
+--------------------------------------------------
+-- Skullrattler
+--------------------------------------------------
+
+Sources[60427] = { 
+    { 
+        type = "drop", 
+        npcID = 80854, 
+        npcName = "Damian", 
+        npcType = "Boss", 
+        instanceID = 35, 
+        dropChance = 20, 
+        mobs = { 
+            { 
+                id = 80854, 
+                chance = 20 
+            } 
+        }, 
+        mobCount = 1, 
+        details = true, 
+        lootNPCID = 80854 
+    }
+
+}
+
+--------------------------------------------------
+-- Clutch of the Damned
+--------------------------------------------------
+
+Sources[60805] = { 
+    { 
+        type = "drop", 
+        npcID = 91910, 
+        npcName = "Multiple creatures", 
+        npcType = "Creatures", 
+        instanceID = 800, 
+        mobCount = 15, 
+        details = true 
+    } 
+}
+
+--------------------------------------------------
+-- Wand of the Eclipse
+--------------------------------------------------
+
+Sources[61019] = { 
+    { 
+        type = "drop", 
+        npcID = 65113, 
+        npcName = "Chronar", 
+        npcType = "Boss", 
+        instanceID = 269, 
+        zone = "The Black Morass", 
+        dropChance = 16.7, 
+        mobs = { 
+            { 
+                id = 65113, 
+                chance = 16.7 
+            } 
+        }, 
+        mobCount = 1, 
+        details = true, 
+        lootNPCID = 65113 
+    } 
+}
+
+--------------------------------------------------
+-- Lodestone
+--------------------------------------------------
+
+Sources[61020] = { 
+    { 
+        type = "drop", 
+        npcID = 61316, 
+        npcName = "Drifting Avatar of Sand", 
+        npcType = "Boss", 
+        instanceID = 269, 
+        zone = "The Black Morass", 
+        dropChance = 2, 
+        mobs = { 
+            { 
+                id = 61316, 
+                chance = 2 
+            } 
+        }, 
+        mobCount = 1, 
+        details = true 
+    }
+}
+
+--------------------------------------------------
+-- Bloodfang Effigy
+--------------------------------------------------
+
+Sources[61286] = { 
+    { 
+        type = "drop", 
+        npcID = 61222, 
+        npcName = "Lord Blackwald II", 
+        npcType = "Boss", 
+        instanceID = 532, 
+        zone = "Lower Karazhan Halls", 
+        dropChance = 14, 
+        mobs = { 
+            { 
+                id = 61222, 
+                chance = 14 
+            } 
+        }, 
+        mobCount = 1, 
+        details = true, 
+        lootNPCID = 61222 
+    } 
+}
+
+--------------------------------------------------
+-- Grungy Firestick
+--------------------------------------------------
+-- Grungy Firestick (61374) is kept in Data/Items.lua and Data/Sources.lua
+-- for reference, but is omitted from the in-game wand list because its
+-- acquisition source could not be confirmed.
+
+Sources[61374] = { 
+    { 
+        type = "drop", 
+        npcID = 80116, 
+        npcName = "Risen Oilblaze", 
+        npcType = "Named creature", 
+        dropChance = 0.2, 
+        mobs = { 
+            { 
+                id = 80116, 
+                chance = 0.2 
+            } 
+        }, 
+        mobCount = 1, 
+        details = true 
+    } 
+}
+
+--------------------------------------------------
+-- Burning Torch
+--------------------------------------------------
+
+Sources[61615] = { 
+    { 
+        type = "drop", 
+        npcID = 61517, 
+        npcName = "Ruk'thok the Pyromancer", 
+        npcType = "Rare creature", 
+        zone = "Lapidis Isle", 
+        dropChance = 33.33, 
+        mobs = { 
+            { 
+                id = 61517, 
+                chance = 33.33 
+            } 
+        }, 
+        mobCount = 1, 
+        details = true 
+    } 
+}
+
+--------------------------------------------------
+-- Quel'dorei Magister's Spellflinger
+--------------------------------------------------
+
+Sources[80544] = { 
+    { 
+        type = "vendor", 
+        npcID = 80266, 
+        npcName = "Soalara Dawnstar",
+        priceText = "7g 54s 85c", 
+        faction = "Alliance", 
+        details = true,
+        note = "Requires Revered reputation with Silvermoon Remnant to purchase."
+    } 
+}
+
+--------------------------------------------------
+-- Quel'dorei Cleric's Wand
+--------------------------------------------------
+
+Sources[80545] = { 
+    { 
+        type = "vendor", 
+        npcID = 80266, 
+        npcName = "Soalara Dawnstar",
+        priceText = "7g 54s 53c", 
+        faction = "Alliance", 
+        details = true,
+        note = "Requires Revered reputation with Silvermoon Remnant to purchase."
+    } 
+}
+
+--------------------------------------------------
+-- Revantusk Mystic's Mojobender
+--------------------------------------------------
+
+Sources[80644] = { 
+    { 
+        type = "vendor", 
+        npcID = 80807, 
+        npcName = "Reolis Riptusk",
+        priceText = "7g 54s 85c",
+        faction = "Horde", 
+        details = true,
+        note = "Requires Revered reputation with Revantusk Trolls to purchase."
+    } 
+}
+
+--------------------------------------------------
+-- Revantusk Mender's Wand
+--------------------------------------------------
+
+Sources[80645] = { 
+    { 
+        type = "vendor", 
+        npcID = 80807, 
+        npcName = "Reolis Riptusk",
+        priceText = "7g 54s 53c", 
+        faction = "Horde", 
+        details = true,
+        note = "Requires Revered reputation with Revantusk Trolls to purchase."
+    } 
+}
+
+--------------------------------------------------
+-- Corrupter's Focus
+--------------------------------------------------
+
+Sources[80748] = { 
+    { 
+        type = "drop",
+        npcName = "Multiple creatures", 
+        npcType = "Creatures", 
+        instanceID = 349,
+        dropChance = 0.01,
+        mobCount = 19, 
+        details = true 
+    }
+}
+
+--------------------------------------------------
+-- Wand of Divine Justice
+--------------------------------------------------
+
+Sources[80799] = { 
+    { 
+        type = "drop", 
+        npcName = "Multiple creatures", 
+        npcType = "Creatures", 
+        instanceID = 796,
+        instanceZoneID = 4,
+        mobCount = 1, 
+        details = true 
+    } 
+}
+
+--------------------------------------------------
+-- Moonbeam
+--------------------------------------------------
+
+Sources[80829] = { 
+    { 
+        type = "drop", 
+        npcID = 4066, 
+        npcName = "Nal'taszar", 
+        npcType = "Rare creature", 
+        zone = "Stonetalon Mountains", 
+        dropChance = 35, 
+        mobs = { 
+            { 
+                id = 4066, 
+                chance = 35 
+            } 
+        }, 
+        mobCount = 1, 
+        details = true 
+    } 
+}
+
+--------------------------------------------------
+-- Diathorus' Claw
+--------------------------------------------------
+
+Sources[81290] = { 
+    { 
+        type = "quest", 
+        questID = 70033, 
+        questName = "The Seeker's Demise", 
+        faction = "Horde", 
+        requiredLevel = 27, 
+        zone = "Ashenvale", 
+        chainID = "diathorus_claw", 
+        details = true 
+    } 
+}
+
+--------------------------------------------------
+-- Crackling Zapper
+--------------------------------------------------
+
+Sources[81320] = { 
+    { 
+        type = "quest", 
+        questID = 55006, 
+        questName = "Backup Capacitor", 
+        faction = "Horde", 
+        requiredLevel = 29, 
+        instanceID = 721, 
+        chainID = "crackling_zapper", 
+        details = true 
+    } 
+}
+
+--------------------------------------------------
+-- Blackflame Wand
+--------------------------------------------------
+
+Sources[83215] = { 
+    { 
+        type = "drop", 
+        npcID = 92111, 
+        npcName = "Fenektis the Deceiver", 
+        npcType = "Boss", 
+        instanceID = 802, 
+        zone = "Crescent Grove", 
+        dropChance = 25, 
+        mobs = { 
+            { 
+                id = 92111, 
+                chance = 25 
+            } 
+        }, 
+        mobCount = 1, 
+        details = true, 
+        lootNPCID = 92111 
+    } 
+}
+
+--------------------------------------------------
+-- Cryptwatcher's Call
+--------------------------------------------------
+
+Sources[83467] = { 
+    { 
+        type = "drop", 
+        npcID = 91928, 
+        npcName = "Alarus", 
+        npcType = "Boss", 
+        instanceID = 800, 
+        dropChance = 25, 
+        mobs = { 
+            { 
+                id = 91928, 
+                chance = 25 
+            } 
+        }, 
+        mobCount = 1, 
+        details = true, 
+        lootNPCID = 91928 
+    } 
+}
+
+--------------------------------------------------
+-- Consecrated Caduceus
+--------------------------------------------------
+
+Sources[84602] = { 
+    { 
+        type = "vendor", 
+        npcID = 80943,
+        priceText = "21g 16s 25c"
+    } 
+}
+
+
+
+
+
+
+
+
+
+
+
 BossLoot[1853] = { { itemID = 12843, name = "Corruptor's Scourgestone", chance = 100, quality = 2 }, { itemID = 13501, name = "Recipe: Major Mana Potion", chance = 10, quality = 2 }, { itemID = 13937, name = "Headmaster's Charge", chance = 1, quality = 4 }, { itemID = 14514, name = "Pattern: Robe of the Void", chance = 7, quality = 4 }, { itemID = 19276, name = "Ace of Portals", chance = 3, quality = 3 }, { itemID = 13398, name = "Boots of the Shrieker", chance = 14.29, quality = 3 }, { itemID = 13938, name = "Bonecreeper Stylus", chance = 14.29, quality = 3 }, { itemID = 13944, name = "Tombstone Breastplate", chance = 14.29, quality = 3 }, { itemID = 13951, name = "Vigorsteel Vambraces", chance = 14.29, quality = 3 }, { itemID = 13953, name = "Silent Fang", chance = 14.29, quality = 3 }, { itemID = 13964, name = "Witchblade", chance = 14.29, quality = 3 }, { itemID = 22433, name = "Don Mauricio's Band of Domination", chance = 14.29, quality = 3 }, { itemID = 16667, name = "Coif of Elements", chance = 11.11, quality = 3 }, { itemID = 16677, name = "Beaststalker's Cap", chance = 11.11, quality = 3 }, { itemID = 16686, name = "Magister's Crown", chance = 11.11, quality = 3 }, { itemID = 16693, name = "Devout Crown", chance = 11.11, quality = 3 }, { itemID = 16698, name = "Dreadmist Mask", chance = 11.11, quality = 3 }, { itemID = 16707, name = "Shadowcraft Cap", chance = 11.11, quality = 3 }, { itemID = 16720, name = "Wildheart Cowl", chance = 11.11, quality = 3 }, { itemID = 16727, name = "Lightforge Helm", chance = 11.11, quality = 3 }, { itemID = 16731, name = "Helm of Valor", chance = 11.11, quality = 3 }, { itemID = 61460, name = "Necromantic Potion", quality = 1 }, { itemID = 21525, name = "Green Winter Hat", chance = 100, quality = 2 }, { itemID = 51217, name = "Fashion Coin", chance = 100, quality = 2 }, { itemID = 56107, name = "Bottom Half of Advanced Gemology II", chance = 30, quality = 3 }, { itemID = 70226, name = "Ancient Warfare Text", chance = 3, quality = 3 } }
 BossLoot[5912] = { { itemID = 3176, name = "Small Claw", chance = 25, quality = 0 }, { itemID = 3177, name = "Tiny Fang", chance = 35, quality = 0 }, { itemID = 5635, name = "Sharp Claw", chance = 2, quality = 1 }, { itemID = 6443, name = "Deviate Hide", quality = 1 }, { itemID = 6470, name = "Deviate Scale", chance = 6, quality = 1 }, { itemID = 6471, name = "Perfect Deviate Scale", chance = 2, quality = 1 }, { itemID = 5243, name = "Firebelcher", chance = 50, quality = 3 }, { itemID = 6632, name = "Feyscale Cloak", chance = 50, quality = 2 } }
 BossLoot[6109] = { { itemID = 18704, name = "Mature Blue Dragon Sinew", chance = 100, quality = 4 }, { itemID = 10135, name = "High Councillor's Tunic", chance = 2.174, quality = 2 }, { itemID = 10143, name = "High Councillor's Robe", chance = 2.174, quality = 2 }, { itemID = 10151, name = "Mighty Tunic", chance = 2.174, quality = 2 }, { itemID = 10157, name = "Mercurial Breastplate", chance = 2.174, quality = 2 }, { itemID = 10158, name = "Mercurial Guard", chance = 2.174, quality = 2 }, { itemID = 10246, name = "Master's Vest", chance = 2.174, quality = 2 }, { itemID = 10252, name = "Master's Leggings", chance = 2.174, quality = 2 }, { itemID = 10254, name = "Master's Robe", chance = 2.174, quality = 2 }, { itemID = 10262, name = "Adventurer's Legguards", chance = 2.174, quality = 2 }, { itemID = 10264, name = "Adventurer's Tunic", chance = 2.174, quality = 2 }, { itemID = 10266, name = "Masterwork Breastplate", chance = 2.174, quality = 2 }, { itemID = 10271, name = "Masterwork Shield", chance = 2.174, quality = 2 }, { itemID = 10273, name = "Masterwork Legplates", chance = 2.174, quality = 2 }, { itemID = 10367, name = "Hyperion Shield", chance = 2.174, quality = 2 }, { itemID = 10384, name = "Hyperion Armor", chance = 2.174, quality = 2 }, { itemID = 10389, name = "Hyperion Legplates", chance = 2.174, quality = 2 }, { itemID = 11980, name = "Opal Ring", chance = 2.174, quality = 2 }, { itemID = 12017, name = "Prismatic Band", chance = 2.174, quality = 2 }, { itemID = 12048, name = "Prismatic Pendant", chance = 2.174, quality = 2 }, { itemID = 12058, name = "Demonic Bone Ring", chance = 2.174, quality = 2 }, { itemID = 14328, name = "Eternal Chestguard", chance = 2.174, quality = 2 }, { itemID = 14332, name = "Eternal Crown", chance = 2.174, quality = 2 }, { itemID = 14336, name = "Eternal Wraps", chance = 2.174, quality = 2 }, { itemID = 14456, name = "Elunarian Vest", chance = 2.174, quality = 2 }, { itemID = 14464, name = "Elunarian Silk Robes", chance = 2.174, quality = 2 }, { itemID = 14680, name = "Indomitable Vest", chance = 2.174, quality = 2 }, { itemID = 14811, name = "Warstrike Chestguard", chance = 2.174, quality = 2 }, { itemID = 14812, name = "Warstrike Buckler", chance = 2.174, quality = 2 }, { itemID = 14975, name = "Exalted Harness", chance = 2.174, quality = 2 }, { itemID = 14979, name = "Exalted Helmet", chance = 2.174, quality = 2 }, { itemID = 14982, name = "Exalted Shield", chance = 2.174, quality = 2 }, { itemID = 15221, name = "Holy War Sword", chance = 2.174, quality = 2 }, { itemID = 15240, name = "Demon's Claw", chance = 2.174, quality = 2 }, { itemID = 15247, name = "Bloodstrike Dagger", chance = 2.174, quality = 2 }, { itemID = 15258, name = "Divine Warblade", chance = 2.174, quality = 2 }, { itemID = 15283, name = "Lunar Wand", chance = 2.174, quality = 2 }, { itemID = 15289, name = "Archstrike Bow", chance = 2.174, quality = 2 }, { itemID = 15439, name = "Supreme Crown", chance = 2.174, quality = 2 }, { itemID = 15442, name = "Supreme Breastplate", chance = 2.174, quality = 2 }, { itemID = 15680, name = "Triumphant Chestpiece", chance = 2.174, quality = 2 }, { itemID = 15684, name = "Triumphant Skullcap", chance = 2.174, quality = 2 }, { itemID = 15687, name = "Triumphant Shield", chance = 2.174, quality = 2 }, { itemID = 15941, name = "High Councillor's Scepter", chance = 2.174, quality = 2 }, { itemID = 15942, name = "Master's Rod", chance = 2.174, quality = 2 }, { itemID = 15968, name = "Elunarian Sphere", chance = 2.174, quality = 2 }, { itemID = 15989, name = "Eternal Rod", chance = 2.174, quality = 2 }, { itemID = 2564, name = "Elven Spirit Claws", chance = 10, quality = 3 }, { itemID = 7734, name = "Six Demon Bag", chance = 10, quality = 3 }, { itemID = 13009, name = "Cow King's Hide", chance = 10, quality = 3 }, { itemID = 13030, name = "Basilisk Bone", chance = 10, quality = 3 }, { itemID = 13046, name = "Blanchard's Stout", chance = 10, quality = 3 }, { itemID = 13065, name = "Wand of Allistarj", chance = 10, quality = 3 }, { itemID = 13066, name = "Wyrmslayer Spaulders", chance = 10, quality = 3 }, { itemID = 13085, name = "Horizon Choker", chance = 10, quality = 3 }, { itemID = 13125, name = "Elven Chain Boots", chance = 10, quality = 3 }, { itemID = 13139, name = "Guttbuster", chance = 10, quality = 3 }, { itemID = 1203, name = "Aegis of Stormwind", chance = 1.316, quality = 3 }, { itemID = 1973, name = "Orb of Deception", chance = 1.316, quality = 3 }, { itemID = 2564, name = "Elven Spirit Claws", chance = 1.316, quality = 3 }, { itemID = 4696, name = "Lapidis Tankard of Tidesippe", chance = 1.316, quality = 3 }, { itemID = 5266, name = "Eye of Adaegus", chance = 1.316, quality = 3 }, { itemID = 5267, name = "Scarlet Kris", chance = 1.316, quality = 3 }, { itemID = 6622, name = "Sword of Zeal", chance = 1.316, quality = 3 }, { itemID = 7734, name = "Six Demon Bag", chance = 1.316, quality = 3 }, { itemID = 7976, name = "Plans: Mithril Shield Spike", chance = 1.316, quality = 3 }, { itemID = 7991, name = "Plans: Mithril Scale Shoulders", chance = 1.316, quality = 3 }, { itemID = 8028, name = "Plans: Runed Mithril Hammer", chance = 1.316, quality = 3 }, { itemID = 9402, name = "Earthborn Kilt", chance = 1.316, quality = 3 }, { itemID = 10605, name = "Schematic: Spellpower Goggles Xtreme", chance = 1.316, quality = 2 }, { itemID = 10608, name = "Schematic: Sniper Scope", chance = 1.316, quality = 3 }, { itemID = 11302, name = "Uther's Strength", chance = 1.316, quality = 3 }, { itemID = 12698, name = "Plans: Dawnbringer Shoulders", chance = 1.316, quality = 3 }, { itemID = 12711, name = "Plans: Whitesoul Helm", chance = 1.316, quality = 3 }, { itemID = 12717, name = "Plans: Lionheart Helm", chance = 1.316, quality = 4 }, { itemID = 12720, name = "Plans: Stronghold Gauntlets", chance = 1.316, quality = 4 }, { itemID = 12728, name = "Plans: Invulnerable Mail", chance = 1.316, quality = 4 }, { itemID = 13000, name = "Staff of Hale Magefire", chance = 1.316, quality = 3 }, { itemID = 13001, name = "Maiden's Circle", chance = 1.316, quality = 3 }, { itemID = 13002, name = "Lady Alizabeth's Pendant", chance = 1.316, quality = 3 }, { itemID = 13003, name = "Lord Alexander's Battle Axe", chance = 1.316, quality = 3 }, { itemID = 13004, name = "Torch of Austen", chance = 1.316, quality = 3 }, { itemID = 13006, name = "Mass of McGowan", chance = 1.316, quality = 3 }, { itemID = 13007, name = "Mageflame Cloak", chance = 1.316, quality = 3 }, { itemID = 13008, name = "Dalewind Trousers", chance = 1.316, quality = 3 }, { itemID = 13009, name = "Cow King's Hide", chance = 1.316, quality = 3 }, { itemID = 13013, name = "Elder Wizard's Mantle", chance = 1.316, quality = 3 }, { itemID = 13015, name = "Serathil", chance = 1.316, quality = 3 }, { itemID = 13030, name = "Basilisk Bone", chance = 1.316, quality = 3 }, { itemID = 13036, name = "Assassination Blade", chance = 1.316, quality = 3 }, { itemID = 13040, name = "Heartseeking Crossbow", chance = 1.316, quality = 3 }, { itemID = 13047, name = "Twig of the World Tree", chance = 1.316, quality = 3 }, { itemID = 13053, name = "Doombringer", chance = 1.316, quality = 3 }, { itemID = 13060, name = "The Needler", chance = 1.316, quality = 3 }, { itemID = 13066, name = "Wyrmslayer Spaulders", chance = 1.316, quality = 3 }, { itemID = 13067, name = "Hydralick Armor", chance = 1.316, quality = 3 }, { itemID = 13070, name = "Sapphiron's Scale Boots", chance = 1.316, quality = 3 }, { itemID = 13072, name = "Stonegrip Gauntlets", chance = 1.316, quality = 3 }, { itemID = 13073, name = "Mugthol's Helm", chance = 1.316, quality = 3 }, { itemID = 13075, name = "Direwing Legguards", chance = 1.316, quality = 3 }, { itemID = 13077, name = "Girdle of Uther", chance = 1.316, quality = 3 }, { itemID = 13083, name = "Garrett Family Crest", chance = 1.316, quality = 3 }, { itemID = 13085, name = "Horizon Choker", chance = 1.316, quality = 3 }, { itemID = 13091, name = "Medallion of Grand Marshal Morris", chance = 1.316, quality = 3 }, { itemID = 13096, name = "Band of the Hierophant", chance = 1.316, quality = 3 }, { itemID = 13107, name = "Magiskull Cuffs", chance = 1.316, quality = 3 }, { itemID = 13111, name = "Sandals of the Insurgent", chance = 1.316, quality = 3 }, { itemID = 13113, name = "Feathermoon Headdress", chance = 1.316, quality = 3 }, { itemID = 13116, name = "Spaulders of the Unseen", chance = 1.316, quality = 3 }, { itemID = 13118, name = "Serpentine Sash", chance = 1.316, quality = 3 }, { itemID = 13120, name = "Deepfury Bracers", chance = 1.316, quality = 3 }, { itemID = 13123, name = "Dreamwalker Armor", chance = 1.316, quality = 3 }, { itemID = 13125, name = "Elven Chain Boots", chance = 1.316, quality = 3 }, { itemID = 13126, name = "Battlecaller Gauntlets", chance = 1.316, quality = 3 }, { itemID = 13130, name = "Windrunner Legguards", chance = 1.316, quality = 3 }, { itemID = 13133, name = "Drakesfire Epaulets", chance = 1.316, quality = 3 }, { itemID = 13135, name = "Lordly Armguards", chance = 1.316, quality = 3 }, { itemID = 13144, name = "Serenity Belt", chance = 1.316, quality = 3 }, { itemID = 13146, name = "Shell Launcher Shotgun", chance = 1.316, quality = 3 }, { itemID = 14501, name = "Pattern: Mooncloth Vest", chance = 1.316, quality = 3 }, { itemID = 14509, name = "Pattern: Mooncloth Circlet", chance = 1.316, quality = 3 }, { itemID = 14511, name = "Pattern: Gloves of Spell Mastery", chance = 1.316, quality = 4 }, { itemID = 17413, name = "Codex: Prayer of Fortitude", chance = 1.316, quality = 3 }, { itemID = 17414, name = "Codex: Prayer of Fortitude II", chance = 1.316, quality = 3 }, { itemID = 17682, name = "Book: Gift of the Wild", chance = 1.316, quality = 3 }, { itemID = 17683, name = "Book: Gift of the Wild II", chance = 1.316, quality = 3 }, { itemID = 18600, name = "Tome of Arcane Brilliance", chance = 1.316, quality = 3 }, { itemID = 22388, name = "Plans: Titanic Leggings", chance = 1.316, quality = 4 }, { itemID = 22389, name = "Plans: Sageblade", chance = 1.316, quality = 4 }, { itemID = 22390, name = "Plans: Persuader", chance = 1.316, quality = 4 }, { itemID = 22393, name = "Codex: Prayer of Shadow Protection", chance = 1.316, quality = 3 }, { itemID = 22890, name = "Tome of Frost Ward V", chance = 1.316, quality = 3 }, { itemID = 22891, name = "Grimoire of Shadow Ward IV", chance = 1.316, quality = 3 }, { itemID = 9297, name = "Recipe: Elixir of Dream Vision", chance = 0.9524, quality = 2 }, { itemID = 10246, name = "Master's Vest", chance = 0.9524, quality = 2 }, { itemID = 10247, name = "Master's Boots", chance = 0.9524, quality = 2 }, { itemID = 10248, name = "Master's Bracers", chance = 0.9524, quality = 2 }, { itemID = 10249, name = "Master's Cloak", chance = 0.9524, quality = 2 }, { itemID = 10250, name = "Master's Hat", chance = 0.9524, quality = 2 }, { itemID = 10251, name = "Master's Gloves", chance = 0.9524, quality = 2 }, { itemID = 10252, name = "Master's Leggings", chance = 0.9524, quality = 2 }, { itemID = 10253, name = "Master's Mantle", chance = 0.9524, quality = 2 }, { itemID = 10254, name = "Master's Robe", chance = 0.9524, quality = 2 }, { itemID = 10255, name = "Master's Belt", chance = 0.9524, quality = 2 }, { itemID = 10256, name = "Adventurer's Bracers", chance = 0.9524, quality = 2 }, { itemID = 10257, name = "Adventurer's Boots", chance = 0.9524, quality = 2 }, { itemID = 10258, name = "Adventurer's Cape", chance = 0.9524, quality = 2 }, { itemID = 10259, name = "Adventurer's Belt", chance = 0.9524, quality = 2 }, { itemID = 10260, name = "Adventurer's Gloves", chance = 0.9524, quality = 2 }, { itemID = 10261, name = "Adventurer's Bandana", chance = 0.9524, quality = 2 }, { itemID = 10262, name = "Adventurer's Legguards", chance = 0.9524, quality = 2 }, { itemID = 10263, name = "Adventurer's Shoulders", chance = 0.9524, quality = 2 }, { itemID = 10264, name = "Adventurer's Tunic", chance = 0.9524, quality = 2 }, { itemID = 10265, name = "Masterwork Bracers", chance = 0.9524, quality = 2 }, { itemID = 10266, name = "Masterwork Breastplate", chance = 0.9524, quality = 2 }, { itemID = 10267, name = "Masterwork Cape", chance = 0.9524, quality = 2 }, { itemID = 10268, name = "Masterwork Gauntlets", chance = 0.9524, quality = 2 }, { itemID = 10269, name = "Masterwork Girdle", chance = 0.9524, quality = 2 }, { itemID = 10270, name = "Masterwork Boots", chance = 0.9524, quality = 2 }, { itemID = 10272, name = "Masterwork Circlet", chance = 0.9524, quality = 2 }, { itemID = 10273, name = "Masterwork Legplates", chance = 0.9524, quality = 2 }, { itemID = 10274, name = "Masterwork Pauldrons", chance = 0.9524, quality = 2 }, { itemID = 10367, name = "Hyperion Shield", chance = 0.9524, quality = 2 }, { itemID = 10384, name = "Hyperion Armor", chance = 0.9524, quality = 2 }, { itemID = 10385, name = "Hyperion Greaves", chance = 0.9524, quality = 2 }, { itemID = 10386, name = "Hyperion Gauntlets", chance = 0.9524, quality = 2 }, { itemID = 10387, name = "Hyperion Girdle", chance = 0.9524, quality = 2 }, { itemID = 10388, name = "Hyperion Helm", chance = 0.9524, quality = 2 }, { itemID = 10389, name = "Hyperion Legplates", chance = 0.9524, quality = 2 }, { itemID = 10390, name = "Hyperion Pauldrons", chance = 0.9524, quality = 2 }, { itemID = 10391, name = "Hyperion Vambraces", chance = 0.9524, quality = 2 }, { itemID = 11224, name = "Formula: Enchant Shield - Frost Resistance", chance = 0.9524, quality = 2 }, { itemID = 11226, name = "Formula: Enchant Gloves - Riding Skill", chance = 0.9524, quality = 2 }, { itemID = 12017, name = "Prismatic Band", chance = 0.9524, quality = 2 }, { itemID = 12048, name = "Prismatic Pendant", chance = 0.9524, quality = 2 }, { itemID = 12682, name = "Plans: Thorium Armor", chance = 0.9524, quality = 2 }, { itemID = 12683, name = "Plans: Thorium Belt", chance = 0.9524, quality = 2 }, { itemID = 12684, name = "Plans: Thorium Bracers", chance = 0.9524, quality = 2 }, { itemID = 12685, name = "Plans: Radiant Belt", chance = 0.9524, quality = 2 }, { itemID = 12689, name = "Plans: Radiant Breastplate", chance = 0.9524, quality = 2 }, { itemID = 12702, name = "Plans: Radiant Circlet", chance = 0.9524, quality = 2 }, { itemID = 13486, name = "Recipe: Transmute Undeath to Water", chance = 0.9524, quality = 2 }, { itemID = 13487, name = "Recipe: Transmute Water to Undeath", chance = 0.9524, quality = 2 }, { itemID = 13488, name = "Recipe: Transmute Life to Earth", chance = 0.9524, quality = 2 }, { itemID = 13489, name = "Recipe: Transmute Earth to Life", chance = 0.9524, quality = 2 }, { itemID = 14328, name = "Eternal Chestguard", chance = 0.9524, quality = 2 }, { itemID = 14329, name = "Eternal Boots", chance = 0.9524, quality = 2 }, { itemID = 14330, name = "Eternal Bindings", chance = 0.9524, quality = 2 }, { itemID = 14331, name = "Eternal Cloak", chance = 0.9524, quality = 2 }, { itemID = 14332, name = "Eternal Crown", chance = 0.9524, quality = 2 }, { itemID = 14333, name = "Eternal Gloves", chance = 0.9524, quality = 2 }, { itemID = 14334, name = "Eternal Sarong", chance = 0.9524, quality = 2 }, { itemID = 14335, name = "Eternal Spaulders", chance = 0.9524, quality = 2 }, { itemID = 14336, name = "Eternal Wraps", chance = 0.9524, quality = 2 }, { itemID = 14337, name = "Eternal Cord", chance = 0.9524, quality = 2 }, { itemID = 14975, name = "Exalted Harness", chance = 0.9524, quality = 2 }, { itemID = 14976, name = "Exalted Gauntlets", chance = 0.9524, quality = 2 }, { itemID = 14977, name = "Exalted Girdle", chance = 0.9524, quality = 2 }, { itemID = 14978, name = "Exalted Sabatons", chance = 0.9524, quality = 2 }, { itemID = 14979, name = "Exalted Helmet", chance = 0.9524, quality = 2 }, { itemID = 14980, name = "Exalted Legplates", chance = 0.9524, quality = 2 }, { itemID = 14981, name = "Exalted Epaulets", chance = 0.9524, quality = 2 }, { itemID = 14982, name = "Exalted Shield", chance = 0.9524, quality = 2 }, { itemID = 14983, name = "Exalted Armsplints", chance = 0.9524, quality = 2 }, { itemID = 15221, name = "Holy War Sword", chance = 0.9524, quality = 2 }, { itemID = 15229, name = "Blesswind Hammer", chance = 0.9524, quality = 2 }, { itemID = 15240, name = "Demon's Claw", chance = 0.9524, quality = 2 }, { itemID = 15247, name = "Bloodstrike Dagger", chance = 0.9524, quality = 2 }, { itemID = 15258, name = "Divine Warblade", chance = 0.9524, quality = 2 }, { itemID = 15267, name = "Brutehammer", chance = 0.9524, quality = 2 }, { itemID = 15273, name = "Death Striker", chance = 0.9524, quality = 2 }, { itemID = 15278, name = "Solstice Staff", chance = 0.9524, quality = 2 }, { itemID = 15283, name = "Lunar Wand", chance = 0.9524, quality = 2 }, { itemID = 15289, name = "Archstrike Bow", chance = 0.9524, quality = 2 }, { itemID = 15325, name = "Sharpshooter Harquebus", chance = 0.9524, quality = 2 }, { itemID = 15434, name = "Supreme Sash", chance = 0.9524, quality = 2 }, { itemID = 15435, name = "Supreme Shoes", chance = 0.9524, quality = 2 }, { itemID = 15436, name = "Supreme Bracers", chance = 0.9524, quality = 2 }, { itemID = 15437, name = "Supreme Cape", chance = 0.9524, quality = 2 }, { itemID = 15438, name = "Supreme Gloves", chance = 0.9524, quality = 2 }, { itemID = 15439, name = "Supreme Crown", chance = 0.9524, quality = 2 }, { itemID = 15440, name = "Supreme Leggings", chance = 0.9524, quality = 2 }, { itemID = 15441, name = "Supreme Shoulders", chance = 0.9524, quality = 2 }, { itemID = 15442, name = "Supreme Breastplate", chance = 0.9524, quality = 2 }, { itemID = 15678, name = "Triumphant Sabatons", chance = 0.9524, quality = 2 }, { itemID = 15679, name = "Triumphant Bracers", chance = 0.9524, quality = 2 }, { itemID = 15680, name = "Triumphant Chestpiece", chance = 0.9524, quality = 2 }, { itemID = 15681, name = "Triumphant Cloak", chance = 0.9524, quality = 2 }, { itemID = 15682, name = "Triumphant Gauntlets", chance = 0.9524, quality = 2 }, { itemID = 15683, name = "Triumphant Girdle", chance = 0.9524, quality = 2 }, { itemID = 15684, name = "Triumphant Skullcap", chance = 0.9524, quality = 2 }, { itemID = 15685, name = "Triumphant Legplates", chance = 0.9524, quality = 2 }, { itemID = 15686, name = "Triumphant Shoulder Pads", chance = 0.9524, quality = 2 }, { itemID = 15687, name = "Triumphant Shield", chance = 0.9524, quality = 2 }, { itemID = 15942, name = "Master's Rod", chance = 0.9524, quality = 2 }, { itemID = 16044, name = "Schematic: Lifelike Mechanical Toad", chance = 0.9524, quality = 2 }, { itemID = 16055, name = "Schematic: Arcane Bomb", chance = 0.9524, quality = 2 }, { itemID = 16253, name = "Formula: Enchant Chest - Greater Stats", chance = 0.9524, quality = 2 }, { itemID = 17962, name = "Blue Sack of Gems", chance = 20, quality = 2 }, { itemID = 17963, name = "Green Sack of Gems", chance = 20, quality = 2 }, { itemID = 17964, name = "Gray Sack of Gems", chance = 20, quality = 2 }, { itemID = 17965, name = "Yellow Sack of Gems", chance = 20, quality = 2 }, { itemID = 17969, name = "Red Sack of Gems", chance = 20, quality = 2 }, { itemID = 17070, name = "Fang of the Mystics", chance = 10, quality = 4 }, { itemID = 18202, name = "Eskhandar's Left Claw", chance = 10, quality = 4 }, { itemID = 18208, name = "Drape of Benediction", chance = 10, quality = 4 }, { itemID = 18541, name = "Puissant Cape", chance = 10, quality = 4 }, { itemID = 18542, name = "Typhoon", chance = 10, quality = 4 }, { itemID = 18545, name = "Leggings of Arcane Supremacy", chance = 10, quality = 4 }, { itemID = 18547, name = "Unmelting Ice Girdle", chance = 10, quality = 4 }, { itemID = 19130, name = "Cold Snap", chance = 10, quality = 4 }, { itemID = 19131, name = "Snowblind Shoes", chance = 10, quality = 4 }, { itemID = 19132, name = "Crystal Adorned Crown", chance = 10, quality = 4 }, { itemID = 17070, name = "Fang of the Mystics", chance = 10, quality = 4 }, { itemID = 18202, name = "Eskhandar's Left Claw", chance = 10, quality = 4 }, { itemID = 18208, name = "Drape of Benediction", chance = 10, quality = 4 }, { itemID = 18541, name = "Puissant Cape", chance = 10, quality = 4 }, { itemID = 18542, name = "Typhoon", chance = 10, quality = 4 }, { itemID = 18545, name = "Leggings of Arcane Supremacy", chance = 10, quality = 4 }, { itemID = 18547, name = "Unmelting Ice Girdle", chance = 10, quality = 4 }, { itemID = 19130, name = "Cold Snap", chance = 10, quality = 4 }, { itemID = 19131, name = "Snowblind Shoes", chance = 10, quality = 4 }, { itemID = 19132, name = "Crystal Adorned Crown", chance = 10, quality = 4 }, { itemID = 83544, name = "Pattern: Stormscale Leggings", chance = 40, quality = 4 } }
@@ -3009,4 +3532,153 @@ BossLoot[65113] = { { itemID = 41458, name = "Time-Worn Spear", quality = 1 }, {
 BossLoot[80830] = { { itemID = 60424, name = "Grellskin Gloves", chance = 20, quality = 3 }, { itemID = 60425, name = "Shadowguard Robe", chance = 20, quality = 3 }, { itemID = 60426, name = "Guard-Captain's Chestplate", chance = 20, quality = 3 }, { itemID = 60427, name = "Skullrattler", chance = 20, quality = 3 }, { itemID = 60428, name = "Felguard's Visage", chance = 20, quality = 3 }, { itemID = 60429, name = "Arcanite Shackles", chance = 12.5, quality = 3 }, { itemID = 60430, name = "Runewarder's Boots", chance = 12.5, quality = 3 }, { itemID = 60431, name = "Almanac of Savagery", chance = 12.5, quality = 3 }, { itemID = 60432, name = "Gauntlets of the Elite Guard", chance = 12.5, quality = 3 }, { itemID = 60433, name = "Pauldrons of the Elite Guard", chance = 12.5, quality = 3 }, { itemID = 60434, name = "Greaves of the Elite Guard", chance = 12.5, quality = 3 }, { itemID = 60435, name = "Sabatons of the Elite Guard", chance = 12.5, quality = 3 }, { itemID = 60436, name = "Sightless Leather Hood", chance = 12.5, quality = 3 } }
 BossLoot[80854] = { { itemID = 41463, name = "Pouch of Surgical Daggers", quality = 1 }, { itemID = 51217, name = "Fashion Coin", chance = 5, quality = 2 }, { itemID = 60421, name = "Damien's Sorrow", chance = 20, quality = 3 }, { itemID = 60423, name = "Bracers of Lost Souls", chance = 20, quality = 3 }, { itemID = 60427, name = "Skullrattler", chance = 20, quality = 3 }, { itemID = 60433, name = "Pauldrons of the Elite Guard", chance = 20, quality = 3 }, { itemID = 60500, name = "Cloak of Atonement", chance = 20, quality = 3 }, { itemID = 60422, name = "The Ripper", chance = 1, quality = 4 }, { itemID = 70226, name = "Ancient Warfare Text", chance = 1.2, quality = 3 } }
 BossLoot[91928] = { { itemID = 51217, name = "Fashion Coin", chance = 100, quality = 2 }, { itemID = 70226, name = "Ancient Warfare Text", chance = 3, quality = 3 }, { itemID = 83464, name = "Mantle of Twisted Damnation", chance = 1, quality = 4 }, { itemID = 83465, name = "Shroud of Haunted Torment", chance = 25, quality = 3 }, { itemID = 83466, name = "Baneforged Leggings", chance = 25, quality = 3 }, { itemID = 83467, name = "Cryptwatcher's Call", chance = 25, quality = 3 }, { itemID = 83468, name = "Corpsekeeper's Charge", chance = 25, quality = 3 }, { itemID = 83469, name = "Cryptstone Circlet", chance = 21.15, quality = 3 }, { itemID = 83470, name = "Wraithscale Leggings", chance = 21.15, quality = 3 }, { itemID = 83471, name = "Staff of Alarus", chance = 21.15, quality = 3 }, { itemID = 83472, name = "Cover of the Necromancer", chance = 21.15, quality = 3 }, { itemID = 83571, name = "Codex: Shadow Mend", chance = 15, quality = 3 } }
-BossLoot[92111] = { { itemID = 51217, name = "Fashion Coin", chance = 1, quality = 2 }, { itemID = 83212, name = "Felflame Shard", chance = 25, quality = 3 }, { itemID = 83213, name = "Trickster's Wraps", chance = 25, quality = 3 }, { itemID = 83214, name = "Betrayer", chance = 25, quality = 3 }, { itemID = 83215, name = "Blackflame Wand", chance = 25, quality = 3 } }
+
+BossLoot[92111] = { 
+    { 
+        itemID = 51217, 
+        name = "Fashion Coin", 
+        chance = 1, 
+        quality = 2 
+    }, { 
+        itemID = 83212, 
+        name = "Felflame Shard", 
+        chance = 25, 
+        quality = 3 
+    }, { 
+        itemID = 83213, 
+        name = "Trickster's Wraps", 
+        chance = 25, 
+        quality = 3 
+    }, { 
+        itemID = 83214, 
+        name = "Betrayer", 
+        chance = 25, 
+        quality = 3 
+    }, { 
+        itemID = 83215, 
+        name = "Blackflame Wand", 
+        chance = 25, 
+        quality = 3 
+    } 
+}
+
+--------------------------------------------------
+-- Halgan Redbrand Loot Table
+--------------------------------------------------
+
+BossLoot[62069] = {
+    {
+        itemID = 58044,
+        name = "Ceremonial Dwarven Staff",
+        chance = 25,
+        quality = 3
+    }, {
+        itemID = 58045,
+        name = "Ancient Legplates",
+        chance = 25,
+        quality = 3
+    }, {
+        itemID = 58046,
+        name = "Shield of Galoraz",
+        chance = 25,
+        quality = 3
+    }, {
+        itemID = 58047,
+        name = "Grasp of Ancestors",
+        chance = 25,
+        quality = 3
+    }
+}
+
+--------------------------------------------------
+-- Oronok Torn-Heart Loot Table
+--------------------------------------------------
+
+BossLoot[62548] = {
+    {
+        itemID = 58135,
+        name = "Dagger of Whispered Madness",
+        chance = 25,
+        quality = 3
+    }, {
+        itemID = 58136,
+        name = "Shadeweave Drape",
+        chance = 25,
+        quality = 3
+    }, {
+        itemID = 58137,
+        name = "Netherbranch",
+        chance = 25,
+        quality = 3
+    }, {
+        itemID = 58177,
+        name = "Stormreaver Robe",
+        chance = 25,
+        quality = 3
+    }, {
+        itemID = 41797,
+        name = "The Pendant of Uth'okk",
+        chance = 100,
+        note = "Quest item"
+    }
+}
+
+--------------------------------------------------
+-- Drifting Avatar of Sand Loot Table
+--------------------------------------------------
+
+BossLoot[61316] = {
+    {
+        itemID = 61015,
+        name = "Hollowbone Choker",
+        chance = 14,
+        quality = 3
+    }, {
+        itemID = 61024,
+        name = "Greaves of the Elusive",
+        chance = 14,
+        quality = 3
+    }, {
+        itemID = 61033,
+        name = "Nightwind Leggings",
+        chance = 14,
+        quality = 3
+    }, {
+        itemID = 61038,
+        name = "Pauldrons of the Timeless",
+        chance = 14,
+        quality = 3
+    }, {
+        itemID = 61042,
+        name = "Stormfist",
+        chance = 14,
+        quality = 3
+    }, {
+        itemID = 61044,
+        name = "Gavel of the Northwind",
+        chance = 14,
+        quality = 3
+    }, {
+        itemID = 61057,
+        name = "Arcanic Gloves",
+        chance = 14,
+        quality = 3
+    }, {
+        itemID = 61020,
+        name = "Lodestone",
+        chance = 2,
+        quality = 4
+    }, {
+        itemID = 70226,
+        name = "Ancient Warfare Text",
+        chance = 1,
+        note = "Quest item",
+        quality = 3
+    }, {
+        itemID = 50203,
+        name = "Corrupted Sand",
+        chance = 100,
+        note = "Quest item - 15 to 20",
+        quality = 2
+    }
+}

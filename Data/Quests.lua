@@ -2586,8 +2586,9 @@ Quests[41353] = {
     faction = "Both", 
     description = "With a single touch, the Amethyst begins to shine in a dim light that could easily enthrall your eyes forevermore. Yet it was not its beauty that captivated your mind. A voice rings into your head. One that does not belong to you. It echoes in stern yet soothing tone: “You must give this more thought Incantagos. Return to Kel'Theril and find comfort in my presence. That Tower is unpredictable and the Ley-Line on which it prays is purely chaotic. Fool yourself no longer, friend. There is another way!” The Amethyst shines no longer. And whenever touched would simply speak the same message. What an odd item you have stumbled upon. Perhaps exploring the Lake of Kel'Theril will offer you some sort of answer.", 
     objectiveText = "Investigate the mysteries of the Enchanted Amethyst.", 
-    instanceID = 814, 
-    startNPC = 61946, 
+    instanceID = 814,
+    startItem = 41403,
+    startDropNPC = 61946, 
     endNPC = 62007 
 }
 
@@ -2700,7 +2701,8 @@ Quests[41841] = {
     faction = "Horde", 
     description = "<In your hand is the broken Bloodstone Pendant used by Ighal’for, disciple of the deranged Cho’gall, to summon the abhorrent beholder Mergothid into Azeroth. The wounds of the fierce battle against the demon are still strewn across your body. Blood runs down your arm onto your palm. Suddenly, the pendant shakes violently, letting out a twisted shriek while drawing in the red liquid. Shortly after, the blood is gone - and the pendant starts pulsating. You remember assisting a Forsaken warden in Tarren Mill recovering similar artifacts; relics that belonged to the Dark Lady, Sylvanas Windrunner. It’d be best to return her stolen trinkets back to her.>", 
     objectiveText = "Deliver the Bloodstone Pendant to Lady Sylvanas Windrunner in Undercity.", 
-    startNPC = 62671, 
+    startItem = 41939,
+    startDropNPC = 62671, 
     endNPC = 10181, 
     rewards = { 
         type = "choice", 

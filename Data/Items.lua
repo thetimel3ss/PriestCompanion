@@ -2226,7 +2226,7 @@ Items[55134] = {
 }
 
 --------------------------------------------------
--- Hellframe
+-- Hellflame
 --------------------------------------------------
 
 Items[55511] = { 
@@ -2492,6 +2492,9 @@ Items[61286] = {
 --------------------------------------------------
 -- Grungy Firestick
 --------------------------------------------------
+-- Grungy Firestick (61374) is kept in Data/Items.lua and Data/Sources.lua
+-- for reference, but is omitted from the in-game wand list because its
+-- acquisition source could not be confirmed.
 
 Items[61374] = { 
     name = "Grungy Firestick", 

@@ -414,7 +414,7 @@ QuestChains["rod_of_permafrost"] = {
     } 
 }
 
-QuestChains["octo:41841"] = { 
+QuestChains["lady_winter_touch"] = { 
     name = "Artifact of the Dark Lady", 
     rewardQuestID = 41841, 
     steps = { 
@@ -463,7 +463,7 @@ QuestChains["stingshot_wand"] = {
     } 
 }
 
-QuestChains["octo:55006"] = { 
+QuestChains["crackling_zapper"] = { 
     name = "Backup Capacitor", 
     rewardQuestID = 55006, 
     steps = { 
@@ -547,7 +547,7 @@ QuestChains["octo:666"] = {
     } 
 }
 
-QuestChains["octo:70033"] = { 
+QuestChains["diathorus_claw"] = { 
     name = "The Seeker's Demise", 
     rewardQuestID = 70033, 
     steps = { 

@@ -183,7 +183,12 @@ Instances[47] = {
     type = "dungeon", 
     description = "Dungeon encounter in Razorfen Kraul.", 
     entranceZone = "The Barrens", 
-    icon = "Interface\\Icons\\INV_Misc_Map_01" 
+    icon = "Interface\\Icons\\INV_Misc_Map_01",
+
+    worldMap = {
+        mapID = 23,
+        zoneID = 1
+    }
 }
 
 --------------------------------------------------
@@ -246,12 +251,17 @@ Instances[229] = {
 --------------------------------------------------
 
 Instances[269] = { 
-    name = "Caverns of Time: Black Morass", 
+    name = "The Black Morass", 
     shortName = "BM", 
     type = "dungeon", 
-    description = "Dungeon encounter in Caverns of Time: Black Morass.", 
-    entranceZone = "Tanaris", 
-    icon = "Interface\\Icons\\INV_Misc_Map_01" 
+    description = "Dungeon encounter in The Black Morass.", 
+    entranceZone = "Caverns of Time", 
+    icon = "Interface\\Icons\\INV_Misc_Map_01",
+    
+    worldMap = {
+        mapID = 31,
+        zoneID = 1
+    }
 }
 
 --------------------------------------------------
@@ -331,7 +341,12 @@ Instances[532] = {
     type = "raid", 
     description = "Raid encounter in Lower Karazhan Halls.", 
     entranceZone = "Deadwind Pass", 
-    icon = "Interface\\Icons\\INV_Misc_Map_01" 
+    icon = "Interface\\Icons\\INV_Misc_Map_01",
+
+    worldMap = {
+        mapID = 29,
+        zoneID = 1
+    }
 }
 
 --------------------------------------------------
@@ -403,7 +418,12 @@ Instances[800] = {
     type = "dungeon", 
     description = "Dungeon encounter in Karazhan Crypt.", 
     entranceZone = "Deadwind Pass", 
-    icon = "Interface\\Icons\\INV_Misc_Map_01" 
+    icon = "Interface\\Icons\\INV_Misc_Map_01",
+
+    worldMap = {
+        mapID = 36,
+        zoneID = 1
+    }
 }
 
 --------------------------------------------------
@@ -416,7 +436,12 @@ Instances[802] = {
     type = "dungeon", 
     description = "Dungeon encounter in Crescent Grove.", 
     entranceZone = "Ashenvale", 
-    icon = "Interface\\Icons\\INV_Misc_Map_01" 
+    icon = "Interface\\Icons\\INV_Misc_Map_01",
+    
+    worldMap = {
+        mapID = 34,
+        zoneID = 1
+    }
 }
 
 --------------------------------------------------
@@ -546,3 +571,50 @@ Instances[2717] = {
     }
 }
 
+--------------------------------------------------
+-- Dragonmaw Retreat
+--------------------------------------------------
+
+Instances[5601] = {
+    name = "Dragonmaw Retreat",
+    shortName = "DMR",
+    type = "dungeon",
+    entranceZone = "Wetlands",
+    icon = "Interface\\Icons\\INV_Misc_Map_01",
+
+    worldMap = {
+        mapID = 41,
+        zoneID = 1
+    },
+
+    entrance = {
+        zone = "Wetlands",
+        x = 67.3,
+        y = 63.3,
+        label = "Dragonmaw Retreat entrance"
+    }
+}
+
+--------------------------------------------------
+-- Stormwrought Ruins
+--------------------------------------------------
+
+Instances[5628] = {
+    name = "Stormwrought Ruins",
+    shortName = "SWR",
+    type = "dungeon",
+    entranceZone = "Balor",
+    icon = "Interface\\Icons\\INV_Misc_Map_01",
+
+    worldMap = {
+        mapID = 42,
+        zoneID = 1
+    },
+
+    entrance = {
+        zone = "Balor",
+        x = 57.1,
+        y = 60.1,
+        label = "Stormwrought Ruins entrance"
+    }
+}

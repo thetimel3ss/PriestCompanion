@@ -5,10 +5,7 @@ local PC = PriestCompanion
 
 PC.Data.Sources = PC.Data.Sources or {}
 
-PC.Data.BossLoot = PC.Data.BossLoot or {}
-
 local Sources = PC.Data.Sources
-local BossLoot = PC.Data.BossLoot
 
 --------------------------------------------------
 -- Lesser Magic Wand
@@ -1877,7 +1874,8 @@ Sources[17077] = {
             } 
         }, 
         mobCount = 1, 
-        details = true, 
+        details = true,
+        lootNPCID = 12098, 
     }, { 
         type = "drop", 
         npcID = 12118, 
@@ -1893,7 +1891,8 @@ Sources[17077] = {
             } 
         }, 
         mobCount = 1, 
-        details = true, 
+        details = true,
+        lootNPCID = 12118, 
     }, { 
         type = "drop", 
         npcID = 12264, 
@@ -1909,7 +1908,8 @@ Sources[17077] = {
             } 
         }, 
         mobCount = 1, 
-        details = true, 
+        details = true,
+        lootNPCID = 12264, 
     } 
 }
 

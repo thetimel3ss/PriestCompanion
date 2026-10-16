@@ -7,6 +7,7 @@
 ### Release Summary
 - First usable Wand Progression feature, with search, recommended filters, acquisition sources, quest-chain details, tooltips, and map navigation.
 - Continued Vanilla 1.12 compatibility with optional ClassicAPI, SuperWoW, Nampower, and UnitXP SP3 enhancements.
+- Set both TOC versions to 0.1.1 and aligned the Lua metadata fallback with the same version.
 
 ### Boss Loot Visibility
 - Preserved full loot data for Incindis (52145), Sulfuron Harbinger (12098), Lucifron (12118), and Shazzrah (12264) while intentionally hiding their tables in Source Details.

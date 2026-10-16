@@ -1858,7 +1858,8 @@ Sources[17077] = {
             } 
         }, 
         mobCount = 1, 
-        details = true, 
+        details = true,
+        showBossLoot = false, 
     }, { 
         type = "drop", 
         npcID = 12098, 
@@ -1875,6 +1876,7 @@ Sources[17077] = {
         }, 
         mobCount = 1, 
         details = true,
+        showBossLoot = false,
         lootNPCID = 12098, 
     }, { 
         type = "drop", 
@@ -1892,6 +1894,7 @@ Sources[17077] = {
         }, 
         mobCount = 1, 
         details = true,
+        showBossLoot = false,
         lootNPCID = 12118, 
     }, { 
         type = "drop", 
@@ -1909,6 +1912,7 @@ Sources[17077] = {
         }, 
         mobCount = 1, 
         details = true,
+        showBossLoot = false,
         lootNPCID = 12264, 
     } 
 }
@@ -2829,7 +2833,8 @@ Sources[58205] = {
             } 
         }, 
         mobCount = 1, 
-        details = true, 
+        details = true,
+        showBossLoot = false, 
         lootNPCID = 52145 
     } 
 }

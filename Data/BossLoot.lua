@@ -3165,6 +3165,8 @@ BossLoot[11981] = {
 -- Sulfuron Harbinger (NPC 12098)
 --------------------------------------------------
 
+-- Intentionally not displayed in Source Details (showBossLoot = false).
+-- Keep this complete loot table for reference without cluttering wand acquisition details.
 BossLoot[12098] = {
     {
         itemID = 7068,
@@ -3309,6 +3311,8 @@ BossLoot[12098] = {
 -- Lucifron (NPC 12118)
 --------------------------------------------------
 
+-- Intentionally not displayed in Source Details (showBossLoot = false).
+-- Keep this complete loot table for reference without cluttering wand acquisition details.
 BossLoot[12118] = {
     {
         itemID = 7068,
@@ -3544,6 +3548,8 @@ BossLoot[12118] = {
 -- Shazzrah (NPC 12264)
 --------------------------------------------------
 
+-- Intentionally not displayed in Source Details (showBossLoot = false).
+-- Keep this complete loot table for reference without cluttering wand acquisition details.
 BossLoot[12264] = {
     {
         itemID = 7068,
@@ -6255,6 +6261,8 @@ BossLoot[16184] = {
 -- Incindis (NPC 52145)
 --------------------------------------------------
 
+-- Intentionally not displayed in Source Details (showBossLoot = false).
+-- Keep this complete loot table for reference without cluttering wand acquisition details.
 BossLoot[52145] = {
     {
         itemID = 41988,

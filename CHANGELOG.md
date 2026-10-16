@@ -5,7 +5,7 @@
 ### Boss Loot Database (2026-10-16)
 - Split boss loot acquisition data into `Data/BossLoot.lua` and load it in both Vanilla and ClassicAPI TOCs.
 - Formatted 41 boss tables and 1,018 loot entries with one field per line, descriptive NPC headers, and ascending NPC ID order; item IDs, chances, qualities, notes and item order remain unchanged.
-- Linked the existing Sulfuron Harbinger (12098), Lucifron (12118), and Shazzrah (12264) loot tables to their drop sources with `lootNPCID`, preserving their existing NPC classifications.
+- Linked the existing Sulfuron Harbinger (12098), Lucifron (12118), Shazzrah (12264), and Drifting Avatar of Sand (61316) loot tables to their drop sources with `lootNPCID`, preserving their existing NPC classifications.
 - Removed the redundant BossLoot initialization and local alias from `Data/Sources.lua`.
 - Kept the deliberately discarded tables (7272, 7274, 7795, 9476, 63107, and 80830) excluded; Korrak (12159) was already absent from the new file and was not restored.
 

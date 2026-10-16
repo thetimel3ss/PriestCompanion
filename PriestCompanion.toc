@@ -17,6 +17,7 @@ Data\Items.lua
 Data\Instances.lua
 Data\NPCs.lua
 Data\Sources.lua
+Data\BossLoot.lua
 Data\Wands.lua
 Data\Quests.lua
 Data\QuestChains.lua

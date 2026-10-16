@@ -1,8 +1,8 @@
 ## Interface: 11200
 ## Title: Priest Companion
-## Notes: Priest knowledge and tools for Vanilla WoW
+## Notes: Wand progression, source details, and map guidance for Vanilla WoW
 ## Author: Timeless
-## Version: 0.1.0
+## Version: 0.1.1
 ## SavedVariables: PriestCompanionDB
 
 Core\Bootstrap.lua

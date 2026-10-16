@@ -2,6 +2,12 @@
 
 ## [Unreleased]
 
+### Documentation (2026-10-16)
+- Separated current limitations, next-step priorities, and planned features into [ROADMAP.md](ROADMAP.md), keeping released change history here.
+- Reassessed current OctoWoW wand coverage and documented in-game validation of the configured custom maps and floors.
+- Audited NPC coordinates (five missing location records and seven `(0, 0)` placeholders), Ragefire Chasm world-map metadata, and 28 aggregate `Multiple creatures` sources.
+- Retained the historical 0.1.0 plan without treating it as the current roadmap.
+
 ## [0.1.1] - 2026-10-16
 
 ### Release Summary
@@ -215,31 +221,11 @@ This version extends the initial 0.1.0 foundation with the first usable Wand Pro
 - Fixed XP and reputation reward coloring in Source Details.
 - Fixed Blackfathom Deeps quest markers to use the native dungeon map and correct Thaelrid coordinates.
 
-### Known Limitations (code review, 2026-10-13)
-- Several NPC records still lack precise coordinates. Their dungeon map can be opened without a marker, or a configured entrance used when the internal map is unavailable.
-- Map lookup still requires matching zone names or explicit map metadata. Selected indices can be checked, but correct dungeon artwork, floor alignment and NPC positions still need in-game verification.
-- Some sources still reference NPCs without centralized records. Inline names can display and instance fallbacks can be used, but native NPC coordinates require completing the database.
-- The detail panel still renders only the primary crafting source and only the selected source type. Vendor map buttons require an NPC record; source-only names/prices can display before the NPC database is completed.
-- Quest-history event registration uses the ClassicAPI environment flag, while other panels use capability detection. Standard-TOC ClassicAPI detection does not load the ClassicAPI API overrides or enable turn-in tracking.
-- Item names can fall back to local data, but icons and full item tooltips still depend on game-provided item data.
-- All Lua files passed syntax loading in Lua 5.0.3. In-memory tests covered map fallback/error paths, faction-specific starters, quest-card reuse/height, and both drop-button handlers with mocked WoW APIs. Actual Vanilla 1.12 rendering, custom maps and server behavior still require in-game testing.
-
-### Planned
-- Complete the Wand Progression item database.
-- Replace or improve the current dungeon icon.
-- Expand optional pfQuest integration for missing quest/map data where useful.
-- Add reputation requirements.
-- Add open-world, dungeon, and raid content filters.
-- Add Skills database.
-- Add Talent builds.
-- Add BiS lists.
-- Add Consumables.
-- Add Settings tab with quest-history sync preferences and reset controls.
-- Add Minimap button.
-- Add Auto Mana tools.
-- Add OOM announcer.
-- Add automatic self-buff utilities.
-- Add automatic purchasing of buff reagents.
+### Validation and Maintenance Notes
+- The maintainer validated the custom maps and configured floors in game and individually tested the changes implemented after 2026-10-13.
+- Earlier Lua 5.0.3 syntax and mocked-WoW-API tests remain historical verification; they do not substitute for the maintainer's later in-game checks.
+- The OctoWoW wand database is complete for the current scope (146 wands with item and acquisition-source records). Future server additions and corrections are routine database updates.
+- Outstanding technical limitations, the NPC/location inventory, aggregate-drop review, and future features are tracked in [ROADMAP.md](ROADMAP.md).
 
 ---
 

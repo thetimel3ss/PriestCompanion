@@ -2951,7 +2951,8 @@ Sources[61020] = {
             } 
         }, 
         mobCount = 1, 
-        details = true 
+        details = true,
+        lootNPCID = 61316
     }
 }
 

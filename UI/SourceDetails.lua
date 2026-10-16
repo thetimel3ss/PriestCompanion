@@ -3569,7 +3569,10 @@ local function GetDropNPC(source)
 end
 
 local function GetBossLoot(source)
+    -- A source can hide its full boss loot table without deleting the data.
+    -- This keeps acquisition details concise for bosses with large loot lists.
     if not source
+    or source.showBossLoot == false
     or not PC.Data.BossLoot then
         return nil
     end

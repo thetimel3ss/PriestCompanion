@@ -241,66 +241,197 @@ end
 local advanced = CreateFrame("Frame", nil, content)
 advanced:SetAllPoints(content)
 
-CreateLabel(
+local prayer = PC.Modules.PrayerTracker
+
+local advancedScroll = CreateFrame(
+    "ScrollFrame",
+    "PriestCompanionAdvancedScroll",
     advanced,
-    "Advanced Diagnostics",
-    15,
-    -18,
-    390,
+    "UIPanelScrollFrameTemplate"
+)
+advancedScroll:SetPoint(
+    "TOPLEFT", advanced, "TOPLEFT", 8, -10
+)
+advancedScroll:SetPoint(
+    "BOTTOMRIGHT", advanced, "BOTTOMRIGHT", -29, 9
+)
+
+local advancedChild = CreateFrame(
+    "Frame", nil, advancedScroll
+)
+advancedChild:SetWidth(388)
+advancedChild:SetHeight(485)
+advancedScroll:SetScrollChild(advancedChild)
+
+CreateLabel(
+    advancedChild,
+    "Book of Prayer Tracker",
+    14, -12, 360,
     "GameFontNormal"
 )
 
+local talentStatus = CreateLabel(
+    advancedChild, "", 14, -40, 350
+)
+
+local requiredNote = CreateLabel(
+    advancedChild, "", 47, -95, 330
+)
+requiredNote:SetTextColor(1, 0.32, 0.32)
+
+local checkboxes = {}
+local checkboxNames = {}
+local checkboxIndex = 0
+
+local function AddPrayerCheckbox(key, text, y)
+    checkboxIndex = checkboxIndex + 1
+
+    local button = CreateFrame(
+        "CheckButton",
+        "PriestCompanionPrayerOption" ..
+            tostring(checkboxIndex),
+        advancedChild,
+        "UICheckButtonTemplate"
+    )
+
+    button:SetWidth(24)
+    button:SetHeight(24)
+    button:SetPoint(
+        "TOPLEFT", advancedChild, "TOPLEFT", 16, -y
+    )
+
+    local caption = advancedChild:CreateFontString(
+        nil, "OVERLAY", "GameFontHighlightSmall"
+    )
+    caption:SetPoint(
+        "LEFT", button, "RIGHT", 4, 0
+    )
+    caption:SetWidth(328)
+    caption:SetJustifyH("LEFT")
+    caption:SetText(text)
+
+    button:SetScript(
+        "OnClick",
+        function()
+            if prayer then
+                prayer.SetOption(
+                    key,
+                    this:GetChecked() == 1
+                        or this:GetChecked() == true
+                )
+            end
+            advanced.Refresh()
+        end
+    )
+
+    checkboxes[key] = button
+    checkboxNames[key] = caption
+    return button
+end
+
+AddPrayerCheckbox("enabled", "Enable Tracker", 66)
+AddPrayerCheckbox("expanded", "Expanded mode (previous heal)", 123)
+AddPrayerCheckbox("showSpellName", "Show spell name", 153)
+AddPrayerCheckbox("showRefund", "Show mana refund eligibility", 183)
+AddPrayerCheckbox("outsideCombat", "Show outside combat", 213)
+AddPrayerCheckbox("locked", "Lock position and size", 243)
+
 CreateLabel(
-    advanced,
-    "Quest history and experimental integration status (read-only).",
-    18,
-    -51,
-    380
+    advancedChild,
+    "Unlocked: drag the tracker to move it; drag any edge or " ..
+        "corner to resize. Lock also prevents resizing.",
+    15, -277, 345
+)
+
+CreateLabel(
+    advancedChild,
+    "Refund display shows eligibility (% of spell cost), " ..
+        "not measured mana gained.",
+    15, -312, 345,
+    "GameFontDisableSmall"
+)
+
+CreateLabel(
+    advancedChild,
+    "Quest History Diagnostics",
+    14, -357, 355,
+    "GameFontNormal"
 )
 
 local turnInLabel = CreateLabel(
-    advanced,
-    "",
-    18,
-    -100,
-    400
+    advancedChild, "", 16, -388, 355
 )
-
 local serverLabel = CreateLabel(
-    advanced,
-    "",
-    18,
-    -127,
-    400
+    advancedChild, "", 16, -413, 355
 )
 
 CreateLabel(
-    advanced,
-    "Registering an event does not prove that the client has delivered it.",
-    18,
-    -174,
-    385
-)
-
-CreateLabel(
-    advanced,
-    "Unknown quest completion is never treated as proof of non-completion.",
-    18,
-    -212,
-    385
+    advancedChild,
+    "Registering an event does not prove its delivery. " ..
+        "Unknown quest completion remains unknown.",
+    16, -450, 345,
+    "GameFontDisableSmall"
 )
 
 function advanced.Refresh()
+    if prayer then
+        local points = prayer.GetTalentPoints()
+        local found = prayer.IsTalentFound()
+        local provider = prayer.GetProvider()
+        local label
+
+        if found then
+            label = "Book of Prayer: " ..
+                tostring(points) .. "/2"
+        else
+            label = "Book of Prayer: unavailable"
+        end
+
+        if provider == "unavailable" then
+            label = label .. "  |  Cast event unavailable"
+        else
+            label = label .. "  |  " .. provider
+        end
+
+        talentStatus:SetText(label)
+
+        local key
+        local button
+        for key, button in pairs(checkboxes) do
+            local checked = prayer.GetOption(key)
+            if key == "enabled" and points < 1 then
+                checked = false
+            end
+            button:SetChecked(checked and 1 or nil)
+        end
+
+        if points < 1 then
+            checkboxes.enabled:Disable()
+            checkboxNames.enabled:SetTextColor(1, 0.32, 0.32)
+
+            if found then
+                requiredNote:SetText(
+                    "* Requires at least 1 point in Book of Prayer."
+                )
+            else
+                requiredNote:SetText(
+                    "* Book of Prayer is not available in your talents."
+                )
+            end
+        else
+            checkboxes.enabled:Enable()
+            checkboxNames.enabled:SetTextColor(1, 0.82, 0.20)
+            requiredNote:SetText("")
+        end
+    end
+
     local caps = PC.Capabilities or {}
     local history = PC.QuestHistory
-
     local eventStatus = "Unavailable"
 
     if caps.questTurnInEvent then
         eventStatus = "Not registered"
-
-        if history
-        and history.LiveTurnInRegistered == true then
+        if history and history.LiveTurnInRegistered == true then
             eventStatus = "Registered (delivery unverified)"
         end
     end
@@ -317,15 +448,12 @@ function advanced.Refresh()
 
         if state then
             if state.unavailableReason then
-                serverStatus =
-                    "Unavailable (" ..
-                    tostring(state.unavailableReason) ..
-                    ")"
+                serverStatus = "Unavailable (" ..
+                    tostring(state.unavailableReason) .. ")"
             elseif state.active then
                 serverStatus = "Waiting for response"
             elseif state.responded then
-                serverStatus =
-                    "Responded (" ..
+                serverStatus = "Responded (" ..
                     tostring(state.received or 0) ..
                     " IDs processed)"
             elseif state.attempted then
@@ -336,6 +464,16 @@ function advanced.Refresh()
 
     serverLabel:SetText(
         "Server Query: " .. serverStatus
+    )
+end
+
+if prayer then
+    prayer.AddListener(
+        function()
+            if advanced:IsShown() then
+                advanced.Refresh()
+            end
+        end
     )
 end
 

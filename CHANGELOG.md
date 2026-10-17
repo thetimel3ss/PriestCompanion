@@ -2,6 +2,15 @@
 
 ## [Unreleased]
 
+### Added — Book of Prayer Tracker prototype (2026-10-17)
+- Added `Data/HealingSpells.lua` to define six rank-independent healing families: Flash Heal, Renew, Prayer of Healing, Heal, Greater Heal and Lesser Heal.
+- Added `Core/PrayerTracker.lua`: scans the character's talents for Book of Prayer points, normalizes successful player casts by healing family and records previous/current families. Ignores interrupted/failed casts and periodic ticks. Uses one cast provider at a time (ClassicAPI `UNIT_SPELLCAST_SUCCEEDED`, then Nampower `SPELL_CAST_EVENT`, then SuperWoW `UNIT_CASTEVENT`).
+- Added `UI/PrayerTracker.lua`, an independent compact/expanded HUD with actual spellbook icons when available. The default compact view displays the latest heal, optional spell name and a footer indicating whether the last heal was eligible for a 15%/30% cost refund. **No numeric mana amount is estimated or claimed to have been measured.**
+- Advanced now provides checkboxes for Enable Tracker, Expanded mode, Show spell name, Show mana refund eligibility, Show outside combat and Lock position and size. With no Book of Prayer points, Enable Tracker is disabled with a red warning.
+- Implemented eight mouse-resize edges/corners, drag-to-move and two independently saved panel sizes; locking prevents both movement and resizing.
+- Added `PriestCompanionCharDB` as a per-character SavedVariable for the settings and HUD geometry. Both TOCs load the new data, core and HUD in order.
+- This feature is **unreleased and not tested in-game**. Check event delivery, custom talent visibility, rank grouping and frame resizing on OctoWoW before promoting to main.
+
 ### Changed — Options command (2026-10-17)
 - Replaced the redundant `/priest env` / `/pc env` command with `/priest options` / `/pc options`, which open the existing **Options → General** page.
 - Updated slash-command help; the Mods diagnostics remain accessible through the Options UI and `/priest` still toggles the main window.

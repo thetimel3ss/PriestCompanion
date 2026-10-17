@@ -159,6 +159,16 @@ local appliedX = nil
 local appliedY = nil
 local edges = {}
 
+local resizeHint = frame:CreateTexture(nil, "OVERLAY")
+resizeHint:SetTexture(
+    "Interface\\\\ChatFrame\\\\UI-ChatIM-SizeGrabber-Up"
+)
+resizeHint:SetWidth(12)
+resizeHint:SetHeight(12)
+resizeHint:SetPoint(
+    "BOTTOMRIGHT", frame, "BOTTOMRIGHT", -4, 4
+)
+
 local function SaveGeometry()
     if Tracker.GetOption("locked") then
         return
@@ -210,15 +220,47 @@ local function CreateResizeEdge(
     y
 )
     local handle = CreateFrame("Frame", nil, frame)
-    handle:SetWidth(width)
-    handle:SetHeight(height)
-    handle:SetPoint(
-        point,
-        frame,
-        relativePoint,
-        x,
-        y
-    )
+
+    if direction == "TOP" or direction == "BOTTOM" then
+        local leftPoint = "TOPLEFT"
+        local rightPoint = "TOPRIGHT"
+
+        if direction == "BOTTOM" then
+            leftPoint = "BOTTOMLEFT"
+            rightPoint = "BOTTOMRIGHT"
+        end
+
+        handle:SetPoint(
+            leftPoint, frame, leftPoint, 12, 0
+        )
+        handle:SetPoint(
+            rightPoint, frame, rightPoint, -12, 0
+        )
+        handle:SetHeight(height)
+    elseif direction == "LEFT" or direction == "RIGHT" then
+        local topPoint = "TOPLEFT"
+        local bottomPoint = "BOTTOMLEFT"
+
+        if direction == "RIGHT" then
+            topPoint = "TOPRIGHT"
+            bottomPoint = "BOTTOMRIGHT"
+        end
+
+        handle:SetPoint(
+            topPoint, frame, topPoint, 0, -12
+        )
+        handle:SetPoint(
+            bottomPoint, frame, bottomPoint, 0, 12
+        )
+        handle:SetWidth(width)
+    else
+        handle:SetWidth(width)
+        handle:SetHeight(height)
+        handle:SetPoint(
+            point, frame, relativePoint, x, y
+        )
+    end
+
     handle:EnableMouse(true)
     handle.edge = direction
 
@@ -278,7 +320,7 @@ local function SetDimensions(expanded)
         width = Tracker.GetOption("compactWidth") or 118
         height = Tracker.GetOption("compactHeight") or 112
         minWidth = 104
-        minHeight = 104
+        minHeight = 112
     end
 
     if width < minWidth then
@@ -305,6 +347,10 @@ local function SetDimensions(expanded)
 
     frame:SetWidth(width)
     frame:SetHeight(height)
+
+    currentName:SetWidth(
+        expanded and 94 or width - 16
+    )
 
     if expanded then
         currentIcon:ClearAllPoints()
@@ -359,6 +405,12 @@ local function UpdateDisplay()
     end
 
     frame:EnableMouse(not locked)
+
+    if locked then
+        resizeHint:Hide()
+    else
+        resizeHint:Show()
+    end
 
     local i
     for i = 1, table.getn(edges) do

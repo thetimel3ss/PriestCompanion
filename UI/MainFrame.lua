@@ -250,8 +250,13 @@ function PC.UI.SelectTab(id, resetScroll, section)
     local button
 
     for tabID, button in pairs(tabButtons) do
-        -- Native tab templates render their disabled state as selected.
-        button:SetEnabled(tabID ~= id)
+        -- WoW 1.12 buttons expose Enable/Disable, not SetEnabled.
+        -- Disable the selected tab to match the native tab appearance.
+        if tabID == id then
+            button:Disable()
+        else
+            button:Enable()
+        end
     end
 end
 

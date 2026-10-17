@@ -35,7 +35,7 @@ local DESCRIPTION_Y = -5
 local FILTER_BAR_X = -12
 local FILTER_BAR_Y = -6
 local FILTER_BAR_WIDTH = 440
-local FILTER_BAR_HEIGHT = 61
+local FILTER_BAR_HEIGHT = 75
 
 local SOURCE_FILTER_X = 18
 local SOURCE_FILTER_Y = 0
@@ -49,14 +49,21 @@ local FACTION_DROPDOWN_X = -18
 local FACTION_DROPDOWN_Y = -2
 local FACTION_DROPDOWN_WIDTH = 105
 
-local LEVEL_FILTER_X = 255
+local LEVEL_FILTER_X = 247
 local LEVEL_FILTER_Y = 0
 local LEVEL_DROPDOWN_X = -18
 local LEVEL_DROPDOWN_Y = -2
 local LEVEL_DROPDOWN_WIDTH = 100
 
+local SEARCH_LABEL_X = 18
+local SEARCH_LABEL_Y = -46
+local SEARCH_BOX_X = 64
+local SEARCH_BOX_Y = -41
+local SEARCH_BOX_WIDTH = 278
+local SEARCH_BOX_HEIGHT = 20
+
 local RECOMMENDED_X = 375
-local RECOMMENDED_Y = -23
+local RECOMMENDED_Y = -18
 local RECOMMENDED_SIZE = 20
 local RECOMMENDED_TEXT_X = 2
 
@@ -105,9 +112,6 @@ local INSTANCE_ICON_Y = -8
 local INSTANCE_TEXT_X = 193
 local INSTANCE_TEXT_Y = -8
 
-local DETAILS_MARKER_X = 213
-local DETAILS_MARKER_Y = -8
-
 --------------------------------------------------
 -- Row State Colors
 --------------------------------------------------
@@ -133,13 +137,15 @@ local filters = {
     source = "All",
     faction = "Auto",
     level = "All",
-    recommendedOnly = false
+    recommendedOnly = true,
+    search = ""
 }
 
 local rows = {}
 local activeRow = nil
 
 local RefreshWandList
+local GetEffectiveRequiredLevel
 
 --------------------------------------------------
 -- Player Context
@@ -258,15 +264,23 @@ local function IsRecommendedNow(wand)
     return true
 end
 
-local function IsUsable(item)
-    if not item
-    or not item.requiredLevel then
+local function IsUsable(
+    itemID,
+    item
+)
+    local requiredLevel =
+        GetEffectiveRequiredLevel(
+            itemID,
+            item
+        )
+
+    if not requiredLevel then
         return true
     end
 
     return
         playerLevel >=
-        item.requiredLevel
+        requiredLevel
 end
 
 --------------------------------------------------
@@ -349,6 +363,45 @@ local function GetEffectiveFaction()
     return filters.faction
 end
 
+local function SearchMatches(
+    itemID,
+    item
+)
+    local query =
+        filters.search
+
+    if not query
+    or query == "" then
+        return true
+    end
+
+    local name =
+        item
+        and item.name
+
+    if not name then
+        name =
+            PC.API.GetItemName(
+                itemID
+            )
+    end
+
+    name = string.lower(
+        tostring(name or "")
+    )
+
+    query = string.lower(
+        tostring(query)
+    )
+
+    return string.find(
+        name,
+        query,
+        1,
+        true
+    ) ~= nil
+end
+
 local function SourceMatchesFilters(source)
     if not source then
         return false
@@ -401,6 +454,69 @@ local function GetMatchingSources(itemID)
 
     return result
 end
+
+--------------------------------------------------
+-- Effective Required Level
+--
+-- Item data is authoritative when it contains an
+-- equip requirement. Quest rewards without an item
+-- requirement use the minimum level required by
+-- their currently matching quest source.
+--------------------------------------------------
+
+GetEffectiveRequiredLevel =
+    function(
+        itemID,
+        item
+    )
+        if item
+        and item.requiredLevel then
+            return item.requiredLevel
+        end
+
+        local sources =
+            GetMatchingSources(itemID)
+
+        local minimumLevel = nil
+        local i
+
+        for i = 1,
+            table.getn(sources)
+        do
+            local source =
+                sources[i]
+
+            if source.type == "quest" then
+                local requiredLevel =
+                    source.requiredLevel
+
+                if source.questID
+                and PC.Data.Quests then
+                    local quest =
+                        PC.Data.Quests[
+                            source.questID
+                        ]
+
+                    if quest
+                    and quest.requiredLevel then
+                        requiredLevel =
+                            quest.requiredLevel
+                    end
+                end
+
+                if requiredLevel
+                and (
+                    not minimumLevel
+                    or requiredLevel < minimumLevel
+                ) then
+                    minimumLevel =
+                        requiredLevel
+                end
+            end
+        end
+
+        return minimumLevel
+    end
 
 local function GetPrimarySource(sources)
     if not sources
@@ -538,27 +654,6 @@ local function GetAggregateInstanceID(sources)
     return foundID
 end
 
-local function AnySourceHasDetails(sources)
-    if not sources
-    or not PC.UI.SourceTooltip then
-        return false
-    end
-
-    local i
-
-    for i = 1,
-        table.getn(sources)
-    do
-        if PC.UI.SourceTooltip.HasDetails(
-            sources[i]
-        ) then
-            return true
-        end
-    end
-
-    return false
-end
-
 local function ItemPassesFilters(itemID)
     local item =
         PC.Data.Items[itemID]
@@ -568,6 +663,13 @@ local function ItemPassesFilters(itemID)
 
     if not item
     or not wand then
+        return false
+    end
+
+    if not SearchMatches(
+        itemID,
+        item
+    ) then
         return false
     end
 
@@ -586,12 +688,18 @@ local function ItemPassesFilters(itemID)
     end
 
     if filters.level == "Usable" then
-        if not IsUsable(item) then
+        if not IsUsable(
+            itemID,
+            item
+        ) then
             return false
         end
 
     elseif filters.level == "Future" then
-        if IsUsable(item) then
+        if IsUsable(
+            itemID,
+            item
+        ) then
             return false
         end
 
@@ -927,6 +1035,41 @@ local function HideItemTooltips()
     end
 end
 
+local function GetDetailSources(row)
+    local result = {}
+
+    if not row
+    or not row.source then
+        return result
+    end
+
+    local sourceType =
+        row.source.type
+
+    if row.sources then
+        local i
+
+        for i = 1,
+            table.getn(row.sources)
+        do
+            local source =
+                row.sources[i]
+
+            if source.type == sourceType then
+                result[
+                    table.getn(result) + 1
+                ] = source
+            end
+        end
+    end
+
+    if table.getn(result) == 0 then
+        result[1] = row.source
+    end
+
+    return result
+end
+
 local function OnItemClick()
     local row = this
 
@@ -943,9 +1086,14 @@ local function OnItemClick()
     )
     and PC.UI.SourceDetails then
 
+        local detailSources =
+            GetDetailSources(
+                row
+            )
+
         PC.UI.SourceDetails.Open(
             row.itemID,
-            row.source
+            detailSources
         )
     end
 end
@@ -1096,7 +1244,7 @@ description:SetPoint(
 )
 
 description:SetText(
-    "Hover for source status. Left-click items marked * for details."
+    "All wands have acquisition details. Hover for tooltips; click a wand to open Source Details."
 )
 
 --------------------------------------------------
@@ -1124,6 +1272,99 @@ filterBar:SetWidth(
 
 filterBar:SetHeight(
     FILTER_BAR_HEIGHT
+)
+
+--------------------------------------------------
+-- Search
+--------------------------------------------------
+
+local searchLabel =
+    filterBar:CreateFontString(
+        nil,
+        "OVERLAY",
+        "GameFontHighlightSmall"
+    )
+
+searchLabel:SetPoint(
+    "TOPLEFT",
+    filterBar,
+    "TOPLEFT",
+    SEARCH_LABEL_X,
+    SEARCH_LABEL_Y
+)
+
+searchLabel:SetText(
+    "Search"
+)
+
+local searchBox =
+    CreateFrame(
+        "EditBox",
+        nil,
+        filterBar,
+        "InputBoxTemplate"
+    )
+
+searchBox:SetWidth(
+    SEARCH_BOX_WIDTH
+)
+
+searchBox:SetHeight(
+    SEARCH_BOX_HEIGHT
+)
+
+searchBox:SetPoint(
+    "TOPLEFT",
+    filterBar,
+    "TOPLEFT",
+    SEARCH_BOX_X,
+    SEARCH_BOX_Y
+)
+
+searchBox:SetAutoFocus(false)
+
+if searchBox.SetFontObject then
+    searchBox:SetFontObject(
+        "GameFontHighlightSmall"
+    )
+end
+
+if searchBox.SetTextInsets then
+    searchBox:SetTextInsets(
+        6,
+        6,
+        0,
+        0
+    )
+end
+
+searchBox:SetText(
+    filters.search
+)
+
+searchBox:SetScript(
+    "OnTextChanged",
+    function()
+        filters.search =
+            this:GetText()
+            or ""
+
+        RefreshWandList(true)
+    end
+)
+
+searchBox:SetScript(
+    "OnEscapePressed",
+    function()
+        this:ClearFocus()
+    end
+)
+
+searchBox:SetScript(
+    "OnEnterPressed",
+    function()
+        this:ClearFocus()
+    end
 )
 
 --------------------------------------------------
@@ -1303,12 +1544,18 @@ recommendedCheck:SetScript(
     "OnClick",
     function()
         filters.recommendedOnly =
-            this:GetChecked()
-            and true
-            or false
+            not filters.recommendedOnly
 
-        RefreshWandList()
+        recommendedCheck:SetChecked(
+            filters.recommendedOnly
+        )
+
+        RefreshWandList(true)
     end
+)
+
+recommendedCheck:SetChecked(
+    filters.recommendedOnly
 )
 
 --------------------------------------------------
@@ -1350,7 +1597,7 @@ UIDropDownMenu_Initialize(
                         sourceDropdown
                     )
 
-                    RefreshWandList()
+                    RefreshWandList(true)
                 end
 
             UIDropDownMenu_AddButton(info)
@@ -1401,7 +1648,7 @@ UIDropDownMenu_Initialize(
                         factionDropdown
                     )
 
-                    RefreshWandList()
+                    RefreshWandList(true)
                 end
 
             UIDropDownMenu_AddButton(info)
@@ -1443,7 +1690,7 @@ UIDropDownMenu_Initialize(
                         levelDropdown
                     )
 
-                    RefreshWandList()
+                    RefreshWandList(true)
                 end
 
             UIDropDownMenu_AddButton(info)
@@ -1603,6 +1850,50 @@ scrollChild:SetHeight(1)
 scrollFrame:SetScrollChild(
     scrollChild
 )
+
+--------------------------------------------------
+-- Scroll Region Refresh
+--------------------------------------------------
+
+local function RefreshScrollRegion(resetScroll)
+    local scroll = 0
+
+    if scrollFrame.GetVerticalScroll then
+        scroll =
+            scrollFrame:GetVerticalScroll()
+            or 0
+    end
+
+    if resetScroll then
+        scroll = 0
+    end
+
+    if scrollFrame.UpdateScrollChildRect then
+        scrollFrame:UpdateScrollChildRect()
+    end
+
+    if scrollFrame.SetVerticalScroll then
+        local maxScroll = scroll
+
+        if scrollFrame.GetVerticalScrollRange then
+            maxScroll =
+                scrollFrame:GetVerticalScrollRange()
+                or 0
+        end
+
+        if scroll > maxScroll then
+            scroll = maxScroll
+        end
+
+        if scroll < 0 then
+            scroll = 0
+        end
+
+        scrollFrame:SetVerticalScroll(
+            scroll
+        )
+    end
+end
 
 --------------------------------------------------
 -- Create Item Row
@@ -1863,33 +2154,6 @@ local function CreateItemRow()
         instanceText
 
     --------------------------------------------------
-    -- Details Indicator
-    --------------------------------------------------
-
-    local detailsText =
-        row:CreateFontString(
-            nil,
-            "OVERLAY",
-            "GameFontNormal"
-        )
-
-    detailsText:SetText(
-        "|cffffd100*|r"
-    )
-
-    detailsText:SetPoint(
-        "LEFT",
-        row,
-        "LEFT",
-        DETAILS_MARKER_X,
-        DETAILS_MARKER_Y
-    )
-
-    detailsText:Hide()
-
-    row.detailsText = detailsText
-
-    --------------------------------------------------
     -- DPS
     --------------------------------------------------
 
@@ -1991,11 +2255,15 @@ end
 
 local function ApplyRowState(
     row,
+    itemID,
     item,
     wand
 )
     local usable =
-        IsUsable(item)
+        IsUsable(
+            itemID,
+            item
+        )
 
     row.requiredLevelText:SetTextColor(
         0.85,
@@ -2098,10 +2366,18 @@ local function RefreshItemRow(
         )
     )
 
-    row.requiredLevelText:SetText(
-        tostring(
-            item.requiredLevel
+    local requiredLevel =
+        GetEffectiveRequiredLevel(
+            itemID,
+            item
         )
+
+    row.requiredLevelText:SetText(
+        requiredLevel
+        and tostring(
+            requiredLevel
+        )
+        or "-"
     )
 
     row.recommendedText:SetText(
@@ -2237,20 +2513,9 @@ local function RefreshItemRow(
         row.instanceText:Hide()
     end
 
-    --------------------------------------------------
-    -- Details Indicator
-    --------------------------------------------------
-
-    if AnySourceHasDetails(
-        matchingSources
-    ) then
-        row.detailsText:Show()
-    else
-        row.detailsText:Hide()
-    end
-
     ApplyRowState(
         row,
+        itemID,
         item,
         wand
     )
@@ -2261,36 +2526,150 @@ end
 --------------------------------------------------
 -- Sorting
 --------------------------------------------------
+-- Normal entries are ordered by required level,
+-- recommended range, DPS, and then name. Challenge-only
+-- entries remain after the normal progression list.
+
+local function GetRequiredSortLevel(itemID)
+    local item =
+        PC.Data.Items[itemID]
+
+    local requiredLevel =
+        GetEffectiveRequiredLevel(
+            itemID,
+            item
+        )
+
+    if requiredLevel then
+        return requiredLevel
+    end
+
+    return 0
+end
+
+local function GetRecommendedSortLevel(itemID)
+    local wand =
+        PC.Data.Wands[itemID]
+
+    if wand
+    and wand.recommended
+    and wand.recommendedLevel
+    and wand.recommendedLevel.min then
+        return
+            wand.recommendedLevel.min
+    end
+
+    return nil
+end
 
 local function SortWands(
     firstID,
     secondID
 )
-    local first =
+    local firstItem =
+        PC.Data.Items[firstID]
+
+    local secondItem =
+        PC.Data.Items[secondID]
+
+    local firstWand =
         PC.Data.Wands[firstID]
 
-    local second =
+    local secondWand =
         PC.Data.Wands[secondID]
 
-    local firstOrder =
-        first.order or 9999
+    local firstChallengeOnly =
+        firstWand
+        and firstWand.challengeOnly
+        and true
+        or false
 
-    local secondOrder =
-        second.order or 9999
+    local secondChallengeOnly =
+        secondWand
+        and secondWand.challengeOnly
+        and true
+        or false
 
-    if firstOrder == secondOrder then
-        return firstID < secondID
+    if firstChallengeOnly ~= secondChallengeOnly then
+        return not firstChallengeOnly
     end
 
-    return firstOrder < secondOrder
-end
+    local firstRequiredLevel =
+        GetRequiredSortLevel(
+            firstID
+        )
 
+    local secondRequiredLevel =
+        GetRequiredSortLevel(
+            secondID
+        )
+
+    if firstRequiredLevel ~= secondRequiredLevel then
+        return firstRequiredLevel < secondRequiredLevel
+    end
+
+    local firstRecommendedLevel =
+        GetRecommendedSortLevel(
+            firstID
+        )
+
+    local secondRecommendedLevel =
+        GetRecommendedSortLevel(
+            secondID
+        )
+
+    if firstRecommendedLevel ~= secondRecommendedLevel then
+        if not firstRecommendedLevel then
+            return false
+        end
+
+        if not secondRecommendedLevel then
+            return true
+        end
+
+        return firstRecommendedLevel < secondRecommendedLevel
+    end
+
+    local firstDPS =
+        GetItemDPS(firstItem)
+
+    local secondDPS =
+        GetItemDPS(secondItem)
+
+    if firstDPS ~= secondDPS then
+        return firstDPS < secondDPS
+    end
+
+    local firstName =
+        firstItem
+        and firstItem.name
+        or tostring(firstID)
+
+    local secondName =
+        secondItem
+        and secondItem.name
+        or tostring(secondID)
+
+    firstName = string.lower(
+        tostring(firstName)
+    )
+
+    secondName = string.lower(
+        tostring(secondName)
+    )
+
+    if firstName ~= secondName then
+        return firstName < secondName
+    end
+
+    return firstID < secondID
+end
 --------------------------------------------------
 -- Refresh List
 --------------------------------------------------
 
 RefreshWandList =
-    function()
+    function(resetScroll)
         UpdatePlayerContext()
 
         --------------------------------------------------
@@ -2406,6 +2785,10 @@ RefreshWandList =
         end
 
         scrollChild:SetHeight(height)
+
+        RefreshScrollRegion(
+            resetScroll
+        )
     end
 
 --------------------------------------------------
@@ -2456,6 +2839,6 @@ eventFrame:SetScript(
 mainFrame:SetScript(
     "OnShow",
     function()
-        RefreshWandList()
+        RefreshWandList(true)
     end
 )

@@ -3,7 +3,7 @@
 -- Vanilla 1.12 compatible
 --
 -- Provides a lightweight, pfQuest-independent way to open the world map
--- and highlight a quest start/end location with a pulsing marker.
+-- and highlight quest or drop locations with pulsing markers.
 
 local PC = PriestCompanion
 
@@ -28,6 +28,9 @@ local END_ICON =
 local UNKNOWN_ICON =
     "Interface\\Icons\\INV_Misc_QuestionMark"
 
+local DROP_ICON =
+    "Interface\\TargetingFrame\\UI-TargetingFrame-Skull"
+
 --------------------------------------------------
 -- Instance Map Metadata
 --------------------------------------------------
@@ -49,7 +52,7 @@ local UNKNOWN_ICON =
 -- Runtime State
 --------------------------------------------------
 
-local marker = nil
+local markers = {}
 local zoneCache = nil
 
 --------------------------------------------------
@@ -283,7 +286,10 @@ local function ResolveInstanceWorldMap(location)
 
     return {
         continent = worldMap.mapID,
-        zone = worldMap.zoneID or 1,
+        zone =
+            location.instanceZoneID
+            or worldMap.zoneID
+            or 1,
         zoneName =
             instance.name
             or location.zone,
@@ -294,6 +300,101 @@ local function ResolveInstanceWorldMap(location)
         isInstanceMap = true,
         fallbackUsed = false
     }
+end
+
+-- SetMapZoom has no useful success return. Confirm the selected indices
+-- before placing a pin; an unsupported target can leave the old map open.
+local function OpenResolvedMap(resolved)
+    if not resolved
+    or not WorldMapFrame
+    or type(SetMapZoom) ~= "function"
+    or type(GetCurrentMapContinent) ~= "function"
+    or type(GetCurrentMapZone) ~= "function" then
+        return false
+    end
+
+    if not WorldMapFrame:IsShown() then
+        WorldMapFrame:Show()
+    end
+
+    local success = pcall(
+        SetMapZoom,
+        resolved.continent,
+        resolved.zone
+    )
+
+    return success
+        and GetCurrentMapContinent() == resolved.continent
+        and GetCurrentMapZone() == resolved.zone
+end
+
+local function HasCoordinates(location)
+    return type(location.x) == "number"
+        and type(location.y) == "number"
+        and location.x >= 0 and location.x <= 100
+        and location.y >= 0 and location.y <= 100
+        and not (location.x == 0 and location.y == 0)
+end
+
+--------------------------------------------------
+-- Instance Map Only
+--------------------------------------------------
+--
+-- Opens an internal dungeon/raid map without placing
+-- a marker. This is useful when a source represents
+-- many creatures spread throughout an instance.
+
+function Map.ShowInstanceMap(
+    instanceID,
+    instanceZoneID,
+    label
+)
+    if not instanceID then
+        return false
+    end
+
+    if not WorldMapFrame
+    or type(SetMapZoom) ~= "function" then
+        Print(
+            "World map API is not available."
+        )
+
+        return false
+    end
+
+    local resolved =
+        ResolveInstanceWorldMap({
+            instanceID = instanceID,
+            instanceZoneID = instanceZoneID
+        })
+
+    Map.HideMarker()
+
+    if resolved and OpenResolvedMap(resolved) then
+        return true
+    end
+
+    local instance = PC.Data and PC.Data.Instances
+        and PC.Data.Instances[instanceID]
+
+    if instance and instance.entrance then
+        local entrance = {}
+        local key, value
+        for key, value in pairs(instance.entrance) do
+            entrance[key] = value
+        end
+        entrance.fallbackUsed = true
+        return Map.ShowLocation(
+            entrance,
+            "drop",
+            entrance.label or
+                ((instance.name or "Instance") .. " entrance")
+        )
+    end
+
+    Print("Map location is not available for " ..
+        tostring(label or "this instance") .. ".")
+    return false
 end
 
 --------------------------------------------------
@@ -309,22 +410,36 @@ local function GetMarkerIcon(markerType)
         return START_ICON
     end
 
+    if markerType == "drop" then
+        return DROP_ICON
+    end
+
+    if markerType == "vendor" then
+        return "Interface\\Icons\\INV_Misc_Coin_01"
+    end
+
     return UNKNOWN_ICON
 end
 
 local function CreateMarker()
-    if marker then
-        return marker
-    end
-
     if not WorldMapButton then
         return nil
     end
 
-    marker =
+    local i
+
+    for i = 1,
+        table.getn(markers)
+    do
+        if not markers[i]:IsShown() then
+            return markers[i]
+        end
+    end
+
+    local marker =
         CreateFrame(
             "Button",
-            "PriestCompanionWorldMapMarker",
+            nil,
             WorldMapButton
         )
 
@@ -530,6 +645,11 @@ local function CreateMarker()
 
     marker:Hide()
 
+    table.insert(
+        markers,
+        marker
+    )
+
     return marker
 end
 
@@ -538,8 +658,12 @@ end
 --------------------------------------------------
 
 function Map.HideMarker()
-    if marker then
-        marker:Hide()
+    local i
+
+    for i = 1,
+        table.getn(markers)
+    do
+        markers[i]:Hide()
     end
 end
 
@@ -549,16 +673,14 @@ end
 
 local function GetInstanceEntranceFallback(location)
     if not location
-    or not location.instanceID
     or not PC.Data
     or not PC.Data.Instances then
         return nil
     end
 
-    local instance =
-        PC.Data.Instances[
-            location.instanceID
-        ]
+    local instanceID = location.instanceID
+        or FindInstanceIDByZoneName(location.zone)
+    local instance = instanceID and PC.Data.Instances[instanceID]
 
     if not instance
     or not instance.entrance then
@@ -659,10 +781,15 @@ end
 function Map.ShowLocation(
     location,
     markerType,
-    label
+    label,
+    appendMarkers
 )
     if not location then
         return false
+    end
+
+    if not appendMarkers then
+        Map.HideMarker()
     end
 
     if not WorldMapFrame
@@ -694,29 +821,26 @@ function Map.ShowLocation(
         return false
     end
 
-    if not resolved.x
-    or not resolved.y then
-        Print(
-            "Coordinates are not available for " ..
-            tostring(
-                label or
-                resolved.label or
-                "this NPC"
-            ) ..
-            "."
-        )
+    local hasCoordinates = HasCoordinates(resolved)
 
-        return false
+    if OpenResolvedMap(resolved) then
+        if not hasCoordinates then
+            return true
+        end
+    else
+        -- Resolution alone is insufficient: the client can reject the indices.
+        local fallbackLocation = location.fallback
+            or GetInstanceEntranceFallback(location)
+        local fallback = fallbackLocation and ResolveLocation(fallbackLocation)
+        if not fallback or not HasCoordinates(fallback)
+        or not OpenResolvedMap(fallback) then
+            Print("Could not open a map location for " ..
+                tostring(label or location.label or "this NPC") .. ".")
+            return false
+        end
+        resolved = fallback
+        resolved.fallbackUsed = true
     end
-
-    if not WorldMapFrame:IsShown() then
-        WorldMapFrame:Show()
-    end
-
-    SetMapZoom(
-        resolved.continent,
-        resolved.zone
-    )
 
     local pin =
         CreateMarker()
@@ -737,13 +861,14 @@ function Map.ShowLocation(
     pin.x = resolved.x
     pin.y = resolved.y
 
-    pin.label =
-        label or
-        resolved.label or
-        "Location"
+    local fallbackUsed = resolved.fallbackUsed or location.fallbackUsed
+    if fallbackUsed then
+        pin.label = resolved.label or "Instance entrance (fallback)"
+    else
+        pin.label = label or resolved.label or "Location"
+    end
 
-    pin.fallbackUsed =
-        resolved.fallbackUsed
+    pin.fallbackUsed = fallbackUsed
 
     pin.elapsed = 0
     pin.mapCheckElapsed = 0
@@ -772,6 +897,16 @@ function Map.ShowNPC(
         return false
     end
 
+    -- One tip per NPC navigation, shared by drop and quest buttons.
+    -- Keep existing map.message records working; npc.message takes priority.
+    local message = npc.message
+    if message == nil and npc.map then
+        message = npc.map.message
+    end
+    if type(message) == "string" and string.find(message, "%S") then
+        Print(message)
+    end
+
     local label =
         tostring(
             npc.name or
@@ -787,13 +922,39 @@ function Map.ShowNPC(
             )
     end
 
-    if npc.map then
-        return
-            Map.ShowLocation(
-                npc.map,
+    if npc.locations
+    and table.getn(npc.locations) > 0 then
+        local shown = false
+        local i
+
+        Map.HideMarker()
+
+        for i = 1,
+            table.getn(npc.locations)
+        do
+            if Map.ShowLocation(
+                npc.locations[i],
                 markerType,
-                label
-            )
+                label,
+                true
+            ) then
+                shown = true
+            end
+        end
+
+        if shown then
+            return true
+        end
+    end
+
+    if npc.map then
+        if Map.ShowLocation(
+            npc.map,
+            markerType,
+            label
+        ) then
+            return true
+        end
     end
 
     --------------------------------------------------

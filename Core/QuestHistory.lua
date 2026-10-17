@@ -525,6 +525,24 @@ end
 -- Quest State
 --------------------------------------------------
 
+-- Explicit exclusions only: sharing a reward does not imply exclusivity.
+function QuestHistory.GetBlockingQuest(questID)
+    local quest = PC.Data and PC.Data.Quests
+        and PC.Data.Quests[tonumber(questID)]
+    local alternatives = quest and quest.exclusiveWith
+
+    if alternatives then
+        local i
+        for i = 1, table.getn(alternatives) do
+            if QuestHistory.IsCompleted(alternatives[i]) then
+                return alternatives[i]
+            end
+        end
+    end
+
+    return nil
+end
+
 function QuestHistory.GetStatus(
     questID,
     questName
@@ -546,6 +564,11 @@ function QuestHistory.GetStatus(
         questID
     ) then
         return "completed"
+    end
+
+    local blockingQuestID = QuestHistory.GetBlockingQuest(questID)
+    if blockingQuestID then
+        return "blocked", blockingQuestID
     end
 
     return "unknown"

@@ -942,6 +942,14 @@ local function BuildQuest(
             "warn"
         )
 
+    elseif questStatus == "blocked" then
+        AddRow(
+            "Interface\\GossipFrame\\AvailableQuestIcon",
+            "Quest Status",
+            "Unavailable (alternative completed)",
+            "bad"
+        )
+
     else
         AddRow(
             "Interface\\GossipFrame\\AvailableQuestIcon",
@@ -1032,6 +1040,11 @@ end
 -- Drop Tooltip
 --------------------------------------------------
 
+local function GetDropperIcon(source)
+    return
+        "Interface\\TargetingFrame\\UI-TargetingFrame-Skull"
+end
+
 local function BuildDrop(
     itemID,
     source
@@ -1039,13 +1052,13 @@ local function BuildDrop(
     title:SetText("Drop")
 
     AddRow(
-        "Interface\\Icons\\INV_Misc_Bag_10",
+        GetDropperIcon(source),
+        "Dropped by",
         source.npcName
         or (
             "NPC " ..
             tostring(source.npcID or "?")
         ),
-        source.npcType or "",
         "neutral"
     )
 
@@ -1066,7 +1079,7 @@ local function BuildDrop(
             "Interface\\Icons\\INV_Misc_Bag_10",
             "Drop Chance",
             string.format(
-                "%.2f%%",
+                "%.4f%%",
                 source.dropChance
             ),
             "neutral"

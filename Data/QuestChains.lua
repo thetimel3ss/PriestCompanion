@@ -17,15 +17,453 @@ local QuestChains =
 -- Gravestone Scepter - Alliance
 --------------------------------------------------
 
-QuestChains[
-    "gravestone_scepter_alliance"
-] = {
+QuestChains["gravestone_scepter_alliance"] = {
     name = "Blackfathom Villainy",
-
     rewardQuestID = 1200,
-
     steps = {
         1198,
         1200
     }
 }
+
+--------------------------------------------------
+-- Flaring Baton
+--------------------------------------------------
+
+QuestChains["flaring_baton"] = {
+    name = "The Escape",
+    rewardQuestID = 863,
+    steps = {
+        858,
+        863
+    }
+}
+
+--------------------------------------------------
+-- Spark of the People's Militia
+--------------------------------------------------
+
+QuestChains["peoples_militia"] = {
+    name = "The People's Militia",
+    rewardQuestID = 14,
+    steps = {
+        12,
+        13,
+        14
+    }
+}
+
+--------------------------------------------------
+-- Moonstone Wand
+--------------------------------------------------
+
+QuestChains["blackwood_corrupted"] = {
+    name = "Darkshore Furbolg Investigation",
+    rewardQuestID = 4763,
+    steps = {
+        984,
+        4761,
+        4762,
+        4763
+    }
+}
+
+--------------------------------------------------
+-- Sable Wand
+--------------------------------------------------
+
+QuestChains["sable_wand"] = {
+    name = "Gnomeregan Underground Assault",
+    rewardQuestID = 2040,
+    steps = {
+        2041,
+        2040
+    }
+}
+
+--------------------------------------------------
+-- Excavation Rod
+--------------------------------------------------
+
+QuestChains["excavation_rod"] = {
+    name = "Ormer's Revenge",
+    rewardQuestID = 296,
+    steps = {
+        294,
+        295,
+        296
+    }
+}
+
+--------------------------------------------------
+-- Consecrated Wand
+--------------------------------------------------
+
+QuestChains["consecrated_wand"] = {
+    name = "Worgen in the Woods",
+    rewardQuestID = 223,
+    steps = {
+        173,
+        221,
+        222,
+        223
+    }
+}
+
+--------------------------------------------------
+-- Moonbeam Wand
+--------------------------------------------------
+
+QuestChains["moonbeam_wand"] = {
+    name = "The Howling Vale",
+    rewardQuestID = 1044,
+    steps = {
+        1022,
+        1037,
+        1038,
+        1039,
+        1040,
+        1041,
+        1042,
+        1043,
+        1044
+    }
+}
+
+--------------------------------------------------
+-- Burning Sliver
+--------------------------------------------------
+
+QuestChains["burning_sliver"] = {
+    name = "Crushridge Bounty",
+    rewardQuestID = 504,
+    steps = {
+        500,
+        504
+    }
+}
+
+--------------------------------------------------
+-- Gnomish Zapper
+--------------------------------------------------
+
+QuestChains["gnomish_zapper"] = {
+    name = "Sunken Treasure",
+    rewardQuestID = 666,
+
+    -- The wand is rewarded by the second quest. Later
+    -- Sunken Treasure follow-ups are not prerequisites
+    -- for obtaining it and are intentionally omitted.
+    steps = {
+        665,
+        666
+    }
+}
+
+--------------------------------------------------
+-- Charged Lightning Rod
+--------------------------------------------------
+
+QuestChains["charged_lightning_rod"] = {
+    name = "Caught!",
+    rewardQuestID = 4450,
+    steps = {
+        4449,
+        4450
+    }
+}
+
+--------------------------------------------------
+-- Cairnstone Sliver
+--------------------------------------------------
+
+QuestChains["cairnstone_sliver"] = {
+    name = "In Search of Knowledge",
+    rewardQuestID = 2942,
+    steps = {
+        2939,
+        2940,
+        2941,
+        2944,
+        2943,
+        2879,
+        2942
+    }
+}
+
+--------------------------------------------------
+-- Smokey's Fireshooter
+--------------------------------------------------
+
+QuestChains["smokeys_fireshooter"] = {
+    name = "That's Asking A Lot",
+    rewardQuestID = 6041,
+    steps = {
+        6026,
+        6041
+    }
+}
+
+--------------------------------------------------
+-- Branding Rod
+--------------------------------------------------
+
+QuestChains["branding_rod"] = {
+    name = "Sergra Darkthorn",
+    rewardQuestID = 873,
+    steps = {
+        860,
+        844,
+        845,
+        903,
+        881,
+        905,
+        3261,
+        882,
+        907,
+        913,
+        874,
+        873
+    }
+}
+
+--------------------------------------------------
+-- Dancing Flame
+--------------------------------------------------
+
+QuestChains["dancing_flame"] = {
+    name = "Test of Faith",
+    rewardQuestID = 1394,
+    steps = {
+        1149,
+        1150,
+        1151,
+        1152,
+        1154,
+        6627,
+        1159,
+        1160,
+        6628,
+        1394
+    }
+}
+
+--------------------------------------------------
+-- Eyepoker
+--------------------------------------------------
+
+QuestChains["eyepoker"] = {
+    name = "Lieutenant Paval Reethe",
+    rewardQuestID = 1273,
+    steps = {
+        1269,
+        1273
+    }
+}
+
+--------------------------------------------------
+-- Fizzle's Zippy Lighter
+--------------------------------------------------
+
+QuestChains["fizzles_zippy_lighter"] = { 
+    name = "News for Fizzle", 
+    rewardQuestID = 1137, 
+    steps = { 
+        1104, 
+        1106, 
+        1108, 
+        1137 
+    } 
+}
+
+QuestChains["chillnail_splinter"] = { 
+    name = "Challenge Overlord Mok'Morokk", 
+    rewardQuestID = 1173, 
+    steps = { 
+        1169, 
+        1170, 
+        1171, 
+        1172, 
+        1173 
+    } 
+}
+
+QuestChains["mages_wand"] = { 
+    name = "Mage's Wand", 
+    rewardQuestID = 1952, 
+    steps = { 
+        1947, 
+        1949, 
+        1950, 
+        1951, 
+        1948, 
+        1952 
+    } 
+}
+
+QuestChains["dwarven_firestick"] = { 
+    name = "Gathering Idols", 
+    rewardQuestID = 297, 
+    steps = { 
+        436, 
+        297 
+    } 
+}
+
+QuestChains["rod_of_permafrost"] = { 
+    name = "Warm is the Day", 
+    rewardQuestID = 41360, 
+    steps = { 
+        41353, 
+        41354, 
+        41355, 
+        41356, 
+        41357, 
+        41358, 
+        41359, 
+        41360 
+    } 
+}
+
+QuestChains["lady_winter_touch"] = { 
+    name = "Artifact of the Dark Lady", 
+    rewardQuestID = 41841, 
+    steps = { 
+        544, 
+        41841 
+    } 
+}
+
+QuestChains["stingshot_wand"] = { 
+    name = "Arikara", 
+    rewardQuestID = 5088, 
+    steps = { 
+        4821, 
+        4865, 
+        5062, 
+        5088 
+    } 
+}
+
+QuestChains["crackling_zapper"] = { 
+    name = "Backup Capacitor", 
+    rewardQuestID = 55006, 
+    steps = { 
+        55003, 
+        55006 
+    } 
+}
+
+QuestChains["goblin_igniter"] = { 
+    name = "Venture Company Mining", 
+    rewardQuestID = 600, 
+    steps = { 
+        605, 
+        600 
+    } 
+}
+
+QuestChains["webwood_branch"] = { 
+    name = "Githyiss the Vile", 
+    rewardQuestID = 60110, 
+    steps = { 
+        4495, 
+        3519, 
+        3521, 
+        3522, 
+        60110 
+    } 
+}
+
+QuestChains["bhartecs_lost_wand"] = { 
+    name = "Fallen Adventurers", 
+    rewardQuestID = 60112, 
+    steps = { 
+        376, 
+        60112 
+    } 
+}
+
+QuestChains["stormrager_horde"] = { 
+    name = "The Scarlet Oracle, Demetria", 
+    rewardQuestID = 6148, 
+    steps = { 
+        6133, 
+        6135, 
+        6144, 
+        6145, 
+        6146, 
+        6147, 
+        6148 
+    } 
+}
+
+QuestChains["stormrager_alliance"] = { 
+    name = "Order Must Be Restored", 
+    rewardQuestID = 6187, 
+    steps = { 
+        6182, 
+        6183, 
+        6184, 
+        6185, 
+        6186, 
+        6187 
+    } 
+}
+
+QuestChains["diathorus_claw"] = { 
+    name = "The Seeker's Demise", 
+    rewardQuestID = 70033, 
+    steps = { 
+        70020, 
+        70021, 
+        70022, 
+        70023, 
+        70024, 
+        70025, 
+        70026, 
+        70027, 
+        70028, 
+        70029, 
+        70030, 
+        70031, 
+        70032, 
+        70033 
+    } 
+}
+
+QuestChains["woestave"] = { 
+    name = "Blood of Morphaz", 
+    rewardQuestID = 8257, 
+    steps = { 
+        8254, 
+        8255, 
+        8256, 
+        8257 
+    } 
+}
+
+QuestChains["elven_wand"] = { 
+    name = "Bashal'Aran", 
+    rewardQuestID = 957, 
+    steps = { 
+        954, 
+        955, 
+        956, 
+        957 
+    } 
+}
+
+QuestChains[
+    "cinder_wand"
+    ] = { 
+        name = "Arugal's Folly", 
+        rewardQuestID = 99, 
+        steps = { 
+            421, 
+            422, 
+            423, 
+            424, 
+            99 
+        } 
+    }

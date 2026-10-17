@@ -143,3 +143,141 @@ table.insert(
     UISpecialFrames,
     "PriestCompanionMainFrame"
 )
+
+
+--------------------------------------------------
+-- Main Navigation
+--------------------------------------------------
+
+-- The tabs belong to the main frame; content panels are created by
+-- their own files later in the TOC load order.
+PC.UI.ActiveTab = "wands"
+
+local tabButtons = {}
+
+local function CreateTab(id, label, x, width)
+    local button = CreateFrame(
+        "Button",
+        nil,
+        frame,
+        "UIPanelButtonTemplate"
+    )
+
+    button:SetWidth(width)
+    button:SetHeight(22)
+    button:SetPoint(
+        "TOPLEFT",
+        frame,
+        "TOPLEFT",
+        x,
+        -31
+    )
+    button:SetText(label)
+
+    button:SetScript(
+        "OnClick",
+        function()
+            PC.UI.SelectTab(id)
+        end
+    )
+
+    tabButtons[id] = button
+end
+
+CreateTab("wands", "Wands", 29, 104)
+CreateTab("environment", "Environment", 138, 122)
+
+--------------------------------------------------
+-- Tab Selection
+--------------------------------------------------
+
+function PC.UI.SelectTab(id, resetScroll)
+    if id ~= "environment" then
+        id = "wands"
+    end
+
+    PC.UI.ActiveTab = id
+
+    -- The item details are a sub-view of Wand Progression.
+    -- Switching top-level tabs closes that sub-view first.
+    if PC.UI.SourceDetails
+    and type(PC.UI.SourceDetails.Hide) == "function" then
+        PC.UI.SourceDetails.Hide()
+    end
+
+    if PC.UI.SourceTooltip
+    and type(PC.UI.SourceTooltip.Hide) == "function" then
+        PC.UI.SourceTooltip.Hide()
+    end
+
+    if GameTooltip then
+        GameTooltip:Hide()
+    end
+
+    local wandPanel = PC.UI.WandPanel
+    local environmentPanel = PC.UI.EnvironmentPanel
+
+    if id == "environment" then
+        if wandPanel then
+            wandPanel:Hide()
+        end
+
+        if environmentPanel then
+            environmentPanel:Show()
+
+            if type(environmentPanel.Refresh) == "function" then
+                environmentPanel.Refresh()
+            end
+        end
+    else
+        if environmentPanel then
+            environmentPanel:Hide()
+        end
+
+        if wandPanel then
+            wandPanel:Show()
+
+            if type(wandPanel.Refresh) == "function" then
+                wandPanel.Refresh(resetScroll)
+            end
+        end
+    end
+
+    local tabID
+    local button
+
+    for tabID, button in pairs(tabButtons) do
+        if tabID == id then
+            button:SetAlpha(1)
+
+            if button.LockHighlight then
+                button:LockHighlight()
+            end
+        else
+            button:SetAlpha(0.70)
+
+            if button.UnlockHighlight then
+                button:UnlockHighlight()
+            end
+        end
+    end
+end
+
+function PC.UI.OpenTab(id)
+    if frame:IsShown() then
+        PC.UI.SelectTab(id)
+    else
+        PC.UI.ActiveTab = id
+        frame:Show()
+    end
+end
+
+frame:SetScript(
+    "OnShow",
+    function()
+        PC.UI.SelectTab(
+            PC.UI.ActiveTab,
+            true
+        )
+    end
+)

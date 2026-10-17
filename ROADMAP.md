@@ -2,129 +2,128 @@
 
 The roadmap tracks outstanding improvements and ongoing verification. Released functionality belongs in [CHANGELOG.md](CHANGELOG.md), not here.
 
-**Review date:** 2026-10-16  
+**Review date:** 2026-10-17  
 **Development branch:** `feature/wand-progression-clean`  
-**Current release:** `0.1.1`
+**Current release:** `0.1.2`
 
 ## Current scope and confirmed decisions
 
 - **Wand Progression database: complete for the current OctoWoW database.** `Data/Wands.lua` exposes 146 wands, each with an item entry and at least one acquisition source. The deliberately excluded Grungy Firestick (61374) remains for reference in Items/Sources only. Later server additions or corrections are normal maintenance, not an unfinished database.
 - **Custom world maps, dungeon maps, and configured floors:** the maintainer has validated the maps and floors currently configured in game. New map metadata, floor alignment changes, and newly entered NPC coordinates still merit in-game checks.
-- **Changes after 2026-10-13:** the maintainer tested the subsequent modifications individually in game. Earlier Lua 5.0.3/mock-API tests are historical context, not a substitute for later live tests.
-- **Aggregate drops:** intentionally use `npcName = "Multiple creatures"` when many creatures can drop an item; enumerating individual NPCs is not required. For a drop with a configured `instanceID`, show the instance without a fabricated individual NPC pin. For drop records without an instance or NPC, show acquisition details without suggesting a precise location.
+- **Changes after 2026-10-13:** the maintainer validated previous changes individually in game. The latest 2026-10-17 data commit was reviewed statically; that review is not a substitute for confirming new coordinates and map behavior in the client. Earlier Lua 5.0.3/mock-API tests remain historical context.
+- **Aggregate drops:** all 28 `npcName = "Multiple creatures"` entries now include the maintainer's acquisition note: 21 world-drop-style records without a fixed NPC/instance and seven multi-mob instance drops. No fake pin should be added. The former aggregate NPC IDs 15319/91910 and the misleading `mobCount = 1` on item 80799 have been removed.
 - **Loot table presentation:** Incindis (52145), Sulfuron Harbinger (12098), Lucifron (12118), and Shazzrah (12264) keep loot data but intentionally hide the full table in Source Details.
 
 ## Open technical limitations and maintenance
 
 ### Mapping and NPC locations
-
-- Five records lack `map` and `locations` entirely; seven contain placeholder coordinates `(0, 0)`. These are not necessarily defects: moving spawns, unavailable dungeon boss overlays, and map-only navigation can make the lack of a pin intentional.
-- The mapping layer relies on matching names or registered `instanceID`/`worldMap` metadata, and cannot infer every custom zone or floor. The current configured custom maps and floors have been **validated by the maintainer in game**. Continue verifying **new or changed** NPC coordinates and floor relationships rather than treating previously validated maps as untested.
-- One instance has no `worldMap` record: Ragefire Chasm (389). Confirm whether adding native map metadata is useful and supported by the client before changing it.
-- A vendor's Show on Map button still requires a centralized NPC entry. The name, price, and note can be shown without one.
+- All **31 registered instances** now have `worldMap` metadata. Ragefire Chasm (389) was completed with `mapID = 4`, `zoneID = 1`.
+- One NPC (Risen Oilblaze, 80116) has neither `map` nor `locations`; its exact location/existence remains unconfirmed. Six other NPCs retain `(0, 0)` placeholders; some are intentional because exact positions cannot be trusted or spawns are variable.
+- Rigger Gizelton (11626), Taragaman the Hungerer (11520), and Lady Falther'ess (14686) received locations/corrections. Noxxion's Spawn (13456) and Harbinger Aph'ygth (65114) were intentionally removed as unused/redundant.
+- Configured custom map identifiers and floors were validated by the maintainer in game. The resolver still requires known `worldMap` indices or resolvable names. **New or modified** maps and NPC pins need targeted game verification; an unknown exact coordinate should use a map-only view.
+- Vendor Show on Map still requires a centralized NPC record. Names, prices, and notes can be shown without it.
 
 ### Source Details presentation
 
 - When multiple acquisition records have different types, Source Details displays the selected type rather than all types at once. For crafting, it presents the primary matching craft record; quests, drops, and vendors already support multiple entries.
 - Large boss loot tables are intentionally omitted for selected sources to avoid visual clutter and performance issues; records retained in `Data/BossLoot.lua` do not imply that the UI must render them.
 
-### Optional ClassicAPI integration
-
-- WoW determines the TOC at addon load time; **detecting ClassicAPI from Lua does not automatically switch between** `PriestCompanion.toc` and `PriestCompanion_ClassicAPI.toc`. A loader, packaging step, or installation choice must select the right manifest.
-- `Core/Capabilities.lua` can recognize a ClassicAPI runtime, but only the ClassicAPI TOC loads `Core/ClassicAPI.lua` and enables `PC.Environment.classicAPI`. `Core/QuestHistory.lua` currently registers `QUEST_TURNED_IN` only when that environment flag is true. Consequently, the standard TOC plus a detected ClassicAPI runtime does not necessarily enable the same overrides or live turn-in tracking.
-- **Priority 1 investigation:** decide how to select the TOC flavor at installation and whether live event support can be safely probed at runtime. Checking for a specific callable API is reasonable; detecting an event reliably is different from detecting a function. Registering an event does not by itself prove that a given client will deliver it. Preserve server and pfQuest quest-history fallbacks.
+### Optional ClassicAPI integration — Priority 1 technical review (2026-10-17)
+- **Manifest selection:** the client selects the addon's TOC **before Lua runs**. Detecting `CLASSIC_API_VERSION` in Lua cannot automatically load `PriestCompanion_ClassicAPI.toc`. Installation/packaging must explicitly select which TOC the game sees as the addon manifest, or the loader architecture must be redesigned to avoid a separate flavor.
+- **Split detection:** `Core/Capabilities.lua` sets `PC.Capabilities.classicAPI` if the ClassicAPI environment flag or `CLASSIC_API_VERSION` is present. However, `Core/ClassicAPI.lua` (included **only** by the specialized TOC) sets `PC.Environment.classicAPI = true` without guarding against absent ClassicAPI. The two booleans therefore represent different things and can disagree.
+- **Quest completion event:** `Core/QuestHistory.lua` registers `QUEST_TURNED_IN` based only on `PC.Environment.classicAPI`. The external ClassicAPI implementation includes `QUEST_TURNED_IN(questID, xpReward, moneyReward)`, backed by a quest-completion packet hook; the Priest Companion correctly reads the quest ID from `arg1`. The **registration condition**, rather than the event handler's argument, needs revision.
+- **Fallbacks:** the direct server `.queststatus`/`TWQUEST` provider, local SavedVariables, pfQuest import, and positive API completion checks must stay functional even when ClassicAPI is absent. The server query currently uses the `GUILD` chat channel; validate its behavior without guild membership and on non-Octo servers. A missing reply leaves progress as unknown rather than proof of non-completion.
+- **Candidate approach for Priority 1:** clearly separate `runtimeDetected`, `adapterLoaded`, and `eventSupported` capabilities. Decide whether to keep two explicit installation flavors or always load guarded ClassicAPI adapters from the standard TOC. Detect concrete APIs/functions for each feature; for backported events, gate registration by the confirmed provider/version or documented client support, with `pcall`/safe fallback where appropriate. Merely attempting `RegisterEvent` is **not** proof an event will fire.
+- **Acceptance matrix:** Vanilla-only with standard TOC; ClassicAPI available with standard TOC; ClassicAPI available with specialized TOC; specialized TOC without ClassicAPI (should safely fall back or be rejected during packaging). For each, check addon load, item names/icons/tooltips, positive quest completion lookup, `QUEST_TURNED_IN` after turn-in, and server/pfQuest history fallbacks.
+- **Status:** technical review documented; **no runtime behavior changed yet**.
 
 ### Item information
 
 - Local item records can provide names and numerical stats, while item icons and full tooltips may still require game-provided data or asynchronous item loading. This is a runtime dependency, not a missing wand record.
 
-## Data audit (2026-10-16)
+## Data audit (2026-10-17)
 
-This is a snapshot of the committed data, for verification only. It is **not** a request to populate arbitrary or fabricated coordinates.
+Snapshot of the **latest committed data**, not a request to populate guessed coordinates.
 
-### NPCs without `map` or `locations` (5)
+### NPCs without `map` or `locations` (1)
 
-| NPC ID | Name | Recorded zone |
+| NPC ID | Name | Status |
 | --- | --- | --- |
-| 11626 | Rigger Gizelton | Desolace |
-| 11520 | Taragaman the Hungerer | Ragefire Chasm |
-| 13456 | Noxxion's Spawn | Not set |
-| 65114 | Harbinger Aph'ygth | Not set |
-| 80116 | Risen Oilblaze | Not set |
+| 80116 | Risen Oilblaze | Kept intentionally; precise location and existence not yet verified |
 
-### NPCs with `x = 0, y = 0` (7)
+### NPCs with `x = 0, y = 0` (6)
 
-| NPC ID | Name | Recorded zone |
-| --- | --- | --- |
-| 1853 | Darkmaster Gandling | Scholomance |
-| 9476 | Watchman Doomgrip | Blackrock Depths |
-| 10509 | Jed Runewatcher | Blackrock Spire |
-| 14516 | Death Knight Darkreaver | Scholomance |
-| 14686 | Lady Falther'ess | Razorfen Downs |
-| 15208 | The Duke of Shards | Silithus; random summon |
-| 80945 | Elisandra Spellbinder | Dire Maul |
+| NPC ID | Name | Zone | Status |
+| --- | --- | --- | --- |
+| 1853 | Darkmaster Gandling | Scholomance | Map-only/position still needs confirmation |
+| 9476 | Watchman Doomgrip | Blackrock Depths | Exact location unknown |
+| 10509 | Jed Runewatcher | Blackrock Spire | Map-only/position still needs confirmation |
+| 14516 | Death Knight Darkreaver | Scholomance | Map-only/position still needs confirmation |
+| 15208 | The Duke of Shards | Silithus | Random summon; no fixed pin |
+| 80945 | Elisandra Spellbinder | Dire Maul | Precise coordinates unconfirmed |
 
-Coordinates `(0, 0)` mean no reliable position marker. Do not replace them with arbitrary guesses; the existing map-only fallback is intentional.
+`(0, 0)` is a placeholder, **not** a valid pin. Watchman Doomgrip (9476) and Elisandra Spellbinder (80945) specifically await reliable coordinates. The Duke of Shards (15208) is a random summon. Lady Falther'ess (14686) no longer has placeholder coordinates.
 
-### Instance missing `worldMap` (1)
+### Instances without `worldMap` (0)
 
-| Instance ID | Name | Notes |
-| --- | --- | --- |
-| 389 | Ragefire Chasm | No `worldMap` mapping; check native map support if a direct map is needed |
+All 31 instanced entries have a `worldMap`. Ragefire Chasm (389) now specifies `worldMap = { mapID = 4, zoneID = 1 }`.
 
 ### Sources registered as `Multiple creatures` (28)
 
-The **21 entries without `instanceID`** below are possible open-world/world-drop candidates, **not automatically proven world drops**. Verify their distribution against OctoWoW data before assigning a location or `sourceCategory`.
+All 28 records have `source.note`: 21 world-drop-style entries with `"World drop from multiple creatures. No fixed location."` and seven instanced aggregate drops with `"Dropped by multiple creatures in this instance."`. None needs a fabricated single NPC ID.
 
-| Item ID | Wand | Instance ID | NPC ID |
+**Without `instanceID` (21):**
+
+| Item ID | Wand | mobCount | Note |
 | --- | --- | --- | --- |
-| 5069 | Fire Wand | — | — |
-| 5071 | Shadow Wand | — | — |
-| 5207 | Opaque Wand | — | — |
-| 5212 | Blazing Wand | — | — |
-| 5213 | Scorching Wand | — | — |
-| 5214 | Wand of Eventide | — | — |
-| 5215 | Ember Wand | — | — |
-| 5216 | Umbral Wand | — | — |
-| 8184 | Firestarter | — | — |
-| 8186 | Dire Wand | — | — |
-| 12984 | Skycaller | — | — |
-| 13004 | Torch of Austen | — | — |
-| 13062 | Thunderwood | — | — |
-| 13063 | Starfaller | — | — |
-| 13064 | Jaina's Firestarter | — | — |
-| 13065 | Wand of Allistarj | — | — |
-| 15279 | Ivory Wand | — | — |
-| 15280 | Wizard's Hand | — | — |
-| 15281 | Glowstar Rod | — | — |
-| 15282 | Dragon Finger | — | — |
-| 15283 | Lunar Wand | — | — |
+| 5069 | Fire Wand | — | Confirmed acquisition note |
+| 5071 | Shadow Wand | — | Confirmed acquisition note |
+| 5207 | Opaque Wand | — | Confirmed acquisition note |
+| 5212 | Blazing Wand | — | Confirmed acquisition note |
+| 5213 | Scorching Wand | — | Confirmed acquisition note |
+| 5214 | Wand of Eventide | — | Confirmed acquisition note |
+| 5215 | Ember Wand | — | Confirmed acquisition note |
+| 5216 | Umbral Wand | — | Confirmed acquisition note |
+| 8184 | Firestarter | — | Confirmed acquisition note |
+| 8186 | Dire Wand | — | Confirmed acquisition note |
+| 12984 | Skycaller | 215 | Confirmed acquisition note |
+| 13004 | Torch of Austen | 466 | Confirmed acquisition note |
+| 13062 | Thunderwood | 426 | Confirmed acquisition note |
+| 13063 | Starfaller | 459 | Confirmed acquisition note |
+| 13064 | Jaina's Firestarter | 354 | Confirmed acquisition note |
+| 13065 | Wand of Allistarj | 560 | Confirmed acquisition note |
+| 15279 | Ivory Wand | 753 | Confirmed acquisition note |
+| 15280 | Wizard's Hand | 846 | Confirmed acquisition note |
+| 15281 | Glowstar Rod | — | Confirmed acquisition note |
+| 15282 | Dragon Finger | — | Confirmed acquisition note |
+| 15283 | Lunar Wand | 254 | Confirmed acquisition note |
 
-The **7 entries with `instanceID`** represent aggregated dungeon/raid drops; a map-only display may be preferable to a long mob list.
+**With `instanceID` (7):**
 
-| Item ID | Wand | Instance ID | NPC ID | mobCount |
+| Item ID | Wand | Instance ID | mobCount | Note |
 | --- | --- | --- | --- | --- |
-| 9381 | Earthen Rod | 70 | — | — |
-| 9489 | Gyromatic Icemaker | 721 | — | 11 |
-| 10572 | Freezing Shard | 129 | — | 14 |
-| 21801 | Antenna of Invigoration | 509 | 15319 | 21 |
-| 60805 | Clutch of the Damned | 800 | 91910 | 15 |
-| 80748 | Corrupter's Focus | 349 | — | 19 |
-| 80799 | Wand of Divine Justice | 796 | — | 1 |
+| 9381 | Earthen Rod | 70 | — | Confirmed acquisition note |
+| 9489 | Gyromatic Icemaker | 721 | 11 | Confirmed acquisition note |
+| 10572 | Freezing Shard | 129 | 14 | Confirmed acquisition note |
+| 21801 | Antenna of Invigoration | 509 | 21 | Confirmed acquisition note |
+| 60805 | Clutch of the Damned | 800 | 15 | Confirmed acquisition note |
+| 80748 | Corrupter's Focus | 349 | 19 | Confirmed acquisition note |
+| 80799 | Wand of Divine Justice | 796 | — | Confirmed acquisition note |
 
-**Items requiring special confirmation:** `Sources[21801]` still has `npcID = 15319`, and `Sources[60805]` still has `npcID = 91910` in the current committed branch, although those IDs were intended to be removed for aggregated drops. `Sources[80799]` is labeled "Multiple creatures" with `mobCount = 1`; confirm whether it represents a single known mob, a grouped drop, or a placeholder. Avoid creating NPC records solely to satisfy aggregate sources.
+`Sources[21801]` and `Sources[60805]` no longer contain aggregate-only NPC IDs (15319/91910). `Sources[80799]` no longer has the contradictory `mobCount = 1`. The item entries and their source details are otherwise preserved.
 
 ## Next steps
 
 ### Priority 1 — Harden the Wand Progression release
 
-- [ ] Clarify and fix ClassicAPI TOC selection vs runtime capability/event support for quest history.
-- [ ] Improve Source Details when the same wand has multiple acquisition *types* or multiple craft alternatives, while respecting selected filters.
-- [ ] Introduce structured reputation requirements (faction, standing, optional character standing check). Current `source.note` descriptions remain valid; add reputation and content filters when practical.
-- [ ] Confirm aggregate source classifications from the 28-item audit; remove residual aggregate-only NPC IDs if that is still intended in the current branch.
-- [ ] Review the value of adding `worldMap` to Ragefire Chasm and improve location records only when reliable coordinates are available.
-- [ ] Review iconography and distinguish dungeons from raids. Suggested direction: a simple dungeon doorway icon for dungeons and a raid crest/skull or crossed-weapons emblem for raids; use subdued vs stronger visual accents. Verify texture paths in the Vanilla client before choosing a bundled/native asset.
-- [ ] Evaluate optional pfQuest enhancements only where Priest Companion data is incomplete: quest start/end coordinates, relevant mob-drop locations, and area lookup fallbacks. Use runtime capability checks, avoid hard dependencies, and prefer the addon’s verified custom records over generic data. The existing mob lookup and quest history import already work as fallbacks.
+- [ ] **ClassicAPI integration and quest history:** choose a clear TOC packaging/loading strategy; align capability detection and optional adapters; gate `QUEST_TURNED_IN` by actual supported provider/version and test the acceptance matrix above. Preserve server and pfQuest fallback providers.
+- [ ] **Source Details:** handle multiple acquisition types for one wand, and multiple matching craft entries, without losing current faction/source filters, layout reuse, or map navigation.
+- [ ] **Structured reputation:** migrate optional requirements from free-text notes to a data structure with faction/standing; preserve backward-compatible notes, then consider reputation- and content-based filters.
+- [ ] **Map/NPC follow-up:** do not guess missing positions for Risen Oilblaze, Watchman Doomgrip, Elisandra Spellbinder, or other `(0, 0)` entries. Add positions only when verified. All registered instances currently have `worldMap`.
+- [ ] **Optional pfQuest review:** use additional quest start/end locations or group-drop hints only where Priest Companion lacks verified data, without creating a hard dependency.
+
+**Deferred until after the above technical review and fixes:**
+- [ ] Differentiate dungeon and raid icons. Consider door/entrance for dungeons and shield/crest for raids; validate exact Vanilla texture paths before selecting assets.
 
 ### Later capabilities (scope and feasibility to be assessed)
 

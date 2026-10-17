@@ -4,6 +4,7 @@
 ## Author: Timeless
 ## Version: 0.1.2
 ## SavedVariables: PriestCompanionDB
+## SavedVariablesPerCharacter: PriestCompanionCharDB
 
 Core\Bootstrap.lua
 Core\API.lua

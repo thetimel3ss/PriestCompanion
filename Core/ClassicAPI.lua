@@ -4,16 +4,30 @@
 local PC = PriestCompanion
 
 --------------------------------------------------
+-- Runtime Guard
+--------------------------------------------------
+
+-- A flavor TOC loads this file only when ClassicAPI redirects the
+-- manifest. A manually selected TOC must still be safe without the DLL.
+local CLASSIC_API_MIN_VERSION = 11100
+
+local classicAPIVersion =
+    tonumber(CLASSIC_API_VERSION)
+
+if not classicAPIVersion
+or classicAPIVersion < CLASSIC_API_MIN_VERSION then
+    -- Keep the original Vanilla API implementations untouched.
+    return
+end
+
+--------------------------------------------------
 -- Environment
 --------------------------------------------------
 
 PC.Environment.flavor = "ClassicAPI"
 PC.Environment.classicAPI = true
-
-if CLASSIC_API_VERSION then
-    PC.Environment.classicAPIVersion =
-        CLASSIC_API_VERSION
-end
+PC.Environment.classicAPIVersion =
+    classicAPIVersion
 
 --------------------------------------------------
 -- Preserve Vanilla Fallbacks
@@ -31,29 +45,50 @@ local VanillaSetItemTooltip =
 local VanillaGetItemCount =
     PC.API.GetItemCount
 
-local VanillaIsQuestCompleted =
-    PC.API.IsQuestCompleted
+-- Do not override PC.API.IsQuestCompleted here.
+-- ClassicAPI cannot provide a complete 1.12 quest-history bitfield.
+-- QuestHistory obtains positive results from server, turn-in,
+-- SavedVariables, pfQuest or future explicitly supported providers.
+
+--------------------------------------------------
+-- Item Cache Request
+--------------------------------------------------
+
+local function RequestItemData(itemID)
+    if type(C_Item) == "table"
+    and type(
+        C_Item.RequestLoadItemDataByID
+    ) == "function" then
+        pcall(
+            C_Item.RequestLoadItemDataByID,
+            itemID
+        )
+    end
+end
 
 --------------------------------------------------
 -- Item Name
 --------------------------------------------------
 
 function PC.API.GetItemName(itemID)
-    if C_Item
-    and C_Item.GetItemNameByID then
+    if type(C_Item) == "table"
+    and type(
+        C_Item.GetItemNameByID
+    ) == "function" then
 
-        local name =
-            C_Item.GetItemNameByID(itemID)
+        local success
+        local name
 
-        if name then
+        success, name = pcall(
+            C_Item.GetItemNameByID,
+            itemID
+        )
+
+        if success and name then
             return name
         end
 
-        if C_Item.RequestLoadItemDataByID then
-            C_Item.RequestLoadItemDataByID(
-                itemID
-            )
-        end
+        RequestItemData(itemID)
     end
 
     return VanillaGetItemName(itemID)
@@ -64,21 +99,24 @@ end
 --------------------------------------------------
 
 function PC.API.GetItemIcon(itemID)
-    if C_Item
-    and C_Item.GetItemIconByID then
+    if type(C_Item) == "table"
+    and type(
+        C_Item.GetItemIconByID
+    ) == "function" then
 
-        local texture =
-            C_Item.GetItemIconByID(itemID)
+        local success
+        local texture
 
-        if texture then
+        success, texture = pcall(
+            C_Item.GetItemIconByID,
+            itemID
+        )
+
+        if success and texture then
             return texture
         end
 
-        if C_Item.RequestLoadItemDataByID then
-            C_Item.RequestLoadItemDataByID(
-                itemID
-            )
-        end
+        RequestItemData(itemID)
     end
 
     return VanillaGetItemIcon(itemID)
@@ -93,10 +131,19 @@ function PC.API.SetItemTooltip(
     itemID
 )
     if tooltip
-    and tooltip.SetItemByID then
+    and type(
+        tooltip.SetItemByID
+    ) == "function" then
 
-        tooltip:SetItemByID(itemID)
-        return
+        local success = pcall(
+            tooltip.SetItemByID,
+            tooltip,
+            itemID
+        )
+
+        if success then
+            return
+        end
     end
 
     VanillaSetItemTooltip(
@@ -110,47 +157,23 @@ end
 --------------------------------------------------
 
 function PC.API.GetItemCount(itemID)
-    if C_Item
-    and C_Item.GetItemCount then
+    if type(C_Item) == "table"
+    and type(
+        C_Item.GetItemCount
+    ) == "function" then
 
-        local count =
-            C_Item.GetItemCount(itemID)
+        local success
+        local count
 
-        if count ~= nil then
+        success, count = pcall(
+            C_Item.GetItemCount,
+            itemID
+        )
+
+        if success and count ~= nil then
             return count
         end
     end
 
     return VanillaGetItemCount(itemID)
-end
-
---------------------------------------------------
--- Quest Completion
---------------------------------------------------
-
-function PC.API.IsQuestCompleted(
-    questID
-)
-    if C_QuestLog
-    and C_QuestLog.IsQuestFlaggedCompleted then
-
-        local success
-        local completed
-
-        success,
-        completed = pcall(
-            C_QuestLog.IsQuestFlaggedCompleted,
-            questID
-        )
-
-        if success then
-            return completed
-                and true
-                or false
-        end
-    end
-
-    return VanillaIsQuestCompleted(
-        questID
-    )
 end

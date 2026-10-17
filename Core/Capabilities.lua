@@ -50,9 +50,22 @@ PC.Capabilities.questTurnInEvent =
 --------------------------------------------------
 
 PC.Capabilities.superWoW = false
+PC.Capabilities.superWoWVersion = nil
+PC.Capabilities.superWoWDetection = "unavailable"
 
 if SUPERWOW_VERSION then
     PC.Capabilities.superWoW = true
+    PC.Capabilities.superWoWVersion =
+        tostring(SUPERWOW_VERSION)
+    PC.Capabilities.superWoWDetection = "version"
+
+-- Older SuperWoW builds may lack SUPERWOW_VERSION.
+-- Require both characteristic APIs to avoid marking an unrelated
+-- SpellInfo or SetAutoloot implementation as SuperWoW.
+elseif type(SpellInfo) == "function"
+and type(SetAutoloot) == "function" then
+    PC.Capabilities.superWoW = true
+    PC.Capabilities.superWoWDetection = "legacy"
 end
 
 --------------------------------------------------
@@ -60,9 +73,26 @@ end
 --------------------------------------------------
 
 PC.Capabilities.nampower = false
+PC.Capabilities.nampowerVersion = nil
+PC.Capabilities.nampowerDetection = "unavailable"
 
 if type(GetNampowerVersion) == "function" then
-    PC.Capabilities.nampower = true
+    local success
+    local version
+
+    success, version = pcall(GetNampowerVersion)
+
+    if success
+    and version ~= nil
+    and version ~= false
+    and tostring(version) ~= "" then
+        PC.Capabilities.nampower = true
+        PC.Capabilities.nampowerVersion =
+            tostring(version)
+        PC.Capabilities.nampowerDetection = "version"
+    elseif not success then
+        PC.Capabilities.nampowerDetection = "probe_failed"
+    end
 end
 
 --------------------------------------------------
@@ -70,25 +100,27 @@ end
 --------------------------------------------------
 
 PC.Capabilities.unitXP = false
+PC.Capabilities.unitXPDetection = "unavailable"
 
 -- Some loaders expose Vanilla1121mod globals.
-if Vanilla1121mod
+if type(Vanilla1121mod) == "table"
 and Vanilla1121mod.UnitXP_SP3 then
-
     PC.Capabilities.unitXP = true
+    PC.Capabilities.unitXPDetection = "loader"
 
 -- VanillaFixes may not expose those globals.
 -- In that case test the UnitXP dispatcher itself.
 elseif type(UnitXP) == "function" then
-
-    local success =
-        pcall(
-            UnitXP,
-            "nop",
-            "nop"
-        )
+    local success = pcall(
+        UnitXP,
+        "nop",
+        "nop"
+    )
 
     if success then
         PC.Capabilities.unitXP = true
+        PC.Capabilities.unitXPDetection = "dispatcher"
+    else
+        PC.Capabilities.unitXPDetection = "probe_failed"
     end
 end

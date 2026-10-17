@@ -384,7 +384,12 @@ function panel.SelectSection(id)
     local button
 
     for sectionID, button in pairs(sectionButtons) do
-        button:SetEnabled(sectionID ~= id)
+        -- WoW 1.12 buttons expose Enable/Disable, not SetEnabled.
+        if sectionID == id then
+            button:Disable()
+        else
+            button:Enable()
+        end
     end
 end
 

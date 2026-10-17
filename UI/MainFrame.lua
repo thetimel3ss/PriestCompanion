@@ -146,60 +146,60 @@ table.insert(
 
 
 --------------------------------------------------
--- Main Navigation
+-- Native Main Tabs
 --------------------------------------------------
 
--- The tabs belong to the main frame; content panels are created by
--- their own files later in the TOC load order.
+-- CharacterFrameTabButtonTemplate matches the main tabs used by
+-- Puppeteer and the Blizzard character frame on Vanilla 1.12.
 PC.UI.ActiveTab = "wands"
 
 local tabButtons = {}
 
-local function CreateTab(id, label, x, width)
-    local button = CreateFrame(
+local function CreateMainTab(id, label, x, width)
+    local tab = CreateFrame(
         "Button",
         nil,
         frame,
-        "UIPanelButtonTemplate"
+        "CharacterFrameTabButtonTemplate"
     )
 
-    button:SetWidth(width)
-    button:SetHeight(22)
-    button:SetPoint(
+    tab:SetWidth(width)
+    tab:SetHeight(30)
+    tab:SetPoint(
         "TOPLEFT",
         frame,
-        "TOPLEFT",
+        "BOTTOMLEFT",
         x,
-        -31
+        11
     )
-    button:SetText(label)
+    tab:SetText(label)
 
-    button:SetScript(
+    tab:SetScript(
         "OnClick",
         function()
             PC.UI.SelectTab(id)
         end
     )
 
-    tabButtons[id] = button
+    tabButtons[id] = tab
 end
 
-CreateTab("wands", "Wands", 29, 104)
-CreateTab("environment", "Environment", 138, 122)
+CreateMainTab("wands", "Wands", 24, 105)
+CreateMainTab("options", "Options", 135, 110)
 
 --------------------------------------------------
--- Tab Selection
+-- Top-Level Navigation
 --------------------------------------------------
 
-function PC.UI.SelectTab(id, resetScroll)
-    if id ~= "environment" then
+function PC.UI.SelectTab(id, resetScroll, section)
+    if id ~= "options" then
         id = "wands"
     end
 
     PC.UI.ActiveTab = id
 
-    -- The item details are a sub-view of Wand Progression.
-    -- Switching top-level tabs closes that sub-view first.
+    -- Source Details is a sub-view of Wands; never leave it
+    -- covering Options when navigating between main tabs.
     if PC.UI.SourceDetails
     and type(PC.UI.SourceDetails.Hide) == "function" then
         PC.UI.SourceDetails.Hide()
@@ -215,23 +215,26 @@ function PC.UI.SelectTab(id, resetScroll)
     end
 
     local wandPanel = PC.UI.WandPanel
-    local environmentPanel = PC.UI.EnvironmentPanel
+    local optionsPanel = PC.UI.OptionsPanel
 
-    if id == "environment" then
+    if id == "options" then
         if wandPanel then
             wandPanel:Hide()
         end
 
-        if environmentPanel then
-            environmentPanel:Show()
+        if optionsPanel then
+            optionsPanel:Show()
 
-            if type(environmentPanel.Refresh) == "function" then
-                environmentPanel.Refresh()
+            if section
+            and type(optionsPanel.SelectSection) == "function" then
+                optionsPanel.SelectSection(section)
+            elseif type(optionsPanel.Refresh) == "function" then
+                optionsPanel.Refresh()
             end
         end
     else
-        if environmentPanel then
-            environmentPanel:Hide()
+        if optionsPanel then
+            optionsPanel:Hide()
         end
 
         if wandPanel then
@@ -247,25 +250,24 @@ function PC.UI.SelectTab(id, resetScroll)
     local button
 
     for tabID, button in pairs(tabButtons) do
-        if tabID == id then
-            button:SetAlpha(1)
-
-            if button.LockHighlight then
-                button:LockHighlight()
-            end
-        else
-            button:SetAlpha(0.70)
-
-            if button.UnlockHighlight then
-                button:UnlockHighlight()
-            end
-        end
+        -- Native tab templates render their disabled state as selected.
+        button:SetEnabled(tabID ~= id)
     end
 end
 
-function PC.UI.OpenTab(id)
+function PC.UI.OpenTab(id, section)
+    if id ~= "options" then
+        id = "wands"
+    end
+
+    if id == "options"
+    and section
+    and PC.UI.OptionsPanel then
+        PC.UI.OptionsPanel.ActiveSection = section
+    end
+
     if frame:IsShown() then
-        PC.UI.SelectTab(id)
+        PC.UI.SelectTab(id, nil, section)
     else
         PC.UI.ActiveTab = id
         frame:Show()

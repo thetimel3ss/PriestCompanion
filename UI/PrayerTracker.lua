@@ -305,6 +305,65 @@ frame:SetScript(
 -- Appearance
 --------------------------------------------------
 
+local function UpdateIconLayout()
+    local expanded = Tracker.GetOption("expanded")
+    local width = frame:GetWidth()
+    local height = frame:GetHeight()
+    local iconSize = math.floor(height * 0.32)
+
+    if iconSize < 34 then
+        iconSize = 34
+    elseif iconSize > 58 then
+        iconSize = 58
+    end
+
+    currentIcon:SetWidth(iconSize)
+    currentIcon:SetHeight(iconSize)
+    previousIcon:SetWidth(iconSize)
+    previousIcon:SetHeight(iconSize)
+
+    currentIcon:ClearAllPoints()
+    previousIcon:ClearAllPoints()
+
+    if expanded then
+        local spread = math.floor(width * 0.22)
+        if spread < 40 then
+            spread = 40
+        elseif spread > 70 then
+            spread = 70
+        end
+
+        currentIcon:SetPoint(
+            "TOP", frame, "TOP", spread, -30
+        )
+        previousIcon:SetPoint(
+            "TOP", frame, "TOP", -spread, -30
+        )
+
+        currentName:SetWidth(
+            math.floor(width * 0.40)
+        )
+        previousName:SetWidth(
+            math.floor(width * 0.40)
+        )
+    else
+        currentIcon:SetPoint(
+            "TOP", frame, "TOP", 0, -25
+        )
+        previousIcon:SetPoint(
+            "TOP", frame, "TOP", -43, -30
+        )
+        currentName:SetWidth(width - 16)
+    end
+end
+
+frame:SetScript(
+    "OnSizeChanged",
+    function()
+        UpdateIconLayout()
+    end
+)
+
 local function SetDimensions(expanded)
     local width
     local height
@@ -347,32 +406,13 @@ local function SetDimensions(expanded)
 
     frame:SetWidth(width)
     frame:SetHeight(height)
-
-    currentName:SetWidth(
-        expanded and 94 or width - 16
-    )
+    UpdateIconLayout()
 
     if expanded then
-        currentIcon:ClearAllPoints()
-        currentIcon:SetPoint(
-            "TOP",
-            frame,
-            "TOP",
-            43,
-            -30
-        )
         previousIcon:Show()
         previousName:Show()
         arrow:Show()
     else
-        currentIcon:ClearAllPoints()
-        currentIcon:SetPoint(
-            "TOP",
-            frame,
-            "TOP",
-            0,
-            -25
-        )
         previousIcon:Hide()
         previousName:Hide()
         arrow:Hide()

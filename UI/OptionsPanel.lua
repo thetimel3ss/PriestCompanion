@@ -15,7 +15,7 @@ end
 
 local panel = CreateFrame(
     "Frame",
-    nil,
+    "PriestCompanionOptionsPanel",
     mainFrame
 )
 
@@ -71,10 +71,10 @@ header:SetText("Options")
 
 local sectionButtons = {}
 
-local function CreateSectionTab(id, label, x, width)
+local function CreateSectionTab(id, label, x, width, index)
     local button = CreateFrame(
         "Button",
-        nil,
+        "PriestCompanionOptionsPanelTab" .. tostring(index),
         panel,
         "TabButtonTemplate"
     )
@@ -101,9 +101,9 @@ local function CreateSectionTab(id, label, x, width)
     sectionButtons[id] = button
 end
 
-CreateSectionTab("general", "General", 17, 98)
-CreateSectionTab("advanced", "Advanced", 120, 110)
-CreateSectionTab("mods", "Mods", 235, 85)
+CreateSectionTab("general", "General", 17, 98, 1)
+CreateSectionTab("advanced", "Advanced", 120, 110, 2)
+CreateSectionTab("mods", "Mods", 235, 85, 3)
 
 --------------------------------------------------
 -- Shared Content Background

@@ -35,7 +35,7 @@ The roadmap tracks outstanding improvements and ongoing verification. Released f
 - **Quest history:** `QUEST_TURNED_IN` registration now depends on a supported ClassicAPI runtime, not on the TOC flavor. The registered event provides quest ID in `arg1`. A `pcall(RegisterEvent)` result is recorded as `QuestHistory.LiveTurnInRegistered` but **cannot prove event delivery**.
 - **Impossible native quest history:** `C_QuestLog.IsQuestFlaggedCompleted` is not feasible in the Vanilla 1.12 client; its ClassicAPI adapter override was removed. Retain SavedVariables, live turn-ins, positive injected provider results, the server-specific `.queststatus`/`TWQUEST` protocol, and optional pfQuest import. Never classify an unknown result as definitely incomplete.
 - **Server fallback:** `.queststatus` still uses `GUILD` chat (no unverified alternate channel). The code skips sending when `IsInGuild() == false` and records `not_in_guild`; missing chat API or send failures are also reported by `GetServerQueryState().unavailableReason`. Server support and delivery still need in-game confirmation. No reply means an unknown history state.
-- **Environment diagnostics:** `/priest env` now opens the Environment tab in the addon instead of printing the details to chat. It shows ClassicAPI version, minimum, compatibility, adapter state, turn-in registration (not delivery), server-query state, and richer SuperWoW/Nampower/UnitXP indicators. DLL detection remains a startup snapshot; Refresh only rereads values and never issues a server query.
+- **Environment diagnostics:** `/priest env` now opens **Options → Mods** instead of printing details to chat. Mods shows ClassicAPI version/minimum/adapter and optional SuperWoW/Nampower/UnitXP data; the **Advanced** subtab displays turn-in registration (not delivery) and the server-query state. DLL detection remains a startup snapshot; Refresh rereads values but never initiates a server query.
 - **Maintainer's prior test result:** the expanded `/priest env` command was verified in-game before the Environment UI change. Reported values included ClassicAPI 1.15.9, SuperWoW 2.2, Nampower 4, UnitXP dispatcher detection and a server response containing 932 processed quest IDs. The **new tabbed presentation and refresh behavior** still require in-game validation.
 - **Static checks completed:** version/adapter separation, the TOC loading order, absence of the unsupported quest-history API call, four Vanilla fallbacks and all existing history providers were inspected in the committed code.
 - **In-game acceptance matrix still pending:** Vanilla-only + standard TOC; ClassicAPI >=1.11.0 + automatic flavor; a supported runtime using the standard TOC; manually selected ClassicAPI TOC without a functioning DLL; unsupported/older DLL. Test item functions, quest turn-ins (including reload persistence), server query with and without a guild, absent server support, and pfQuest import. Also test with the latest supported ClassicAPI version.
@@ -118,12 +118,14 @@ All 28 records have `source.note`: 21 world-drop-style entries with `"World drop
 
 ## Next steps
 
-### Current focus — Environment UI and client diagnostics
+### Current focus — Native tabbed Options UI and client diagnostics
 
-- [x] Add Wands/Environment tabs to the main frame and a read-only Environment panel; load it from both TOCs.
-- [x] Make `/priest env` and `/pc env` open the Environment tab instead of posting all diagnostics to chat.
-- [x] Show ClassicAPI presence/version/minimum/adapter, quest-history turn-in registration and server-query state, and optional DLL information. A display-only Refresh button must not send network requests.
-- [ ] Validate the Environment layout, tab switching, command aliases and Refresh button inside a Vanilla 1.12 client with and without ClassicAPI. Prior capability flags and server history were user-tested; the new UI itself is not yet verified in-game.
+- [x] Replace top-level command-style navigation with Vanilla-native **Wands / Options** bottom tabs, inspired by Puppeteer. The options area now has **General / Advanced / Mods** secondary tabs.
+- [x] Add `UI/OptionsPanel.lua` for read-only General and Advanced information; reorganize `UI/EnvironmentPanel.lua` into a scrollable **Options → Mods** subpage with individual DLL cards.
+- [x] Make `/priest env` and `/pc env` open Options → Mods without posting diagnostics to chat.
+- [x] Retain ClassicAPI detection/version/minimum/adapter, quest-history turn-in and server-query diagnostics, SuperWoW, Nampower and UnitXP SP3 details. The Mods Refresh button never sends chat/server queries.
+- [x] Load Options before Mods in both TOCs; leave Wand Progression data, filtering and quest/source mapping unchanged.
+- [ ] **In-game UI validation:** check native main and secondary tabs, text visibility, Mods scrolling, /priest env aliases, closing/reopening, switching out of Source Details, and whether the Wand list retains its prior behavior on Vanilla 1.12 with/without ClassicAPI. Static inspection cannot replace this test.
 
 ### Deferred — Wand Progression enhancements
 
@@ -140,7 +142,7 @@ All 28 records have `source.note`: 21 world-drop-style entries with `"World drop
 ### Later capabilities (scope and feasibility to be assessed)
 
 - [ ] Open-world / dungeon / raid content filters (potentially grouped with reputation filters).
-- [ ] Settings tab (quest-history preferences, optional integrations, reset and UI settings).
+- [ ] Add real configurable settings to Options → General / Advanced later (quest-history preferences, optional integrations, reset and UI settings). Current Options pages are read-only.
 - [ ] Minimap launcher.
 - [ ] Priest skills database.
 - [ ] Talent builds.

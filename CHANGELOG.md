@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Fixed — Vanilla 1.12 tab compatibility (2026-10-17)
+- Replaced unsupported native Button `SetEnabled()` calls with `Enable()` / `Disable()` in `UI/MainFrame.lua` and `UI/OptionsPanel.lua`. This addresses Lua errors when opening the main frame or selecting Options subtabs.
+- Kept the same tab selection behavior, slash commands and Puppeteer-inspired layout. In-game retesting is pending.
+
 ### Added — Puppeteer-Inspired Options UI (2026-10-17)
 - Added native Vanilla-style bottom tabs (**Wands** and **Options**) and secondary Options tabs (**General**, **Advanced**, **Mods**), modeled on Puppeteer's two-level navigation without importing PTGuiLib or other dependencies.
 - Added `UI/OptionsPanel.lua` for nested navigation, a General information page and an Advanced read-only quest-history diagnostics page.

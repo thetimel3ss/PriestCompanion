@@ -86,27 +86,35 @@ frame:Hide()
 PC.UI.MainFrame = frame
 
 --------------------------------------------------
--- Title
+-- Decorated Title (Vanilla dialog header)
 --------------------------------------------------
 
-local title =
-    frame:CreateFontString(
-        nil,
-        "OVERLAY",
-        "GameFontNormal"
-    )
+-- Match the compact title plaque used in Puppeteer's settings frame.
+-- The full 256x64 atlas has large transparent sides; crop the plaque.
+local titleFrame = CreateFrame("Frame", nil, frame)
+titleFrame:SetWidth(190)
+titleFrame:SetHeight(38)
+titleFrame:SetPoint("TOP", frame, "TOP", 0, 22)
 
-title:SetPoint(
-    "TOP",
-    frame,
-    "TOP",
+local titleTexture = titleFrame:CreateTexture(nil, "ARTWORK")
+titleTexture:SetTexture(
+    "Interface\\DialogFrame\\UI-DialogBox-Header"
+)
+titleTexture:SetTexCoord(
+    58 / 256,
+    197 / 256,
     0,
-    -18
+    40 / 64
 )
+titleTexture:SetAllPoints(titleFrame)
 
-title:SetText(
-    "Priest Companion"
+local title = titleFrame:CreateFontString(
+    nil,
+    "OVERLAY",
+    "GameFontNormal"
 )
+title:SetPoint("CENTER", titleFrame, "CENTER", 0, 0)
+title:SetText("Priest Companion")
 
 --------------------------------------------------
 -- Close Button
@@ -155,7 +163,7 @@ PC.UI.ActiveTab = "wands"
 
 local tabButtons = {}
 
-local function CreateMainTab(id, label, x, width, index)
+local function CreateMainTab(id, label, index, previous)
     local tab = CreateFrame(
         "Button",
         "PriestCompanionMainFrameTab" .. tostring(index),
@@ -163,29 +171,51 @@ local function CreateMainTab(id, label, x, width, index)
         "CharacterFrameTabButtonTemplate"
     )
 
-    tab:SetWidth(width)
-    tab:SetHeight(30)
-    tab:SetPoint(
-        "TOPLEFT",
-        frame,
-        "BOTTOMLEFT",
-        x,
-        11
-    )
     tab:SetText(label)
+    tab:RegisterForClicks("LeftButtonUp")
+
+    -- Let FrameXML calculate the proper border and text width.
+    PanelTemplates_TabResize(0, tab)
+
+    tab:ClearAllPoints()
+
+    if previous then
+        tab:SetPoint(
+            "LEFT",
+            previous,
+            "RIGHT",
+            0,
+            0
+        )
+    else
+        -- Same bottom-tab anchor used by Puppeteer's TabFrame.
+        tab:SetPoint(
+            "TOPLEFT",
+            frame,
+            "BOTTOMLEFT",
+            0,
+            -5
+        )
+    end
 
     tab:SetScript(
         "OnClick",
         function()
             PC.UI.SelectTab(id)
+            PlaySound("igMainMenuOptionCheckBoxOn")
         end
     )
 
     tabButtons[id] = tab
+    return tab
 end
 
-CreateMainTab("wands", "Wands", 24, 105, 1)
-CreateMainTab("options", "Options", 135, 110, 2)
+local wandsTab = CreateMainTab("wands", "Wands", 1)
+CreateMainTab("options", "Options", 2, wandsTab)
+
+-- The Blizzard tab controller manages active/pressed visuals,
+-- including left/middle/right textures and disabled states.
+PanelTemplates_SetNumTabs(frame, 2)
 
 --------------------------------------------------
 -- Top-Level Navigation
@@ -246,17 +276,12 @@ function PC.UI.SelectTab(id, resetScroll, section)
         end
     end
 
-    local tabID
-    local button
-
-    for tabID, button in pairs(tabButtons) do
-        -- WoW 1.12 buttons expose Enable/Disable, not SetEnabled.
-        -- Disable the selected tab to match the native tab appearance.
-        if tabID == id then
-            button:Disable()
-        else
-            button:Enable()
-        end
+    -- Do not merely Enable/Disable; FrameXML updates the pressed
+    -- textures and border join for both main tabs.
+    if id == "options" then
+        PanelTemplates_SetTab(frame, 2)
+    else
+        PanelTemplates_SetTab(frame, 1)
     end
 end
 

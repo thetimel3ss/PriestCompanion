@@ -2,6 +2,13 @@
 
 ## [Unreleased]
 
+### Added — Environment Tab (2026-10-17)
+- Introduced a dedicated **Environment** tab in the main Priest Companion window, alongside **Wands**, to display the current client-flavor, ClassicAPI, quest-history and optional DLL diagnostics without filling game chat.
+- Added `UI/EnvironmentPanel.lua`, a read-only diagnostic panel with grouped labels and a **Refresh** button that only refreshes the displayed snapshot and server-query status; it does not send `.queststatus`.
+- Updated `/priest env` and `/pc env` to open the Environment tab. The main `/priest` command still opens/closes the main window.
+- Added main-frame tab navigation while keeping the existing Wand Progression panel and Source Details available, and loaded the new panel in both Vanilla and ClassicAPI TOCs.
+- Retained the current `0.1.2` version until the new interface has been validated in-game.
+
 ### Changed — Environment Diagnostics (2026-10-17)
 - Expanded `/priest env` (also `/pc env`) to report the addon version, client flavor, ClassicAPI detected/installed/minimum versions, compatibility, loaded adapter, and `QUEST_TURNED_IN` registration status.
 - The event line distinguishes unavailable, not registered, and registered-but-not-yet-verified delivery; registration alone does not prove a real quest turn-in event was received.

@@ -51,15 +51,15 @@ function PC.ToggleMainFrame()
 end
 
 --------------------------------------------------
--- Environment Tab
+-- Options > Mods
 --------------------------------------------------
 
--- Keep the historical public entry point, but show diagnostics in the
--- addon UI instead of printing many lines into the game chat.
+-- Preserve the historical /priest env command; show Options > Mods
+-- instead of printing client diagnostics into game chat.
 function PC.ShowEnvironment()
     if PC.UI
     and type(PC.UI.OpenTab) == "function" then
-        PC.UI.OpenTab("environment")
+        PC.UI.OpenTab("options", "mods")
         return
     end
 
@@ -98,7 +98,7 @@ function PC.OnSlashCommand(message)
         )
 
         DEFAULT_CHAT_FRAME:AddMessage(
-            "/priest env - Open the Environment tab"
+            "/priest env - Open Options > Mods"
         )
 
         return

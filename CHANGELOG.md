@@ -2,6 +2,11 @@
 
 ## [Unreleased]
 
+### Changed — Options command (2026-10-17)
+- Replaced the redundant `/priest env` / `/pc env` command with `/priest options` / `/pc options`, which open the existing **Options → General** page.
+- Updated slash-command help; the Mods diagnostics remain accessible through the Options UI and `/priest` still toggles the main window.
+- Based the change on the maintainer's `bb8b9cf1` tab/title layout commit without modifying those visual adjustments.
+
 ### Fixed — Mods link field alignment and readability (2026-10-17)
 - Matched Puppeteer's Vanilla `InputBoxTemplate` link behavior: named link edit boxes, corrected the default left texture anchor, set 4px internal text insets and centered the link text.
 - Set link text to full white for readability while preserving copy/select behavior and the existing read-only URL restoration.
@@ -12,7 +17,7 @@
 - Switched the Wands/Options bottom tabs and General/Advanced/Mods top tabs to `PanelTemplates_SetNumTabs`, `PanelTemplates_TabResize` and `PanelTemplates_SetTab` so the selected/pressed textures and tab border joins follow Blizzard's own Vanilla 1.12 behavior.
 - Anchored secondary tabs immediately above the shared content border and removed the redundant outer Options border/heading to reduce doubled outlines.
 - Redesigned Options → Mods with an introduction, colored per-DLL headings and detected/missing/unsupported statuses, expanded capability descriptions, and selectable source links for ClassicAPI, SuperWoW, Nampower and UnitXP SP3.
-- Kept the Mods Refresh action display-only (no new server query), and preserved existing Wands/Source Details behavior and the `/priest env` shortcut.
+- Kept the Mods Refresh action display-only (no new server query) and preserved Wands/Source Details. The earlier `/priest env` shortcut was superseded by `/priest options` later in this unreleased branch.
 - Visual and interaction verification inside the client is still pending; no version bump or main-branch changes.
 
 ### Fixed — Vanilla 1.12 tab compatibility (2026-10-17)
@@ -23,7 +28,7 @@
 - Added native Vanilla-style bottom tabs (**Wands** and **Options**) and secondary Options tabs (**General**, **Advanced**, **Mods**), modeled on Puppeteer's two-level navigation without importing PTGuiLib or other dependencies.
 - Added `UI/OptionsPanel.lua` for nested navigation, a General information page and an Advanced read-only quest-history diagnostics page.
 - Reworked `UI/EnvironmentPanel.lua` as a scrollable **Options → Mods** page with individual ClassicAPI, SuperWoW, Nampower and UnitXP SP3 cards, status, version information and descriptions of optional capabilities.
-- Changed `/priest env` and `/pc env` to open **Options → Mods** directly. The command no longer prints multi-line diagnostics into chat; the Mods Refresh button is read-only and does not issue server queries.
+- Initially changed `/priest env` and `/pc env` to open **Options → Mods** directly; these were subsequently replaced with `/priest options` / `/pc options` (Options → General). The Mods Refresh button remains read-only.
 - Preserved existing Wand Progression data, filters, row rendering and Source Details behavior. Both Vanilla and ClassicAPI TOCs now load the Options panel before the nested Mods page.
 - The interface is still **Unreleased** and requires in-game validation, especially native tab templates, scrolling and navigation. The addon remains version `0.1.2`.
 

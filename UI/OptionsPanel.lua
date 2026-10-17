@@ -35,35 +35,12 @@ panel:SetPoint(
     25
 )
 
-panel:SetBackdrop({
-    bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
-    edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
-    tile = true,
-    tileSize = 16,
-    edgeSize = 16,
-    insets = {
-        left = 4,
-        right = 4,
-        top = 4,
-        bottom = 4
-    }
-})
-
-panel:SetBackdropColor(0.03, 0.03, 0.03, 0.96)
-panel:SetBackdropBorderColor(0.30, 0.30, 0.30, 1)
+-- The parent is transparent: the tabbed inner frame owns the
+-- single border, just like Puppeteer's Options panel.
 panel:Hide()
 
 PC.UI.OptionsPanel = panel
 panel.ActiveSection = "general"
-
-local header = panel:CreateFontString(
-    nil,
-    "OVERLAY",
-    "GameFontNormal"
-)
-
-header:SetPoint("TOPLEFT", panel, "TOPLEFT", 16, -14)
-header:SetText("Options")
 
 --------------------------------------------------
 -- Secondary Tabs
@@ -71,7 +48,7 @@ header:SetText("Options")
 
 local sectionButtons = {}
 
-local function CreateSectionTab(id, label, x, width, index)
+local function CreateSectionTab(id, label, index, previous)
     local button = CreateFrame(
         "Button",
         "PriestCompanionOptionsPanelTab" .. tostring(index),
@@ -79,31 +56,45 @@ local function CreateSectionTab(id, label, x, width, index)
         "TabButtonTemplate"
     )
 
-    button:SetWidth(width)
-    button:SetHeight(22)
-    button:SetPoint(
-        "TOPLEFT",
-        panel,
-        "TOPLEFT",
-        x,
-        -40
-    )
-
     button:SetText(label)
+    button:SetHeight(22)
+    button:RegisterForClicks("LeftButtonUp")
+    PanelTemplates_TabResize(0, button)
+    button:ClearAllPoints()
+
+    if previous then
+        button:SetPoint("LEFT", previous, "RIGHT", 0, 0)
+    else
+        -- The buttons sit directly on the inner content border.
+        -- Inner content top is 28px from panel top.
+        button:SetPoint(
+            "TOPLEFT",
+            panel,
+            "TOPLEFT",
+            15,
+            -6
+        )
+    end
 
     button:SetScript(
         "OnClick",
         function()
             panel.SelectSection(id)
+            PlaySound("igMainMenuOptionCheckBoxOn")
         end
     )
 
     sectionButtons[id] = button
+    return button
 end
 
-CreateSectionTab("general", "General", 17, 98, 1)
-CreateSectionTab("advanced", "Advanced", 120, 110, 2)
-CreateSectionTab("mods", "Mods", 235, 85, 3)
+local generalTab = CreateSectionTab("general", "General", 1)
+local advancedTab = CreateSectionTab(
+    "advanced", "Advanced", 2, generalTab
+)
+CreateSectionTab("mods", "Mods", 3, advancedTab)
+
+PanelTemplates_SetNumTabs(panel, 3)
 
 --------------------------------------------------
 -- Shared Content Background
@@ -120,7 +111,7 @@ content:SetPoint(
     panel,
     "TOPLEFT",
     10,
-    -72
+    -28
 )
 
 content:SetPoint(
@@ -149,6 +140,13 @@ content:SetBackdropColor(0.09, 0.09, 0.19, 0.94)
 content:SetBackdropBorderColor(0.58, 0.58, 0.65, 1)
 
 PC.UI.OptionsContent = content
+
+-- Keep the tab textures above the content frame border.
+local sectionID
+local tabButton
+for sectionID, tabButton in pairs(sectionButtons) do
+    tabButton:SetFrameLevel(content:GetFrameLevel() + 2)
+end
 
 --------------------------------------------------
 -- General Content
@@ -380,16 +378,13 @@ function panel.SelectSection(id)
         end
     end
 
-    local sectionID
-    local button
-
-    for sectionID, button in pairs(sectionButtons) do
-        -- WoW 1.12 buttons expose Enable/Disable, not SetEnabled.
-        if sectionID == id then
-            button:Disable()
-        else
-            button:Enable()
-        end
+    -- Blizzard handles selected textures, widths and border joins.
+    if id == "advanced" then
+        PanelTemplates_SetTab(panel, 2)
+    elseif id == "mods" then
+        PanelTemplates_SetTab(panel, 3)
+    else
+        PanelTemplates_SetTab(panel, 1)
     end
 end
 

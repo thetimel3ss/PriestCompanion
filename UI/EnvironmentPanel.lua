@@ -1,80 +1,151 @@
 -- Priest Companion
--- Environment Panel
--- Read-only client capability and quest-history diagnostics.
+-- Options > Mods
+-- Read-only client extension information, inspired by Puppeteer's Mods tab.
 
 local PC = PriestCompanion
-local mainFrame = PC.UI.MainFrame
+local parent = PC.UI.OptionsContent
 
-if not mainFrame then
+if not parent then
     return
 end
 
 --------------------------------------------------
--- Layout
+-- Mods Subpage
 --------------------------------------------------
 
 local panel = CreateFrame(
     "Frame",
     nil,
-    mainFrame
+    parent
 )
 
-panel:SetPoint(
-    "TOPLEFT",
-    mainFrame,
-    "TOPLEFT",
-    25,
-    -55
-)
-
-panel:SetPoint(
-    "BOTTOMRIGHT",
-    mainFrame,
-    "BOTTOMRIGHT",
-    -25,
-    25
-)
-
-panel:SetBackdrop({
-    bgFile =
-        "Interface\\Tooltips\\UI-Tooltip-Background",
-
-    edgeFile =
-        "Interface\\Tooltips\\UI-Tooltip-Border",
-
-    tile = true,
-    tileSize = 16,
-    edgeSize = 16,
-
-    insets = {
-        left = 4,
-        right = 4,
-        top = 4,
-        bottom = 4
-    }
-})
-
-panel:SetBackdropColor(
-    0.03, 0.03, 0.03, 0.96
-)
-
-panel:SetBackdropBorderColor(
-    0.30, 0.30, 0.30, 1
-)
-
+panel:SetAllPoints(parent)
 panel:Hide()
 
+-- Retain the EnvironmentPanel name for compatibility with UI callers.
 PC.UI.EnvironmentPanel = panel
 
+local title = panel:CreateFontString(
+    nil,
+    "OVERLAY",
+    "GameFontNormal"
+)
+
+title:SetPoint(
+    "TOPLEFT",
+    panel,
+    "TOPLEFT",
+    15,
+    -14
+)
+
+title:SetText("Client Mods")
+
+local subtitle = panel:CreateFontString(
+    nil,
+    "OVERLAY",
+    "GameFontHighlightSmall"
+)
+
+subtitle:SetPoint(
+    "TOPLEFT",
+    title,
+    "BOTTOMLEFT",
+    0,
+    -5
+)
+
+subtitle:SetWidth(360)
+subtitle:SetJustifyH("LEFT")
+subtitle:SetText(
+    "Optional client extensions and their available capabilities."
+)
+
 --------------------------------------------------
--- Static Rows
+-- Scrollable Mod Cards
 --------------------------------------------------
 
-local rows = {}
-local nextY = 14
+local scrollFrame = CreateFrame(
+    "ScrollFrame",
+    "PriestCompanionModsScrollFrame",
+    panel,
+    "UIPanelScrollFrameTemplate"
+)
 
-local function AddSection(title)
-    local heading = panel:CreateFontString(
+scrollFrame:SetPoint(
+    "TOPLEFT",
+    panel,
+    "TOPLEFT",
+    13,
+    -67
+)
+
+scrollFrame:SetPoint(
+    "BOTTOMRIGHT",
+    panel,
+    "BOTTOMRIGHT",
+    -32,
+    12
+)
+
+local scrollChild = CreateFrame(
+    "Frame",
+    nil,
+    scrollFrame
+)
+
+scrollChild:SetWidth(396)
+scrollChild:SetHeight(520)
+scrollFrame:SetScrollChild(scrollChild)
+
+local cardStatus = {}
+local cardDetails = {}
+local cursorY = 6
+
+local function CreateModCard(
+    key,
+    name,
+    description,
+    height,
+    hasDetails
+)
+    local card = CreateFrame(
+        "Frame",
+        nil,
+        scrollChild
+    )
+
+    card:SetWidth(391)
+    card:SetHeight(height)
+
+    card:SetPoint(
+        "TOPLEFT",
+        scrollChild,
+        "TOPLEFT",
+        0,
+        -cursorY
+    )
+
+    card:SetBackdrop({
+        bgFile =
+            "Interface\\Tooltips\\UI-Tooltip-Background",
+        edgeFile =
+            "Interface\\Tooltips\\UI-Tooltip-Border",
+        tile = true,
+        tileSize = 12,
+        edgeSize = 12,
+        insets = {
+            left = 4,
+            right = 4,
+            top = 4,
+            bottom = 4
+        }
+    })
+
+    card:SetBackdropColor(0.05, 0.05, 0.11, 0.95)
+    card:SetBackdropBorderColor(0.42, 0.42, 0.50, 1)
+
+    local heading = card:CreateFontString(
         nil,
         "OVERLAY",
         "GameFontNormal"
@@ -82,311 +153,233 @@ local function AddSection(title)
 
     heading:SetPoint(
         "TOPLEFT",
-        panel,
+        card,
         "TOPLEFT",
-        16,
-        -nextY
+        12,
+        -12
     )
 
-    heading:SetText(title)
-    nextY = nextY + 25
-end
+    heading:SetText(name)
 
-local function AddRow(key, label)
-    local caption = panel:CreateFontString(
+    local status = card:CreateFontString(
         nil,
         "OVERLAY",
         "GameFontHighlightSmall"
     )
 
-    caption:SetWidth(145)
-    caption:SetJustifyH("LEFT")
-    caption:SetPoint(
-        "TOPLEFT",
-        panel,
-        "TOPLEFT",
-        18,
-        -nextY
+    status:SetWidth(220)
+    status:SetJustifyH("RIGHT")
+    status:SetPoint(
+        "TOPRIGHT",
+        card,
+        "TOPRIGHT",
+        -13,
+        -14
     )
 
-    caption:SetText(label)
+    cardStatus[key] = status
 
-    local value = panel:CreateFontString(
+    local summary = card:CreateFontString(
         nil,
         "OVERLAY",
         "GameFontHighlightSmall"
     )
 
-    value:SetWidth(270)
-    value:SetJustifyH("RIGHT")
-    value:SetPoint(
-        "TOPRIGHT",
-        panel,
-        "TOPRIGHT",
-        -16,
-        -nextY
+    summary:SetWidth(364)
+    summary:SetJustifyH("LEFT")
+    summary:SetPoint(
+        "TOPLEFT",
+        card,
+        "TOPLEFT",
+        13,
+        -40
     )
 
-    rows[key] = value
-    nextY = nextY + 19
+    summary:SetText(description)
+
+    if hasDetails then
+        local detail = card:CreateFontString(
+            nil,
+            "OVERLAY",
+            "GameFontHighlightSmall"
+        )
+
+        detail:SetWidth(364)
+        detail:SetJustifyH("LEFT")
+        detail:SetPoint(
+            "TOPLEFT",
+            card,
+            "TOPLEFT",
+            13,
+            -93
+        )
+
+        cardDetails[key] = detail
+    end
+
+    cursorY = cursorY + height + 9
 end
 
-AddSection("Client")
-AddRow("addonVersion", "Addon Version")
-AddRow("flavor", "Flavor")
-
-nextY = nextY + 9
-
-AddSection("ClassicAPI")
-AddRow("classicDetected", "Detected")
-AddRow("classicVersion", "Version")
-AddRow("classicMinimum", "Minimum")
-AddRow("classicSupported", "Supported")
-AddRow("classicAdapter", "Adapter Loaded")
-
-nextY = nextY + 9
-
-AddSection("Quest History")
-AddRow("turnIn", "QUEST_TURNED_IN")
-AddRow("serverQuery", "Server Query")
-
-nextY = nextY + 9
-
-AddSection("Other Extensions")
-AddRow("superWoW", "SuperWoW")
-AddRow("nampower", "Nampower")
-AddRow("unitXP", "UnitXP SP3")
-
-local footer = panel:CreateFontString(
-    nil,
-    "OVERLAY",
-    "GameFontDisableSmall"
+CreateModCard(
+    "classic",
+    "ClassicAPI",
+    "Optional modern item helpers, addon loading and quest turn-in events. The Vanilla core works without it.",
+    152,
+    true
 )
 
-footer:SetWidth(430)
-footer:SetJustifyH("LEFT")
-footer:SetPoint(
-    "BOTTOMLEFT",
-    panel,
-    "BOTTOMLEFT",
-    16,
-    10
+CreateModCard(
+    "super",
+    "SuperWoW",
+    "Provides enhanced unit information and targeting APIs. Priest Companion can use supported features in future modules.",
+    102,
+    false
 )
 
-footer:SetText(
-    "DLL detection is sampled at startup. Event registration does not confirm delivery."
+CreateModCard(
+    "nampower",
+    "Nampower",
+    "Provides additional casting and combat APIs, including spell-queue capabilities where supported.",
+    102,
+    false
 )
+
+CreateModCard(
+    "unitxp",
+    "UnitXP SP3",
+    "Offers accurate unit distance and line-of-sight queries for features that explicitly use those APIs.",
+    102,
+    false
+)
+
+scrollChild:SetHeight(cursorY + 8)
 
 --------------------------------------------------
--- Helpers
+-- Display Helpers
 --------------------------------------------------
 
 local function FormatClassicAPIVersion(version)
-    local packed = tonumber(version)
+    local value = tonumber(version)
 
-    if not packed
-    or packed <= 0 then
-        return "unavailable"
+    if not value
+    or value <= 0 then
+        return "Unknown"
     end
 
-    packed = math.floor(packed)
-
-    local major = math.floor(
-        packed / 10000
-    )
-
-    local minor = math.floor(
-        (packed % 10000) / 100
-    )
-
-    local patch = packed % 100
+    value = math.floor(value)
 
     return string.format(
         "%d.%d.%d",
-        major,
-        minor,
-        patch
+        math.floor(value / 10000),
+        math.floor((value % 10000) / 100),
+        value % 100
     )
 end
 
-local function EnabledText(value)
-    if value == true then
-        return "Yes"
+local function SetModStatus(key, message, available)
+    local value = cardStatus[key]
+
+    if not value then
+        return
     end
 
-    return "No"
-end
+    value:SetText(message)
 
-local function SetRow(key, value)
-    if rows[key] then
-        rows[key]:SetText(
-            tostring(value or "unavailable")
-        )
+    if available then
+        value:SetTextColor(0.30, 1.00, 0.30)
+    else
+        value:SetTextColor(1.00, 0.47, 0.36)
     end
 end
 
 --------------------------------------------------
--- Live Display Refresh
+-- Refresh Values (No Server Requests)
 --------------------------------------------------
 
 function panel.Refresh()
-    local capabilities = PC.Capabilities or {}
-    local environment = PC.Environment or {}
-    local history = PC.QuestHistory
+    local caps = PC.Capabilities or {}
 
-    SetRow(
-        "addonVersion",
-        PC.version or "unknown"
-    )
-
-    SetRow(
-        "flavor",
-        environment.flavor or "unknown"
-    )
-
-    SetRow(
-        "classicDetected",
-        EnabledText(
-            capabilities.classicAPI
-        )
-    )
-
-    SetRow(
-        "classicVersion",
+    local classicVersion =
         FormatClassicAPIVersion(
-            capabilities.classicAPIVersion
+            caps.classicAPIVersion
         )
-    )
 
-    SetRow(
-        "classicMinimum",
+    if caps.classicAPI then
+        if caps.classicAPISupported then
+            SetModStatus(
+                "classic",
+                "Detected v" .. classicVersion,
+                true
+            )
+        else
+            SetModStatus(
+                "classic",
+                "Unsupported v" .. classicVersion,
+                false
+            )
+        end
+    else
+        SetModStatus(
+            "classic",
+            "Not detected",
+            false
+        )
+    end
+
+    cardDetails.classic:SetText(
+        "Minimum: v" ..
         FormatClassicAPIVersion(
-            capabilities.classicAPIMinVersion
-        )
+            caps.classicAPIMinVersion
+        ) ..
+        "   |   Adapter loaded: " ..
+        (caps.classicAPIAdapter and "Yes" or "No")
     )
 
-    SetRow(
-        "classicSupported",
-        EnabledText(
-            capabilities.classicAPISupported
-        )
-    )
+    if caps.superWoW then
+        local status = "Detected"
 
-    SetRow(
-        "classicAdapter",
-        EnabledText(
-            capabilities.classicAPIAdapter
-        )
-    )
-
-    local turnInStatus = "Unavailable"
-
-    if capabilities.questTurnInEvent then
-        turnInStatus = "Not registered"
-
-        if history
-        and history.LiveTurnInRegistered == true then
-            turnInStatus =
-                "Registered (delivery not verified)"
+        if caps.superWoWVersion then
+            status = status .. " v" ..
+                tostring(caps.superWoWVersion)
+        elseif caps.superWoWDetection == "legacy" then
+            status = status .. " (legacy)"
         end
+
+        SetModStatus("super", status, true)
+    else
+        SetModStatus("super", "Not detected", false)
     end
 
-    SetRow("turnIn", turnInStatus)
+    if caps.nampower then
+        local status = "Detected"
 
-    local serverStatus = "Not queried"
-
-    if history
-    and type(
-        history.GetServerQueryState
-    ) == "function" then
-
-        local state =
-            history.GetServerQueryState()
-
-        if state then
-            if state.unavailableReason then
-                serverStatus =
-                    "Unavailable (" ..
-                    tostring(state.unavailableReason) ..
-                    ")"
-            elseif state.active then
-                serverStatus =
-                    "Waiting for response"
-            elseif state.responded then
-                serverStatus =
-                    "Responded (" ..
-                    tostring(state.received or 0) ..
-                    " IDs processed)"
-            elseif state.attempted then
-                serverStatus = "No response"
-            end
+        if caps.nampowerVersion then
+            status = status .. " v" ..
+                tostring(caps.nampowerVersion)
         end
+
+        SetModStatus("nampower", status, true)
+    else
+        SetModStatus("nampower", "Not detected", false)
     end
 
-    SetRow("serverQuery", serverStatus)
+    if caps.unitXP then
+        local status = "Detected"
 
-    local superWoWStatus =
-        EnabledText(capabilities.superWoW)
+        if caps.unitXPDetection == "loader" then
+            status = status .. " (loader)"
+        elseif caps.unitXPDetection == "dispatcher" then
+            status = status .. " (dispatcher)"
+        end
 
-    if capabilities.superWoWVersion then
-        superWoWStatus =
-            superWoWStatus ..
-            " (v" ..
-            tostring(
-                capabilities.superWoWVersion
-            ) ..
-            ")"
-    elseif capabilities.superWoWDetection ==
-    "legacy" then
-        superWoWStatus =
-            superWoWStatus ..
-            " (legacy APIs)"
+        SetModStatus("unitxp", status, true)
+    else
+        SetModStatus("unitxp", "Not detected", false)
     end
-
-    SetRow("superWoW", superWoWStatus)
-
-    local nampowerStatus =
-        EnabledText(capabilities.nampower)
-
-    if capabilities.nampowerVersion then
-        nampowerStatus =
-            nampowerStatus ..
-            " (v" ..
-            tostring(
-                capabilities.nampowerVersion
-            ) ..
-            ")"
-    elseif capabilities.nampowerDetection ==
-    "probe_failed" then
-        nampowerStatus =
-            nampowerStatus ..
-            " (probe failed)"
-    end
-
-    SetRow("nampower", nampowerStatus)
-
-    local unitXPStatus =
-        EnabledText(capabilities.unitXP)
-
-    if capabilities.unitXPDetection ==
-    "loader" then
-        unitXPStatus =
-            unitXPStatus .. " (loader flag)"
-    elseif capabilities.unitXPDetection ==
-    "dispatcher" then
-        unitXPStatus =
-            unitXPStatus .. " (dispatcher probe)"
-    elseif capabilities.unitXPDetection ==
-    "probe_failed" then
-        unitXPStatus =
-            unitXPStatus .. " (probe failed)"
-    end
-
-    SetRow("unitXP", unitXPStatus)
 end
 
 --------------------------------------------------
--- Manual Display Refresh
+-- Manual UI Refresh
 --------------------------------------------------
 
 local refreshButton = CreateFrame(
@@ -396,14 +389,14 @@ local refreshButton = CreateFrame(
     "UIPanelButtonTemplate"
 )
 
-refreshButton:SetWidth(74)
+refreshButton:SetWidth(72)
 refreshButton:SetHeight(20)
 
 refreshButton:SetPoint(
     "TOPRIGHT",
     panel,
     "TOPRIGHT",
-    -12,
+    -10,
     -9
 )
 

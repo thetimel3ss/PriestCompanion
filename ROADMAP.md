@@ -125,7 +125,8 @@ All 28 records have `source.note`: 21 world-drop-style entries with `"World drop
 - [x] Make `/priest env` and `/pc env` open Options → Mods without posting diagnostics to chat.
 - [x] Retain ClassicAPI detection/version/minimum/adapter, quest-history turn-in and server-query diagnostics, SuperWoW, Nampower and UnitXP SP3 details. The Mods Refresh button never sends chat/server queries.
 - [x] Load Options before Mods in both TOCs; leave Wand Progression data, filtering and quest/source mapping unchanged.
-- [ ] **In-game UI validation:** check native main and secondary tabs, text visibility, Mods scrolling, /priest env aliases, closing/reopening, switching out of Source Details, and whether the Wand list retains its prior behavior on Vanilla 1.12 with/without ClassicAPI. Static inspection cannot replace this test.
+- [x] **Puppeteer-inspired visual refinement:** centered decorated dialog title, PanelTemplates-driven pressed/selected tab artwork, secondary-tab border alignment, and descriptive Mods sections with detected/missing/unsupported colors and selectable links.
+- [ ] **In-game UI validation:** check the decorated title position, border and pressed states for both tab tiers, copyable Mods links, scroll range and status colors; then check /priest env aliases, close/reopen, return from Source Details, and unchanged Wand list on Vanilla 1.12 with/without ClassicAPI. Static inspection cannot replace this test.
 
 ### Deferred — Wand Progression enhancements
 

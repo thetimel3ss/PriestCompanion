@@ -2,6 +2,11 @@
 
 ## [Unreleased]
 
+### Fixed — Mods link field alignment and readability (2026-10-17)
+- Matched Puppeteer's Vanilla `InputBoxTemplate` link behavior: named link edit boxes, corrected the default left texture anchor, set 4px internal text insets and centered the link text.
+- Set link text to full white for readability while preserving copy/select behavior and the existing read-only URL restoration.
+- Kept this fix confined to `UI/EnvironmentPanel.lua`; no changes to DLL detection, server queries, Wands or other navigation.
+
 ### Changed — Native tab visuals and Mods presentation (2026-10-17)
 - Matched Puppeteer's compact decorated window heading with the cropped Vanilla `UI-DialogBox-Header` texture and centered Priest Companion title.
 - Switched the Wands/Options bottom tabs and General/Advanced/Mods top tabs to `PanelTemplates_SetNumTabs`, `PanelTemplates_TabResize` and `PanelTemplates_SetTab` so the selected/pressed textures and tab border joins follow Blizzard's own Vanilla 1.12 behavior.

@@ -51,21 +51,19 @@ function PC.ToggleMainFrame()
 end
 
 --------------------------------------------------
--- Options > Mods
+-- Options
 --------------------------------------------------
 
--- Preserve the historical /priest env command; show Options > Mods
--- instead of printing client diagnostics into game chat.
-function PC.ShowEnvironment()
+function PC.ShowOptions()
     if PC.UI
     and type(PC.UI.OpenTab) == "function" then
-        PC.UI.OpenTab("options", "mods")
+        PC.UI.OpenTab("options", "general")
         return
     end
 
     DEFAULT_CHAT_FRAME:AddMessage(
         "|cffff0000Priest Companion:|r " ..
-        "Environment panel is unavailable."
+        "Options panel is unavailable."
     )
 end
 
@@ -98,14 +96,14 @@ function PC.OnSlashCommand(message)
         )
 
         DEFAULT_CHAT_FRAME:AddMessage(
-            "/priest env - Open Options > Mods"
+            "/priest options - Open Options > General"
         )
 
         return
     end
 
-    if message == "env" then
-        PC.ShowEnvironment()
+    if message == "options" then
+        PC.ShowOptions()
         return
     end
 

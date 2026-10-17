@@ -27,3 +27,4 @@ UI\MainFrame.lua
 UI\SourceTooltip.lua
 UI\SourceDetails.lua
 UI\WandPanel.lua
+UI\EnvironmentPanel.lua

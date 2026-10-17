@@ -88,7 +88,9 @@ end
 local function Notify()
     local i
     for i = 1, table.getn(listeners) do
-        pcall(listeners[i])
+        -- These are Priest Companion-owned UI listeners. Surface an
+        -- actual UI error during testing instead of silently hiding it.
+        listeners[i]()
     end
 end
 

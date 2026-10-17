@@ -155,10 +155,10 @@ PC.UI.ActiveTab = "wands"
 
 local tabButtons = {}
 
-local function CreateMainTab(id, label, x, width)
+local function CreateMainTab(id, label, x, width, index)
     local tab = CreateFrame(
         "Button",
-        nil,
+        "PriestCompanionMainFrameTab" .. tostring(index),
         frame,
         "CharacterFrameTabButtonTemplate"
     )
@@ -184,8 +184,8 @@ local function CreateMainTab(id, label, x, width)
     tabButtons[id] = tab
 end
 
-CreateMainTab("wands", "Wands", 24, 105)
-CreateMainTab("options", "Options", 135, 110)
+CreateMainTab("wands", "Wands", 24, 105, 1)
+CreateMainTab("options", "Options", 135, 110, 2)
 
 --------------------------------------------------
 -- Top-Level Navigation

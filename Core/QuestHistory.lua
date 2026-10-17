@@ -484,6 +484,7 @@ function QuestHistory.QueryServer(
 
     if not success then
         session.queryActive = false
+        session.queryAttempted = false
         session.queryStartedAt = nil
         session.queryScheduled = false
         session.serverUnavailableReason = "send_failed"

@@ -260,7 +260,7 @@ local advancedChild = CreateFrame(
     "Frame", nil, advancedScroll
 )
 advancedChild:SetWidth(388)
-advancedChild:SetHeight(485)
+advancedChild:SetHeight(500)
 advancedScroll:SetScrollChild(advancedChild)
 
 CreateLabel(
@@ -351,25 +351,32 @@ CreateLabel(
     "GameFontDisableSmall"
 )
 
+local lastHealLabel = CreateLabel(
+    advancedChild,
+    "Last confirmed heal: none yet",
+    15, -339, 355,
+    "GameFontDisableSmall"
+)
+
 CreateLabel(
     advancedChild,
     "Quest History Diagnostics",
-    14, -357, 355,
+    14, -365, 355,
     "GameFontNormal"
 )
 
 local turnInLabel = CreateLabel(
-    advancedChild, "", 16, -388, 355
+    advancedChild, "", 16, -394, 355
 )
 local serverLabel = CreateLabel(
-    advancedChild, "", 16, -413, 355
+    advancedChild, "", 16, -419, 355
 )
 
 CreateLabel(
     advancedChild,
     "Registering an event does not prove its delivery. " ..
         "Unknown quest completion remains unknown.",
-    16, -450, 345,
+    16, -457, 345,
     "GameFontDisableSmall"
 )
 
@@ -394,6 +401,17 @@ function advanced.Refresh()
         end
 
         talentStatus:SetText(label)
+
+        local state = prayer.GetState()
+        if state.last then
+            lastHealLabel:SetText(
+                "Last confirmed heal: " .. state.last
+            )
+        else
+            lastHealLabel:SetText(
+                "Last confirmed heal: none yet"
+            )
+        end
 
         local key
         local button

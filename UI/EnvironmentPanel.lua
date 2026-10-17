@@ -133,7 +133,10 @@ local function CreateStaticText(
     return label
 end
 
+local nextLinkIndex = 0
+
 local function CreateReadOnlyLink(url, y)
+    nextLinkIndex = nextLinkIndex + 1
     local label = CreateStaticText(
         scrollChild,
         "Link:",
@@ -144,9 +147,11 @@ local function CreateReadOnlyLink(url, y)
         "GameFontNormalSmall"
     )
 
+    -- A stable name exposes the decorative textures created by
+    -- InputBoxTemplate ("<EditBoxName>Left", Middle and Right).
     local editBox = CreateFrame(
         "EditBox",
-        nil,
+        "PriestCompanionModLink" .. tostring(nextLinkIndex),
         scrollChild,
         "InputBoxTemplate"
     )
@@ -154,6 +159,31 @@ local function CreateReadOnlyLink(url, y)
     editBox:SetWidth(310)
     editBox:SetHeight(20)
     editBox:SetAutoFocus(false)
+
+    -- Puppeteer's PTGuiEditbox fixes the stock InputBoxTemplate
+    -- left texture, which otherwise starts five pixels too far left.
+    local globalEnvironment = getfenv(0)
+    local left = globalEnvironment[editBox:GetName() .. "Left"]
+
+    if left then
+        local point, relativeFrame, relativePoint, xOffset, yOffset =
+            left:GetPoint(1)
+
+        if point then
+            left:ClearAllPoints()
+            left:SetPoint(
+                point,
+                relativeFrame,
+                relativePoint,
+                0,
+                yOffset
+            )
+        end
+    end
+
+    editBox:SetTextInsets(4, 4, 0, 0)
+    editBox:SetJustifyH("CENTER")
+    editBox:SetTextColor(1, 1, 1)
     editBox:SetPoint(
         "TOPLEFT",
         scrollChild,

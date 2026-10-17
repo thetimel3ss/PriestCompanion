@@ -2,6 +2,25 @@
 
 ## [Unreleased]
 
+## [0.1.2] - 2026-10-17
+
+### Changed
+- Completed all registered instance `worldMap` references, adding the Ragefire Chasm (389) native map (`mapID = 4`, `zoneID = 1`).
+- Added precise map coordinates for Rigger Gizelton (11626) and Taragaman the Hungerer (11520), and corrected Lady Falther'ess (14686) to 65.3, 16.9 in Razorfen Downs.
+- Added acquisition notes for all 28 `Multiple creatures` sources: 21 world-drop-style entries without a fixed instance and seven collective dungeon/raid drops, including items with more than 200 possible droppers.
+- Preserved the deliberate `(0, 0)` markers when precise coordinates remain unknown, including Watchman Doomgrip (9476) and Elisandra Spellbinder (80945).
+- Updated the versions in both TOC flavors and the Lua metadata fallback to `0.1.2`.
+
+### Fixed
+- Removed unused/redundant NPC records Noxxion's Spawn (13456) and Harbinger Aph'ygth (65114).
+- Removed aggregate-only NPC references 15319 and 91910 from items 21801 and 60805, respectively; kept the group-drop description without a fabricated individual NPC marker.
+- Removed the contradictory `mobCount = 1` from the multi-creature Wand of Divine Justice source (80799).
+
+### Documentation and Technical Review (2026-10-17)
+- Updated [ROADMAP.md](ROADMAP.md) with the 2026-10-17 audit: 173 NPC records, one missing location, six `(0, 0)` placeholders, no instances lacking `worldMap`, and all 28 aggregate drops carrying notes.
+- Documented the first Priority 1 technical review of ClassicAPI TOC selection, runtime detection, quest-turn-in event support, and expected test cases. **No ClassicAPI runtime behavior has been modified yet.**
+- Confirmed continued 146/146 wand, item, and source coverage for the current OctoWoW dataset. New server content can be added in subsequent maintenance updates.
+
 ### Documentation (2026-10-16)
 - Separated current limitations, next-step priorities, and planned features into [ROADMAP.md](ROADMAP.md), keeping released change history here.
 - Reassessed current OctoWoW wand coverage and documented in-game validation of the configured custom maps and floors.

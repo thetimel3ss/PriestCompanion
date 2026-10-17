@@ -2,6 +2,14 @@
 
 ## [Unreleased]
 
+### Changed — Native tab visuals and Mods presentation (2026-10-17)
+- Matched Puppeteer's compact decorated window heading with the cropped Vanilla `UI-DialogBox-Header` texture and centered Priest Companion title.
+- Switched the Wands/Options bottom tabs and General/Advanced/Mods top tabs to `PanelTemplates_SetNumTabs`, `PanelTemplates_TabResize` and `PanelTemplates_SetTab` so the selected/pressed textures and tab border joins follow Blizzard's own Vanilla 1.12 behavior.
+- Anchored secondary tabs immediately above the shared content border and removed the redundant outer Options border/heading to reduce doubled outlines.
+- Redesigned Options → Mods with an introduction, colored per-DLL headings and detected/missing/unsupported statuses, expanded capability descriptions, and selectable source links for ClassicAPI, SuperWoW, Nampower and UnitXP SP3.
+- Kept the Mods Refresh action display-only (no new server query), and preserved existing Wands/Source Details behavior and the `/priest env` shortcut.
+- Visual and interaction verification inside the client is still pending; no version bump or main-branch changes.
+
 ### Fixed — Vanilla 1.12 tab compatibility (2026-10-17)
 - Replaced unsupported native Button `SetEnabled()` calls with `Enable()` / `Disable()` in `UI/MainFrame.lua` and `UI/OptionsPanel.lua`. This addresses Lua errors when opening the main frame or selecting Options subtabs.
 - Kept the same tab selection behavior, slash commands and Puppeteer-inspired layout. In-game retesting is pending.

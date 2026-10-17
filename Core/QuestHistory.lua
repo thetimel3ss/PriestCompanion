@@ -43,6 +43,7 @@ local session = {
     queryStartedAt = nil,
     serverResponded = false,
     serverReceived = 0,
+    serverUnavailableReason = nil,
     pfQuestImported = false
 }
 
@@ -365,14 +366,17 @@ function QuestHistory.ImportCompletionFromAPI(
         return false
     end
 
-    local completed =
-        PC.API.IsQuestCompleted(
-            questID
-        )
+    local success
+    local completed
 
-    -- Only a positive result is trustworthy enough to persist.
-    -- false/nil remains unknown on Vanilla-style clients.
-    if completed == true then
+    success, completed = pcall(
+        PC.API.IsQuestCompleted,
+        questID
+    )
+
+    -- Providers are optional. Only a successful positive result
+    -- may be persisted; nil, false and API errors remain unknown.
+    if success and completed == true then
         QuestHistory.MarkCompleted(
             questID,
             "api"
@@ -450,6 +454,17 @@ function QuestHistory.QueryServer(
 
     if type(SendChatMessage) ~=
     "function" then
+        session.queryScheduled = false
+        session.serverUnavailableReason = "no_chat_api"
+        return false
+    end
+
+    -- Guild chat is the server-specific transport used by OctoWoW.
+    -- Do not try to send to GUILD when the character has no guild.
+    if type(IsInGuild) == "function"
+    and not IsInGuild() then
+        session.queryScheduled = false
+        session.serverUnavailableReason = "not_in_guild"
         return false
     end
 
@@ -459,11 +474,21 @@ function QuestHistory.QueryServer(
     session.queryStartedAt = GetTime()
     session.serverResponded = false
     session.serverReceived = 0
+    session.serverUnavailableReason = nil
 
-    SendChatMessage(
+    local success = pcall(
+        SendChatMessage,
         SERVER_COMMAND,
         SERVER_CHANNEL
     )
+
+    if not success then
+        session.queryActive = false
+        session.queryStartedAt = nil
+        session.queryScheduled = false
+        session.serverUnavailableReason = "send_failed"
+        return false
+    end
 
     return true
 end
@@ -480,7 +505,10 @@ function QuestHistory.GetServerQueryState()
             session.serverResponded,
 
         received =
-            session.serverReceived
+            session.serverReceived,
+
+        unavailableReason =
+            session.serverUnavailableReason
     }
 end
 
@@ -594,12 +622,17 @@ eventFrame:RegisterEvent(
     "CHAT_MSG_ADDON"
 )
 
--- ClassicAPI backports QUEST_TURNED_IN with the quest ID in arg1.
--- Register it only in the ClassicAPI flavor so Vanilla clients are not
--- asked to subscribe to an event they do not know.
-if PC.Environment
-and PC.Environment.classicAPI then
-    eventFrame:RegisterEvent(
+-- ClassicAPI backports QUEST_TURNED_IN with questID in arg1.
+-- It may be present even if the client loaded the standard TOC.
+-- A successful RegisterEvent call is not proof that a client will
+-- deliver an event, so keep the other history providers enabled.
+QuestHistory.LiveTurnInRegistered = false
+
+if PC.Capabilities
+and PC.Capabilities.questTurnInEvent then
+    QuestHistory.LiveTurnInRegistered = pcall(
+        eventFrame.RegisterEvent,
+        eventFrame,
         "QUEST_TURNED_IN"
     )
 end

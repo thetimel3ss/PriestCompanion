@@ -1,6 +1,7 @@
 -- Priest Companion
 -- Options > Mods
--- Read-only client extension information, inspired by Puppeteer's Mods tab.
+-- Vanilla 1.12 scrollable client modification information.
+-- Layout follows Puppeteer's Mods presentation without importing PTGuiLib.
 
 local PC = PriestCompanion
 local parent = PC.UI.OptionsContent
@@ -13,56 +14,37 @@ end
 -- Mods Subpage
 --------------------------------------------------
 
-local panel = CreateFrame(
-    "Frame",
-    nil,
-    parent
-)
-
+local panel = CreateFrame("Frame", nil, parent)
 panel:SetAllPoints(parent)
 panel:Hide()
 
--- Retain the EnvironmentPanel name for compatibility with UI callers.
+-- Preserve the public name for callers of the previous UI.
 PC.UI.EnvironmentPanel = panel
 
-local title = panel:CreateFontString(
-    nil,
-    "OVERLAY",
-    "GameFontNormal"
-)
+--------------------------------------------------
+-- Display-only Refresh Button
+--------------------------------------------------
 
-title:SetPoint(
-    "TOPLEFT",
+local refreshButton = CreateFrame(
+    "Button",
+    nil,
     panel,
-    "TOPLEFT",
-    15,
-    -14
+    "UIPanelButtonTemplate"
 )
 
-title:SetText("Client Mods")
-
-local subtitle = panel:CreateFontString(
-    nil,
-    "OVERLAY",
-    "GameFontHighlightSmall"
+refreshButton:SetWidth(72)
+refreshButton:SetHeight(20)
+refreshButton:SetPoint(
+    "TOPRIGHT",
+    panel,
+    "TOPRIGHT",
+    -13,
+    -9
 )
-
-subtitle:SetPoint(
-    "TOPLEFT",
-    title,
-    "BOTTOMLEFT",
-    0,
-    -5
-)
-
-subtitle:SetWidth(360)
-subtitle:SetJustifyH("LEFT")
-subtitle:SetText(
-    "Optional client extensions and their available capabilities."
-)
+refreshButton:SetText("Refresh")
 
 --------------------------------------------------
--- Scrollable Mod Cards
+-- Scrollable Text Sections
 --------------------------------------------------
 
 local scrollFrame = CreateFrame(
@@ -77,9 +59,8 @@ scrollFrame:SetPoint(
     panel,
     "TOPLEFT",
     13,
-    -67
+    -39
 )
-
 scrollFrame:SetPoint(
     "BOTTOMRIGHT",
     panel,
@@ -93,176 +74,261 @@ local scrollChild = CreateFrame(
     nil,
     scrollFrame
 )
-
-scrollChild:SetWidth(396)
-scrollChild:SetHeight(520)
+scrollChild:SetWidth(395)
+scrollChild:SetHeight(1)
 scrollFrame:SetScrollChild(scrollChild)
 
-local cardStatus = {}
-local cardDetails = {}
-local cursorY = 6
-
-local function CreateModCard(
-    key,
-    name,
-    description,
-    height,
-    hasDetails
+local introduction = scrollChild:CreateFontString(
+    nil,
+    "OVERLAY",
+    "GameFontNormal"
 )
-    local card = CreateFrame(
-        "Frame",
+introduction:SetWidth(375)
+introduction:SetJustifyH("CENTER")
+introduction:SetPoint(
+    "TOP",
+    scrollChild,
+    "TOP",
+    0,
+    -4
+)
+introduction:SetText(
+    "Client mods add optional APIs. Detected does not mean " ..
+    "that every related feature is used by Priest Companion."
+)
+
+--------------------------------------------------
+-- Reusable Mod Sections
+--------------------------------------------------
+
+local sections = {}
+local nextY = 52
+
+local function CreateStaticText(
+    parentFrame,
+    text,
+    x,
+    y,
+    width,
+    height,
+    font
+)
+    local label = parentFrame:CreateFontString(
         nil,
-        scrollChild
+        "OVERLAY",
+        font or "GameFontHighlightSmall"
+    )
+    label:SetPoint(
+        "TOPLEFT",
+        parentFrame,
+        "TOPLEFT",
+        x,
+        -y
+    )
+    label:SetWidth(width)
+    label:SetHeight(height)
+    label:SetJustifyH("LEFT")
+    label:SetJustifyV("TOP")
+    label:SetText(text)
+    return label
+end
+
+local function CreateReadOnlyLink(url, y)
+    local label = CreateStaticText(
+        scrollChild,
+        "Link:",
+        16,
+        y + 3,
+        35,
+        20,
+        "GameFontNormalSmall"
     )
 
-    card:SetWidth(391)
-    card:SetHeight(height)
+    local editBox = CreateFrame(
+        "EditBox",
+        nil,
+        scrollChild,
+        "InputBoxTemplate"
+    )
 
-    card:SetPoint(
+    editBox:SetWidth(310)
+    editBox:SetHeight(20)
+    editBox:SetAutoFocus(false)
+    editBox:SetPoint(
         "TOPLEFT",
         scrollChild,
         "TOPLEFT",
-        0,
-        -cursorY
+        54,
+        -y
     )
-
-    card:SetBackdrop({
-        bgFile =
-            "Interface\\Tooltips\\UI-Tooltip-Background",
-        edgeFile =
-            "Interface\\Tooltips\\UI-Tooltip-Border",
-        tile = true,
-        tileSize = 12,
-        edgeSize = 12,
-        insets = {
-            left = 4,
-            right = 4,
-            top = 4,
-            bottom = 4
-        }
-    })
-
-    card:SetBackdropColor(0.05, 0.05, 0.11, 0.95)
-    card:SetBackdropBorderColor(0.42, 0.42, 0.50, 1)
-
-    local heading = card:CreateFontString(
-        nil,
-        "OVERLAY",
-        "GameFontNormal"
+    editBox:SetText(url)
+    editBox:SetScript(
+        "OnEscapePressed",
+        function()
+            this:ClearFocus()
+        end
     )
-
-    heading:SetPoint(
-        "TOPLEFT",
-        card,
-        "TOPLEFT",
-        12,
-        -12
+    editBox:SetScript(
+        "OnEnterPressed",
+        function()
+            this:ClearFocus()
+        end
     )
-
-    heading:SetText(name)
-
-    local status = card:CreateFontString(
-        nil,
-        "OVERLAY",
-        "GameFontHighlightSmall"
+    editBox:SetScript(
+        "OnEditFocusGained",
+        function()
+            this:HighlightText()
+        end
     )
-
-    status:SetWidth(220)
-    status:SetJustifyH("RIGHT")
-    status:SetPoint(
-        "TOPRIGHT",
-        card,
-        "TOPRIGHT",
-        -13,
-        -14
+    editBox:SetScript(
+        "OnTextChanged",
+        function()
+            if this:GetText() ~= url then
+                this:SetText(url)
+            end
+        end
     )
-
-    cardStatus[key] = status
-
-    local summary = card:CreateFontString(
-        nil,
-        "OVERLAY",
-        "GameFontHighlightSmall"
-    )
-
-    summary:SetWidth(364)
-    summary:SetJustifyH("LEFT")
-    summary:SetPoint(
-        "TOPLEFT",
-        card,
-        "TOPLEFT",
-        13,
-        -40
-    )
-
-    summary:SetText(description)
-
-    if hasDetails then
-        local detail = card:CreateFontString(
-            nil,
-            "OVERLAY",
-            "GameFontHighlightSmall"
-        )
-
-        detail:SetWidth(364)
-        detail:SetJustifyH("LEFT")
-        detail:SetPoint(
-            "TOPLEFT",
-            card,
-            "TOPLEFT",
-            13,
-            -93
-        )
-
-        cardDetails[key] = detail
-    end
-
-    cursorY = cursorY + height + 9
 end
 
-CreateModCard(
+local function AddModSection(
+    key,
+    name,
+    red,
+    green,
+    blue,
+    features,
+    note,
+    url
+)
+    local topY = nextY
+
+    local heading = scrollChild:CreateFontString(
+        nil,
+        "OVERLAY",
+        "GameFontNormalLarge"
+    )
+    heading:SetPoint(
+        "TOP",
+        scrollChild,
+        "TOP",
+        0,
+        -topY
+    )
+    heading:SetWidth(360)
+    heading:SetJustifyH("CENTER")
+    heading:SetText(name)
+    heading:SetTextColor(red, green, blue)
+
+    local status = scrollChild:CreateFontString(
+        nil,
+        "OVERLAY",
+        "GameFontHighlightSmall"
+    )
+    status:SetPoint(
+        "TOP",
+        scrollChild,
+        "TOP",
+        0,
+        -(topY + 23)
+    )
+    status:SetWidth(365)
+    status:SetJustifyH("CENTER")
+
+    sections[key] = {
+        status = status
+    }
+
+    local explanation = CreateStaticText(
+        scrollChild,
+        features,
+        16,
+        topY + 47,
+        365,
+        75
+    )
+    explanation:SetTextColor(1.00, 0.82, 0.17)
+
+    local noteLabel = CreateStaticText(
+        scrollChild,
+        note,
+        16,
+        topY + 122,
+        365,
+        34,
+        "GameFontDisableSmall"
+    )
+
+    CreateReadOnlyLink(url, topY + 159)
+
+    nextY = topY + 193
+end
+
+AddModSection(
     "classic",
     "ClassicAPI",
-    "Optional modern item helpers, addon loading and quest turn-in events. The Vanilla core works without it.",
-    152,
-    true
+    1.00, 0.77, 0.30,
+    "ClassicAPI offers the following enhancements:\n" ..
+    "- Item name, icon, count and tooltip helpers\n" ..
+    "- Automatic selection of a ClassicAPI-specific addon TOC\n" ..
+    "- QUEST_TURNED_IN for tracking new quest completions",
+    "Priest Companion can use its item adapters and live quest " ..
+    "event. Historical quests still require other providers.",
+    "https://github.com/brues-code/ClassicAPI"
 )
 
-CreateModCard(
+AddModSection(
     "super",
     "SuperWoW",
-    "Provides enhanced unit information and targeting APIs. Priest Companion can use supported features in future modules.",
-    102,
-    false
+    1.00, 0.40, 0.40,
+    "SuperWoW offers the following enhancements:\n" ..
+    "- Enhanced unit information and targeting\n" ..
+    "- Accurate distance to many friendly units\n" ..
+    "- Improved mouseover and direct-target capabilities",
+    "Priest Companion currently detects SuperWoW; these " ..
+    "enhancements are not automatically enabled by detection.",
+    "https://github.com/balakethelock/SuperWoW"
 )
 
-CreateModCard(
+AddModSection(
     "nampower",
     "Nampower",
-    "Provides additional casting and combat APIs, including spell-queue capabilities where supported.",
-    102,
-    false
+    0.40, 1.00, 0.40,
+    "Nampower offers the following enhancements:\n" ..
+    "- Improved spell casting and input handling\n" ..
+    "- Spell queue functionality\n" ..
+    "- Additional combat APIs in supported versions",
+    "Priest Companion currently detects Nampower; future " ..
+    "features must individually check the required APIs.",
+    "https://gitea.com/avitasia/nampower"
 )
 
-CreateModCard(
+AddModSection(
     "unitxp",
     "UnitXP SP3",
-    "Offers accurate unit distance and line-of-sight queries for features that explicitly use those APIs.",
-    102,
-    false
+    0.48, 0.62, 1.00,
+    "UnitXP SP3 offers the following enhancements:\n" ..
+    "- More accurate distance information\n" ..
+    "- Unit line-of-sight queries\n" ..
+    "- Additional unit position capabilities",
+    "Priest Companion currently detects its dispatcher. " ..
+    "Individual features still need their own capability checks.",
+    "https://codeberg.org/konaka/UnitXP_SP3/wiki"
 )
 
-scrollChild:SetHeight(cursorY + 8)
+scrollChild:SetHeight(nextY + 8)
+
+if scrollFrame.UpdateScrollChildRect then
+    scrollFrame:UpdateScrollChildRect()
+end
 
 --------------------------------------------------
--- Display Helpers
+-- Status Rendering
 --------------------------------------------------
 
 local function FormatClassicAPIVersion(version)
     local value = tonumber(version)
 
-    if not value
-    or value <= 0 then
+    if not value or value <= 0 then
         return "Unknown"
     end
 
@@ -276,131 +342,133 @@ local function FormatClassicAPIVersion(version)
     )
 end
 
-local function SetModStatus(key, message, available)
-    local value = cardStatus[key]
+local function SetModStatus(key, label, state)
+    local record = sections[key]
 
-    if not value then
+    if not record then
         return
     end
 
-    value:SetText(message)
+    record.status:SetText(label)
 
-    if available then
-        value:SetTextColor(0.30, 1.00, 0.30)
+    if state == "detected" then
+        record.status:SetTextColor(0.20, 1.00, 0.20)
+    elseif state == "outdated" then
+        record.status:SetTextColor(1.00, 0.80, 0.22)
     else
-        value:SetTextColor(1.00, 0.47, 0.36)
+        record.status:SetTextColor(1.00, 0.30, 0.30)
     end
 end
 
 --------------------------------------------------
--- Refresh Values (No Server Requests)
+-- Display Refresh (No Server Queries)
 --------------------------------------------------
 
 function panel.Refresh()
     local caps = PC.Capabilities or {}
 
-    local classicVersion =
-        FormatClassicAPIVersion(
-            caps.classicAPIVersion
-        )
+    local classicVersion = FormatClassicAPIVersion(
+        caps.classicAPIVersion
+    )
 
     if caps.classicAPI then
         if caps.classicAPISupported then
+            local adapter = "Adapter not loaded"
+
+            if caps.classicAPIAdapter then
+                adapter = "Adapter loaded"
+            end
+
             SetModStatus(
                 "classic",
-                "Detected v" .. classicVersion,
-                true
+                "Mod Detected - Version " ..
+                    classicVersion .. " - " .. adapter,
+                "detected"
             )
         else
             SetModStatus(
                 "classic",
-                "Unsupported v" .. classicVersion,
-                false
+                "Mod Detected (Unsupported) - Version " ..
+                    classicVersion,
+                "outdated"
             )
         end
     else
         SetModStatus(
             "classic",
-            "Not detected",
-            false
+            "Mod Not Detected",
+            "missing"
         )
     end
 
-    cardDetails.classic:SetText(
-        "Minimum: v" ..
-        FormatClassicAPIVersion(
-            caps.classicAPIMinVersion
-        ) ..
-        "   |   Adapter loaded: " ..
-        (caps.classicAPIAdapter and "Yes" or "No")
-    )
-
     if caps.superWoW then
-        local status = "Detected"
+        local version = "Version unknown"
 
         if caps.superWoWVersion then
-            status = status .. " v" ..
-                tostring(caps.superWoWVersion)
+            version = "Version " .. tostring(
+                caps.superWoWVersion
+            )
         elseif caps.superWoWDetection == "legacy" then
-            status = status .. " (legacy)"
+            version = "Legacy version"
         end
 
-        SetModStatus("super", status, true)
+        SetModStatus(
+            "super",
+            "Mod Detected - " .. version,
+            "detected"
+        )
     else
-        SetModStatus("super", "Not detected", false)
+        SetModStatus(
+            "super",
+            "Mod Not Detected",
+            "missing"
+        )
     end
 
     if caps.nampower then
-        local status = "Detected"
+        local version = "Version unknown"
 
         if caps.nampowerVersion then
-            status = status .. " v" ..
-                tostring(caps.nampowerVersion)
+            version = "Version " .. tostring(
+                caps.nampowerVersion
+            )
         end
 
-        SetModStatus("nampower", status, true)
+        SetModStatus(
+            "nampower",
+            "Mod Detected - " .. version,
+            "detected"
+        )
     else
-        SetModStatus("nampower", "Not detected", false)
+        SetModStatus(
+            "nampower",
+            "Mod Not Detected",
+            "missing"
+        )
     end
 
     if caps.unitXP then
-        local status = "Detected"
+        local suffix = "Detected by capability check"
 
         if caps.unitXPDetection == "loader" then
-            status = status .. " (loader)"
+            suffix = "Detected by loader"
         elseif caps.unitXPDetection == "dispatcher" then
-            status = status .. " (dispatcher)"
+            suffix = "Detected by dispatcher"
         end
 
-        SetModStatus("unitxp", status, true)
+        SetModStatus(
+            "unitxp",
+            "Mod Detected - " .. suffix,
+            "detected"
+        )
     else
-        SetModStatus("unitxp", "Not detected", false)
+        SetModStatus(
+            "unitxp",
+            "Mod Not Detected",
+            "missing"
+        )
     end
 end
-
---------------------------------------------------
--- Manual UI Refresh
---------------------------------------------------
-
-local refreshButton = CreateFrame(
-    "Button",
-    nil,
-    panel,
-    "UIPanelButtonTemplate"
-)
-
-refreshButton:SetWidth(72)
-refreshButton:SetHeight(20)
-
-refreshButton:SetPoint(
-    "TOPRIGHT",
-    panel,
-    "TOPRIGHT",
-    -10,
-    -9
-)
-
-refreshButton:SetText("Refresh")
 
 refreshButton:SetScript(
     "OnClick",

@@ -7,13 +7,43 @@ local PC = PriestCompanion
 -- ClassicAPI
 --------------------------------------------------
 
-PC.Capabilities.classicAPI = false
+-- ClassicAPI v1.11.0 introduced automatic _ClassicAPI.toc selection.
+-- This is the minimum integration baseline, not a requirement for Vanilla.
+-- Test each future API independently before increasing this minimum.
+local CLASSIC_API_MIN_VERSION = 11100
 
-if PC.Environment.classicAPI then
-    PC.Capabilities.classicAPI = true
-elseif CLASSIC_API_VERSION then
-    PC.Capabilities.classicAPI = true
-end
+local classicAPIVersion =
+    tonumber(CLASSIC_API_VERSION)
+
+local classicAPIPresent =
+    classicAPIVersion ~= nil
+    and classicAPIVersion > 0
+
+PC.Capabilities.classicAPI =
+    classicAPIPresent and true or false
+
+PC.Capabilities.classicAPIVersion =
+    classicAPIVersion
+
+PC.Capabilities.classicAPIMinVersion =
+    CLASSIC_API_MIN_VERSION
+
+PC.Capabilities.classicAPISupported =
+    classicAPIPresent
+    and classicAPIVersion >= CLASSIC_API_MIN_VERSION
+    or false
+
+-- The DLL can be detected under the standard TOC too.
+-- Adapter loaded and DLL present are distinct capabilities.
+PC.Capabilities.classicAPIAdapter =
+    PC.Capabilities.classicAPISupported
+    and PC.Environment.classicAPI == true
+    or false
+
+-- QUEST_TURNED_IN is emitted by ClassicAPI itself, independently of
+-- which TOC selected the Priest Companion's item API adapters.
+PC.Capabilities.questTurnInEvent =
+    PC.Capabilities.classicAPISupported
 
 --------------------------------------------------
 -- SuperWoW

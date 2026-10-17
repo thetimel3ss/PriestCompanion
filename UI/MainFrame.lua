@@ -94,7 +94,7 @@ PC.UI.MainFrame = frame
 local titleFrame = CreateFrame("Frame", nil, frame)
 titleFrame:SetWidth(190)
 titleFrame:SetHeight(38)
-titleFrame:SetPoint("TOP", frame, "TOP", 0, 22)
+titleFrame:SetPoint("TOP", frame, "TOP", 0, 12)
 
 local titleTexture = titleFrame:CreateTexture(nil, "ARTWORK")
 titleTexture:SetTexture(
@@ -194,7 +194,7 @@ local function CreateMainTab(id, label, index, previous)
             frame,
             "BOTTOMLEFT",
             0,
-            -5
+            6
         )
     end
 

@@ -35,8 +35,8 @@ The roadmap tracks outstanding improvements and ongoing verification. Released f
 - **Quest history:** `QUEST_TURNED_IN` registration now depends on a supported ClassicAPI runtime, not on the TOC flavor. The registered event provides quest ID in `arg1`. A `pcall(RegisterEvent)` result is recorded as `QuestHistory.LiveTurnInRegistered` but **cannot prove event delivery**.
 - **Impossible native quest history:** `C_QuestLog.IsQuestFlaggedCompleted` is not feasible in the Vanilla 1.12 client; its ClassicAPI adapter override was removed. Retain SavedVariables, live turn-ins, positive injected provider results, the server-specific `.queststatus`/`TWQUEST` protocol, and optional pfQuest import. Never classify an unknown result as definitely incomplete.
 - **Server fallback:** `.queststatus` still uses `GUILD` chat (no unverified alternate channel). The code skips sending when `IsInGuild() == false` and records `not_in_guild`; missing chat API or send failures are also reported by `GetServerQueryState().unavailableReason`. Server support and delivery still need in-game confirmation. No reply means an unknown history state.
-- **Environment diagnostics:** `/priest env` now reports ClassicAPI version, minimum, compatibility, adapter state, turn-in registration (not delivery), server-query state, and richer SuperWoW/Nampower/UnitXP indicators. Its extension detection is a startup snapshot; enabling/updating a DLL requires a client restart. Reading diagnostics does not initiate any server query.
-- **Maintainer's prior test result:** earlier ClassicAPI detection and local quest-history persistence tests returned the expected values. The expanded `/priest env` output and improved optional extension probes still need targeted in-game verification.
+- **Environment diagnostics:** `/priest env` now opens the Environment tab in the addon instead of printing the details to chat. It shows ClassicAPI version, minimum, compatibility, adapter state, turn-in registration (not delivery), server-query state, and richer SuperWoW/Nampower/UnitXP indicators. DLL detection remains a startup snapshot; Refresh only rereads values and never issues a server query.
+- **Maintainer's prior test result:** the expanded `/priest env` command was verified in-game before the Environment UI change. Reported values included ClassicAPI 1.15.9, SuperWoW 2.2, Nampower 4, UnitXP dispatcher detection and a server response containing 932 processed quest IDs. The **new tabbed presentation and refresh behavior** still require in-game validation.
 - **Static checks completed:** version/adapter separation, the TOC loading order, absence of the unsupported quest-history API call, four Vanilla fallbacks and all existing history providers were inspected in the committed code.
 - **In-game acceptance matrix still pending:** Vanilla-only + standard TOC; ClassicAPI >=1.11.0 + automatic flavor; a supported runtime using the standard TOC; manually selected ClassicAPI TOC without a functioning DLL; unsupported/older DLL. Test item functions, quest turn-ins (including reload persistence), server query with and without a guild, absent server support, and pfQuest import. Also test with the latest supported ClassicAPI version.
 - **Status:** code implemented on `feature/classicapi-capabilities-questhistory` under **Unreleased**. It has not been validated inside a WoW 1.12 client; do not mark this task fully done until live testing confirms behavior.
@@ -118,7 +118,14 @@ All 28 records have `source.note`: 21 world-drop-style entries with `"World drop
 
 ## Next steps
 
-### Priority 1 — Harden the Wand Progression release
+### Current focus — Environment UI and client diagnostics
+
+- [x] Add Wands/Environment tabs to the main frame and a read-only Environment panel; load it from both TOCs.
+- [x] Make `/priest env` and `/pc env` open the Environment tab instead of posting all diagnostics to chat.
+- [x] Show ClassicAPI presence/version/minimum/adapter, quest-history turn-in registration and server-query state, and optional DLL information. A display-only Refresh button must not send network requests.
+- [ ] Validate the Environment layout, tab switching, command aliases and Refresh button inside a Vanilla 1.12 client with and without ClassicAPI. Prior capability flags and server history were user-tested; the new UI itself is not yet verified in-game.
+
+### Deferred — Wand Progression enhancements
 
 - [x] **ClassicAPI code:** use the automatic flavor TOC redirect, add a guarded v1.11.0-capable adapter, detect capabilities separately, and preserve optional quest-history providers.
 - [ ] **ClassicAPI in-game validation:** complete the acceptance matrix above, specifically live `QUEST_TURNED_IN`, item fallbacks, no-guild server transport, and reload persistence before merging this feature branch.

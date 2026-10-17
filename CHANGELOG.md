@@ -2,6 +2,13 @@
 
 ## [Unreleased]
 
+### Changed — Environment Diagnostics (2026-10-17)
+- Expanded `/priest env` (also `/pc env`) to report the addon version, client flavor, ClassicAPI detected/installed/minimum versions, compatibility, loaded adapter, and `QUEST_TURNED_IN` registration status.
+- The event line distinguishes unavailable, not registered, and registered-but-not-yet-verified delivery; registration alone does not prove a real quest turn-in event was received.
+- Included the quest-history server query state and unavailable reason (where provided), without sending an additional request merely to display the diagnostics.
+- Improved optional extension detection metadata: SuperWoW version with a conservative legacy-API fallback, Nampower version via a protected provider call, and UnitXP SP3 loader/dispatcher probe indication.
+- These capabilities remain sampled during addon startup. After enabling or updating a DLL, restart the WoW client before relying on the diagnostic output.
+
 ### Changed — ClassicAPI and Quest History (2026-10-17)
 - Established an **optional** ClassicAPI v1.11.0 integration baseline; the addon still supports Vanilla 1.12 without the DLL, and the existing `_ClassicAPI.toc` flavor remains selected automatically by compatible ClassicAPI clients.
 - Separated presence, version, minimum support, loaded adapter and quest-turn-in event capabilities in `Core/Capabilities.lua`.

@@ -3,7 +3,7 @@
 The roadmap tracks outstanding improvements and ongoing verification. Released functionality belongs in [CHANGELOG.md](CHANGELOG.md), not here.
 
 **Review date:** 2026-10-17  
-**Development branch:** `feature/wand-progression-clean`  
+**Development branch:** `feature/classicapi-capabilities-questhistory`  
 **Current release:** `0.1.2`
 
 ## Current scope and confirmed decisions

@@ -2,6 +2,15 @@
 
 ## [Unreleased]
 
+### Changed — ClassicAPI and Quest History (2026-10-17)
+- Established an **optional** ClassicAPI v1.11.0 integration baseline; the addon still supports Vanilla 1.12 without the DLL, and the existing `_ClassicAPI.toc` flavor remains selected automatically by compatible ClassicAPI clients.
+- Separated presence, version, minimum support, loaded adapter and quest-turn-in event capabilities in `Core/Capabilities.lua`.
+- Guarded `Core/ClassicAPI.lua` against absent/outdated ClassicAPI and added protected enhanced item API calls with preserved Vanilla fallbacks.
+- Removed the `C_QuestLog.IsQuestFlaggedCompleted` override, because this API cannot provide historical quest completion state in Vanilla 1.12.
+- Registered `QUEST_TURNED_IN` according to ClassicAPI runtime capability rather than selected TOC flavor; kept local, server, pfQuest and optional positive API history providers.
+- Protected the server history command from failed chat calls and unsupported guild transport; `GetServerQueryState()` now reports `unavailableReason` when the server query could not start.
+- Updated [ROADMAP.md](ROADMAP.md) with compatibility expectations and remaining **in-game test cases**. Changes are not included in a tagged release and have not yet been exercised in a WoW client.
+
 ## [0.1.2] - 2026-10-17
 
 ### Changed

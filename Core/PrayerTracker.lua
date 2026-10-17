@@ -331,6 +331,13 @@ end
 --------------------------------------------------
 
 local eventFrame = CreateFrame("Frame")
+local pendingTalentRescan = nil
+
+local function ScheduleTalentRescan()
+    -- A short follow-up covers delayed server talent and spellbook data
+    -- after login, talent purchase or respec without polling forever.
+    pendingTalentRescan = 0.8
+end
 
 local function RegisterProvider(eventName, name)
     local success = pcall(
@@ -394,6 +401,22 @@ local function LoadSettings()
 end
 
 eventFrame:SetScript(
+    "OnUpdate",
+    function()
+        if pendingTalentRescan then
+            pendingTalentRescan =
+                pendingTalentRescan - arg1
+
+            if pendingTalentRescan <= 0 then
+                pendingTalentRescan = nil
+                ScanSpellbook()
+                ScanBookOfPrayer()
+            end
+        end
+    end
+)
+
+eventFrame:SetScript(
     "OnEvent",
     function()
         if event == "VARIABLES_LOADED" then
@@ -404,6 +427,7 @@ eventFrame:SetScript(
         if event == "PLAYER_ENTERING_WORLD" then
             ScanSpellbook()
             ScanBookOfPrayer()
+            ScheduleTalentRescan()
             Notify()
             return
         end
@@ -411,12 +435,14 @@ eventFrame:SetScript(
         if event == "CHARACTER_POINTS_CHANGED"
         or event == "PLAYER_LEVEL_UP" then
             ScanBookOfPrayer()
+            ScheduleTalentRescan()
             return
         end
 
         if event == "SPELLS_CHANGED" then
             ScanSpellbook()
             ScanBookOfPrayer()
+            ScheduleTalentRescan()
             return
         end
 

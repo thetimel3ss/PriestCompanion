@@ -445,7 +445,13 @@ NPCs[11596] = {
 NPCs[11626] = {
     id = 11626,
     name = "Rigger Gizelton",
-    zone = "Desolace"
+    zone = "Desolace",
+    message = "This NPC starts Gizelton Caravan only when located at the south end of his route. The quest only becomes available just after he leaves the south end and just before he enters Mannoroc Coven",
+    map = {
+        zone = "Desolace",
+        x = 40.6,
+        y = 79.4
+    }
 }
 
 NPCs[14736] = {
@@ -1202,7 +1208,13 @@ NPCs[11484] = {
 NPCs[11520] = { 
     id = 11520, 
     name = "Taragaman the Hungerer", 
-    zone = "Ragefire Chasm" 
+    zone = "Ragefire Chasm",
+    map = {
+        instanceID = 389,
+        zone = "Ragefire Chasm",
+        x = 41,
+        y = 57.7
+    }
 }
 
 NPCs[11720] = { 
@@ -1381,11 +1393,6 @@ NPCs[12461] = {
     }
 }
 
-NPCs[13456] = { 
-    id = 13456, 
-    name = "Noxxion's Spawn" 
-}
-
 NPCs[13816] = { 
     id = 13816, 
     name = "Prospector Stonehewer", 
@@ -1520,8 +1527,8 @@ NPCs[14686] = {
     map = {
         instanceID = 129,
         zone = "Razorfen Downs",
-        x = 0,
-        y = 0
+        x = 65.3,
+        y = 16.9
     } 
 }
 
@@ -1820,11 +1827,6 @@ NPCs[65113] = {
         x = 32.1,
         y = 27.4
     }
-}
-
-NPCs[65114] = { 
-    id = 65114, 
-    name = "Harbinger Aph'ygth" 
 }
 
 NPCs[70020] = { 

@@ -292,7 +292,12 @@ Instances[389] = {
     type = "dungeon", 
     description = "Dungeon encounter in Ragefire Chasm.", 
     entranceZone = "Orgrimmar", 
-    icon = "Interface\\Icons\\INV_Misc_Map_01" 
+    icon = "Interface\\Icons\\INV_Misc_Map_01",
+    
+    worldMap = {
+        mapID = 4,
+        zoneID = 1
+    }
 }
 
 --------------------------------------------------

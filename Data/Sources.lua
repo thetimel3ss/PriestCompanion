@@ -321,7 +321,8 @@ Sources[15281] = {
         requiredLevel = 52,
         dropChance = 0.0049,
         faction = "Both",
-        details = true
+        details = true,
+        note = "World drop from multiple creatures. No fixed location."
     }
 }
 
@@ -337,7 +338,8 @@ Sources[15282] = {
         requiredLevel = 55,
         dropChance = 0.0104,
         faction = "Both",
-        details = true
+        details = true,
+        note = "World drop from multiple creatures. No fixed location."
     }
 }
 
@@ -824,7 +826,8 @@ Sources[5069] = {
         requiredLevel = 7,
         dropChance = 0.03,
         faction = "Both",
-        details = true 
+        details = true,
+        note = "World drop from multiple creatures. No fixed location."
     } 
 }
 
@@ -840,7 +843,8 @@ Sources[5071] = {
         requiredLevel = 9,
         dropChance = 0.0119, 
         faction = "Both",
-        details = true 
+        details = true,
+        note = "World drop from multiple creatures. No fixed location."
     } 
 }
 
@@ -856,7 +860,8 @@ Sources[5207] = {
         requiredLevel = 9,
         dropChance = 0.0083,
         faction = "Both",
-        details = true
+        details = true,
+        note = "World drop from multiple creatures. No fixed location."
     }
 }
 
@@ -928,7 +933,8 @@ Sources[5212] = {
         requiredLevel = 12,
         dropChance = 0.0088,
         faction = "Both",
-        details = true 
+        details = true,
+        note = "World drop from multiple creatures. No fixed location."
     } 
 }
 
@@ -944,7 +950,8 @@ Sources[5213] = {
         requiredLevel = 30,
         dropChance = 0.0056,
         faction = "Both",
-        details = true 
+        details = true,
+        note = "World drop from multiple creatures. No fixed location."
     } 
 }
 
@@ -960,7 +967,8 @@ Sources[5214] = {
         requiredLevel = 27,
         dropChance = 0.0055,
         faction = "Both",
-        details = true
+        details = true,
+        note = "World drop from multiple creatures. No fixed location."
     }
 }
 
@@ -976,7 +984,8 @@ Sources[5215] = {
         requiredLevel = 36,
         dropChance = 0.0053,
         faction = "Both",
-        details = true
+        details = true,
+        note = "World drop from multiple creatures. No fixed location."
     }
 }
 
@@ -992,7 +1001,8 @@ Sources[5216] = {
         requiredLevel = 40,
         dropChance = 0.0032,
         faction = "Both",
-        details = true
+        details = true,
+        note = "World drop from multiple creatures. No fixed location."
     }
 }
 
@@ -1307,7 +1317,8 @@ Sources[8184] = {
         requiredLevel = 24,
         dropChance = 0.0064,
         faction = "Both",
-        details = true
+        details = true,
+        note = "World drop from multiple creatures. No fixed location."
     }
 }
 
@@ -1323,7 +1334,8 @@ Sources[8186] = {
         requiredLevel = 24,
         dropChance = 0.000625,
         faction = "Both",
-        details = true    
+        details = true,
+        note = "World drop from multiple creatures. No fixed location."    
     }
 }
 
@@ -1340,7 +1352,8 @@ Sources[9381] = {
         requiredLevel = 33,
         dropChance = 0.02,
         faction = "Both",
-        details = true
+        details = true,
+        note = "Dropped by multiple creatures in this instance."
     }
 }
 
@@ -1414,7 +1427,8 @@ Sources[9489] = {
         requiredLevel = 26,
         dropChance = 0.02,
         faction = "Both", 
-        details = true
+        details = true,
+        note = "Dropped by multiple creatures in this instance."
     } 
 }
 
@@ -1432,7 +1446,8 @@ Sources[10572] = {
         requiredLevel = 34,
         dropChance = 0.02,
         faction = "Both",
-        details = true 
+        details = true,
+        note = "Dropped by multiple creatures in this instance."
     } 
 }
 
@@ -1584,7 +1599,8 @@ Sources[12984] = {
         dropChance = 0.0009,
         faction = "Both",
         mobCount = 215, 
-        details = true 
+        details = true,
+        note = "World drop from multiple creatures. No fixed location." 
     } 
 }
 
@@ -1601,7 +1617,8 @@ Sources[13004] = {
         dropChance = 0.001,
         faction = "Both",
         mobCount = 466, 
-        details = true 
+        details = true,
+        note = "World drop from multiple creatures. No fixed location."
     } 
 }
 
@@ -1618,7 +1635,8 @@ Sources[13062] = {
         dropChance = 0.001,
         faction = "Both",
         mobCount = 426,
-        details = true
+        details = true,
+        note = "World drop from multiple creatures. No fixed location."
     }
 }
 
@@ -1635,7 +1653,8 @@ Sources[13063] = {
         dropChance = 0.001,
         faction = "Both",
         mobCount = 459,
-        details = true
+        details = true,
+        note = "World drop from multiple creatures. No fixed location."
     }
 }
 
@@ -1652,7 +1671,8 @@ Sources[13064] = {
         dropChance = 0.0011,
         faction = "Both",
         mobCount = 354,
-        details = true
+        details = true,
+        note = "World drop from multiple creatures. No fixed location."
     }
 }
 
@@ -1669,7 +1689,8 @@ Sources[13065] = {
         dropChance = 0.0025,
         faction = "Both",
         mobCount = 560,
-        details = true
+        details = true,
+        note = "World drop from multiple creatures. No fixed location."
     }
 }
 
@@ -1759,7 +1780,8 @@ Sources[15279] = {
         requiredLevel = 46,
         dropChance = 0.0044,
         mobCount = 753,
-        details = true
+        details = true,
+        note = "World drop from multiple creatures. No fixed location."
     }
 }
 
@@ -1775,7 +1797,8 @@ Sources[15280] = {
         requiredLevel = 48,
         dropChance = 0.0051,
         mobCount = 846,
-        details = true
+        details = true,
+        note = "World drop from multiple creatures. No fixed location."
     }
 }
 
@@ -1791,7 +1814,8 @@ Sources[15283] = {
         requiredLevel = 59,
         dropChance = 0.0217391304, 
         mobCount = 254,
-        details = true
+        details = true,
+        note = "World drop from multiple creatures. No fixed location."
     }
 }
 
@@ -2354,13 +2378,13 @@ Sources[21603] = {
 Sources[21801] = { 
     { 
         type = "drop", 
-        npcID = 15319, 
         npcName = "Multiple creatures", 
         npcType = "Raid creatures", 
         instanceID = 509,
         dropChance = 0.06,
         mobCount = 21, 
-        details = true 
+        details = true,
+        note = "Dropped by multiple creatures in this instance."
     } 
 }
 
@@ -2902,12 +2926,12 @@ Sources[60427] = {
 Sources[60805] = { 
     { 
         type = "drop", 
-        npcID = 91910, 
         npcName = "Multiple creatures", 
         npcType = "Creatures", 
         instanceID = 800, 
         mobCount = 15, 
-        details = true 
+        details = true,
+        note = "Dropped by multiple creatures in this instance."
     } 
 }
 
@@ -3110,7 +3134,8 @@ Sources[80748] = {
         instanceID = 349,
         dropChance = 0.01,
         mobCount = 19, 
-        details = true 
+        details = true,
+        note = "Dropped by multiple creatures in this instance."
     }
 }
 
@@ -3125,8 +3150,8 @@ Sources[80799] = {
         npcType = "Creatures", 
         instanceID = 796,
         instanceZoneID = 4,
-        mobCount = 1, 
-        details = true 
+        details = true,
+        note = "Dropped by multiple creatures in this instance."
     } 
 }
 

@@ -128,13 +128,17 @@ All 28 records have `source.note`: 21 world-drop-style entries with `"World drop
 - [x] **Puppeteer-inspired visual refinement:** centered decorated dialog title, PanelTemplates-driven pressed/selected tab artwork, secondary-tab border alignment, and descriptive Mods sections with detected/missing/unsupported colors and selectable links.
 - [ ] **In-game UI validation:** check the decorated title position, border and pressed states for both tab tiers, copyable Mods links, scroll range and status colors; then check /priest options aliases, close/reopen, return from Source Details, and unchanged Wand list on Vanilla 1.12 with/without ClassicAPI. Static inspection cannot replace this test.
 
-### Proposed feature — Book of Prayer heal-family tracker (design pending)
+### Book of Prayer Tracker — implementation on feature branch (2026-10-17)
 
-- **Goal:** a small, movable, optionally visible HUD showing the most recently *successfully cast* qualifying healing spell and which different healing families are eligible for the next Book of Prayer proc. This feature is a design proposal, not implemented or validated in-game.
-- **Normalization:** compare spell families (Flash Heal, Renew, Greater Heal, etc.), ignoring ranks and distinguishing different spell types. Non-healing casts should not replace the previous healing family, and unsuccessful/interrupted casts should not update the state.
-- **Preferred tracking:** ClassicAPI's `UNIT_SPELLCAST_SUCCEEDED` can provide spell ID/name for the local player (verify event support on each runtime); optional SuperWoW `UNIT_CASTEVENT` may provide a fallback via caster GUID, event type, and spell ID. Raw 1.12 `SPELLCAST_STOP` alone is not authoritative proof of cast success; account for unknown or limited mode if no reliable provider is available.
-- **Talent detection:** query Vanilla `GetNumTalentTabs`, `GetNumTalents` and `GetTalentInfo` to detect Book of Prayer ranks if available; allow manual visibility until the custom talent can be verified in-game.
-- **Open tests:** qualify spell list, Renew application vs periodic ticks, group heals, Holy Nova, overheals, Power Word: Shield, cast failure, combat-log edge cases, and talent points versus actual refund behavior. Do not claim confirmed mana refund from a client-side guess.
+- [x] Define six supported healing families independent of spell rank: Flash Heal, Renew, Prayer of Healing, Heal, Greater Heal and Lesser Heal.
+- [x] Scan `GetTalentInfo` for the actual Book of Prayer talent and current points. Recheck upon login, talents and spellbook changes; do not enable the tracker without talent points.
+- [x] Track successful local-player casts, prioritizing ClassicAPI `UNIT_SPELLCAST_SUCCEEDED`; Nampower `SPELL_CAST_EVENT` and SuperWoW `UNIT_CASTEVENT` are optional fallbacks. Avoid double-counting one cast across providers. Do not derive success from `SPELLCAST_STOP`.
+- [x] Implement a compact HUD with icon and optional spell name, expanded mode with the penultimate healing family, optional last-cast refund *eligibility* footer, drag movement and resizing from all edges/corners.
+- [x] Add Advanced checkboxes: Enable, Expanded, Show spell name, Show mana refund eligibility, Show outside combat, Lock position and size. When talent points = 0, disable Enable and display a red explanation.
+- [x] Persist settings and separate compact/expanded sizes and screen position per character in `PriestCompanionCharDB`.
+- [ ] **In-game OctoWoW validation (mandatory):** check the talent scanner for 0/1/2 points, changing talents/respec, rank-independent family tracking, Renew ticks and Prayer of Healing being counted once, cast success vs interruption, actual spell icons, compact/expanded display and movement/resizing/lock behavior. Test settings and geometry across `/reload` and relog.
+- [ ] **Client variation:** test with and without ClassicAPI and with each fallback extension separately. If no trustworthy cast events are present, keep tracking unavailable rather than incorrectly treating `SPELLCAST_STOP` as a confirmed heal.
+- [ ] **Refund accuracy:** the HUD shows only *eligibility* (based on family change and talent rank) and does not measure mana refunded. No numeric mana estimator or session statistics are part of this release.
 
 ### Deferred — Wand Progression enhancements
 

@@ -2,10 +2,18 @@
 
 ## [Unreleased]
 
+### Added — Puppeteer-Inspired Options UI (2026-10-17)
+- Added native Vanilla-style bottom tabs (**Wands** and **Options**) and secondary Options tabs (**General**, **Advanced**, **Mods**), modeled on Puppeteer's two-level navigation without importing PTGuiLib or other dependencies.
+- Added `UI/OptionsPanel.lua` for nested navigation, a General information page and an Advanced read-only quest-history diagnostics page.
+- Reworked `UI/EnvironmentPanel.lua` as a scrollable **Options → Mods** page with individual ClassicAPI, SuperWoW, Nampower and UnitXP SP3 cards, status, version information and descriptions of optional capabilities.
+- Changed `/priest env` and `/pc env` to open **Options → Mods** directly. The command no longer prints multi-line diagnostics into chat; the Mods Refresh button is read-only and does not issue server queries.
+- Preserved existing Wand Progression data, filters, row rendering and Source Details behavior. Both Vanilla and ClassicAPI TOCs now load the Options panel before the nested Mods page.
+- The interface is still **Unreleased** and requires in-game validation, especially native tab templates, scrolling and navigation. The addon remains version `0.1.2`.
+
 ### Added — Environment Tab (2026-10-17)
-- Introduced a dedicated **Environment** tab in the main Priest Companion window, alongside **Wands**, to display the current client-flavor, ClassicAPI, quest-history and optional DLL diagnostics without filling game chat.
+- Initially introduced a dedicated **Environment** tab to display client diagnostics without filling game chat. Its contents have since been reorganized into **Options → Advanced / Mods** in this unreleased branch.
 - Added `UI/EnvironmentPanel.lua`, a read-only diagnostic panel with grouped labels and a **Refresh** button that only refreshes the displayed snapshot and server-query status; it does not send `.queststatus`.
-- Updated `/priest env` and `/pc env` to open the Environment tab. The main `/priest` command still opens/closes the main window.
+- The initial Environment-tab command was later redirected to **Options → Mods**; the main `/priest` command still opens/closes the main window.
 - Added main-frame tab navigation while keeping the existing Wand Progression panel and Source Details available, and loaded the new panel in both Vanilla and ClassicAPI TOCs.
 - Retained the current `0.1.2` version until the new interface has been validated in-game.
 

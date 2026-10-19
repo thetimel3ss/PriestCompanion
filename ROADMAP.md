@@ -2,9 +2,9 @@
 
 The roadmap tracks outstanding improvements and ongoing verification. Released functionality belongs in [CHANGELOG.md](CHANGELOG.md), not here.
 
-**Review date:** 2026-10-17  
-**Development branch:** `feature/classicapi-capabilities-questhistory`  
-**Current release:** `0.1.2`
+**Review date:** 2026-10-19  
+**Current release:** `0.2.0` (`main`)  
+**Future development:** separate feature branches from `main`
 
 ## Current scope and confirmed decisions
 
@@ -28,7 +28,7 @@ The roadmap tracks outstanding improvements and ongoing verification. Released f
 - When multiple acquisition records have different types, Source Details displays the selected type rather than all types at once. For crafting, it presents the primary matching craft record; quests, drops, and vendors already support multiple entries.
 - Large boss loot tables are intentionally omitted for selected sources to avoid visual clutter and performance issues; records retained in `Data/BossLoot.lua` do not imply that the UI must render them.
 
-### Optional ClassicAPI integration — implementation on feature branch (2026-10-17)
+### Optional ClassicAPI integration — included in v0.2.0 (2026-10-19)
 - **Flavor TOC selection:** ClassicAPI v1.11.0+ automatically redirects a request for `PriestCompanion.toc` to `PriestCompanion_ClassicAPI.toc` if it exists. Without that DLL support, Vanilla loads the normal TOC. The two existing manifests are deliberately retained, and ClassicAPI is **not** a required dependency.
 - **Minimum enhanced baseline:** `CLASSIC_API_VERSION >= 11100` (v1.11.0) for this integration. `Core/Capabilities.lua` now differentiates DLL presence, version, supported version, adapter-loaded state, and expected `QUEST_TURNED_IN` support. Future Skills/Talents/BiS/Consumables/reputation/mana/buff modules should probe their own functions before increasing the minimum.
 - **Adapter guard:** `Core/ClassicAPI.lua` leaves the Vanilla API untouched if the version is absent or too old. Item name/icon/count/tooltip enhancements check for callable providers and protect calls with `pcall`, then use their Vanilla fallbacks as appropriate.
@@ -39,7 +39,7 @@ The roadmap tracks outstanding improvements and ongoing verification. Released f
 - **Maintainer's prior test result:** the expanded `/priest env` command was verified in-game before the Environment UI change. Reported values included ClassicAPI 1.15.9, SuperWoW 2.2, Nampower 4, UnitXP dispatcher detection and a server response containing 932 processed quest IDs. The **new tabbed presentation and refresh behavior** still require in-game validation.
 - **Static checks completed:** version/adapter separation, the TOC loading order, absence of the unsupported quest-history API call, four Vanilla fallbacks and all existing history providers were inspected in the committed code.
 - **In-game acceptance matrix still pending:** Vanilla-only + standard TOC; ClassicAPI >=1.11.0 + automatic flavor; a supported runtime using the standard TOC; manually selected ClassicAPI TOC without a functioning DLL; unsupported/older DLL. Test item functions, quest turn-ins (including reload persistence), server query with and without a guild, absent server support, and pfQuest import. Also test with the latest supported ClassicAPI version.
-- **Status:** code implemented on `feature/classicapi-capabilities-questhistory` under **Unreleased**. It has not been validated inside a WoW 1.12 client; do not mark this task fully done until live testing confirms behavior.
+- **Status:** optional integration code included in `0.2.0`; the separate ClassicAPI and quest-history compatibility matrix remains **unverified**. Its release does not mean every client/provider combination has been tested.
 
 ### Item information
 
@@ -118,7 +118,7 @@ All 28 records have `source.note`: 21 world-drop-style entries with `"World drop
 
 ## Next steps
 
-### Current focus — Native tabbed Options UI and client diagnostics
+### Native tabbed Options UI and client diagnostics — released in v0.2.0
 
 - [x] Replace top-level command-style navigation with Vanilla-native **Wands / Options** bottom tabs, inspired by Puppeteer. The options area now has **General / Advanced / Mods** secondary tabs.
 - [x] Add `UI/OptionsPanel.lua` for read-only General information and interactive Book of Prayer settings under Advanced; reorganize `UI/EnvironmentPanel.lua` into a scrollable **Options → Mods** subpage with individual DLL sections.
@@ -128,7 +128,9 @@ All 28 records have `source.note`: 21 world-drop-style entries with `"World drop
 - [x] **Puppeteer-inspired visual refinement:** centered decorated dialog title, PanelTemplates-driven pressed/selected tab artwork, secondary-tab border alignment, and descriptive Mods sections with detected/missing/unsupported colors and selectable links.
 - [ ] **In-game UI validation:** confirm first-open Options → General after `/reload`, tab switching and reopening, the two Advanced tooltips (hover on checkbox *and* label), the removed Quest History Diagnostics display, the decorated title and selected tab textures, Mods links/scroll/status, `/priest options` aliases, and the unchanged Wands view. Static inspection cannot replace this test.
 
-### Book of Prayer Tracker — implementation on feature branch (2026-10-17)
+### Book of Prayer Tracker — released in v0.2.0 (2026-10-19)
+
+- [x] **Maintainer-confirmed in-game checks:** Nampower displays mana correctly when Renew follows Flash Heal rapidly; Reset Position and Preview Tracker worked before confirmation was added. The maintainer also verified Inner Focus → heal → heal; Ascendance → heal → another heal; Ascendance → heal → heal; Inner Focus → Ascendance → heal → heal / another heal; Ascendance → Inner Focus → heal → heal / another heal. Inner Focus requires restarting the refund cycle, correctly reflected by the tracker; Ascendance reports reduced mana returned. Reset confirmation and other rapid-cast/compatibility sequences still need live testing.
 
 - [x] Define six supported healing families independent of spell rank: Flash Heal, Renew, Prayer of Healing, Heal, Greater Heal and Lesser Heal.
 - [x] Scan `GetTalentInfo` for the actual Book of Prayer talent and current points. Recheck upon login, talents and spellbook changes; do not enable the tracker without talent points.
@@ -145,14 +147,14 @@ All 28 records have `source.note`: 21 world-drop-style entries with `"World drop
 - [ ] **Live layout controls:** verify Reset Position OK vs Cancel/Escape when locked and unlocked, after changing compact/expanded dimensions, and across /reload. Test Preview with 0/2 and 2/2 talent, while auto-hide is enabled, after enabling/disabling the mana label, while dragging/resizing, and on switching tabs/closing the main frame; verify genuine heal history remains unchanged.
 - [x] **Mana label spacing:** reserve footer space when **Show mana refund** is checked; reposition and shrink spell icons rather than moving the mana text. If **Show spell name** is unchecked, allow a larger icon; adapt further for names wrapping onto two lines. Preserve distinct compact/expanded sizing and the existing saved window geometry.
 - [ ] **Visual validation:** test all four combinations of Show spell name / Show mana refund in compact and expanded modes, including long spell names and window scaling at saved minimum sizes. Confirm no overlaps between icon, name, and mana text.
-- [ ] **Mana refund validation:** compare Nampower `SPELL_ENERGIZE_ON_SELF` real amounts for SpellID 52942 with the displayed `+N mana` (normal, Ascendance, Inner Focus). Confirm whether energize arrives before or after `UNIT_SPELLCAST_SUCCEEDED`, whether the event works with Nampower 4.0 requiring a CVar and Nampower 4.5+ requiring only registration, whether toggling off restores a legacy setting changed by the addon, and whether an absent event selects the ClassicAPI `~N mana` estimate. Retest all six healing families, alternative ranks, cast cancellation, and reload; distinguish actual values from server rounding and client estimates.
+- [ ] **Remaining mana refund validation:** Inner Focus and Ascendance cast-order behavior is maintainer-confirmed (see checked item above). Still compare Nampower `SPELL_ENERGIZE_ON_SELF` packets against `+N mana` across all families/ranks, determine before/after `UNIT_SPELLCAST_SUCCEEDED` delivery, test Nampower 4.0 CVar vs 4.5+ event registration, restoring CVar state, ClassicAPI `~N mana` fallback when events are absent, canceled casts, and reload; distinguish actual server amounts from rounding and client estimates.
 - [ ] **Client variation:** test with and without ClassicAPI and with each fallback extension separately. If no trustworthy cast events are present, keep tracking unavailable rather than incorrectly treating `SPELLCAST_STOP` as a confirmed heal.
 - [x] **Refund accuracy architecture:** use server-reported Nampower energize data when present and optional ClassicAPI-derived estimates otherwise. Numeric output is user-toggleable, with `+` for actual server data and `~` for an estimate. Session statistics remain out of scope.
 
 ### Deferred — Wand Progression enhancements
 
 - [x] **ClassicAPI code:** use the automatic flavor TOC redirect, add a guarded v1.11.0-capable adapter, detect capabilities separately, and preserve optional quest-history providers.
-- [ ] **ClassicAPI in-game validation:** complete the acceptance matrix above, specifically live `QUEST_TURNED_IN`, item fallbacks, no-guild server transport, and reload persistence before merging this feature branch.
+- [ ] **ClassicAPI in-game validation after v0.2.0:** complete the acceptance matrix above, specifically live `QUEST_TURNED_IN`, item fallbacks, no-guild server transport, and reload persistence in a dedicated follow-up branch if fixes are needed.
 - [ ] **Source Details:** handle multiple acquisition types for one wand, and multiple matching craft entries, without losing current faction/source filters, layout reuse, or map navigation.
 - [ ] **Structured reputation:** migrate optional requirements from free-text notes to a data structure with faction/standing; preserve backward-compatible notes, then consider reputation- and content-based filters.
 - [ ] **Map/NPC follow-up:** do not guess missing positions for Risen Oilblaze, Watchman Doomgrip, Elisandra Spellbinder, or other `(0, 0)` entries. Add positions only when verified. All registered instances currently have `worldMap`.

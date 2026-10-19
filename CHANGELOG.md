@@ -2,18 +2,28 @@
 
 ## [Unreleased]
 
+_No changes recorded yet._
+
+## [0.2.0] - 2026-10-19
+
+### Release summary
+- Introduced **Book of Prayer Tracker** for priests: talent detection, six rank-independent healing families, compact/expanded HUD, optional spell labels, refund-eligibility border, configurable auto-hide, movable/resizable saved position, Preview Tracker and a confirmation-protected Reset Position.
+- Added optional **Nampower** Book of Prayer mana event reporting (`+N mana`), with cost-based **ClassicAPI** estimates (`~N mana`) when the direct event is unavailable. Reworked rapid-cast event correlation to preserve closely spaced Flash Heal → Renew refunds.
+- Released the **Wands / Options** native tab interface, **Options → Tracker / Mods**, environment diagnostics, and guarded optional ClassicAPI and Quest History enhancements. Core Vanilla compatibility and two TOC flavors are retained.
+- **Maintainer validation (OctoWoW):** rapid Flash Heal → Renew mana display, Reset Position and Preview Tracker worked in-game. The maintainer also tested Inner Focus → heal → heal; Ascendance → heal → another heal; Ascendance → heal → heal; both orders of Inner Focus and Ascendance followed by either two heals of the same family or different families. Inner Focus correctly required restarting the refund cycle; Ascendance correctly showed reduced mana refunds. Confirmation-dialog Cancel/Escape, reload, cross-client compatibility and other edge cases remain tracked in [ROADMAP.md](ROADMAP.md).
+
 ### Fixed — Fast consecutive heals and Reset Position confirmation (2026-10-19)
 - Replace the blanket 750ms rapid-heal rejection with a bounded Nampower Book of Prayer packet queue and individual recent-success records. Correlate events against eligible casts by actual server amount, spell-cost estimate (when ClassicAPI is available), successful-cast order and event timing; keep a refund from an older cast even when a new spell is sent.
 - Reduce the after-success matching window to **400ms** (150ms allowance for events just before SUCCEEDED) with a 120ms settling delay and a guarded 240ms delay when a newer SENT is pending. Accept at most one refund per successful heal, and preserve the ClassicAPI `~N mana` fallback when a packet cannot be matched confidently. Nampower does not provide the underlying cast GUID, so same-cost overlapping casts cannot be identified with certainty.
 - Reset Position now opens a Vanilla-style **OK / Cancel** confirmation explaining that position and both compact/expanded window sizes return to defaults while other options (including lock) remain unchanged. Cancel/Escape does nothing.
-- Added live test scenarios for rapid Flash Heal → Renew, reversed order, duplicate/late packets, canceled casts, and confirming/canceling reset. No change to the Preview Tracker controls or main branch; in-game verification remains required.
+- Documented live test scenarios for rapid Flash Heal → Renew, reversed order, duplicate/late packets, canceled casts, and confirming/canceling reset. Preview Tracker behavior is unchanged; remaining scenarios still need in-game verification.
 
 ### Improved — Book of Prayer event matching and tracker layout controls (2026-10-19)
 - Introduced conservative Book of Prayer `SPELL_ENERGIZE_ON_SELF` matching for spell `52942`. The initial 750ms blanket suppression has since been superseded by the queue-based synchronization described above; ClassicAPI `~N mana` estimates remain the fallback.
 - Continue matching ClassicAPI pre-cast mana-cost snapshots by `UNIT_SPELLCAST_SENT` GUID and spell ID, discarding the snapshot on new casts or matching failed/interrupted casts. Nampower refund packets are now buffered independently and are not cleared when another spell begins.
 - Added **Reset Position** under Options → Tracker. It resets saved `x`, `y`, compact width/height, and expanded width/height to their original defaults without changing lock, visibility, mana, or other character preferences. Geometry refreshes immediately, including while locked.
 - Added **Preview Tracker / Close Preview**. Preview uses a separate temporary UI-only sample of Renew → Flash Heal and `+38 mana` with a visible PREVIEW tag, respecting the current icon/name/refund-display preferences. It can be used without talent points and despite combat/auto-hide restrictions, and cannot overwrite healing history or the stored mana result. It ends on leaving the Tracker settings tab; dragging/resizing while unlocked intentionally saves only geometry.
-- The branch and `main` separation, addon version `0.1.2`, optional ClassicAPI/Nampower/SuperWoW behavior and maintainer's title font choice are preserved. In-game acceptance checks still required.
+- Optional ClassicAPI/Nampower/SuperWoW behavior and the maintainer's title font choice are preserved. Unverified edge cases remain tracked in the roadmap.
 
 ### Refined — Prayer Tracker spell layout with mana shown (2026-10-19)
 - Kept the mana refund label anchored in its existing bottom position and adjusted spell-icon size and vertical placement instead, in both compact and expanded display modes.
@@ -27,14 +37,14 @@
 - Detect Nampower's major/minor release through `GetNampowerVersion()`. On **4.5+**, registering the energize event enables it; older versions require the Nampower `NP_EnableSpellEnergizeEvents` CVar, set automatically only when the user enables **Show mana refund** and the talent is active. The addon does not execute a slash command. If the addon changes an older CVar, it restores its prior value when the user disables the option or logs out (including reload).
 - Rename the checkbox from **Show estimated mana refund** to **Show mana refund** and document `+N` (Nampower actual) versus `~N` (ClassicAPI estimate). Preserve its previous saved state and default off behavior.
 - Increase the mana-refund font from `GameFontHighlightSmall` to `GameFontHighlight`, without changing the maintainer's manually adjusted tracker title font.
-- **In-game validation pending:** test Nampower 4.0 vs 4.5+, event delivery/timing and fallbacks, Inner Focus suppression, Ascendance, reload, and color/number agreement.
+- **In-game validation:** the maintainer confirmed correct Inner Focus cycle suppression and Ascendance's reduced actual refunds in multiple cast orders. Nampower 4.0 vs 4.5+ behavior, late event delivery, fallback-provider combinations, reload, and broader spell/rank coverage still require targeted tests.
 
 ### Added — Predicted Book of Prayer mana refund (2026-10-19)
 - Renamed the visible Options subtab **Advanced** to **Tracker**, preserving the existing internal section ID (`advanced`) and all user settings.
 - Added **Show estimated mana refund** (off by default) next to the existing independent color-border option. After a confirmed qualifying heal, the HUD may display e.g. `~38 mana`; the tilde explicitly indicates a prediction, **not an observed/verified increase in mana**. When cost data is unavailable the HUD does not display a fabricated value.
 - On ClassicAPI-capable clients, capture the spell's live `C_Spell.GetSpellPowerCost(spellID)[1].cost` at `UNIT_SPELLCAST_SENT`, match the spell ID and cast GUID at `UNIT_SPELLCAST_SUCCEEDED`, and estimate `effectiveCost * talentPoints * 0.15`, rounding the *displayed* estimate to an integer. Other providers keep the previous family/color tracking without making numeric estimates.
 - Account for the tested OctoWoW Inner Focus quirk: an Inner Focus-affected cast returns no mana, and the next healing cast is also ineligible; zero-cost casts suppress the displayed refund. Confirm full behavior on the live server, including buff cancellation/expiration, instant casts, and Ascendance changes; no hardcoded Ascendance multiplier is used.
-- The main healing tracker still requires Book of Prayer talent points and only considers the same six healing families, independent of rank. Mana forecasts and Inner Focus suppression are **unreleased pending in-game verification**.
+- The healing tracker still requires Book of Prayer talent points and only considers the same six healing families, independent of rank. Mana forecasts and Inner Focus suppression have additional in-game test cases in the roadmap.
 
 ### Added — Configurable Prayer Tracker auto-hide (2026-10-19)
 - Added an opt-in **Auto-hide after inactivity** checkbox in Options → Advanced with a numeric-only Vanilla `InputBoxTemplate` field for the timeout (1–600 whole seconds, default 15). The input is disabled when auto-hide is unchecked and includes a tooltip describing the timer.
@@ -69,7 +79,7 @@
 - Advanced now provides checkboxes for Enable Tracker, Expanded mode, Show spell name, Show mana refund eligibility, Show outside combat and Lock position and size. With no Book of Prayer points, Enable Tracker is disabled with a red warning.
 - Implemented eight mouse-resize edges/corners, drag-to-move, size-responsive spell icons/labels and two independently saved panel sizes; locking prevents both movement and resizing.
 - Added `PriestCompanionCharDB` as a per-character SavedVariable for the settings and HUD geometry. Both TOCs load the new data, core and HUD in order.
-- This feature is **unreleased and not tested in-game**. Check event delivery, custom talent visibility, rank grouping and frame resizing on OctoWoW before promoting to main.
+- This initial tracker implementation was subsequently refined and the maintainer confirmed the rapid-cast mana display works in OctoWoW. Additional talent/rank and resizing acceptance cases remain open in the roadmap.
 
 ### Changed — Options command (2026-10-17)
 - Replaced the redundant `/priest env` / `/pc env` command with `/priest options` / `/pc options`, which open the existing **Options → General** page.
@@ -86,8 +96,8 @@
 - Switched the Wands/Options bottom tabs and General/Advanced/Mods top tabs to `PanelTemplates_SetNumTabs`, `PanelTemplates_TabResize` and `PanelTemplates_SetTab` so the selected/pressed textures and tab border joins follow Blizzard's own Vanilla 1.12 behavior.
 - Anchored secondary tabs immediately above the shared content border and removed the redundant outer Options border/heading to reduce doubled outlines.
 - Redesigned Options → Mods with an introduction, colored per-DLL headings and detected/missing/unsupported statuses, expanded capability descriptions, and selectable source links for ClassicAPI, SuperWoW, Nampower and UnitXP SP3.
-- Kept the Mods Refresh action display-only (no new server query) and preserved Wands/Source Details. The earlier `/priest env` shortcut was superseded by `/priest options` later in this unreleased branch.
-- Visual and interaction verification inside the client is still pending; no version bump or main-branch changes.
+- Kept the Mods Refresh action display-only (no new server query) and preserved Wands/Source Details. The earlier `/priest env` shortcut was subsequently superseded by `/priest options`.
+- Visual and interaction verification for the new tab interface still includes outstanding in-game scenarios documented in the roadmap.
 
 ### Fixed — Vanilla 1.12 tab compatibility (2026-10-17)
 - Replaced unsupported native Button `SetEnabled()` calls with `Enable()` / `Disable()` in `UI/MainFrame.lua` and `UI/OptionsPanel.lua`. This addresses Lua errors when opening the main frame or selecting Options subtabs.
@@ -99,10 +109,10 @@
 - Reworked `UI/EnvironmentPanel.lua` as a scrollable **Options → Mods** page with individual ClassicAPI, SuperWoW, Nampower and UnitXP SP3 cards, status, version information and descriptions of optional capabilities.
 - Initially changed `/priest env` and `/pc env` to open **Options → Mods** directly; these were subsequently replaced with `/priest options` / `/pc options` (Options → General). The Mods Refresh button remains read-only.
 - Preserved existing Wand Progression data, filters, row rendering and Source Details behavior. Both Vanilla and ClassicAPI TOCs now load the Options panel before the nested Mods page.
-- The interface is still **Unreleased** and requires in-game validation, especially native tab templates, scrolling and navigation. The addon remains version `0.1.2`.
+- The interface ships with `0.2.0`. Native tab templates, scrolling and navigation retain in-game validation tasks in the roadmap.
 
 ### Added — Environment Tab (2026-10-17)
-- Initially introduced a dedicated **Environment** tab to display client diagnostics without filling game chat. Its contents have since been reorganized into **Options → Advanced / Mods** in this unreleased branch.
+- Initially introduced a dedicated **Environment** tab to display client diagnostics without filling game chat. Its contents were subsequently reorganized into **Options → Tracker / Mods** during development.
 - Added `UI/EnvironmentPanel.lua`, a read-only diagnostic panel with grouped labels and a **Refresh** button that only refreshes the displayed snapshot and server-query status; it does not send `.queststatus`.
 - The initial Environment-tab command was later redirected to **Options → Mods**; the main `/priest` command still opens/closes the main window.
 - Added main-frame tab navigation while keeping the existing Wand Progression panel and Source Details available, and loaded the new panel in both Vanilla and ClassicAPI TOCs.
@@ -122,7 +132,7 @@
 - Removed the `C_QuestLog.IsQuestFlaggedCompleted` override, because this API cannot provide historical quest completion state in Vanilla 1.12.
 - Registered `QUEST_TURNED_IN` according to ClassicAPI runtime capability rather than selected TOC flavor; kept local, server, pfQuest and optional positive API history providers.
 - Protected the server history command from failed chat calls and unsupported guild transport; `GetServerQueryState()` now reports `unavailableReason` when the server query could not start.
-- Updated [ROADMAP.md](ROADMAP.md) with compatibility expectations and remaining **in-game test cases**. Changes are not included in a tagged release and have not yet been exercised in a WoW client.
+- Updated [ROADMAP.md](ROADMAP.md) with compatibility expectations and remaining **in-game test cases**. The ClassicAPI enhancements are included in `0.2.0`, although their full acceptance matrix has not yet been completed.
 
 ## [0.1.2] - 2026-10-17
 

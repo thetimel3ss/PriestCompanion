@@ -2,6 +2,14 @@
 
 ## [Unreleased]
 
+### Changed — Advanced tooltip help and startup tab (2026-10-19)
+- Moved the explanatory text for **Show refund status (border color)** and **Lock position** into native `GameTooltip` hover hints; both the checkbox and its text label show the tooltip, and the label can be clicked to toggle the setting.
+- Renamed **Lock position and size** to **Lock position** (it continues to prevent both dragging and resizing).
+- Removed the temporary **Last confirmed heal** line and all **Quest History Diagnostics** labels/status from Options → Advanced. The quest-history core and background tracking are unchanged; the UI will be revisited in a future feature.
+- Removed the now-unused explanatory paragraphs and reduced the Advanced scrolling content height. Updated General's description of Advanced.
+- Changed the first-open window default after client load to **Options → General**. Later manual tab changes are respected while the session remains open; `/priest options` continues to explicitly open General.
+- Preserved the maintainer's latest `dcccb773` tracker title font-size adjustment and existing saved Prayer Tracker preferences. Pending in-game visual verification.
+
 ### Changed — Cleaner Book of Prayer HUD (2026-10-19)
 - Removed the `30%` / `15%` / `0%` refund footer entirely. The existing Advanced **Show refund status (border color)** checkbox now controls only the green/red/neutral HUD border and subtle background tint.
 - Increased logical compact spell icon size from 36 to 48 and expanded icon size from 40 to 54; when **Show spell name** is unchecked, increase them further to 62 and 64 respectively.

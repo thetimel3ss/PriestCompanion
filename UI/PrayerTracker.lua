@@ -525,12 +525,37 @@ local function UpdateDisplay()
     end
 
     if Tracker.IsActive()
-    and (Tracker.GetOption("outsideCombat") or inCombat) then
+    and (Tracker.GetOption("outsideCombat") or inCombat)
+    and not Tracker.ShouldAutoHide() then
         frame:Show()
     else
         frame:Hide()
     end
 end
+
+-- OnUpdate runs only while the HUD is visible. After the inactivity
+-- timeout it hides itself; the next successful heal calls Notify()
+-- and UpdateDisplay(), restoring the HUD automatically.
+local autoHideElapsed = 0
+frame:SetScript(
+    "OnUpdate",
+    function()
+        if not Tracker.GetOption("autoHide") then
+            autoHideElapsed = 0
+            return
+        end
+
+        autoHideElapsed = autoHideElapsed + arg1
+
+        if autoHideElapsed >= 0.15 then
+            autoHideElapsed = 0
+
+            if Tracker.ShouldAutoHide() then
+                frame:Hide()
+            end
+        end
+    end
+)
 
 Tracker.AddListener(UpdateDisplay)
 UpdateDisplay()

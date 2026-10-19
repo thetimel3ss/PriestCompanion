@@ -38,6 +38,7 @@ local BOOL_OPTIONS = {
 
 local settings = {}
 local listeners = {}
+local geometryRevision = 0
 local talentPoints = 0
 local talentFound = false
 local lastFamily = nil
@@ -209,6 +210,29 @@ function Tracker.SaveGeometry(x, y, width, height)
             SaveOption("compactHeight", height)
         end
     end
+end
+
+-- Reset only placement and saved sizes, not any behavior preferences.
+-- This also works when the position is locked.
+function Tracker.GetGeometryRevision()
+    return geometryRevision
+end
+
+function Tracker.ResetGeometry()
+    local fields = {
+        "x", "y",
+        "compactWidth", "compactHeight",
+        "expandedWidth", "expandedHeight"
+    }
+    local i
+
+    for i = 1, table.getn(fields) do
+        local key = fields[i]
+        SaveOption(key, DEFAULTS[key])
+    end
+
+    geometryRevision = geometryRevision + 1
+    Notify()
 end
 
 function Tracker.IsActive()

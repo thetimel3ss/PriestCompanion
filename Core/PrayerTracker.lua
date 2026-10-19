@@ -495,6 +495,7 @@ function Tracker.RecordSuccessfulSpell(spellID, spellName, castGUID)
     if pendingActualRefund and type(GetTime) == "function"
     and GetTime() - pendingActualRefund.at <= 0.75 then
         lastRefundActual = pendingActualRefund.amount
+        lastEligible = true
     end
     pendingActualRefund = nil
 
@@ -579,8 +580,17 @@ local function ReceiveBookOfPrayerMana(spellID, powerType, amount, periodic)
 
     -- The server refund belongs to the most recent healing cast.
     -- Do not put a stale energize value onto a later unrelated spell.
-    if now and lastHealTime and now - lastHealTime <= 0.75 then
+    local matchWindow = 1.5
+
+    -- With no ClassicAPI success event, the Nampower cast event may
+    -- precede the server's cast completion by several seconds.
+    if provider ~= "ClassicAPI" then
+        matchWindow = 5
+    end
+
+    if now and lastHealTime and now - lastHealTime <= matchWindow then
         lastRefundActual = amount
+        lastEligible = true
         Notify()
     elseif now then
         pendingActualRefund = { amount = amount, at = now }

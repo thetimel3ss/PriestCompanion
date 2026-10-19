@@ -1,6 +1,6 @@
 -- Priest Companion
 -- Book of Prayer tracker: talent, successful cast and session HUD state.
--- Vanilla Lua 5.0 compatible; no spell automation and no mana estimates.
+-- Vanilla Lua 5.0 compatible; no spell automation; mana predictions approximate.
 
 local PC = PriestCompanion
 
@@ -12,6 +12,7 @@ local DEFAULTS = {
     expanded = false,
     showSpellName = true,
     showRefund = true,
+    showManaRefund = false,
     outsideCombat = true,
     autoHide = false,
     autoHideSeconds = 15,
@@ -29,6 +30,7 @@ local BOOL_OPTIONS = {
     expanded = true,
     showSpellName = true,
     showRefund = true,
+    showManaRefund = true,
     outsideCombat = true,
     autoHide = true,
     locked = true
@@ -43,7 +45,11 @@ local previousFamily = nil
 local lastIcon = nil
 local previousIcon = nil
 local lastEligible = false
+local lastRefundEstimate = nil
 local lastHealTime = nil
+local pendingCastCost = nil
+local innerFocusReady = false
+local innerFocusBlockNext = false
 local provider = "unavailable"
 local lastCastGUID = nil
 
@@ -98,6 +104,7 @@ function Tracker.GetState()
         lastIcon = lastIcon,
         previousIcon = previousIcon,
         eligible = lastEligible,
+        refundEstimate = lastRefundEstimate,
         talentPoints = talentPoints,
         provider = provider
     }
@@ -256,7 +263,11 @@ local function ScanBookOfPrayer()
         lastIcon = nil
         previousIcon = nil
         lastEligible = false
+        lastRefundEstimate = nil
         lastHealTime = nil
+        pendingCastCost = nil
+        innerFocusReady = false
+        innerFocusBlockNext = false
         lastCastGUID = nil
     end
 
@@ -349,24 +360,95 @@ local function ResolveSpellName(spellID, providedName)
 end
 
 --------------------------------------------------
+-- Pre-cast cost snapshot (ClassicAPI)
+--------------------------------------------------
+
+local function ReadEffectiveManaCost(spellID)
+    if type(C_Spell) ~= "table"
+    or type(C_Spell.GetSpellPowerCost) ~= "function"
+    or type(spellID) ~= "number" then
+        return nil
+    end
+
+    local ok, costs = pcall(C_Spell.GetSpellPowerCost, spellID)
+    if not ok or type(costs) ~= "table" then
+        return nil
+    end
+
+    local entry = costs[1]
+    if type(entry) ~= "table" or entry.type ~= 0 then
+        return nil
+    end
+
+    local amount = tonumber(entry.cost)
+    if amount and amount >= 0 then
+        return amount
+    end
+    return nil
+end
+
+local function CaptureSentSpell(castGUID, spellID, spellName)
+    if not GetSpellFamily(ResolveSpellName(spellID, spellName)) then
+        return
+    end
+
+    pendingCastCost = {
+        guid = castGUID,
+        spellID = spellID,
+        cost = ReadEffectiveManaCost(spellID)
+    }
+end
+
+local function IsInnerFocus(spellID, spellName)
+    if spellName == "Inner Focus" then
+        return true
+    end
+
+    if spellID and type(GetSpellInfo) == "function" then
+        local ok, name = pcall(GetSpellInfo, spellID)
+        if ok and name == "Inner Focus" then return true end
+    end
+
+    if spellID and type(SpellInfo) == "function" then
+        local ok, name = pcall(SpellInfo, spellID)
+        if ok and name == "Inner Focus" then return true end
+    end
+    return false
+end
+
+--------------------------------------------------
 -- A Successful Heal Changes the Cycle
 --------------------------------------------------
 
 function Tracker.RecordSuccessfulSpell(spellID, spellName, castGUID)
-    if talentPoints < 1 then
+    if talentPoints < 1 then return false end
+
+    -- Inner Focus itself is not a healing spell. Its free spell and the
+    -- next healing spell are both refund-ineligible on OctoWoW.
+    if IsInnerFocus(spellID, spellName) then
+        innerFocusReady = true
         return false
     end
 
-    local name = ResolveSpellName(spellID, spellName)
-    local family = GetSpellFamily(name)
+    local family = GetSpellFamily(ResolveSpellName(spellID, spellName))
 
-    if not family then
-        return false
+    if castGUID and castGUID == lastCastGUID then return false end
+
+    local usedInnerFocus = innerFocusReady
+    if usedInnerFocus then
+        innerFocusReady = false
+        innerFocusBlockNext = true
     end
 
-    if castGUID and castGUID == lastCastGUID then
-        return false
+    if not family then return false end
+
+    local effectiveCost = nil
+    if pendingCastCost
+    and pendingCastCost.guid == castGUID
+    and pendingCastCost.spellID == spellID then
+        effectiveCost = pendingCastCost.cost
     end
+    pendingCastCost = nil
 
     lastCastGUID = castGUID
     previousFamily = lastFamily
@@ -374,9 +456,28 @@ function Tracker.RecordSuccessfulSpell(spellID, spellName, castGUID)
     lastFamily = family
     lastIcon = PC.Data.HealingSpells[family].icon
 
+    local blockRefund = usedInnerFocus
+    if not usedInnerFocus and innerFocusBlockNext then
+        blockRefund = true
+        innerFocusBlockNext = false
+    end
+
+    if effectiveCost == 0 then
+        blockRefund = true
+        innerFocusBlockNext = true
+    end
+
     lastEligible =
         previousFamily ~= nil
         and previousFamily ~= family
+        and not blockRefund
+
+    lastRefundEstimate = nil
+    if lastEligible and effectiveCost and effectiveCost > 0 then
+        -- Approximate: the server may round fractional refunds either way.
+        lastRefundEstimate =
+            math.floor(effectiveCost * talentPoints * 0.15 + 0.5)
+    end
 
     -- Reset inactivity only for a confirmed, qualifying healing cast.
     if type(GetTime) == "function" then
@@ -419,6 +520,10 @@ end
 -- ClassicAPI, Nampower and SuperWoW are installed simultaneously.
 if PC.Capabilities.classicAPISupported then
     RegisterProvider("UNIT_SPELLCAST_SUCCEEDED", "ClassicAPI")
+    if provider == "ClassicAPI" then
+        pcall(eventFrame.RegisterEvent, eventFrame,
+            "UNIT_SPELLCAST_SENT")
+    end
 end
 
 if provider == "unavailable"
@@ -515,6 +620,14 @@ eventFrame:SetScript(
         if event == "PLAYER_REGEN_ENABLED"
         or event == "PLAYER_REGEN_DISABLED" then
             Notify()
+            return
+        end
+
+        if event == "UNIT_SPELLCAST_SENT"
+        and provider == "ClassicAPI" then
+            if arg1 == "player" then
+                CaptureSentSpell(arg3, arg4, arg5)
+            end
             return
         end
 

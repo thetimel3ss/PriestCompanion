@@ -13,6 +13,8 @@ local DEFAULTS = {
     showSpellName = true,
     showRefund = true,
     outsideCombat = true,
+    autoHide = false,
+    autoHideSeconds = 15,
     locked = false,
     x = 0,
     y = -150,
@@ -28,6 +30,7 @@ local BOOL_OPTIONS = {
     showSpellName = true,
     showRefund = true,
     outsideCombat = true,
+    autoHide = true,
     locked = true
 }
 
@@ -40,6 +43,7 @@ local previousFamily = nil
 local lastIcon = nil
 local previousIcon = nil
 local lastEligible = false
+local lastHealTime = nil
 local provider = "unavailable"
 local lastCastGUID = nil
 
@@ -53,6 +57,26 @@ end
 
 function Tracker.GetOption(key)
     return settings[key]
+end
+
+-- A valid setting is an integer from 1 to 600 seconds.
+-- Keep this in the core, so UI input cannot store invalid values.
+local function NormalizeAutoHideSeconds(value)
+    local number = tonumber(value)
+
+    if not number or number ~= number then
+        return nil
+    end
+
+    number = math.floor(number)
+
+    if number < 1 then
+        return 1
+    elseif number > 600 then
+        return 600
+    end
+
+    return number
 end
 
 function Tracker.GetTalentPoints()
@@ -102,6 +126,35 @@ local function SaveOption(key, value)
             PriestCompanionCharDB.prayerTracker or {}
         PriestCompanionCharDB.prayerTracker[key] = value
     end
+end
+
+function Tracker.SetAutoHideSeconds(value)
+    local seconds = NormalizeAutoHideSeconds(value)
+
+    if not seconds then
+        return false
+    end
+
+    SaveOption("autoHideSeconds", seconds)
+    Notify()
+    return true
+end
+
+function Tracker.ShouldAutoHide()
+    if not settings.autoHide then
+        return false
+    end
+
+    -- Hide on login until a qualifying heal occurs in this session.
+    if not lastHealTime then
+        return true
+    end
+
+    if type(GetTime) ~= "function" then
+        return false
+    end
+
+    return GetTime() - lastHealTime >= settings.autoHideSeconds
 end
 
 function Tracker.SetOption(key, value)
@@ -203,6 +256,7 @@ local function ScanBookOfPrayer()
         lastIcon = nil
         previousIcon = nil
         lastEligible = false
+        lastHealTime = nil
         lastCastGUID = nil
     end
 
@@ -324,6 +378,11 @@ function Tracker.RecordSuccessfulSpell(spellID, spellName, castGUID)
         previousFamily ~= nil
         and previousFamily ~= family
 
+    -- Reset inactivity only for a confirmed, qualifying healing cast.
+    if type(GetTime) == "function" then
+        lastHealTime = GetTime()
+    end
+
     Notify()
     return true
 end
@@ -392,6 +451,11 @@ local function LoadSettings()
             if BOOL_OPTIONS[key] then
                 if type(saved[key]) == "boolean" then
                     settings[key] = saved[key]
+                end
+            elseif key == "autoHideSeconds" then
+                local seconds = NormalizeAutoHideSeconds(saved[key])
+                if seconds then
+                    settings[key] = seconds
                 end
             elseif type(saved[key]) == "number" then
                 settings[key] = saved[key]

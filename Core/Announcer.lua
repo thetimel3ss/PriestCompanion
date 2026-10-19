@@ -19,19 +19,21 @@ local DEFAULTS = {
     message = DEFAULT_MESSAGE,
     channels = {
         SAY = true,
+        YELL = false,
         PARTY = false,
         RAID = false,
         SELF = false
     }
 }
 
-local CHANNELS = { "SAY", "PARTY", "RAID", "SELF" }
+local CHANNELS = { "SAY", "YELL", "PARTY", "RAID", "SELF" }
 local settings = {
     enabled = DEFAULTS.enabled,
     announceSelf = DEFAULTS.announceSelf,
     message = DEFAULTS.message,
     channels = {
         SAY = DEFAULTS.channels.SAY,
+        YELL = DEFAULTS.channels.YELL,
         PARTY = DEFAULTS.channels.PARTY,
         RAID = DEFAULTS.channels.RAID,
         SELF = DEFAULTS.channels.SELF
@@ -84,6 +86,7 @@ local function SaveSettings()
         message = settings.message,
         channels = {
             SAY = settings.channels.SAY,
+            YELL = settings.channels.YELL,
             PARTY = settings.channels.PARTY,
             RAID = settings.channels.RAID,
             SELF = settings.channels.SELF
@@ -234,7 +237,8 @@ local function IsSelfTarget(target)
 end
 
 local function ChatAvailable(channel)
-    if channel == "SAY" or channel == "SELF" then
+    if channel == "SAY" or channel == "YELL"
+    or channel == "SELF" then
         return true
     end
 

@@ -2,6 +2,12 @@
 
 ## [Unreleased]
 
+### Improved — Announcer checkbox tooltips, spacing and Yell (2026-10-19)
+- Move the successful-cast guidance from the body below Enable Fear Ward into the enabled checkbox/caption tooltip. Move the Say/Party/Raid/Self channel explanation into channel checkbox/caption tooltips, including the new Yell behavior.
+- Align channel and self-cast checkboxes to uniform 30px vertical rows while preserving the right-hand Party and Self column.
+- Add **Yell** as a fifth, independent announcement channel (default off) with settings persistence, availability checking, and one message per successful cast alongside any other selected channels.
+- Extend in-game checks to include Say + Yell + Raid, tooltip hover on checkbox/caption, checkbox row spacing, and preferences after /reload.
+
 ### Added — Fear Ward Announcer (development branch, 2026-10-19)
 - Added independent Options → **Announcer** subtab, preserving General, Tracker, and Mods. Configurations are saved per character under `PriestCompanionCharDB.announcer` and disabled by default.
 - Support **multiple simultaneous text channels**, using independent Say, Party, Raid, and Self (local chat) checkboxes. A successful Fear Ward can announce to Say and Raid at once; unavailable Party/Raid destinations are skipped rather than substituted. Optionally allow announcements when targeting oneself.

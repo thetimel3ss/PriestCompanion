@@ -24,7 +24,7 @@ scroll:SetPoint("BOTTOMRIGHT", panel, "BOTTOMRIGHT", -29, 9)
 
 local child = CreateFrame("Frame", nil, scroll)
 child:SetWidth(388)
-child:SetHeight(465)
+child:SetHeight(417)
 scroll:SetScrollChild(child)
 
 local function Label(text, x, y, width, font)
@@ -40,13 +40,37 @@ end
 
 Label("Fear Ward Announcer", 14, 12, 350, "GameFontNormal")
 local statusLabel = Label("", 14, 38, 356)
-local helpLabel = Label(
+-- The explanations live in tooltips instead of taking panel space.
+local ENABLE_TOOLTIP =
     "Send a message only after a successful Fear Ward cast. " ..
-    "Choose any combination of channels below.",
-    14, 111, 353
-)
+    "Choose any combination of channels below."
+local CHANNEL_TOOLTIP =
+    "Say and Yell work without a party or raid. Party and Raid " ..
+    "are skipped when the corresponding group is unavailable. " ..
+    "Self only shows a local chat message. No announcement is " ..
+    "made when the Fear Ward recipient cannot be confirmed."
+local SELF_TARGET_TOOLTIP =
+    "Also announce Fear Ward when cast on your own character. " ..
+    "This does not change which chat channels are selected."
 
-local function Checkbox(name, title, x, y, onToggle)
+local function ShowTooltip(owner, heading, details)
+    if not GameTooltip then
+        return
+    end
+
+    GameTooltip:SetOwner(owner, "ANCHOR_RIGHT")
+    GameTooltip:SetText(heading, 1, 0.82, 0.20)
+    GameTooltip:AddLine(details, 1, 1, 1, true)
+    GameTooltip:Show()
+end
+
+local function HideTooltip()
+    if GameTooltip then
+        GameTooltip:Hide()
+    end
+end
+
+local function Checkbox(name, title, x, y, onToggle, helpText)
     local check = CreateFrame(
         "CheckButton", name, child, "UICheckButtonTemplate"
     )
@@ -68,6 +92,35 @@ local function Checkbox(name, title, x, y, onToggle)
         panel.Refresh()
     end)
 
+    if helpText then
+        check:SetScript("OnEnter", function()
+            ShowTooltip(this, title, helpText)
+        end)
+        check:SetScript("OnLeave", HideTooltip)
+
+        -- FontStrings do not receive hover events by themselves in Vanilla.
+        -- An adjacent button makes the caption hoverable and clickable.
+        local captionHitBox = CreateFrame("Button", nil, child)
+        captionHitBox:SetPoint("LEFT", check, "RIGHT", 4, 0)
+        captionHitBox:SetWidth(135)
+        captionHitBox:SetHeight(24)
+        captionHitBox:RegisterForClicks("LeftButtonUp")
+        captionHitBox:SetScript("OnEnter", function()
+            ShowTooltip(this, title, helpText)
+        end)
+        captionHitBox:SetScript("OnLeave", HideTooltip)
+        captionHitBox:SetScript("OnClick", function()
+            if not check:IsEnabled() then
+                return
+            end
+            local checked = check:GetChecked()
+            local nextValue = not (checked == 1 or checked == true)
+            check:SetChecked(nextValue and 1 or nil)
+            onToggle(nextValue)
+            panel.Refresh()
+        end)
+    end
+
     return check, label
 end
 
@@ -76,18 +129,22 @@ local enabledBox, enabledLabel = Checkbox(
     "Enable Fear Ward", 14, 77,
     function(value)
         announcer.SetOption("enabled", value)
-    end
+    end,
+    ENABLE_TOOLTIP
 )
 
 Label("Announcement channels (multiple selections allowed)",
     14, 143, 355, "GameFontNormalSmall")
 
 local channelBoxes = {}
+-- Every row is separated by exactly 30 px; the existing right
+-- column stays at x = 204, alongside the left column at x = 14.
 local channelDefinitions = {
     { "SAY", "Say", 14, 164 },
     { "PARTY", "Party", 204, 164 },
-    { "RAID", "Raid", 14, 195 },
-    { "SELF", "Self (local chat)", 204, 195 }
+    { "RAID", "Raid", 14, 194 },
+    { "SELF", "Self (local chat)", 204, 194 },
+    { "YELL", "Yell", 14, 224 }
 }
 
 local i
@@ -99,27 +156,29 @@ for i = 1, table.getn(channelDefinitions) do
         entry[2], entry[3], entry[4],
         function(value)
             announcer.SetChannel(channel, value)
-        end
+        end,
+        CHANNEL_TOOLTIP
     )
     channelBoxes[channel] = check
 end
 
 local selfBox = Checkbox(
     "PriestCompanionAnnouncerSelfTarget",
-    "Include casts on myself", 14, 237,
+    "Include casts on myself", 14, 254,
     function(value)
         announcer.SetOption("announceSelf", value)
-    end
+    end,
+    SELF_TARGET_TOOLTIP
 )
 
 Label("Custom message (use {target} and optional {spell})",
-    14, 276, 360, "GameFontNormalSmall")
+    14, 294, 360, "GameFontNormalSmall")
 
 local messageBox = CreateFrame(
     "EditBox", "PriestCompanionAnnouncerMessage",
     child, "InputBoxTemplate"
 )
-messageBox:SetPoint("TOPLEFT", child, "TOPLEFT", 21, -303)
+messageBox:SetPoint("TOPLEFT", child, "TOPLEFT", 21, -320)
 messageBox:SetWidth(335)
 messageBox:SetHeight(20)
 messageBox:SetAutoFocus(false)
@@ -156,14 +215,8 @@ messageBox:SetScript("OnEditFocusGained", function()
     this:HighlightText()
 end)
 
-Label("Preview (not sent)", 14, 344, 350, "GameFontNormalSmall")
-local previewLabel = Label("", 15, 367, 350)
-Label(
-    "Say is always available. Party and Raid are skipped if you " ..
-    "are not in that group. Self shows a local message only. " ..
-    "No announcement is made when the target is unknown.",
-    14, 407, 354
-)
+Label("Preview (not sent)", 14, 359, 350, "GameFontNormalSmall")
+local previewLabel = Label("", 15, 382, 350)
 
 function panel.Refresh()
     local available = announcer.GetProvider() == "ClassicAPI"

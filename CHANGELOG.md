@@ -2,6 +2,13 @@
 
 ## [Unreleased]
 
+### Added — Predicted Book of Prayer mana refund (2026-10-19)
+- Renamed the visible Options subtab **Advanced** to **Tracker**, preserving the existing internal section ID (`advanced`) and all user settings.
+- Added **Show estimated mana refund** (off by default) next to the existing independent color-border option. After a confirmed qualifying heal, the HUD may display e.g. `~38 mana`; the tilde explicitly indicates a prediction, **not an observed/verified increase in mana**. When cost data is unavailable the HUD does not display a fabricated value.
+- On ClassicAPI-capable clients, capture the spell's live `C_Spell.GetSpellPowerCost(spellID)[1].cost` at `UNIT_SPELLCAST_SENT`, match the spell ID and cast GUID at `UNIT_SPELLCAST_SUCCEEDED`, and estimate `effectiveCost * talentPoints * 0.15`, rounding the *displayed* estimate to an integer. Other providers keep the previous family/color tracking without making numeric estimates.
+- Account for the tested OctoWoW Inner Focus quirk: an Inner Focus-affected cast returns no mana, and the next healing cast is also ineligible; zero-cost casts suppress the displayed refund. Confirm full behavior on the live server, including buff cancellation/expiration, instant casts, and Ascendance changes; no hardcoded Ascendance multiplier is used.
+- The main healing tracker still requires Book of Prayer talent points and only considers the same six healing families, independent of rank. Mana forecasts and Inner Focus suppression are **unreleased pending in-game verification**.
+
 ### Added — Configurable Prayer Tracker auto-hide (2026-10-19)
 - Added an opt-in **Auto-hide after inactivity** checkbox in Options → Advanced with a numeric-only Vanilla `InputBoxTemplate` field for the timeout (1–600 whole seconds, default 15). The input is disabled when auto-hide is unchecked and includes a tooltip describing the timer.
 - The inactivity timer resets only when a compatible healing spell is successfully cast. Once the timeout expires the floating HUD hides automatically and is restored by the next successful qualifying heal, including while a previous hide is in effect.

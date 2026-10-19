@@ -260,7 +260,7 @@ local advancedChild = CreateFrame(
     "Frame", nil, advancedScroll
 )
 advancedChild:SetWidth(388)
-advancedChild:SetHeight(360)
+advancedChild:SetHeight(390)
 advancedScroll:SetScrollChild(advancedChild)
 
 CreateLabel(
@@ -515,6 +515,97 @@ AddPrayerCheckbox(
         "moving and resizing the tracker."
 )
 
+--------------------------------------------------
+-- Tracker Layout Controls
+--------------------------------------------------
+
+local resetButton = CreateFrame(
+    "Button",
+    "PriestCompanionPrayerResetPosition",
+    advancedChild,
+    "UIPanelButtonTemplate"
+)
+resetButton:SetWidth(152)
+resetButton:SetHeight(24)
+resetButton:SetPoint(
+    "TOPLEFT", advancedChild, "TOPLEFT", 16, -318
+)
+resetButton:SetText("Reset Position")
+resetButton:SetScript(
+    "OnClick",
+    function()
+        if prayer then
+            prayer.ResetGeometry()
+        end
+    end
+)
+resetButton:SetScript(
+    "OnEnter",
+    function()
+        ShowPrayerTooltip(
+            this,
+            "Reset Position",
+            "Reset the tracker position and both compact/expanded " ..
+                "window sizes. Other settings are kept."
+        )
+    end
+)
+resetButton:SetScript("OnLeave", HidePrayerTooltip)
+
+local previewButton = CreateFrame(
+    "Button",
+    "PriestCompanionPrayerPreview",
+    advancedChild,
+    "UIPanelButtonTemplate"
+)
+previewButton:SetWidth(152)
+previewButton:SetHeight(24)
+previewButton:SetPoint(
+    "TOPLEFT", advancedChild, "TOPLEFT", 190, -318
+)
+previewButton:SetText("Preview Tracker")
+previewButton:SetScript(
+    "OnClick",
+    function()
+        local hud = PC.UI.PrayerTracker
+
+        if hud and type(hud.SetPreview) == "function"
+        and type(hud.IsPreviewActive) == "function" then
+            hud.SetPreview(not hud.IsPreviewActive())
+        end
+
+        advanced.Refresh()
+    end
+)
+previewButton:SetScript(
+    "OnEnter",
+    function()
+        ShowPrayerTooltip(
+            this,
+            "Preview Tracker",
+            "Show example heals and a sample mana refund without " ..
+                "casting or changing your real healing history. " ..
+                "Preview ignores combat and auto-hide restrictions."
+        )
+    end
+)
+previewButton:SetScript("OnLeave", HidePrayerTooltip)
+
+-- Do not leave the simulated HUD visible after closing Options
+-- or navigating away from the Tracker section.
+advanced:SetScript(
+    "OnHide",
+    function()
+        local hud = PC.UI.PrayerTracker
+
+        if hud and type(hud.SetPreview) == "function"
+        and type(hud.IsPreviewActive) == "function"
+        and hud.IsPreviewActive() then
+            hud.SetPreview(false)
+        end
+    end
+)
+
 function advanced.Refresh()
     if prayer then
         local points = prayer.GetTalentPoints()
@@ -536,6 +627,14 @@ function advanced.Refresh()
         end
 
         talentStatus:SetText(label)
+
+        local hud = PC.UI.PrayerTracker
+        if hud and type(hud.IsPreviewActive) == "function"
+        and hud.IsPreviewActive() then
+            previewButton:SetText("Close Preview")
+        else
+            previewButton:SetText("Preview Tracker")
+        end
 
         local key
         local button

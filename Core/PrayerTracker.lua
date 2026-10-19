@@ -52,6 +52,7 @@ local pendingActualRefund = nil
 local lastHealTime = nil
 local pendingCastCost = nil
 local lastRefundMatched = false
+local lastRefundAmbiguous = false
 local innerFocusReady = false
 local innerFocusBlockNext = false
 local provider = "unavailable"
@@ -303,6 +304,7 @@ local function ScanBookOfPrayer()
         lastHealTime = nil
         pendingCastCost = nil
         lastRefundMatched = false
+        lastRefundAmbiguous = false
         innerFocusReady = false
         innerFocusBlockNext = false
         lastCastGUID = nil
@@ -524,6 +526,17 @@ function Tracker.RecordSuccessfulSpell(spellID, spellName, castGUID)
     lastRefundActual = nil
     lastRefundMatched = false
 
+    -- Two successful heals in the same 750ms packet window cannot be
+    -- distinguished by Nampower's GUID-less energize event.
+    -- Fail closed and keep the ClassicAPI estimate for this cast.
+    local castTime = nil
+    if type(GetTime) == "function" then
+        castTime = GetTime()
+    end
+    lastRefundAmbiguous = castTime and lastHealTime
+        and castTime - lastHealTime <= 0.75
+        or false
+
     -- A refund can precede SUCCEEDED. Only accept it if its buffered
     -- SENT GUID and spell ID match this successful cast exactly.
     if lastEligible and matchedSent and pendingActualRefund
@@ -543,8 +556,8 @@ function Tracker.RecordSuccessfulSpell(spellID, spellName, castGUID)
     end
 
     -- Reset inactivity only for a confirmed, qualifying healing cast.
-    if type(GetTime) == "function" then
-        lastHealTime = GetTime()
+    if castTime then
+        lastHealTime = castTime
     end
 
     Notify()
@@ -631,7 +644,8 @@ local function ReceiveBookOfPrayerMana(spellID, powerType, amount, periodic)
     and now >= lastHealTime
     and now - lastHealTime <= window
     and lastEligible
-    and not lastRefundMatched then
+    and not lastRefundMatched
+    and not lastRefundAmbiguous then
         lastRefundActual = amount
         lastRefundMatched = true
         Notify()

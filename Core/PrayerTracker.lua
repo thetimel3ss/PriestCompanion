@@ -283,6 +283,10 @@ local function ScanBookOfPrayer()
     end
 
     if talentPoints ~= oldPoints or talentFound ~= oldFound then
+        -- A respec can acquire or remove Book of Prayer at runtime.
+        if ConfigureManaProvider then
+            ConfigureManaProvider()
+        end
         Notify()
     end
 end

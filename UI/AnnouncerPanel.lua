@@ -231,11 +231,11 @@ local protectionBox = Checkbox(
     function(value)
         announcer.SetOption("preventOverwrite", value)
     end,
-    "Prevent a Fear Ward cast when your selected friendly target " ..
-    "already has the buff. Works with supported direct Lua spell " ..
-    "casts, spellbook casts and native action bar spell buttons. " ..
-    "Complex macros and casts outside Lua may bypass this guard; " ..
-    "mouseover macros need target-aware protection."
+    "Prevent Fear Ward when the recipient already has the buff. " ..
+    "Includes self-casts with no selected target, explicit " ..
+    "SuperWoW unit casts, and SpellTargetUnit cursor casts. " ..
+    "Native @mouseover macros may bypass Lua hooks; use a " ..
+    "target-aware macro check when needed."
 )
 
 local function UpdateMessagePreview()

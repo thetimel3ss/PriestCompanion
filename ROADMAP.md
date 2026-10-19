@@ -121,7 +121,9 @@ All 28 records have `source.note`: 21 world-drop-style entries with `"World drop
 ### Announcer — Fear Ward (in progress on `feature/announcer`)
 
 - [x] Add an optional, independent per-character **Prevent overwriting Fear Ward** setting under Options → Announcer (disabled by default). Check the recipient's current aura before supported Lua spell dispatches and prevent duplicate application with a local notice, even when announcements are disabled.
-- [ ] **Overwrite protection compatibility:** verify `CastSpellByName`, spellbook `CastSpell`, direct action-bar `UseAction`, /cast macros, self-casting, and mouseover behavior. Confirm known limitations of custom/engine macros and other DLLs; never claim to intercept all cast paths until the client confirms it.
+- [x] **Maintainer's first live checks:** Fear Ward on a recipient without an active buff works; action-bar casts, spellbook casts and typed `/cast Fear Ward` are prevented when that recipient is buffed.
+- [x] **Follow-up implementation:** cover no-target self-casts, explicit SuperWoW recipient arguments and `SpellTargetUnit` cursor targeting; preserve the initial working paths.
+- [ ] **Remaining live verification:** retest self-cast without a target (with and without Fear Ward), SuperWoW `CastSpellByName("Fear Ward", "mouseover")`, Lua `CastSpellByName` followed by `SpellTargetUnit`, and native ClassicAPI `[@mouseover]` macros. Test different selected target versus mouseover, target switching and unrelated cursor spells. Native/DLL macro parsing may bypass Lua hooks; do not claim universal protection.
 - [ ] **Aura verification:** confirm spellID 6346 and aura name/texture on OctoWoW, verify protection against a buff applied by another priest, and test the absence of ClassicAPI.
 
 - [x] Create a separate Options → Announcer tab and per-character preferences for Fear Ward, initially disabled.

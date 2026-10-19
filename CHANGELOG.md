@@ -2,6 +2,13 @@
 
 ## [Unreleased]
 
+### Fixed — Fear Ward targeting edge cases (2026-10-19)
+- Based on maintainer tests: unbuffed target casts, actionbar reapplication blocking, spellbook blocking and typed `/cast Fear Ward` all work in OctoWoW; mouseover macros and no-target self-casting bypassed the initial guard.
+- Treat no selected target as the player for pre-cast Fear Ward protection, matching the tested self-cast behavior. Recognize explicit unit arguments supplied by SuperWoW (including mouseover), rather than testing the currently selected target.
+- Intercept `SpellTargetUnit(unit)` only when it follows a Fear Ward targeting cursor within a short window; when that actual recipient has Fear Ward, cancel the pending targeting cursor via `SpellStopTargeting()`. Other spells and stale cursor state are not intentionally blocked.
+- Support numeric spell ID `6346` in `CastSpellByName` hooks. Retain the default-off setting and do not alter successful announcement logic. Mouseover macros handled entirely by native/DLL macro engines are still not guaranteed to be intercepted.
+- **In-game retest required:** no target with/without self-buff, SuperWoW direct unit casting, Lua `CastSpellByName` → `SpellTargetUnit` (buffed/unbuffed recipient), native `[@mouseover]` macros, friendly target present while cursor targets another ally, and actionbar/spellbook regression.
+
 ### Added — Optional Fear Ward overwrite protection (2026-10-19)
 - Add an independent **Prevent overwriting Fear Ward** checkbox under Options → Announcer (off by default and saved per character). The option works regardless of whether message announcements are enabled.
 - Before launching Fear Ward through `CastSpellByName`, `CastSpell` or direct-spell `UseAction` paths, check the friendly target's existing aura; skip the cast and display a throttled local warning when Fear Ward is already present. Use ClassicAPI spellID/name aura readers where available; Vanilla's icon lookup is a fallback.

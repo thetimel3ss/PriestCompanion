@@ -404,7 +404,8 @@ local function IsFearWardName(value)
     spell = string.gsub(spell, "^%s+", "")
     spell = string.gsub(spell, "%s+$", "")
 
-    if spell == FEAR_WARD_NAME then
+    if spell == FEAR_WARD_NAME
+    or tonumber(spell) == FEAR_WARD_ID then
         return true
     end
 
@@ -478,16 +479,28 @@ local function HasFearWard(unit)
 end
 
 local function ProtectionUnit(onSelf)
+    -- SuperWoW extends CastSpellByName's second argument with a unit
+    -- token. Never replace an explicit recipient with the selected target.
+    if type(onSelf) == "string" then
+        if type(UnitExists) == "function" and UnitExists(onSelf) then
+            return onSelf
+        end
+        return nil
+    end
+
     if onSelf == true or onSelf == 1 then
         return "player"
     end
 
     if type(UnitExists) == "function" and UnitExists("target") then
+        -- Keep the existing selected-target behavior. An explicit
+        -- SpellTargetUnit or @mouseover target is handled separately.
         return "target"
     end
 
-    -- Do not infer a recipient when the client has no explicit target.
-    return nil
+    -- OctoWoW self-casts this helpful spell when there is no target.
+    -- A missing target must not silently bypass self-buff protection.
+    return "player"
 end
 
 local function ShouldBlockFearWard(unit)
@@ -532,30 +545,94 @@ function Announcer.ShouldBlockFearWard(unit)
     return ShouldBlockFearWard(unit)
 end
 
+-- In Vanilla, a script may start Fear Ward and then specify the unit
+-- through SpellTargetUnit("raid1") or SpellTargetUnit(mouseoverUnit).
+-- Remember ONLY a pending Fear Ward target cursor; do not cancel other
+-- spell targeting. The cursor check and short expiry prevent stale state.
+local pendingFearWardTargetAt = nil
+local TARGET_WINDOW = 2
+
+local function CaptureTargetCursor()
+    pendingFearWardTargetAt = nil
+    if not settings.preventOverwrite
+    or type(SpellIsTargeting) ~= "function" then
+        return
+    end
+
+    local ok, targeting = pcall(SpellIsTargeting)
+    if ok and targeting then
+        pendingFearWardTargetAt = GetTime()
+    end
+end
+
+if type(SpellTargetUnit) == "function" then
+    local previousTargetUnit = SpellTargetUnit
+    SpellTargetUnit = function(unit)
+        local started = pendingFearWardTargetAt
+        pendingFearWardTargetAt = nil
+
+        if started
+        and type(GetTime) == "function"
+        and GetTime() - started <= TARGET_WINDOW then
+            local validCursor = true
+            if type(SpellIsTargeting) == "function" then
+                local ok, targeting = pcall(SpellIsTargeting)
+                validCursor = ok and targeting and true or false
+            end
+
+            if validCursor and ShouldBlockFearWard(unit) then
+                if type(SpellStopTargeting) == "function" then
+                    pcall(SpellStopTargeting)
+                end
+                return
+            end
+        end
+
+        return previousTargetUnit(unit)
+    end
+end
+
 -- Keep the existing function as a delegate so independently hooking
 -- addons can still work. No hooksecurefunc: a post-hook cannot block.
 if type(CastSpellByName) == "function" then
     local previousCastByName = CastSpellByName
     CastSpellByName = function(spellName, onSelf)
-        if IsFearWardName(spellName)
+        local fearWard = IsFearWardName(spellName)
+        pendingFearWardTargetAt = nil
+
+        if fearWard
         and ShouldBlockFearWard(ProtectionUnit(onSelf)) then
             return
         end
-        return previousCastByName(spellName, onSelf)
+
+        local result = previousCastByName(spellName, onSelf)
+        if fearWard then
+            CaptureTargetCursor()
+        end
+        return result
     end
 end
 
 if type(CastSpell) == "function" then
     local previousCast = CastSpell
     CastSpell = function(spellbookSlot, bookType)
+        local fearWard = false
         if bookType ~= "pet" and type(GetSpellName) == "function" then
             local name = GetSpellName(spellbookSlot, bookType or "spell")
-            if IsFearWardName(name)
-            and ShouldBlockFearWard(ProtectionUnit(false)) then
-                return
-            end
+            fearWard = IsFearWardName(name)
         end
-        return previousCast(spellbookSlot, bookType)
+        pendingFearWardTargetAt = nil
+
+        if fearWard
+        and ShouldBlockFearWard(ProtectionUnit(false)) then
+            return
+        end
+
+        local result = previousCast(spellbookSlot, bookType)
+        if fearWard then
+            CaptureTargetCursor()
+        end
+        return result
     end
 end
 
@@ -565,15 +642,25 @@ if type(UseAction) == "function" then
         -- ClassicAPI exposes the exact spell ID of direct action buttons.
         -- Do NOT inspect icon textures or block macros based on their
         -- first spell: their actual target may differ (e.g. @mouseover).
+        local fearWard = false
         if type(GetActionInfo) == "function" then
             local kind, spellID = GetActionInfo(slot)
-            if kind == "spell" and tonumber(spellID) == FEAR_WARD_ID
-            and ShouldBlockFearWard(ProtectionUnit(onSelf)) then
-                return
-            end
+            fearWard = kind == "spell"
+                and tonumber(spellID) == FEAR_WARD_ID
         end
 
-        return previousUseAction(slot, checkCursor, onSelf)
+        pendingFearWardTargetAt = nil
+
+        if fearWard
+        and ShouldBlockFearWard(ProtectionUnit(onSelf)) then
+            return
+        end
+
+        local result = previousUseAction(slot, checkCursor, onSelf)
+        if fearWard then
+            CaptureTargetCursor()
+        end
+        return result
     end
 end
 

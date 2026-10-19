@@ -159,7 +159,8 @@ table.insert(
 
 -- CharacterFrameTabButtonTemplate matches the main tabs used by
 -- Puppeteer and the Blizzard character frame on Vanilla 1.12.
-PC.UI.ActiveTab = "wands"
+-- Initial window state after login; later tab choices persist until reload.
+PC.UI.ActiveTab = "options"
 
 local tabButtons = {}
 

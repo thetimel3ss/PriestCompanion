@@ -25,6 +25,7 @@ Data\QuestChains.lua
 Data\HealingSpells.lua
 
 Core\PrayerTracker.lua
+Core\Announcer.lua
 
 UI\MainFrame.lua
 UI\SourceTooltip.lua
@@ -32,4 +33,5 @@ UI\SourceDetails.lua
 UI\WandPanel.lua
 UI\OptionsPanel.lua
 UI\EnvironmentPanel.lua
+UI\AnnouncerPanel.lua
 UI\PrayerTracker.lua

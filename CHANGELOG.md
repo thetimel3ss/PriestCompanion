@@ -2,7 +2,13 @@
 
 ## [Unreleased]
 
-_No changes recorded yet._
+### Added — Fear Ward Announcer (development branch, 2026-10-19)
+- Added independent Options → **Announcer** subtab, preserving General, Tracker, and Mods. Configurations are saved per character under `PriestCompanionCharDB.announcer` and disabled by default.
+- Support **multiple simultaneous text channels**, using independent Say, Party, Raid, and Self (local chat) checkboxes. A successful Fear Ward can announce to Say and Raid at once; unavailable Party/Raid destinations are skipped rather than substituted. Optionally allow announcements when targeting oneself.
+- Provide a configurable one-line chat template with `{target}` and optional `{spell}`, plus a preview that never sends chat messages. Recipient placeholder is retained when a custom template omits it.
+- Pair ClassicAPI `UNIT_SPELLCAST_SENT` (recipient, cast GUID, spell 6346) with `UNIT_SPELLCAST_SUCCEEDED` using the same GUID. Failed/interrupted casts and unconfirmed targets do not announce; each cast announces at most once to each selected channel.
+- ClassicAPI 1.11.0+ is required for confirmed target-aware announcements in this initial version; Nampower client-side `SPELL_CAST_EVENT` is not used as a successful server-cast confirmation. The rest of Priest Companion keeps its optional-DLL architecture.
+- No spell automation or resurrection handling is included in this initial feature. **In-game acceptance tests pending**; the addon remains v0.2.0 until this branch is validated.
 
 ## [0.2.0] - 2026-10-19
 

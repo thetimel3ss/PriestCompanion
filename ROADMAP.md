@@ -118,6 +118,17 @@ All 28 records have `source.note`: 21 world-drop-style entries with `"World drop
 
 ## Next steps
 
+### Announcer — Fear Ward (in progress on `feature/announcer`)
+
+- [x] Create a separate Options → Announcer tab and per-character preferences for Fear Ward, initially disabled.
+- [x] Allow multiple selected announcement channels at once: Say, Party, Raid and local-only Self. Skip unavailable group channels rather than rerouting; allow an independent toggle for self-cast announcements.
+- [x] Support customizable message text and preview, retaining the target placeholder. Announce only after confirmed ClassicAPI SENT → SUCCEEDED GUID match; skip failed casts, duplicate success, or unknown recipients without assuming a target.
+- [ ] **In-game verification:** Fear Ward on self/party/raid members, Say + Raid and Party + Say simultaneously, success vs failed/out-of-range casts, mouseover casts, changing target immediately, duplicate events, missing target, no ClassicAPI, channel changes mid-session, and settings across /reload.
+- [ ] **Resurrection Announcer:** announce the target on cast initiation/completion carefully without claiming a player accepted resurrection; keep separate settings.
+- [ ] **Fear Ward Assistant:** allow a preferred target and cooldown/aura readiness reminders; assess whether automatic casting is supported and permitted by the client/server before implementing any action.
+- [ ] **Resurrection Assistant:** offer a post-wipe dead-player list with player-confirmed resurrection actions; handle combat, range, and player availability.
+- [ ] **Future announcers:** OOM alerts and other optional priest spell announcements. Avoid chat spam and preserve independent channel selection.
+
 ### Native tabbed Options UI and client diagnostics — released in v0.2.0
 
 - [x] Replace top-level command-style navigation with Vanilla-native **Wands / Options** bottom tabs, inspired by Puppeteer. The options area now has **General / Advanced / Mods** secondary tabs.

@@ -92,9 +92,12 @@ local generalTab = CreateSectionTab("general", "General", 1)
 local advancedTab = CreateSectionTab(
     "advanced", "Tracker", 2, generalTab
 )
-CreateSectionTab("mods", "Mods", 3, advancedTab)
+local announcerTab = CreateSectionTab(
+    "announcer", "Announcer", 3, advancedTab
+)
+CreateSectionTab("mods", "Mods", 4, announcerTab)
 
-PanelTemplates_SetNumTabs(panel, 3)
+PanelTemplates_SetNumTabs(panel, 4)
 
 --------------------------------------------------
 -- Shared Content Background
@@ -216,6 +219,14 @@ CreateLabel(
     "Tracker contains Book of Prayer settings.",
     18,
     -213,
+    385
+)
+
+CreateLabel(
+    general,
+    "Announcer configures Fear Ward messages and chat channels.",
+    18,
+    -250,
     385
 )
 
@@ -724,6 +735,7 @@ end
 
 function panel.SelectSection(id)
     if id ~= "advanced"
+    and id ~= "announcer"
     and id ~= "mods" then
         id = "general"
     end
@@ -734,9 +746,13 @@ function panel.SelectSection(id)
     advanced:Hide()
 
     local mods = PC.UI.EnvironmentPanel
+    local announcements = PC.UI.AnnouncerPanel
 
     if mods then
         mods:Hide()
+    end
+    if announcements then
+        announcements:Hide()
     end
 
     local selected = nil
@@ -745,6 +761,8 @@ function panel.SelectSection(id)
         selected = general
     elseif id == "advanced" then
         selected = advanced
+    elseif id == "announcer" then
+        selected = announcements
     else
         selected = mods
     end
@@ -760,8 +778,10 @@ function panel.SelectSection(id)
     -- Blizzard handles selected textures, widths and border joins.
     if id == "advanced" then
         PanelTemplates_SetTab(panel, 2)
-    elseif id == "mods" then
+    elseif id == "announcer" then
         PanelTemplates_SetTab(panel, 3)
+    elseif id == "mods" then
+        PanelTemplates_SetTab(panel, 4)
     else
         PanelTemplates_SetTab(panel, 1)
     end
@@ -778,6 +798,6 @@ panel:SetScript(
     end
 )
 
--- The Mods content is added by UI/EnvironmentPanel.lua later in the TOC.
+-- Mods and Announcer content are added by their own UI files later in the TOC.
 general:Hide()
 advanced:Hide()

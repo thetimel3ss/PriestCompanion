@@ -260,7 +260,7 @@ local advancedChild = CreateFrame(
     "Frame", nil, advancedScroll
 )
 advancedChild:SetWidth(388)
-advancedChild:SetHeight(320)
+advancedChild:SetHeight(360)
 advancedScroll:SetScrollChild(advancedChild)
 
 CreateLabel(
@@ -405,11 +405,19 @@ AddPrayerCheckbox(
         "and red if the same healing family is repeated. " ..
         "It stays neutral until two qualifying casts are known."
 )
-AddPrayerCheckbox("outsideCombat", "Show outside combat", 186)
+AddPrayerCheckbox(
+    "showManaRefund",
+    "Show estimated mana refund",
+    186,
+    "Shows an approximate mana amount after an eligible heal. " ..
+        "Requires a supported pre-cast mana cost from ClassicAPI. " ..
+        "No number is shown if the cost cannot be verified."
+)
+AddPrayerCheckbox("outsideCombat", "Show outside combat", 216)
 AddPrayerCheckbox(
     "autoHide",
     "Auto-hide after inactivity",
-    216,
+    246,
     "Hide the tracker when no compatible healing spell has " ..
         "been successfully cast for the configured number " ..
         "of seconds. The next heal shows it again.",
@@ -424,7 +432,7 @@ local autoHideSecondsBox = CreateFrame(
     "InputBoxTemplate"
 )
 autoHideSecondsBox:SetPoint(
-    "TOPLEFT", advancedChild, "TOPLEFT", 280, -217
+    "TOPLEFT", advancedChild, "TOPLEFT", 280, -247
 )
 autoHideSecondsBox:SetWidth(52)
 autoHideSecondsBox:SetHeight(20)
@@ -446,7 +454,7 @@ if inputLeft then
 end
 
 local secondsLabel = CreateLabel(
-    advancedChild, "sec", 340, -219, 36
+    advancedChild, "sec", 340, -249, 36
 )
 
 local function SaveAutoHideSeconds()
@@ -501,7 +509,7 @@ autoHideSecondsBox:SetScript("OnLeave", HidePrayerTooltip)
 AddPrayerCheckbox(
     "locked",
     "Lock position",
-    246,
+    276,
     "When unlocked, drag the tracker to move it and drag " ..
         "an edge or corner to resize. Locking prevents both " ..
         "moving and resizing the tracker."

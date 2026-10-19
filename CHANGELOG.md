@@ -2,6 +2,14 @@
 
 ## [Unreleased]
 
+### Added — Nampower exact Book of Prayer refund and larger mana text (2026-10-19)
+- Prefer the live Nampower `SPELL_ENERGIZE_ON_SELF` server event, filtered to spell ID **52942** (Book of Prayer), mana power type `0`, nonperiodic, and positive amount. The displayed `+N mana` is the server-reported amount (`arg5`), not a calculated percentage. Match to the current recent qualifying heal, with a short buffer if the energize event precedes the successful cast event; avoid duplicating other energize sources.
+- Keep the existing ClassicAPI `C_Spell.GetSpellPowerCost` prediction as a fallback (`~N mana`) when the direct Nampower report is unavailable; existing Inner Focus suppression and Ascendance's dynamically modified cost path remain relevant. Nampower is an optional integration and does not replace the preferred ClassicAPI success event.
+- Detect Nampower's major/minor release through `GetNampowerVersion()`. On **4.5+**, registering the energize event enables it; older versions require the Nampower `NP_EnableSpellEnergizeEvents` CVar, set automatically only when the user enables **Show mana refund** and the talent is active. The addon does not execute a slash command. If the addon changes an older CVar, it restores its prior value when the user disables the option.
+- Rename the checkbox from **Show estimated mana refund** to **Show mana refund** and document `+N` (Nampower actual) versus `~N` (ClassicAPI estimate). Preserve its previous saved state and default off behavior.
+- Increase the mana-refund font from `GameFontHighlightSmall` to `GameFontHighlight`, without changing the maintainer's manually adjusted tracker title font.
+- **In-game validation pending:** test Nampower 4.0 vs 4.5+, event delivery/timing and fallbacks, Inner Focus suppression, Ascendance, reload, and color/number agreement.
+
 ### Added — Predicted Book of Prayer mana refund (2026-10-19)
 - Renamed the visible Options subtab **Advanced** to **Tracker**, preserving the existing internal section ID (`advanced`) and all user settings.
 - Added **Show estimated mana refund** (off by default) next to the existing independent color-border option. After a confirmed qualifying heal, the HUD may display e.g. `~38 mana`; the tilde explicitly indicates a prediction, **not an observed/verified increase in mana**. When cost data is unavailable the HUD does not display a fabricated value.

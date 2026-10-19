@@ -55,15 +55,24 @@ frame:SetBackdropColor(0.04, 0.04, 0.09, 0.95)
 frame:SetBackdropBorderColor(0.55, 0.55, 0.67, 1)
 frame:Hide()
 
-local title = frame:CreateFontString(
+-- Keep all content in a fixed logical layout. When the user resizes the
+-- outer window, scale this inner frame (including icons and font strings)
+-- instead of enforcing large minimum dimensions for every text element.
+local visual = CreateFrame("Frame", nil, frame)
+visual:SetPoint("CENTER", frame, "CENTER", 0, 0)
+visual:SetWidth(118)
+visual:SetHeight(112)
+visual:EnableMouse(false)
+
+local title = visual:CreateFontString(
     nil,
     "OVERLAY",
     "GameFontNormalSmall"
 )
-title:SetPoint("TOP", frame, "TOP", 0, -9)
+title:SetPoint("TOP", visual, "TOP", 0, -9)
 title:SetText("Book of Prayer")
 
-local currentIcon = frame:CreateTexture(
+local currentIcon = visual:CreateTexture(
     nil,
     "ARTWORK"
 )
@@ -71,13 +80,13 @@ currentIcon:SetWidth(36)
 currentIcon:SetHeight(36)
 currentIcon:SetPoint(
     "TOP",
-    frame,
+    visual,
     "TOP",
     0,
     -25
 )
 
-local previousIcon = frame:CreateTexture(
+local previousIcon = visual:CreateTexture(
     nil,
     "ARTWORK"
 )
@@ -85,13 +94,13 @@ previousIcon:SetWidth(36)
 previousIcon:SetHeight(36)
 previousIcon:SetPoint(
     "TOP",
-    frame,
+    visual,
     "TOP",
     -43,
     -30
 )
 
-local currentName = frame:CreateFontString(
+local currentName = visual:CreateFontString(
     nil,
     "OVERLAY",
     "GameFontHighlightSmall"
@@ -106,7 +115,7 @@ currentName:SetPoint(
     -2
 )
 
-local previousName = frame:CreateFontString(
+local previousName = visual:CreateFontString(
     nil,
     "OVERLAY",
     "GameFontDisableSmall"
@@ -121,33 +130,33 @@ previousName:SetPoint(
     -2
 )
 
-local arrow = frame:CreateFontString(
+local arrow = visual:CreateFontString(
     nil,
     "OVERLAY",
     "GameFontNormal"
 )
 arrow:SetPoint(
     "CENTER",
-    frame,
+    visual,
     "TOP",
     0,
     -48
 )
 arrow:SetText(">")
 
-local refundText = frame:CreateFontString(
+local refundText = visual:CreateFontString(
     nil,
     "OVERLAY",
     "GameFontHighlightSmall"
 )
 refundText:SetPoint(
     "BOTTOM",
-    frame,
+    visual,
     "BOTTOM",
     0,
-    13
+    10
 )
-refundText:SetWidth(280)
+refundText:SetWidth(110)
 refundText:SetJustifyH("CENTER")
 
 --------------------------------------------------
@@ -161,7 +170,7 @@ local edges = {}
 
 local resizeHint = frame:CreateTexture(nil, "OVERLAY")
 resizeHint:SetTexture(
-    "Interface\\\\ChatFrame\\\\UI-ChatIM-SizeGrabber-Up"
+    "Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Up"
 )
 resizeHint:SetWidth(12)
 resizeHint:SetHeight(12)
@@ -307,16 +316,25 @@ frame:SetScript(
 
 local function UpdateIconLayout()
     local expanded = Tracker.GetOption("expanded")
-    local width = frame:GetWidth()
-    local height = frame:GetHeight()
-    local iconSize = math.floor(height * 0.32)
+    local baseWidth = expanded and 212 or 118
+    local baseHeight = expanded and 130 or 112
 
-    if iconSize < 34 then
-        iconSize = 34
-    elseif iconSize > 58 then
-        iconSize = 58
+    -- Scale the entire content uniformly so icons, labels and the
+    -- footer shrink/grow together, including below the old 104x112
+    -- compact minimum. The outer border itself stays crisp.
+    local scaleX = frame:GetWidth() / baseWidth
+    local scaleY = frame:GetHeight() / baseHeight
+    local scale = math.min(scaleX, scaleY)
+
+    if scale < 0.1 then
+        scale = 0.1
     end
 
+    visual:SetWidth(baseWidth)
+    visual:SetHeight(baseHeight)
+    visual:SetScale(scale)
+
+    local iconSize = expanded and 40 or 36
     currentIcon:SetWidth(iconSize)
     currentIcon:SetHeight(iconSize)
     previousIcon:SetWidth(iconSize)
@@ -326,35 +344,25 @@ local function UpdateIconLayout()
     previousIcon:ClearAllPoints()
 
     if expanded then
-        local spread = math.floor(width * 0.22)
-        if spread < 40 then
-            spread = 40
-        elseif spread > 70 then
-            spread = 70
-        end
-
         currentIcon:SetPoint(
-            "TOP", frame, "TOP", spread, -30
+            "TOP", visual, "TOP", 46, -30
         )
         previousIcon:SetPoint(
-            "TOP", frame, "TOP", -spread, -30
+            "TOP", visual, "TOP", -46, -30
         )
-
-        currentName:SetWidth(
-            math.floor(width * 0.40)
-        )
-        previousName:SetWidth(
-            math.floor(width * 0.40)
-        )
+        currentName:SetWidth(94)
+        previousName:SetWidth(94)
     else
         currentIcon:SetPoint(
-            "TOP", frame, "TOP", 0, -25
+            "TOP", visual, "TOP", 0, -25
         )
         previousIcon:SetPoint(
-            "TOP", frame, "TOP", -43, -30
+            "TOP", visual, "TOP", -43, -30
         )
-        currentName:SetWidth(width - 16)
+        currentName:SetWidth(110)
     end
+
+    refundText:SetWidth(baseWidth - 10)
 end
 
 frame:SetScript(
@@ -373,13 +381,13 @@ local function SetDimensions(expanded)
     if expanded then
         width = Tracker.GetOption("expandedWidth") or 212
         height = Tracker.GetOption("expandedHeight") or 130
-        minWidth = 170
-        minHeight = 118
+        minWidth = 104
+        minHeight = 78
     else
         width = Tracker.GetOption("compactWidth") or 118
         height = Tracker.GetOption("compactHeight") or 112
-        minWidth = 104
-        minHeight = 112
+        minWidth = 68
+        minHeight = 68
     end
 
     if width < minWidth then
@@ -489,24 +497,32 @@ local function UpdateDisplay()
         previousName:Hide()
     end
 
+    -- Color the tracker itself to indicate eligibility. This is a
+    -- predicted Book of Prayer state, never a measured mana refund.
     if Tracker.GetOption("showRefund") then
         refundText:Show()
 
         if not current or not previous then
-            refundText:SetText("No previous heal")
+            frame:SetBackdropBorderColor(0.55, 0.55, 0.67, 1)
+            frame:SetBackdropColor(0.04, 0.04, 0.09, 0.95)
+            refundText:SetText("-")
             refundText:SetTextColor(0.70, 0.70, 0.70)
         elseif state.eligible then
-            local percent = state.talentPoints * 15
+            frame:SetBackdropBorderColor(0.25, 0.95, 0.32, 1)
+            frame:SetBackdropColor(0.04, 0.10, 0.05, 0.95)
             refundText:SetText(
-                "Eligible: " .. tostring(percent) ..
-                "% mana cost"
+                tostring(state.talentPoints * 15) .. "%"
             )
-            refundText:SetTextColor(0.30, 1.00, 0.30)
+            refundText:SetTextColor(0.30, 1.00, 0.35)
         else
-            refundText:SetText("Same spell: no refund")
-            refundText:SetTextColor(1.00, 0.48, 0.40)
+            frame:SetBackdropBorderColor(0.97, 0.30, 0.30, 1)
+            frame:SetBackdropColor(0.11, 0.04, 0.05, 0.95)
+            refundText:SetText("0%")
+            refundText:SetTextColor(1.00, 0.40, 0.40)
         end
     else
+        frame:SetBackdropBorderColor(0.55, 0.55, 0.67, 1)
+        frame:SetBackdropColor(0.04, 0.04, 0.09, 0.95)
         refundText:Hide()
     end
 

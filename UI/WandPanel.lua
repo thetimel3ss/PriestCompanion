@@ -2817,7 +2817,7 @@ eventFrame:SetScript(
             end
         end
 
-        if mainFrame:IsShown() then
+        if panel:IsShown() then
             RefreshWandList()
 
             if activeRow
@@ -2833,12 +2833,12 @@ eventFrame:SetScript(
 )
 
 --------------------------------------------------
--- Main Frame OnShow
+-- Refresh API for Main Navigation
 --------------------------------------------------
 
-mainFrame:SetScript(
-    "OnShow",
-    function()
-        RefreshWandList(true)
+-- MainFrame selects the visible tab and asks the Wand panel to refresh.
+-- Do not replace MainFrame's OnShow handler: it manages both tabs.
+panel.Refresh =
+    function(resetScroll)
+        RefreshWandList(resetScroll)
     end
-)

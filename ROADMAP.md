@@ -2,9 +2,9 @@
 
 The roadmap tracks outstanding improvements and ongoing verification. Released functionality belongs in [CHANGELOG.md](CHANGELOG.md), not here.
 
-**Review date:** 2026-10-17  
-**Development branch:** `feature/wand-progression-clean`  
-**Current release:** `0.1.2`
+**Review date:** 2026-10-19  
+**Current release:** `0.2.0` (`main`)  
+**Future development:** separate feature branches from `main`
 
 ## Current scope and confirmed decisions
 
@@ -28,14 +28,18 @@ The roadmap tracks outstanding improvements and ongoing verification. Released f
 - When multiple acquisition records have different types, Source Details displays the selected type rather than all types at once. For crafting, it presents the primary matching craft record; quests, drops, and vendors already support multiple entries.
 - Large boss loot tables are intentionally omitted for selected sources to avoid visual clutter and performance issues; records retained in `Data/BossLoot.lua` do not imply that the UI must render them.
 
-### Optional ClassicAPI integration — Priority 1 technical review (2026-10-17)
-- **Manifest selection:** the client selects the addon's TOC **before Lua runs**. Detecting `CLASSIC_API_VERSION` in Lua cannot automatically load `PriestCompanion_ClassicAPI.toc`. Installation/packaging must explicitly select which TOC the game sees as the addon manifest, or the loader architecture must be redesigned to avoid a separate flavor.
-- **Split detection:** `Core/Capabilities.lua` sets `PC.Capabilities.classicAPI` if the ClassicAPI environment flag or `CLASSIC_API_VERSION` is present. However, `Core/ClassicAPI.lua` (included **only** by the specialized TOC) sets `PC.Environment.classicAPI = true` without guarding against absent ClassicAPI. The two booleans therefore represent different things and can disagree.
-- **Quest completion event:** `Core/QuestHistory.lua` registers `QUEST_TURNED_IN` based only on `PC.Environment.classicAPI`. The external ClassicAPI implementation includes `QUEST_TURNED_IN(questID, xpReward, moneyReward)`, backed by a quest-completion packet hook; the Priest Companion correctly reads the quest ID from `arg1`. The **registration condition**, rather than the event handler's argument, needs revision.
-- **Fallbacks:** the direct server `.queststatus`/`TWQUEST` provider, local SavedVariables, pfQuest import, and positive API completion checks must stay functional even when ClassicAPI is absent. The server query currently uses the `GUILD` chat channel; validate its behavior without guild membership and on non-Octo servers. A missing reply leaves progress as unknown rather than proof of non-completion.
-- **Candidate approach for Priority 1:** clearly separate `runtimeDetected`, `adapterLoaded`, and `eventSupported` capabilities. Decide whether to keep two explicit installation flavors or always load guarded ClassicAPI adapters from the standard TOC. Detect concrete APIs/functions for each feature; for backported events, gate registration by the confirmed provider/version or documented client support, with `pcall`/safe fallback where appropriate. Merely attempting `RegisterEvent` is **not** proof an event will fire.
-- **Acceptance matrix:** Vanilla-only with standard TOC; ClassicAPI available with standard TOC; ClassicAPI available with specialized TOC; specialized TOC without ClassicAPI (should safely fall back or be rejected during packaging). For each, check addon load, item names/icons/tooltips, positive quest completion lookup, `QUEST_TURNED_IN` after turn-in, and server/pfQuest history fallbacks.
-- **Status:** technical review documented; **no runtime behavior changed yet**.
+### Optional ClassicAPI integration — included in v0.2.0 (2026-10-19)
+- **Flavor TOC selection:** ClassicAPI v1.11.0+ automatically redirects a request for `PriestCompanion.toc` to `PriestCompanion_ClassicAPI.toc` if it exists. Without that DLL support, Vanilla loads the normal TOC. The two existing manifests are deliberately retained, and ClassicAPI is **not** a required dependency.
+- **Minimum enhanced baseline:** `CLASSIC_API_VERSION >= 11100` (v1.11.0) for this integration. `Core/Capabilities.lua` now differentiates DLL presence, version, supported version, adapter-loaded state, and expected `QUEST_TURNED_IN` support. Future Skills/Talents/BiS/Consumables/reputation/mana/buff modules should probe their own functions before increasing the minimum.
+- **Adapter guard:** `Core/ClassicAPI.lua` leaves the Vanilla API untouched if the version is absent or too old. Item name/icon/count/tooltip enhancements check for callable providers and protect calls with `pcall`, then use their Vanilla fallbacks as appropriate.
+- **Quest history:** `QUEST_TURNED_IN` registration now depends on a supported ClassicAPI runtime, not on the TOC flavor. The registered event provides quest ID in `arg1`. A `pcall(RegisterEvent)` result is recorded as `QuestHistory.LiveTurnInRegistered` but **cannot prove event delivery**.
+- **Impossible native quest history:** `C_QuestLog.IsQuestFlaggedCompleted` is not feasible in the Vanilla 1.12 client; its ClassicAPI adapter override was removed. Retain SavedVariables, live turn-ins, positive injected provider results, the server-specific `.queststatus`/`TWQUEST` protocol, and optional pfQuest import. Never classify an unknown result as definitely incomplete.
+- **Server fallback:** `.queststatus` still uses `GUILD` chat (no unverified alternate channel). The code skips sending when `IsInGuild() == false` and records `not_in_guild`; missing chat API or send failures are also reported by `GetServerQueryState().unavailableReason`. Server support and delivery still need in-game confirmation. No reply means an unknown history state.
+- **Options command and startup:** `/priest options` (or `/pc options`) explicitly opens **Options → General**, which is now also the first-open tab after loading the game. `/priest env` remains removed. Mods shows optional DLL compatibility; Advanced now hosts Book of Prayer options only. Quest-history core remains active but its diagnostic UI was temporarily removed pending relocation. Mods Refresh is display-only.
+- **Maintainer's prior test result:** the expanded `/priest env` command was verified in-game before the Environment UI change. Reported values included ClassicAPI 1.15.9, SuperWoW 2.2, Nampower 4, UnitXP dispatcher detection and a server response containing 932 processed quest IDs. The **new tabbed presentation and refresh behavior** still require in-game validation.
+- **Static checks completed:** version/adapter separation, the TOC loading order, absence of the unsupported quest-history API call, four Vanilla fallbacks and all existing history providers were inspected in the committed code.
+- **In-game acceptance matrix still pending:** Vanilla-only + standard TOC; ClassicAPI >=1.11.0 + automatic flavor; a supported runtime using the standard TOC; manually selected ClassicAPI TOC without a functioning DLL; unsupported/older DLL. Test item functions, quest turn-ins (including reload persistence), server query with and without a guild, absent server support, and pfQuest import. Also test with the latest supported ClassicAPI version.
+- **Status:** optional integration code included in `0.2.0`; the separate ClassicAPI and quest-history compatibility matrix remains **unverified**. Its release does not mean every client/provider combination has been tested.
 
 ### Item information
 
@@ -114,9 +118,43 @@ All 28 records have `source.note`: 21 world-drop-style entries with `"World drop
 
 ## Next steps
 
-### Priority 1 — Harden the Wand Progression release
+### Native tabbed Options UI and client diagnostics — released in v0.2.0
 
-- [ ] **ClassicAPI integration and quest history:** choose a clear TOC packaging/loading strategy; align capability detection and optional adapters; gate `QUEST_TURNED_IN` by actual supported provider/version and test the acceptance matrix above. Preserve server and pfQuest fallback providers.
+- [x] Replace top-level command-style navigation with Vanilla-native **Wands / Options** bottom tabs, inspired by Puppeteer. The options area now has **General / Advanced / Mods** secondary tabs.
+- [x] Add `UI/OptionsPanel.lua` for read-only General information and interactive Book of Prayer settings under Advanced; reorganize `UI/EnvironmentPanel.lua` into a scrollable **Options → Mods** subpage with individual DLL sections.
+- [x] Replace the former `/priest env` / `/pc env` with `/priest options` / `/pc options` opening Options → General; Mods remains available as a secondary tab.
+- [x] Retain ClassicAPI detection/version/minimum/adapter, quest-history turn-in and server-query diagnostics, SuperWoW, Nampower and UnitXP SP3 details. The Mods Refresh button never sends chat/server queries.
+- [x] Load Options before Mods in both TOCs; leave Wand Progression data, filtering and quest/source mapping unchanged.
+- [x] **Puppeteer-inspired visual refinement:** centered decorated dialog title, PanelTemplates-driven pressed/selected tab artwork, secondary-tab border alignment, and descriptive Mods sections with detected/missing/unsupported colors and selectable links.
+- [ ] **In-game UI validation:** confirm first-open Options → General after `/reload`, tab switching and reopening, the two Advanced tooltips (hover on checkbox *and* label), the removed Quest History Diagnostics display, the decorated title and selected tab textures, Mods links/scroll/status, `/priest options` aliases, and the unchanged Wands view. Static inspection cannot replace this test.
+
+### Book of Prayer Tracker — released in v0.2.0 (2026-10-19)
+
+- [x] **Maintainer-confirmed in-game checks:** Nampower displays mana correctly when Renew follows Flash Heal rapidly; Reset Position and Preview Tracker worked before confirmation was added. The maintainer also verified Inner Focus → heal → heal; Ascendance → heal → another heal; Ascendance → heal → heal; Inner Focus → Ascendance → heal → heal / another heal; Ascendance → Inner Focus → heal → heal / another heal. Inner Focus requires restarting the refund cycle, correctly reflected by the tracker; Ascendance reports reduced mana returned. Reset confirmation and other rapid-cast/compatibility sequences still need live testing.
+
+- [x] Define six supported healing families independent of spell rank: Flash Heal, Renew, Prayer of Healing, Heal, Greater Heal and Lesser Heal.
+- [x] Scan `GetTalentInfo` for the actual Book of Prayer talent and current points. Recheck upon login, talents and spellbook changes; do not enable the tracker without talent points.
+- [x] Track successful local-player casts, prioritizing ClassicAPI `UNIT_SPELLCAST_SUCCEEDED`; Nampower `SPELL_CAST_EVENT` and SuperWoW `UNIT_CASTEVENT` are optional fallbacks. Avoid double-counting one cast across providers. Do not derive success from `SPELLCAST_STOP`.
+- [x] Implement a compact HUD with larger icon and optional spell name, expanded mode with the penultimate healing family, and refund status via green/red/neutral border only (no displayed percentage). Keep drag movement and resizing from all edges/corners. On 2026-10-19, add proportional scaling of the entire inner HUD and reduce minimum window dimensions.
+- [x] Rename the visible Advanced subtab to **Tracker** (internal navigation ID remains `advanced`). Add Tracker checkboxes: Enable, Expanded, Show spell name, Show refund status (border color), Show estimated mana refund (off by default), Show outside combat, Lock position. When talent points = 0, disable Enable and display a red explanation. Hover tooltips document refund colors and movement/resizing.
+- [x] Add opt-in **Auto-hide after inactivity** (default off) and a numeric-only timeout field (1–600 seconds, default 15) under Options → Advanced. Reset the timer after each confirmed supported heal; hide on timeout and restore on the next qualifying cast. Save both preferences per character; disabling auto-hide disables the timeout input.
+- [x] Prefer **actual mana returned** via Nampower `SPELL_ENERGIZE_ON_SELF` (Book of Prayer ID `52942`, mana type `0`, `arg5` exact amount), rendering `+N mana`. Nampower 4.5+ enables the event by registration; older versions require a guarded `NP_EnableSpellEnergizeEvents` CVar toggle while the user enables Show mana refund. Keep ClassicAPI `UNIT_SPELLCAST_SENT` + `C_Spell.GetSpellPowerCost` as the fallback `~N mana` estimate when the direct report does not arrive. Preserve Inner Focus suppression behavior and use dynamic cost modifiers for Ascendance.
+- [x] Persist settings and separate compact/expanded sizes and screen position per character in `PriestCompanionCharDB`.
+- [ ] **In-game OctoWoW validation (mandatory):** check the talent scanner for 0/1/2 points, changing talents/respec, rank-independent family tracking, Renew ticks and Prayer of Healing being counted once, cast success vs interruption, actual spell icons and expanded name layout (including long names), proportional scaling down to 68x68 compact / 104x78 expanded, border colors for eligible/repeated/unknown spells without a percentage footer, and the evenly spaced Advanced checkboxes. Test auto-hide after the configured delay (1, 15, 600 seconds), repeated same-family heals resetting the timer, hiding before the first heal on a fresh login, revival on the next confirmed heal, ignored non-healing casts, numeric-only validation, locked/drag behavior, and per-character preferences across `/reload` and relog.
+- [x] **Rapid-heal energize correlation:** retain independently buffered Nampower events and a short history of eligible successful casts, matching by amount vs. ClassicAPI cost estimate, cast order and event timing. Use a **400ms post-success window**, **150ms pre-success allowance**, and short settling/deferred-SENT delays instead of discarding all heals occurring within 750ms. Consume each event/cast at most once; preserve fallback when no reliable correspondence exists. The GUID-less Nampower packets remain inherently ambiguous for overlapping equal-cost spells.
+- [x] **Tracker layout controls:** add Reset Position with native OK/Cancel confirmation (resets both compact and expanded dimensions and the saved offset, without changing other per-character preferences, including lock) and Preview Tracker (temporary UI-only sample, visible even without the talent or outside-combat permission). Preview does not touch the real healing history and ends on leaving the settings page; its simulated content is visibly labeled.
+- [ ] **Live synchronization tests:** Flash Heal → Renew → Flash Heal, multiple instant heals close together, canceled casts followed by a heal, Inner Focus + Ascendance, Nampower event before/after SUCCEEDED, no ClassicAPI, and a delayed server packet. Confirm exactly one real refund is shown per cast, or a fallback estimate/blank instead of a mismatched value.
+- [ ] **Live layout controls:** verify Reset Position OK vs Cancel/Escape when locked and unlocked, after changing compact/expanded dimensions, and across /reload. Test Preview with 0/2 and 2/2 talent, while auto-hide is enabled, after enabling/disabling the mana label, while dragging/resizing, and on switching tabs/closing the main frame; verify genuine heal history remains unchanged.
+- [x] **Mana label spacing:** reserve footer space when **Show mana refund** is checked; reposition and shrink spell icons rather than moving the mana text. If **Show spell name** is unchecked, allow a larger icon; adapt further for names wrapping onto two lines. Preserve distinct compact/expanded sizing and the existing saved window geometry.
+- [ ] **Visual validation:** test all four combinations of Show spell name / Show mana refund in compact and expanded modes, including long spell names and window scaling at saved minimum sizes. Confirm no overlaps between icon, name, and mana text.
+- [ ] **Remaining mana refund validation:** Inner Focus and Ascendance cast-order behavior is maintainer-confirmed (see checked item above). Still compare Nampower `SPELL_ENERGIZE_ON_SELF` packets against `+N mana` across all families/ranks, determine before/after `UNIT_SPELLCAST_SUCCEEDED` delivery, test Nampower 4.0 CVar vs 4.5+ event registration, restoring CVar state, ClassicAPI `~N mana` fallback when events are absent, canceled casts, and reload; distinguish actual server amounts from rounding and client estimates.
+- [ ] **Client variation:** test with and without ClassicAPI and with each fallback extension separately. If no trustworthy cast events are present, keep tracking unavailable rather than incorrectly treating `SPELLCAST_STOP` as a confirmed heal.
+- [x] **Refund accuracy architecture:** use server-reported Nampower energize data when present and optional ClassicAPI-derived estimates otherwise. Numeric output is user-toggleable, with `+` for actual server data and `~` for an estimate. Session statistics remain out of scope.
+
+### Deferred — Wand Progression enhancements
+
+- [x] **ClassicAPI code:** use the automatic flavor TOC redirect, add a guarded v1.11.0-capable adapter, detect capabilities separately, and preserve optional quest-history providers.
+- [ ] **ClassicAPI in-game validation after v0.2.0:** complete the acceptance matrix above, specifically live `QUEST_TURNED_IN`, item fallbacks, no-guild server transport, and reload persistence in a dedicated follow-up branch if fixes are needed.
 - [ ] **Source Details:** handle multiple acquisition types for one wand, and multiple matching craft entries, without losing current faction/source filters, layout reuse, or map navigation.
 - [ ] **Structured reputation:** migrate optional requirements from free-text notes to a data structure with faction/standing; preserve backward-compatible notes, then consider reputation- and content-based filters.
 - [ ] **Map/NPC follow-up:** do not guess missing positions for Risen Oilblaze, Watchman Doomgrip, Elisandra Spellbinder, or other `(0, 0)` entries. Add positions only when verified. All registered instances currently have `worldMap`.
@@ -128,7 +166,7 @@ All 28 records have `source.note`: 21 world-drop-style entries with `"World drop
 ### Later capabilities (scope and feasibility to be assessed)
 
 - [ ] Open-world / dungeon / raid content filters (potentially grouped with reputation filters).
-- [ ] Settings tab (quest-history preferences, optional integrations, reset and UI settings).
+- [ ] Add more configurable settings to Options → General / Advanced later (quest-history preferences, optional integrations, reset and UI settings). General is currently read-only; Advanced now contains Book of Prayer controls. Restore quest-history diagnostics elsewhere in a future feature.
 - [ ] Minimap launcher.
 - [ ] Priest skills database.
 - [ ] Talent builds.

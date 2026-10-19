@@ -1,9 +1,10 @@
 ## Interface: 11200
 ## Title: Priest Companion
-## Notes: Wand progression, source details, and map guidance for Vanilla WoW
+## Notes: Wand progression, Book of Prayer tracker, and client diagnostics for Vanilla WoW
 ## Author: Timeless
-## Version: 0.1.2
+## Version: 0.2.0
 ## SavedVariables: PriestCompanionDB
+## SavedVariablesPerCharacter: PriestCompanionCharDB
 
 Core\Bootstrap.lua
 Core\API.lua
@@ -22,8 +23,14 @@ Data\BossLoot.lua
 Data\Wands.lua
 Data\Quests.lua
 Data\QuestChains.lua
+Data\HealingSpells.lua
+
+Core\PrayerTracker.lua
 
 UI\MainFrame.lua
 UI\SourceTooltip.lua
 UI\SourceDetails.lua
 UI\WandPanel.lua
+UI\OptionsPanel.lua
+UI\EnvironmentPanel.lua
+UI\PrayerTracker.lua

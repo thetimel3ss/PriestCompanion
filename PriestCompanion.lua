@@ -11,7 +11,7 @@ PC.version =
     GetAddOnMetadata(
         PC.name,
         "Version"
-    ) or "0.1.2"
+    ) or "0.2.0"
 
 --------------------------------------------------
 -- SavedVariables
@@ -51,47 +51,19 @@ function PC.ToggleMainFrame()
 end
 
 --------------------------------------------------
--- Environment Information
+-- Options
 --------------------------------------------------
 
-function PC.ShowEnvironment()
-    DEFAULT_CHAT_FRAME:AddMessage(
-        "|cff66ccffPriest Companion Environment|r"
-    )
+function PC.ShowOptions()
+    if PC.UI
+    and type(PC.UI.OpenTab) == "function" then
+        PC.UI.OpenTab("options", "general")
+        return
+    end
 
     DEFAULT_CHAT_FRAME:AddMessage(
-        "Flavor: " ..
-        tostring(
-            PC.Environment.flavor
-        )
-    )
-
-    DEFAULT_CHAT_FRAME:AddMessage(
-        "ClassicAPI: " ..
-        tostring(
-            PC.Capabilities.classicAPI
-        )
-    )
-
-    DEFAULT_CHAT_FRAME:AddMessage(
-        "SuperWoW: " ..
-        tostring(
-            PC.Capabilities.superWoW
-        )
-    )
-
-    DEFAULT_CHAT_FRAME:AddMessage(
-        "Nampower: " ..
-        tostring(
-            PC.Capabilities.nampower
-        )
-    )
-
-    DEFAULT_CHAT_FRAME:AddMessage(
-        "UnitXP: " ..
-        tostring(
-            PC.Capabilities.unitXP
-        )
+        "|cffff0000Priest Companion:|r " ..
+        "Options panel is unavailable."
     )
 end
 
@@ -124,14 +96,14 @@ function PC.OnSlashCommand(message)
         )
 
         DEFAULT_CHAT_FRAME:AddMessage(
-            "/priest env - Show detected client extensions"
+            "/priest options - Open Options > General"
         )
 
         return
     end
 
-    if message == "env" then
-        PC.ShowEnvironment()
+    if message == "options" then
+        PC.ShowOptions()
         return
     end
 

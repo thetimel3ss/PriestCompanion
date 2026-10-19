@@ -24,7 +24,7 @@ scroll:SetPoint("BOTTOMRIGHT", panel, "BOTTOMRIGHT", -29, 9)
 
 local child = CreateFrame("Frame", nil, scroll)
 child:SetWidth(388)
-child:SetHeight(409)
+child:SetHeight(478)
 scroll:SetScrollChild(child)
 
 local function Label(text, x, y, width, font)
@@ -224,6 +224,20 @@ saveButton:SetText("Save")
 Label("Preview (not sent)", 14, 348, 350, "GameFontNormalSmall")
 local previewLabel = Label("", 15, 370, 350)
 
+Label("Fear Ward Protection", 14, 410, 350, "GameFontNormal")
+local protectionBox = Checkbox(
+    "PriestCompanionFearWardPreventOverwrite",
+    "Prevent overwriting Fear Ward", 14, 440,
+    function(value)
+        announcer.SetOption("preventOverwrite", value)
+    end,
+    "Prevent a Fear Ward cast when your selected friendly target " ..
+    "already has the buff. Works with supported direct Lua spell " ..
+    "casts, spellbook casts and native action bar spell buttons. " ..
+    "Complex macros and casts outside Lua may bypass this guard; " ..
+    "mouseover macros need target-aware protection."
+)
+
 local function UpdateMessagePreview()
     previewLabel:SetText(
         announcer.FormatMessage("Tankname", messageBox:GetText()) or ""
@@ -298,6 +312,9 @@ function panel.Refresh()
     )
     selfBox:SetChecked(
         announcer.GetOption("announceSelf") and 1 or nil
+    )
+    protectionBox:SetChecked(
+        announcer.GetOption("preventOverwrite") and 1 or nil
     )
 
     local key

@@ -120,6 +120,10 @@ All 28 records have `source.note`: 21 world-drop-style entries with `"World drop
 
 ### Announcer — Fear Ward (in progress on `feature/announcer`)
 
+- [x] Add an optional, independent per-character **Prevent overwriting Fear Ward** setting under Options → Announcer (disabled by default). Check the recipient's current aura before supported Lua spell dispatches and prevent duplicate application with a local notice, even when announcements are disabled.
+- [ ] **Overwrite protection compatibility:** verify `CastSpellByName`, spellbook `CastSpell`, direct action-bar `UseAction`, /cast macros, self-casting, and mouseover behavior. Confirm known limitations of custom/engine macros and other DLLs; never claim to intercept all cast paths until the client confirms it.
+- [ ] **Aura verification:** confirm spellID 6346 and aura name/texture on OctoWoW, verify protection against a buff applied by another priest, and test the absence of ClassicAPI.
+
 - [x] Create a separate Options → Announcer tab and per-character preferences for Fear Ward, initially disabled.
 - [x] Allow multiple selected announcement channels at once: Say, Yell, Party, Raid and local-only Self. Skip unavailable group channels rather than rerouting; allow an independent toggle for self-cast announcements.
 - [x] Support customizable message text and preview, retaining the target placeholder. Announce only after confirmed ClassicAPI SENT → SUCCEEDED GUID match; skip failed casts, duplicate success, or unknown recipients without assuming a target.

@@ -2,6 +2,12 @@
 
 ## [Unreleased]
 
+### Added — Optional Fear Ward overwrite protection (2026-10-19)
+- Add an independent **Prevent overwriting Fear Ward** checkbox under Options → Announcer (off by default and saved per character). The option works regardless of whether message announcements are enabled.
+- Before launching Fear Ward through `CastSpellByName`, `CastSpell` or direct-spell `UseAction` paths, check the friendly target's existing aura; skip the cast and display a throttled local warning when Fear Ward is already present. Use ClassicAPI spellID/name aura readers where available; Vanilla's icon lookup is a fallback.
+- Do not cancel an already successful instant spell, block unidentified macros by icon, or assume a mouseover/implicit recipient. Native /cast commands, custom macro targets, and external client DLL cast paths may bypass Lua guards; full universal prevention is not asserted.
+- Verification pending: native actionbar, spellbook, Lua macros, /cast, party/raid/self/mouseover paths, no target, cooldowns and no ClassicAPI; confirm no false positives or lost unrelated spells.
+
 ### Improved — Announcer layout and explicit message controls (2026-10-19)
 - Tightened the gap after Enable Fear Ward to a consistent 30px between checkbox, Announcement channels heading and first channel row. Kept channel rows at 30px intervals, and moved Include casts on myself to the right column beside Yell.
 - Added **Default** and **Save** buttons for the custom Fear Ward message. Default restores the original template in the editor as an unsaved draft; Save (or Enter) persists the message per character. Escape restores the saved text. Leaving the Announcer tab discards unsaved edits; changing other checkboxes does not.

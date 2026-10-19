@@ -16,6 +16,7 @@ local MAX_MESSAGE_BYTES = 140
 local DEFAULTS = {
     enabled = false,
     announceSelf = false,
+    preventOverwrite = false,
     message = DEFAULT_MESSAGE,
     channels = {
         SAY = true,
@@ -30,6 +31,7 @@ local CHANNELS = { "SAY", "YELL", "PARTY", "RAID", "SELF" }
 local settings = {
     enabled = DEFAULTS.enabled,
     announceSelf = DEFAULTS.announceSelf,
+    preventOverwrite = DEFAULTS.preventOverwrite,
     message = DEFAULTS.message,
     channels = {
         SAY = DEFAULTS.channels.SAY,
@@ -83,6 +85,7 @@ local function SaveSettings()
     PriestCompanionCharDB.announcer = {
         enabled = settings.enabled,
         announceSelf = settings.announceSelf,
+        preventOverwrite = settings.preventOverwrite,
         message = settings.message,
         channels = {
             SAY = settings.channels.SAY,
@@ -108,6 +111,9 @@ local function LoadSettings()
     if type(saved.announceSelf) == "boolean" then
         settings.announceSelf = saved.announceSelf
     end
+    if type(saved.preventOverwrite) == "boolean" then
+        settings.preventOverwrite = saved.preventOverwrite
+    end
     settings.message = NormalizeMessage(saved.message)
 
     if type(saved.channels) == "table" then
@@ -126,7 +132,8 @@ function Announcer.GetOption(key)
 end
 
 function Announcer.SetOption(key, value)
-    if key ~= "enabled" and key ~= "announceSelf" then
+    if key ~= "enabled" and key ~= "announceSelf"
+    and key ~= "preventOverwrite" then
         return false
     end
     settings[key] = value and true or false
@@ -376,6 +383,197 @@ end
 local function RemoveFailed(guid)
     if guid and guid ~= "" then
         pending[guid] = nil
+    end
+end
+
+--------------------------------------------------
+-- Fear Ward overwrite protection (pre-cast)
+--------------------------------------------------
+
+-- In 1.12 a completed instant cast cannot reliably be cancelled.
+-- Guard the supported Lua cast entrypoints BEFORE calling the original.
+-- Other DLLs/addons can issue casts outside these Lua entrypoints.
+local lastGuardNotice = nil
+local lastGuardUnit = nil
+
+local function IsFearWardName(value)
+    if type(value) ~= "string" then
+        return false
+    end
+    local spell = string.gsub(value, "%s*%([^%)]+%)$", "")
+    spell = string.gsub(spell, "^%s+", "")
+    spell = string.gsub(spell, "%s+$", "")
+
+    if spell == FEAR_WARD_NAME then
+        return true
+    end
+
+    if type(GetSpellInfo) == "function" then
+        local ok, name = pcall(GetSpellInfo, FEAR_WARD_ID)
+        if ok and name and spell == name then
+            return true
+        end
+    end
+
+    return false
+end
+
+local function HasFearWard(unit)
+    if type(UnitExists) ~= "function" or not UnitExists(unit) then
+        return false
+    end
+
+    -- ClassicAPI's aura lookup compares spell ID, not reused icon paths.
+    -- A name fallback covers nonstandard server aura spell IDs.
+    if type(C_UnitAuras) == "table" then
+        if type(C_UnitAuras.GetUnitAuraBySpellID) == "function" then
+            local ok, aura = pcall(
+                C_UnitAuras.GetUnitAuraBySpellID,
+                unit, FEAR_WARD_ID, "HELPFUL"
+            )
+            if ok and aura then
+                return true
+            end
+        end
+
+        if type(C_UnitAuras.GetAuraDataBySpellName) == "function" then
+            local name = FEAR_WARD_NAME
+            if type(GetSpellInfo) == "function" then
+                local ok, localName = pcall(GetSpellInfo, FEAR_WARD_ID)
+                if ok and type(localName) == "string" then
+                    name = localName
+                end
+            end
+            local ok, aura = pcall(
+                C_UnitAuras.GetAuraDataBySpellName,
+                unit, name, "HELPFUL"
+            )
+            if ok and aura then
+                return true
+            end
+        end
+    end
+
+    -- Vanilla 1.12 UnitBuff returns an icon path, not a spell name.
+    -- Use only the known Fear Ward texture as a conservative fallback
+    -- when ClassicAPI's aura readers are unavailable.
+    if type(C_UnitAuras) ~= "table"
+    and type(UnitBuff) == "function" then
+        local i
+        for i = 1, 32 do
+            local texture = UnitBuff(unit, i)
+            if not texture then
+                break
+            end
+            if type(texture) == "string"
+            and string.find(
+                string.lower(texture), "spell_holy_excorcism", 1, true
+            ) then
+                return true
+            end
+        end
+    end
+
+    return false
+end
+
+local function ProtectionUnit(onSelf)
+    if onSelf == true or onSelf == 1 then
+        return "player"
+    end
+
+    if type(UnitExists) == "function" and UnitExists("target") then
+        return "target"
+    end
+
+    -- Do not infer a recipient when the client has no explicit target.
+    return nil
+end
+
+local function ShouldBlockFearWard(unit)
+    if not settings.preventOverwrite or not unit then
+        return false
+    end
+
+    if type(UnitCanAssist) == "function"
+    and not UnitCanAssist("player", unit) then
+        return false
+    end
+
+    if not HasFearWard(unit) then
+        return false
+    end
+
+    local now = type(GetTime) == "function" and GetTime() or 0
+    local targetName = type(UnitName) == "function"
+        and UnitName(unit) or "target"
+
+    -- Suppress repeated warnings from nested cast wrappers / button spam.
+    if targetName ~= lastGuardUnit
+    or not lastGuardNotice or now - lastGuardNotice >= 1 then
+        lastGuardNotice = now
+        lastGuardUnit = targetName
+        if DEFAULT_CHAT_FRAME then
+            DEFAULT_CHAT_FRAME:AddMessage(
+                "|cffffbb33Priest Companion:|r Fear Ward already " ..
+                "active on " .. targetName .. "; cast prevented."
+            )
+        end
+    end
+
+    return true
+end
+
+function Announcer.HasFearWard(unit)
+    return HasFearWard(unit)
+end
+
+function Announcer.ShouldBlockFearWard(unit)
+    return ShouldBlockFearWard(unit)
+end
+
+-- Keep the existing function as a delegate so independently hooking
+-- addons can still work. No hooksecurefunc: a post-hook cannot block.
+if type(CastSpellByName) == "function" then
+    local previousCastByName = CastSpellByName
+    CastSpellByName = function(spellName, onSelf)
+        if IsFearWardName(spellName)
+        and ShouldBlockFearWard(ProtectionUnit(onSelf)) then
+            return
+        end
+        return previousCastByName(spellName, onSelf)
+    end
+end
+
+if type(CastSpell) == "function" then
+    local previousCast = CastSpell
+    CastSpell = function(spellbookSlot, bookType)
+        if bookType ~= "pet" and type(GetSpellName) == "function" then
+            local name = GetSpellName(spellbookSlot, bookType or "spell")
+            if IsFearWardName(name)
+            and ShouldBlockFearWard(ProtectionUnit(false)) then
+                return
+            end
+        end
+        return previousCast(spellbookSlot, bookType)
+    end
+end
+
+if type(UseAction) == "function" then
+    local previousUseAction = UseAction
+    UseAction = function(slot, checkCursor, onSelf)
+        -- ClassicAPI exposes the exact spell ID of direct action buttons.
+        -- Do NOT inspect icon textures or block macros based on their
+        -- first spell: their actual target may differ (e.g. @mouseover).
+        if type(GetActionInfo) == "function" then
+            local kind, spellID = GetActionInfo(slot)
+            if kind == "spell" and tonumber(spellID) == FEAR_WARD_ID
+            and ShouldBlockFearWard(ProtectionUnit(onSelf)) then
+                return
+            end
+        end
+
+        return previousUseAction(slot, checkCursor, onSelf)
     end
 end
 

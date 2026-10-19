@@ -103,7 +103,7 @@ previousIcon:SetPoint(
 local currentName = visual:CreateFontString(
     nil,
     "OVERLAY",
-    "GameFontHighlightSmall"
+    "GameFontHighlight"
 )
 currentName:SetWidth(170)
 currentName:SetJustifyH("CENTER")
@@ -118,10 +118,11 @@ currentName:SetPoint(
 local previousName = visual:CreateFontString(
     nil,
     "OVERLAY",
-    "GameFontDisableSmall"
+    "GameFontHighlightSmall"
 )
 previousName:SetWidth(88)
 previousName:SetJustifyH("CENTER")
+previousName:SetTextColor(0.80, 0.80, 0.86)
 previousName:SetPoint(
     "TOP",
     previousIcon,
@@ -143,21 +144,6 @@ arrow:SetPoint(
     -48
 )
 arrow:SetText(">")
-
-local refundText = visual:CreateFontString(
-    nil,
-    "OVERLAY",
-    "GameFontHighlightSmall"
-)
-refundText:SetPoint(
-    "BOTTOM",
-    visual,
-    "BOTTOM",
-    0,
-    10
-)
-refundText:SetWidth(110)
-refundText:SetJustifyH("CENTER")
 
 --------------------------------------------------
 -- Movement and Resizing
@@ -319,9 +305,9 @@ local function UpdateIconLayout()
     local baseWidth = expanded and 212 or 118
     local baseHeight = expanded and 130 or 112
 
-    -- Scale the entire content uniformly so icons, labels and the
-    -- footer shrink/grow together, including below the old 104x112
-    -- compact minimum. The outer border itself stays crisp.
+    -- Scale the whole content uniformly, including icons and names.
+    -- With no mana footer, the spell artwork and text get more space.
+    -- The outer border stays crisp at small window sizes.
     local scaleX = frame:GetWidth() / baseWidth
     local scaleY = frame:GetHeight() / baseHeight
     local scale = math.min(scaleX, scaleY)
@@ -334,7 +320,15 @@ local function UpdateIconLayout()
     visual:SetHeight(baseHeight)
     visual:SetScale(scale)
 
-    local iconSize = expanded and 40 or 36
+    local showName = Tracker.GetOption("showSpellName")
+    local iconSize
+
+    if expanded then
+        iconSize = showName and 54 or 64
+    else
+        iconSize = showName and 48 or 62
+    end
+
     currentIcon:SetWidth(iconSize)
     currentIcon:SetHeight(iconSize)
     previousIcon:SetWidth(iconSize)
@@ -344,25 +338,31 @@ local function UpdateIconLayout()
     previousIcon:ClearAllPoints()
 
     if expanded then
+        local iconY = showName and -29 or -38
+
         currentIcon:SetPoint(
-            "TOP", visual, "TOP", 46, -30
+            "TOP", visual, "TOP", 48, iconY
         )
         previousIcon:SetPoint(
-            "TOP", visual, "TOP", -46, -30
+            "TOP", visual, "TOP", -48, iconY
         )
         currentName:SetWidth(94)
         previousName:SetWidth(94)
+        arrow:ClearAllPoints()
+        arrow:SetPoint(
+            "CENTER", visual, "TOP", 0, -57
+        )
     else
+        local iconY = showName and -25 or -36
+
         currentIcon:SetPoint(
-            "TOP", visual, "TOP", 0, -25
+            "TOP", visual, "TOP", 0, iconY
         )
         previousIcon:SetPoint(
             "TOP", visual, "TOP", -43, -30
         )
         currentName:SetWidth(110)
     end
-
-    refundText:SetWidth(baseWidth - 10)
 end
 
 frame:SetScript(
@@ -487,6 +487,10 @@ local function UpdateDisplay()
     currentName:SetText(current or "Waiting for heal")
     previousName:SetText(previous or "No previous heal")
 
+    -- This can change with the Show spell name checkbox even when
+    -- the outer HUD has not been resized.
+    UpdateIconLayout()
+
     if Tracker.GetOption("showSpellName") then
         currentName:Show()
         if expanded then
@@ -497,33 +501,22 @@ local function UpdateDisplay()
         previousName:Hide()
     end
 
-    -- Color the tracker itself to indicate eligibility. This is a
-    -- predicted Book of Prayer state, never a measured mana refund.
-    if Tracker.GetOption("showRefund") then
-        refundText:Show()
-
-        if not current or not previous then
-            frame:SetBackdropBorderColor(0.55, 0.55, 0.67, 1)
-            frame:SetBackdropColor(0.04, 0.04, 0.09, 0.95)
-            refundText:SetText("-")
-            refundText:SetTextColor(0.70, 0.70, 0.70)
-        elseif state.eligible then
+    -- The colored border is the only refund indicator: green when
+    -- consecutive successful heals belong to different families,
+    -- red for the same family, neutral until a comparison is known.
+    -- Do not show percentage or measured mana in the HUD.
+    if Tracker.GetOption("showRefund")
+    and current and previous then
+        if state.eligible then
             frame:SetBackdropBorderColor(0.25, 0.95, 0.32, 1)
             frame:SetBackdropColor(0.04, 0.10, 0.05, 0.95)
-            refundText:SetText(
-                tostring(state.talentPoints * 15) .. "%"
-            )
-            refundText:SetTextColor(0.30, 1.00, 0.35)
         else
             frame:SetBackdropBorderColor(0.97, 0.30, 0.30, 1)
             frame:SetBackdropColor(0.11, 0.04, 0.05, 0.95)
-            refundText:SetText("0%")
-            refundText:SetTextColor(1.00, 0.40, 0.40)
         end
     else
         frame:SetBackdropBorderColor(0.55, 0.55, 0.67, 1)
         frame:SetBackdropColor(0.04, 0.04, 0.09, 0.95)
-        refundText:Hide()
     end
 
     local inCombat = false

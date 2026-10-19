@@ -67,7 +67,7 @@ visual:EnableMouse(false)
 local title = visual:CreateFontString(
     nil,
     "OVERLAY",
-    "GameFontNormalSmall"
+    "GameFontNormal"
 )
 title:SetPoint("TOP", visual, "TOP", 0, -9)
 title:SetText("Book of Prayer")

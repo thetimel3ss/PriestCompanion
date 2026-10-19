@@ -397,6 +397,10 @@ local lastGuardNotice = nil
 local lastGuardUnit = nil
 
 local function IsFearWardName(value)
+    -- ClassicAPI CastAtUnit accepts both numeric spell IDs and names.
+    if type(value) == "number" then
+        return value == FEAR_WARD_ID
+    end
     if type(value) ~= "string" then
         return false
     end
@@ -589,6 +593,22 @@ if type(SpellTargetUnit) == "function" then
         end
 
         return previousTargetUnit(unit)
+    end
+end
+
+-- ClassicAPI implements /cast [@unit] via C_Spell.CastAtUnit, NOT
+-- the Lua CastSpellByName path. Guard the exact resolved unit here.
+-- This is what protects @mouseover without accidentally testing the
+-- current selected target. Keep the original function for other spells.
+if type(C_Spell) == "table"
+and type(C_Spell.CastAtUnit) == "function" then
+    local previousCastAtUnit = C_Spell.CastAtUnit
+    C_Spell.CastAtUnit = function(spellIDOrName, unit, placeGroundSpell)
+        if IsFearWardName(spellIDOrName)
+        and ShouldBlockFearWard(unit) then
+            return false
+        end
+        return previousCastAtUnit(spellIDOrName, unit, placeGroundSpell)
     end
 end
 

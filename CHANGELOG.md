@@ -2,6 +2,12 @@
 
 ## [Unreleased]
 
+### Fixed — ClassicAPI mouseover Fear Ward macro routing (2026-10-19)
+- The maintainer verified that Fear Ward without a target now correctly prevents self-overwriting, while `/cast [@mouseover,help,nodead][help,nodead][@player] Fear Ward` was still recasting on an already-buffed mouseover unit.
+- Traced ClassicAPI's `/cast` macro conditional handler to `C_Spell.CastAtUnit(spell, unit, placeGroundSpell)`; a mouseover-targeted cast bypasses the old `CastSpellByName` hook and the `SpellTargetUnit` targeting cursor.
+- Add a guarded `C_Spell.CastAtUnit` interception for Fear Ward using its exact passed unit, independent of the selected target. Preserve original return values and forwarding for other spells; recognize numeric spell ID 6346 as well as names.
+- **In-game retest pending:** mouseover has Fear Ward (blocked), mouseover lacks it (allowed), selected target has Fear Ward but mouseover does not (allowed), mouseover absent and fallback selected target/player is buffed (blocked); repeat direct action-bar, spellbook, typed /cast, self-cast regression checks.
+
 ### Fixed — Fear Ward targeting edge cases (2026-10-19)
 - Based on maintainer tests: unbuffed target casts, actionbar reapplication blocking, spellbook blocking and typed `/cast Fear Ward` all work in OctoWoW; mouseover macros and no-target self-casting bypassed the initial guard.
 - Treat no selected target as the player for pre-cast Fear Ward protection, matching the tested self-cast behavior. Recognize explicit unit arguments supplied by SuperWoW (including mouseover), rather than testing the currently selected target.

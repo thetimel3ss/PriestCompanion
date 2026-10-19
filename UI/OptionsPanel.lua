@@ -90,7 +90,7 @@ end
 
 local generalTab = CreateSectionTab("general", "General", 1)
 local advancedTab = CreateSectionTab(
-    "advanced", "Advanced", 2, generalTab
+    "advanced", "Tracker", 2, generalTab
 )
 CreateSectionTab("mods", "Mods", 3, advancedTab)
 
@@ -213,7 +213,7 @@ CreateLabel(
 
 CreateLabel(
     general,
-    "Advanced contains Book of Prayer tracker settings.",
+    "Tracker contains Book of Prayer settings.",
     18,
     -213,
     385

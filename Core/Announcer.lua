@@ -151,18 +151,30 @@ function Announcer.GetMessage()
     return settings.message
 end
 
+function Announcer.GetDefaultMessage()
+    return DEFAULT_MESSAGE
+end
+
 function Announcer.SetMessage(message)
     settings.message = NormalizeMessage(message)
     SaveSettings()
     return settings.message
 end
 
-function Announcer.FormatMessage(target)
+function Announcer.FormatMessage(target, draft)
     if type(target) ~= "string" or target == "" then
         return nil
     end
+
+    -- A draft is used for the UI preview only; announcement delivery
+    -- always passes no draft and reads the explicitly saved setting.
+    local message = settings.message
+    if type(draft) == "string" then
+        message = NormalizeMessage(draft)
+    end
+
     -- Replacement functions avoid interpreting percent signs in unit names.
-    local text = string.gsub(settings.message, "{target}", function()
+    local text = string.gsub(message, "{target}", function()
         return target
     end)
     text = string.gsub(text, "{spell}", function()

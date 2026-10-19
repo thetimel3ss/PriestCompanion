@@ -24,7 +24,7 @@ scroll:SetPoint("BOTTOMRIGHT", panel, "BOTTOMRIGHT", -29, 9)
 
 local child = CreateFrame("Frame", nil, scroll)
 child:SetWidth(388)
-child:SetHeight(417)
+child:SetHeight(409)
 scroll:SetScrollChild(child)
 
 local function Label(text, x, y, width, font)
@@ -133,18 +133,20 @@ local enabledBox, enabledLabel = Checkbox(
     ENABLE_TOOLTIP
 )
 
+-- 30px from Enable Fear Ward to this heading, then 30px to
+-- the first row of channel checkboxes.
 Label("Announcement channels (multiple selections allowed)",
-    14, 143, 355, "GameFontNormalSmall")
+    14, 107, 355, "GameFontNormalSmall")
 
 local channelBoxes = {}
 -- Every row is separated by exactly 30 px; the existing right
 -- column stays at x = 204, alongside the left column at x = 14.
 local channelDefinitions = {
-    { "SAY", "Say", 14, 164 },
-    { "PARTY", "Party", 204, 164 },
-    { "RAID", "Raid", 14, 194 },
-    { "SELF", "Self (local chat)", 204, 194 },
-    { "YELL", "Yell", 14, 224 }
+    { "SAY", "Say", 14, 137 },
+    { "PARTY", "Party", 204, 137 },
+    { "RAID", "Raid", 14, 167 },
+    { "SELF", "Self (local chat)", 204, 167 },
+    { "YELL", "Yell", 14, 197 }
 }
 
 local i
@@ -164,7 +166,7 @@ end
 
 local selfBox = Checkbox(
     "PriestCompanionAnnouncerSelfTarget",
-    "Include casts on myself", 14, 254,
+    "Include casts on myself", 204, 197,
     function(value)
         announcer.SetOption("announceSelf", value)
     end,
@@ -172,13 +174,13 @@ local selfBox = Checkbox(
 )
 
 Label("Custom message (use {target} and optional {spell})",
-    14, 294, 360, "GameFontNormalSmall")
+    14, 241, 360, "GameFontNormalSmall")
 
 local messageBox = CreateFrame(
     "EditBox", "PriestCompanionAnnouncerMessage",
     child, "InputBoxTemplate"
 )
-messageBox:SetPoint("TOPLEFT", child, "TOPLEFT", 21, -320)
+messageBox:SetPoint("TOPLEFT", child, "TOPLEFT", 21, -266)
 messageBox:SetWidth(335)
 messageBox:SetHeight(20)
 messageBox:SetAutoFocus(false)
@@ -196,27 +198,81 @@ if leftTexture then
     end
 end
 
-local function SaveMessage()
-    announcer.SetMessage(messageBox:GetText())
-    if type(panel.Refresh) == "function" then
-        panel.Refresh()
-    end
+-- Text changes stay in the edit box until the user presses Save.
+-- Default loads a draft of the original text; Save is the commit action.
+local messageDraftDirty = false
+local settingDraft = false
+
+local defaultButton = CreateFrame(
+    "Button", "PriestCompanionAnnouncerMessageDefault",
+    child, "UIPanelButtonTemplate"
+)
+defaultButton:SetWidth(92)
+defaultButton:SetHeight(24)
+defaultButton:SetPoint("TOPLEFT", child, "TOPLEFT", 21, -300)
+defaultButton:SetText("Default")
+
+local saveButton = CreateFrame(
+    "Button", "PriestCompanionAnnouncerMessageSave",
+    child, "UIPanelButtonTemplate"
+)
+saveButton:SetWidth(92)
+saveButton:SetHeight(24)
+saveButton:SetPoint("TOPLEFT", child, "TOPLEFT", 126, -300)
+saveButton:SetText("Save")
+
+Label("Preview (not sent)", 14, 348, 350, "GameFontNormalSmall")
+local previewLabel = Label("", 15, 370, 350)
+
+local function UpdateMessagePreview()
+    previewLabel:SetText(
+        announcer.FormatMessage("Tankname", messageBox:GetText()) or ""
+    )
 end
 
-messageBox:SetScript("OnEnterPressed", function()
-    this:ClearFocus()
+local function SetMessageDraft(text)
+    settingDraft = true
+    messageBox:SetText(text or "")
+    settingDraft = false
+    messageDraftDirty = messageBox:GetText() ~= announcer.GetMessage()
+    UpdateMessagePreview()
+end
+
+local function SaveMessage()
+    local saved = announcer.SetMessage(messageBox:GetText())
+    SetMessageDraft(saved)
+    messageBox:ClearFocus()
+end
+
+-- Clicking either button takes focus away from the edit box.
+-- Do not save in OnEditFocusLost: Default should not first save
+-- the unsaved text, and a tab switch must not accidentally save it.
+messageBox:SetScript("OnTextChanged", function()
+    if not settingDraft then
+        messageDraftDirty = this:GetText() ~= announcer.GetMessage()
+    end
+    UpdateMessagePreview()
 end)
+messageBox:SetScript("OnEnterPressed", SaveMessage)
 messageBox:SetScript("OnEscapePressed", function()
-    this:SetText(announcer.GetMessage())
+    SetMessageDraft(announcer.GetMessage())
     this:ClearFocus()
 end)
-messageBox:SetScript("OnEditFocusLost", SaveMessage)
 messageBox:SetScript("OnEditFocusGained", function()
     this:HighlightText()
 end)
 
-Label("Preview (not sent)", 14, 359, 350, "GameFontNormalSmall")
-local previewLabel = Label("", 15, 382, 350)
+defaultButton:SetScript("OnClick", function()
+    SetMessageDraft(announcer.GetDefaultMessage())
+end)
+saveButton:SetScript("OnClick", SaveMessage)
+
+-- Unsaved edits are kept while changing checkboxes, but discarded
+-- if the player leaves the Announcer page.
+panel:SetScript("OnHide", function()
+    messageBox:ClearFocus()
+    SetMessageDraft(announcer.GetMessage())
+end)
 
 function panel.Refresh()
     local available = announcer.GetProvider() == "ClassicAPI"
@@ -249,11 +305,9 @@ function panel.Refresh()
         button:SetChecked(announcer.GetChannel(key) and 1 or nil)
     end
 
-    if not messageBox:HasFocus() then
-        messageBox:SetText(announcer.GetMessage())
+    if not messageDraftDirty and not messageBox:HasFocus() then
+        SetMessageDraft(announcer.GetMessage())
+    else
+        UpdateMessagePreview()
     end
-
-    previewLabel:SetText(
-        announcer.FormatMessage("Tankname") or ""
-    )
 end

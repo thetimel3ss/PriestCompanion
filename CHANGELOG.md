@@ -2,6 +2,11 @@
 
 ## [Unreleased]
 
+### Improved — Announcer layout and explicit message controls (2026-10-19)
+- Tightened the gap after Enable Fear Ward to a consistent 30px between checkbox, Announcement channels heading and first channel row. Kept channel rows at 30px intervals, and moved Include casts on myself to the right column beside Yell.
+- Added **Default** and **Save** buttons for the custom Fear Ward message. Default restores the original template in the editor as an unsaved draft; Save (or Enter) persists the message per character. Escape restores the saved text. Leaving the Announcer tab discards unsaved edits; changing other checkboxes does not.
+- The on-screen preview updates as the draft changes without announcing or persisting it; normal Fear Ward announcements always use the saved template.
+
 ### Improved — Announcer checkbox tooltips, spacing and Yell (2026-10-19)
 - Move the successful-cast guidance from the body below Enable Fear Ward into the enabled checkbox/caption tooltip. Move the Say/Party/Raid/Self channel explanation into channel checkbox/caption tooltips, including the new Yell behavior.
 - Align channel and self-cast checkboxes to uniform 30px vertical rows while preserving the right-hand Party and Self column.

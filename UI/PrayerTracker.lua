@@ -161,8 +161,26 @@ manaText:Hide()
 --------------------------------------------------
 
 local lastMode = nil
+local appliedGeometryRevision = nil
 local appliedX = nil
 local appliedY = nil
+local previewActive = false
+
+-- Preview contents are UI-only; the real cast history is never modified.
+local previewState = {
+    last = "Flash Heal",
+    previous = "Renew",
+    eligible = true,
+    refundActual = 38
+}
+
+local previewLabel = frame:CreateFontString(
+    nil, "OVERLAY", "GameFontNormalSmall"
+)
+previewLabel:SetPoint("BOTTOM", frame, "TOP", 0, 2)
+previewLabel:SetText("PREVIEW")
+previewLabel:SetTextColor(0.40, 0.75, 1.00)
+previewLabel:Hide()
 local edges = {}
 
 local resizeHint = frame:CreateTexture(nil, "OVERLAY")
@@ -482,8 +500,12 @@ local function UpdateDisplay()
     local expanded = Tracker.GetOption("expanded")
     local locked = Tracker.GetOption("locked")
 
-    if expanded ~= lastMode then
+    local revision = Tracker.GetGeometryRevision()
+
+    if expanded ~= lastMode
+    or revision ~= appliedGeometryRevision then
         lastMode = expanded
+        appliedGeometryRevision = revision
         SetDimensions(expanded)
     end
 
@@ -517,6 +539,11 @@ local function UpdateDisplay()
     end
 
     local state = Tracker.GetState()
+
+    if previewActive then
+        state = previewState
+    end
+
     local spells = PC.Data.HealingSpells or {}
     local current = state.last
     local previous = state.previous
@@ -595,13 +622,32 @@ local function UpdateDisplay()
         inCombat = UnitAffectingCombat("player") and true or false
     end
 
-    if Tracker.IsActive()
+    if previewActive
+    or (Tracker.IsActive()
     and (Tracker.GetOption("outsideCombat") or inCombat)
-    and not Tracker.ShouldAutoHide() then
+    and not Tracker.ShouldAutoHide()) then
         frame:Show()
     else
         frame:Hide()
     end
+end
+
+-- Options uses these functions for temporary preview. Geometry remains
+-- movable/resizable when unlocked, while the actual history is untouched.
+function frame.SetPreview(value)
+    previewActive = value == true
+
+    if previewActive then
+        previewLabel:Show()
+    else
+        previewLabel:Hide()
+    end
+
+    UpdateDisplay()
+end
+
+function frame.IsPreviewActive()
+    return previewActive
 end
 
 -- OnUpdate runs only while the HUD is visible. After the inactivity
@@ -611,7 +657,7 @@ local autoHideElapsed = 0
 frame:SetScript(
     "OnUpdate",
     function()
-        if not Tracker.GetOption("autoHide") then
+        if previewActive or not Tracker.GetOption("autoHide") then
             autoHideElapsed = 0
             return
         end

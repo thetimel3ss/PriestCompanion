@@ -332,12 +332,56 @@ local function UpdateIconLayout()
     visual:SetScale(scale)
 
     local showName = Tracker.GetOption("showSpellName")
+    local reserveMana = Tracker.GetOption("showManaRefund")
     local iconSize
+    local iconY
+
+    -- Keep the mana label at its current bottom anchor. Instead reserve
+    -- space above it for the spell name and scale the icon accordingly.
+    -- Reserve the space whenever the option is enabled so that the
+    -- icon does not jump in size between eligible and repeated heals.
+    local longName = false
+
+    if showName
+    and type(currentName.GetStringHeight) == "function" then
+        local height = currentName:GetStringHeight() or 0
+
+        if expanded
+        and type(previousName.GetStringHeight) == "function" then
+            local previousHeight = previousName:GetStringHeight() or 0
+            height = math.max(height, previousHeight)
+        end
+
+        longName = height > 20
+    end
 
     if expanded then
-        iconSize = showName and 54 or 64
+        if reserveMana then
+            -- Plenty of horizontal room, but leave a clear footer gap.
+            iconSize = showName and 48 or 64
+            iconY = showName and -27 or -31
+
+            if showName and longName then
+                iconSize = 44
+            end
+        else
+            iconSize = showName and 54 or 64
+            iconY = showName and -29 or -38
+        end
     else
-        iconSize = showName and 48 or 62
+        if reserveMana then
+            -- Compact + mana has the tightest vertical budget.
+            -- A wrapped name gets a slightly smaller icon.
+            iconSize = showName and 43 or 54
+            iconY = showName and -23 or -27
+
+            if showName and longName then
+                iconSize = 34
+            end
+        else
+            iconSize = showName and 48 or 62
+            iconY = showName and -25 or -36
+        end
     end
 
     currentIcon:SetWidth(iconSize)
@@ -349,8 +393,6 @@ local function UpdateIconLayout()
     previousIcon:ClearAllPoints()
 
     if expanded then
-        local iconY = showName and -29 or -38
-
         currentIcon:SetPoint(
             "TOP", visual, "TOP", 48, iconY
         )
@@ -364,8 +406,6 @@ local function UpdateIconLayout()
             "CENTER", visual, "TOP", 0, -57
         )
     else
-        local iconY = showName and -25 or -36
-
         currentIcon:SetPoint(
             "TOP", visual, "TOP", 0, iconY
         )

@@ -2,6 +2,12 @@
 
 ## [Unreleased]
 
+### Refined — Prayer Tracker spell layout with mana shown (2026-10-19)
+- Kept the mana refund label anchored in its existing bottom position and adjusted spell-icon size and vertical placement instead, in both compact and expanded display modes.
+- When **Show mana refund** is enabled, reserve footer space regardless of whether the last cast returned mana; this prevents the icon from jumping between successive casts. With **Show spell name** enabled, use a smaller icon to avoid the mana label. With the spell name hidden, retain a larger icon (compact: 54; expanded: 64 logical pixels).
+- For names that wrap across multiple lines, reduce the icon further to preserve readability, including in compact mode. Without the mana option, the previous icon dimensions remain unchanged.
+- Preserve per-character HUD geometry, Nampower/ClassicAPI mana sources, the enlarged mana label font, and the user's title font selection. In-game rendering remains to be verified.
+
 ### Added — Nampower exact Book of Prayer refund and larger mana text (2026-10-19)
 - Prefer the live Nampower `SPELL_ENERGIZE_ON_SELF` server event, filtered to spell ID **52942** (Book of Prayer), mana power type `0`, nonperiodic, and positive amount. The displayed `+N mana` is the server-reported amount (`arg5`), not a calculated percentage. Match to the current recent qualifying heal, with a short buffer if the energize event precedes the successful cast event; avoid duplicating other energize sources.
 - Keep the existing ClassicAPI `C_Spell.GetSpellPowerCost` prediction as a fallback (`~N mana`) when the direct Nampower report is unavailable; existing Inner Focus suppression and Ascendance's dynamically modified cost path remain relevant. Nampower is an optional integration and does not replace the preferred ClassicAPI success event.

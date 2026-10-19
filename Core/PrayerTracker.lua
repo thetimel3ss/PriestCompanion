@@ -50,6 +50,7 @@ local lastRefundActual = nil
 local pendingActualRefund = nil
 local lastHealTime = nil
 local pendingCastCost = nil
+local lastRefundMatched = false
 local innerFocusReady = false
 local innerFocusBlockNext = false
 local provider = "unavailable"
@@ -277,6 +278,7 @@ local function ScanBookOfPrayer()
         pendingActualRefund = nil
         lastHealTime = nil
         pendingCastCost = nil
+        lastRefundMatched = false
         innerFocusReady = false
         innerFocusBlockNext = false
         lastCastGUID = nil
@@ -403,6 +405,11 @@ local function ReadEffectiveManaCost(spellID)
 end
 
 local function CaptureSentSpell(castGUID, spellID, spellName)
+    -- Every new player cast invalidates the previous pending snapshot.
+    -- This is essential when a heal was cancelled or interrupted.
+    pendingCastCost = nil
+    pendingActualRefund = nil
+
     if not GetSpellFamily(ResolveSpellName(spellID, spellName)) then
         return
     end
@@ -458,9 +465,11 @@ function Tracker.RecordSuccessfulSpell(spellID, spellName, castGUID)
     if not family then return false end
 
     local effectiveCost = nil
-    if pendingCastCost
-    and pendingCastCost.guid == castGUID
-    and pendingCastCost.spellID == spellID then
+    local matchedSent = pendingCastCost
+        and pendingCastCost.guid == castGUID
+        and pendingCastCost.spellID == spellID
+
+    if matchedSent then
         effectiveCost = pendingCastCost.cost
     end
     pendingCastCost = nil
@@ -489,13 +498,17 @@ function Tracker.RecordSuccessfulSpell(spellID, spellName, castGUID)
 
     lastRefundEstimate = nil
     lastRefundActual = nil
+    lastRefundMatched = false
 
-    -- Nampower's SPELL_ENERGIZE_ON_SELF may precede the cast-success
-    -- notification. Attach only a recent server refund to this heal.
-    if pendingActualRefund and type(GetTime) == "function"
+    -- A refund can precede SUCCEEDED. Only accept it if its buffered
+    -- SENT GUID and spell ID match this successful cast exactly.
+    if lastEligible and matchedSent and pendingActualRefund
+    and pendingActualRefund.guid == castGUID
+    and pendingActualRefund.spellID == spellID
+    and type(GetTime) == "function"
     and GetTime() - pendingActualRefund.at <= 0.75 then
         lastRefundActual = pendingActualRefund.amount
-        lastEligible = true
+        lastRefundMatched = true
     end
     pendingActualRefund = nil
 
@@ -569,31 +582,35 @@ local function ReceiveBookOfPrayerMana(spellID, powerType, amount, periodic)
         now = GetTime()
     end
 
-    -- An energize may be delivered just before SUCCEEDED. If another
-    -- compatible cast is in flight, defer until its success event.
+    -- The Nampower packet has no castGUID. Never assign it to the
+    -- wrong spell just because another spell is now in flight.
+    -- If the previous successful cast was too recent, an event during
+    -- the next SENT is ambiguous and must be ignored.
+    local window = 0.75
+
     if pendingCastCost then
-        if now then
-            pendingActualRefund = { amount = amount, at = now }
+        if now and (not lastHealTime
+        or now - lastHealTime > window) then
+            pendingActualRefund = {
+                amount = amount,
+                at = now,
+                guid = pendingCastCost.guid,
+                spellID = pendingCastCost.spellID
+            }
         end
         return
     end
 
-    -- The server refund belongs to the most recent healing cast.
-    -- Do not put a stale energize value onto a later unrelated spell.
-    local matchWindow = 1.5
-
-    -- With no ClassicAPI success event, the Nampower cast event may
-    -- precede the server's cast completion by several seconds.
-    if provider ~= "ClassicAPI" then
-        matchWindow = 5
-    end
-
-    if now and lastHealTime and now - lastHealTime <= matchWindow then
+    -- Match at most one server refund to the latest eligible heal.
+    -- Outside this short window, retain the ClassicAPI approximation.
+    if now and lastHealTime
+    and now >= lastHealTime
+    and now - lastHealTime <= window
+    and lastEligible
+    and not lastRefundMatched then
         lastRefundActual = amount
-        lastEligible = true
+        lastRefundMatched = true
         Notify()
-    elseif now then
-        pendingActualRefund = { amount = amount, at = now }
     end
 end
 
@@ -690,6 +707,12 @@ if PC.Capabilities.classicAPISupported then
     if provider == "ClassicAPI" then
         pcall(eventFrame.RegisterEvent, eventFrame,
             "UNIT_SPELLCAST_SENT")
+        pcall(eventFrame.RegisterEvent, eventFrame,
+            "UNIT_SPELLCAST_FAILED")
+        pcall(eventFrame.RegisterEvent, eventFrame,
+            "UNIT_SPELLCAST_FAILED_QUIET")
+        pcall(eventFrame.RegisterEvent, eventFrame,
+            "UNIT_SPELLCAST_INTERRUPTED")
     end
 end
 
@@ -822,6 +845,18 @@ eventFrame:SetScript(
         and provider == "ClassicAPI" then
             if arg1 == "player" then
                 CaptureSentSpell(arg3, arg4, arg5)
+            end
+            return
+        end
+
+        if provider == "ClassicAPI"
+        and (event == "UNIT_SPELLCAST_FAILED"
+        or event == "UNIT_SPELLCAST_FAILED_QUIET"
+        or event == "UNIT_SPELLCAST_INTERRUPTED") then
+            if arg1 == "player" and pendingCastCost
+            and pendingCastCost.guid == arg2 then
+                pendingCastCost = nil
+                pendingActualRefund = nil
             end
             return
         end

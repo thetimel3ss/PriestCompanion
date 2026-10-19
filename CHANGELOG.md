@@ -2,6 +2,12 @@
 
 ## [Unreleased]
 
+### Improved — Prayer Tracker sizing and visual status (2026-10-19)
+- The floating HUD now uses an internal scaled content frame so the header, spell icons, names, and footer resize proportionally with the window; compact minimum dimensions are 68x68 (previously 104x112) and expanded minimum dimensions are 104x78 (previously 170x118).
+- Replaced the verbose `Eligible: ... mana cost` / `Same spell: no refund` messages with a color-coded HUD border and subtle background: green for eligible family changes, red for repeated families, neutral before a comparison or when the option is disabled. The small footer shows only the talent refund rate (15%/30%) or 0%; no mana amounts are estimated.
+- Renamed the Advanced checkbox to **Show refund status (border color)** and aligned all six checkboxes with a consistent 30px vertical step; the red talent-points requirement is now inline with Enable Tracker.
+- Preserved previous per-character geometry/settings, drag and edge resizing, cast detection and the maintainer's title/main-tab positions. Pending in-game UI verification.
+
 ### Added — Book of Prayer Tracker prototype (2026-10-17)
 - Added `Data/HealingSpells.lua` to define six rank-independent healing families: Flash Heal, Renew, Prayer of Healing, Heal, Greater Heal and Lesser Heal.
 - Added `Core/PrayerTracker.lua`: scans the character's talents for Book of Prayer points, normalizes successful player casts by healing family and records previous/current families. Ignores interrupted/failed casts and periodic ticks. Uses one cast provider at a time (ClassicAPI `UNIT_SPELLCAST_SUCCEEDED`, then Nampower `SPELL_CAST_EVENT`, then SuperWoW `UNIT_CASTEVENT`).

@@ -345,8 +345,8 @@ CreateLabel(
 
 CreateLabel(
     advancedChild,
-    "Green = different heal, red = same heal. " ..
-        "The percentage is a talent rate, not measured mana.",
+    "Border: green when switching heals, red when repeating. " ..
+        "Neutral until two qualifying casts are known.",
     15, -285, 345,
     "GameFontDisableSmall"
 )

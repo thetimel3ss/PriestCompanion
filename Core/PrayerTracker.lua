@@ -705,6 +705,7 @@ end
 
 eventFrame:RegisterEvent("VARIABLES_LOADED")
 eventFrame:RegisterEvent("PLAYER_ENTERING_WORLD")
+eventFrame:RegisterEvent("PLAYER_LOGOUT")
 eventFrame:RegisterEvent("CHARACTER_POINTS_CHANGED")
 eventFrame:RegisterEvent("SPELLS_CHANGED")
 eventFrame:RegisterEvent("PLAYER_LEVEL_UP")
@@ -763,6 +764,23 @@ eventFrame:SetScript(
     function()
         if event == "VARIABLES_LOADED" then
             LoadSettings()
+            return
+        end
+
+        if event == "PLAYER_LOGOUT" then
+            -- On older Nampower, avoid leaving a global CVar enabled
+            -- across sessions solely because of Priest Companion.
+            if legacyEnergizeCVarChanged
+            and legacyEnergizePriorCVar ~= nil
+            and type(SetCVar) == "function" then
+                pcall(
+                    SetCVar,
+                    "NP_EnableSpellEnergizeEvents",
+                    tostring(legacyEnergizePriorCVar)
+                )
+                legacyEnergizeCVarChanged = false
+                legacyEnergizePriorCVar = nil
+            end
             return
         end
 

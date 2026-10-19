@@ -48,11 +48,24 @@ local previousIcon = nil
 local lastEligible = false
 local lastRefundEstimate = nil
 local lastRefundActual = nil
-local pendingActualRefund = nil
 local lastHealTime = nil
 local pendingCastCost = nil
 local lastRefundMatched = false
-local lastRefundAmbiguous = false
+
+-- Nampower reports Book of Prayer (52942) without the originating cast GUID.
+-- Keep a bounded queue, correlate by success time and effective spell cost,
+-- and avoid attributing late events to whichever spell is currently displayed.
+local recentHeals = {}
+local waitingRefunds = {}
+local healSequence = 0
+local latestHealSequence = nil
+local REFUND_AFTER_WINDOW = 0.40
+local REFUND_BEFORE_WINDOW = 0.15
+local REFUND_SETTLE_SECONDS = 0.12
+local REFUND_DEFER_SENT_SECONDS = 0.24
+local REFUND_PACKET_TTL = 0.48
+local RECENT_HEAL_TTL = 1.25
+local ReconcileRefunds = nil
 local innerFocusReady = false
 local innerFocusBlockNext = false
 local provider = "unavailable"
@@ -182,8 +195,13 @@ function Tracker.SetOption(key, value)
 
     SaveOption(key, value == true)
 
-    if key == "showManaRefund" and ConfigureManaProvider then
-        ConfigureManaProvider()
+    if key == "showManaRefund" then
+        -- A setting toggle must not replay already-received mana packets.
+        recentHeals = {}
+        waitingRefunds = {}
+        if ConfigureManaProvider then
+            ConfigureManaProvider()
+        end
     end
 
     Notify()
@@ -300,11 +318,12 @@ local function ScanBookOfPrayer()
         lastEligible = false
         lastRefundEstimate = nil
         lastRefundActual = nil
-        pendingActualRefund = nil
         lastHealTime = nil
         pendingCastCost = nil
         lastRefundMatched = false
-        lastRefundAmbiguous = false
+        recentHeals = {}
+        waitingRefunds = {}
+        latestHealSequence = nil
         innerFocusReady = false
         innerFocusBlockNext = false
         lastCastGUID = nil
@@ -431,10 +450,9 @@ local function ReadEffectiveManaCost(spellID)
 end
 
 local function CaptureSentSpell(castGUID, spellID, spellName)
-    -- Every new player cast invalidates the previous pending snapshot.
-    -- This is essential when a heal was cancelled or interrupted.
+    -- A new SENT invalidates only the pending cost snapshot; older
+    -- confirmed heals and their Nampower packets must remain available.
     pendingCastCost = nil
-    pendingActualRefund = nil
 
     if not GetSpellFamily(ResolveSpellName(spellID, spellName)) then
         return
@@ -443,7 +461,8 @@ local function CaptureSentSpell(castGUID, spellID, spellName)
     pendingCastCost = {
         guid = castGUID,
         spellID = spellID,
-        cost = ReadEffectiveManaCost(spellID)
+        cost = ReadEffectiveManaCost(spellID),
+        at = type(GetTime) == "function" and GetTime() or nil
     }
 end
 
@@ -526,33 +545,35 @@ function Tracker.RecordSuccessfulSpell(spellID, spellName, castGUID)
     lastRefundActual = nil
     lastRefundMatched = false
 
-    -- Two successful heals in the same 750ms packet window cannot be
-    -- distinguished by Nampower's GUID-less energize event.
-    -- Fail closed and keep the ClassicAPI estimate for this cast.
     local castTime = nil
     if type(GetTime) == "function" then
         castTime = GetTime()
     end
-    lastRefundAmbiguous = castTime and lastHealTime
-        and castTime - lastHealTime <= 0.75
-        or false
-
-    -- A refund can precede SUCCEEDED. Only accept it if its buffered
-    -- SENT GUID and spell ID match this successful cast exactly.
-    if lastEligible and matchedSent and pendingActualRefund
-    and pendingActualRefund.guid == castGUID
-    and pendingActualRefund.spellID == spellID
-    and type(GetTime) == "function"
-    and GetTime() - pendingActualRefund.at <= 0.75 then
-        lastRefundActual = pendingActualRefund.amount
-        lastRefundMatched = true
-    end
-    pendingActualRefund = nil
 
     if lastEligible and effectiveCost and effectiveCost > 0 then
         -- Approximate: the server may round fractional refunds either way.
         lastRefundEstimate =
             math.floor(effectiveCost * talentPoints * 0.15 + 0.5)
+    end
+
+    -- Include ineligible heals in the timeline, but never assign them a
+    -- refund. A new successful spell does not invalidate an older packet.
+    if castTime then
+        healSequence = healSequence + 1
+        latestHealSequence = healSequence
+        table.insert(recentHeals, {
+            sequence = healSequence,
+            guid = castGUID,
+            spellID = spellID,
+            family = family,
+            at = castTime,
+            expected = lastRefundEstimate,
+            eligible = lastEligible,
+            matched = false
+        })
+        if ReconcileRefunds then
+            ReconcileRefunds()
+        end
     end
 
     -- Reset inactivity only for a confirmed, qualifying healing cast.
@@ -594,6 +615,97 @@ local function IsLegacyNampower()
     return major < 4 or (major == 4 and minor < 5)
 end
 
+-- A packet may be delivered immediately before SUCCEEDED, immediately
+-- after it, or during the SENT of the next instant heal. Cost proximity
+-- disambiguates different families/ranks when ClassicAPI is available.
+local function FindRefundCandidate(packet)
+    local best = nil
+    local bestScore = nil
+    local i
+
+    for i = 1, table.getn(recentHeals) do
+        local heal = recentHeals[i]
+        local differenceInTime = packet.at - heal.at
+
+        if heal.eligible and not heal.matched
+        and differenceInTime >= -REFUND_BEFORE_WINDOW
+        and differenceInTime <= REFUND_AFTER_WINDOW then
+            local score = nil
+
+            if heal.expected and heal.expected > 0 then
+                local difference = math.abs(heal.expected - packet.amount)
+                local tolerance = math.max(
+                    6, math.floor(heal.expected * 0.25 + 0.5)
+                )
+                if difference <= tolerance then
+                    score = difference / heal.expected
+                        + math.abs(differenceInTime) * 0.1
+                end
+            else
+                -- Without ClassicAPI cost data, match in cast order.
+                -- The Nampower event alone has no identifying GUID.
+                score = 1 + math.abs(differenceInTime) * 0.1
+            end
+
+            if score and (not bestScore or score < bestScore) then
+                best = heal
+                bestScore = score
+            end
+        end
+    end
+
+    return best
+end
+
+ReconcileRefunds = function()
+    if type(GetTime) ~= "function" then
+        return
+    end
+
+    local now = GetTime()
+    local i
+
+    -- Prevent stale casts being candidates for a later refund packet.
+    for i = table.getn(recentHeals), 1, -1 do
+        if now - recentHeals[i].at > RECENT_HEAL_TTL then
+            table.remove(recentHeals, i)
+        end
+    end
+
+    i = 1
+    while i <= table.getn(waitingRefunds) do
+        local packet = waitingRefunds[i]
+        local age = now - packet.at
+        local pendingNewCast = pendingCastCost
+            and pendingCastCost.at
+            and pendingCastCost.at <= packet.at
+
+        -- Give success events time to arrive, including instant Renew.
+        -- A newer SENT may otherwise steal an older heal's packet.
+        if age < REFUND_SETTLE_SECONDS
+        or (pendingNewCast and age < REFUND_DEFER_SENT_SECONDS) then
+            i = i + 1
+        else
+            local heal = FindRefundCandidate(packet)
+
+            if heal then
+                heal.matched = true
+                if heal.sequence == latestHealSequence then
+                    lastRefundActual = packet.amount
+                    lastRefundMatched = true
+                    Notify()
+                end
+                table.remove(waitingRefunds, i)
+            elseif age > REFUND_PACKET_TTL then
+                -- Do not guess a spell if neither amount nor timing fit.
+                table.remove(waitingRefunds, i)
+            else
+                i = i + 1
+            end
+        end
+    end
+end
+
 local function ReceiveBookOfPrayerMana(spellID, powerType, amount, periodic)
     if not settings.showManaRefund or talentPoints < 1 then
         return
@@ -614,42 +726,17 @@ local function ReceiveBookOfPrayerMana(spellID, powerType, amount, periodic)
         return
     end
 
-    local now = nil
-    if type(GetTime) == "function" then
-        now = GetTime()
-    end
-
-    -- The Nampower packet has no castGUID. Never assign it to the
-    -- wrong spell just because another spell is now in flight.
-    -- If the previous successful cast was too recent, an event during
-    -- the next SENT is ambiguous and must be ignored.
-    local window = 0.75
-
-    if pendingCastCost then
-        if now and (not lastHealTime
-        or now - lastHealTime > window) then
-            pendingActualRefund = {
-                amount = amount,
-                at = now,
-                guid = pendingCastCost.guid,
-                spellID = pendingCastCost.spellID
-            }
-        end
+    if type(GetTime) ~= "function" then
         return
     end
 
-    -- Match at most one server refund to the latest eligible heal.
-    -- Outside this short window, retain the ClassicAPI approximation.
-    if now and lastHealTime
-    and now >= lastHealTime
-    and now - lastHealTime <= window
-    and lastEligible
-    and not lastRefundMatched
-    and not lastRefundAmbiguous then
-        lastRefundActual = amount
-        lastRefundMatched = true
-        Notify()
-    end
+    table.insert(waitingRefunds, {
+        amount = amount,
+        at = GetTime()
+    })
+
+    -- Reconciliation also runs OnUpdate, after the short settling delay.
+    ReconcileRefunds()
 end
 
 --------------------------------------------------
@@ -817,6 +904,10 @@ eventFrame:SetScript(
                 ScanBookOfPrayer()
             end
         end
+
+        if table.getn(waitingRefunds) > 0 and ReconcileRefunds then
+            ReconcileRefunds()
+        end
     end
 )
 
@@ -894,7 +985,6 @@ eventFrame:SetScript(
             if arg1 == "player" and pendingCastCost
             and pendingCastCost.guid == arg2 then
                 pendingCastCost = nil
-                pendingActualRefund = nil
             end
             return
         end

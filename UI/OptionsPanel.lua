@@ -519,6 +519,26 @@ AddPrayerCheckbox(
 -- Tracker Layout Controls
 --------------------------------------------------
 
+-- Native Vanilla confirmation. Cancel/Escape leaves both saved dimensions
+-- and position untouched; only OK calls the existing geometry reset.
+local RESET_TRACKER_POPUP = "PRIEST_COMPANION_RESET_TRACKER_GEOMETRY"
+
+StaticPopupDialogs[RESET_TRACKER_POPUP] = {
+    text = "Reset Book of Prayer Tracker position and window sizes?" ..
+        "\n\nThis restores the default position and both compact " ..
+        "and expanded sizes. Lock and all other settings are kept.",
+    button1 = OKAY or "OK",
+    button2 = CANCEL or "Cancel",
+    OnAccept = function()
+        if prayer then
+            prayer.ResetGeometry()
+        end
+    end,
+    timeout = 0,
+    whileDead = 1,
+    hideOnEscape = 1
+}
+
 local resetButton = CreateFrame(
     "Button",
     "PriestCompanionPrayerResetPosition",
@@ -534,9 +554,7 @@ resetButton:SetText("Reset Position")
 resetButton:SetScript(
     "OnClick",
     function()
-        if prayer then
-            prayer.ResetGeometry()
-        end
+        StaticPopup_Show(RESET_TRACKER_POPUP)
     end
 )
 resetButton:SetScript(

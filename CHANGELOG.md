@@ -2,6 +2,12 @@
 
 ## [Unreleased]
 
+### Added — Configurable Prayer Tracker auto-hide (2026-10-19)
+- Added an opt-in **Auto-hide after inactivity** checkbox in Options → Advanced with a numeric-only Vanilla `InputBoxTemplate` field for the timeout (1–600 whole seconds, default 15). The input is disabled when auto-hide is unchecked and includes a tooltip describing the timer.
+- The inactivity timer resets only when a compatible healing spell is successfully cast. Once the timeout expires the floating HUD hides automatically and is restored by the next successful qualifying heal, including while a previous hide is in effect.
+- Auto-hide is off by default to preserve existing behavior; the checkbox and timeout are persisted per character in `PriestCompanionCharDB`. Numeric values are validated and clamped by the core, including data loaded from saved variables.
+- The feature does not change talent detection, spell-family logic, cast event providers, colored refund border, movable/resizable HUD, or the maintainer's adjusted tracker title font. In-game verification still required.
+
 ### Changed — Advanced tooltip help and startup tab (2026-10-19)
 - Moved the explanatory text for **Show refund status (border color)** and **Lock position** into native `GameTooltip` hover hints; both the checkbox and its text label show the tooltip, and the label can be clicked to toggle the setting.
 - Renamed **Lock position and size** to **Lock position** (it continues to prevent both dragging and resizing).

@@ -1,5 +1,5 @@
 -- Priest Companion
--- Options > Announcer: independent per-channel Fear Ward notifications.
+-- Options > Announcer: independent Fear Ward and Resurrection messages.
 -- Vanilla 1.12 native frames; no automated spell casting.
 
 local PC = PriestCompanion
@@ -24,7 +24,7 @@ scroll:SetPoint("BOTTOMRIGHT", panel, "BOTTOMRIGHT", -29, 9)
 
 local child = CreateFrame("Frame", nil, scroll)
 child:SetWidth(388)
-child:SetHeight(478)
+child:SetHeight(832)
 scroll:SetScrollChild(child)
 
 local function Label(text, x, y, width, font)
@@ -70,7 +70,7 @@ local function HideTooltip()
     end
 end
 
-local function Checkbox(name, title, x, y, onToggle, helpText)
+local function Checkbox(name, title, x, y, onToggle, helpText, captionWidth)
     local check = CreateFrame(
         "CheckButton", name, child, "UICheckButtonTemplate"
     )
@@ -82,7 +82,7 @@ local function Checkbox(name, title, x, y, onToggle, helpText)
         nil, "OVERLAY", "GameFontHighlightSmall"
     )
     label:SetPoint("LEFT", check, "RIGHT", 4, 0)
-    label:SetWidth(135)
+    label:SetWidth(captionWidth or 135)
     label:SetJustifyH("LEFT")
     label:SetText(title)
 
@@ -102,7 +102,7 @@ local function Checkbox(name, title, x, y, onToggle, helpText)
         -- An adjacent button makes the caption hoverable and clickable.
         local captionHitBox = CreateFrame("Button", nil, child)
         captionHitBox:SetPoint("LEFT", check, "RIGHT", 4, 0)
-        captionHitBox:SetWidth(135)
+        captionHitBox:SetWidth(captionWidth or 135)
         captionHitBox:SetHeight(24)
         captionHitBox:RegisterForClicks("LeftButtonUp")
         captionHitBox:SetScript("OnEnter", function()
@@ -131,6 +131,22 @@ local enabledBox, enabledLabel = Checkbox(
         announcer.SetOption("enabled", value)
     end,
     ENABLE_TOOLTIP
+)
+
+-- Keep overwrite protection beside Enable Fear Ward, not at the end
+-- of the page. A wider right caption keeps its two-line title contained.
+local protectionBox = Checkbox(
+    "PriestCompanionFearWardPreventOverwrite",
+    "Prevent overwriting Fear Ward", 204, 77,
+    function(value)
+        announcer.SetOption("preventOverwrite", value)
+    end,
+    "Prevent Fear Ward when the recipient already has the buff. " ..
+    "Includes self-casts without a target, spellbook, actionbar " ..
+    "and ClassicAPI /cast [@mouseover] macros using CastAtUnit. " ..
+    "Protection checks the actual cast recipient; other DLL " ..
+    "macro paths may need separate validation.",
+    155
 )
 
 -- 30px from Enable Fear Ward to this heading, then 30px to
@@ -224,20 +240,6 @@ saveButton:SetText("Save")
 Label("Preview (not sent)", 14, 348, 350, "GameFontNormalSmall")
 local previewLabel = Label("", 15, 370, 350)
 
-Label("Fear Ward Protection", 14, 410, 350, "GameFontNormal")
-local protectionBox = Checkbox(
-    "PriestCompanionFearWardPreventOverwrite",
-    "Prevent overwriting Fear Ward", 14, 440,
-    function(value)
-        announcer.SetOption("preventOverwrite", value)
-    end,
-    "Prevent Fear Ward when the recipient already has the buff. " ..
-    "Includes self-casts without a target, spellbook, actionbar " ..
-    "and ClassicAPI /cast [@mouseover] macros using CastAtUnit. " ..
-    "Protection checks the actual cast recipient; other DLL " ..
-    "macro paths may need separate validation."
-)
-
 local function UpdateMessagePreview()
     previewLabel:SetText(
         announcer.FormatMessage("Tankname", messageBox:GetText()) or ""
@@ -281,11 +283,158 @@ defaultButton:SetScript("OnClick", function()
 end)
 saveButton:SetScript("OnClick", SaveMessage)
 
--- Unsaved edits are kept while changing checkboxes, but discarded
--- if the player leaves the Announcer page.
+--------------------------------------------------
+-- Resurrection Announcer
+--------------------------------------------------
+
+Label("Resurrection Announcer", 14, 418, 350, "GameFontNormal")
+local resStatus = Label("", 14, 446, 356)
+
+local resEnabled, resEnabledLabel = Checkbox(
+    "PriestCompanionResurrectionEnabled",
+    "Enable Resurrection", 14, 480,
+    function(value)
+        announcer.SetResOption("enabled", value)
+    end,
+    "Announce only once the Resurrection cast has actually STARTED, " ..
+    "not when the cast button is pressed. A later interruption or " ..
+    "a declined resurrection is not treated as success."
+)
+
+Label("Announcement channels (multiple selections allowed)",
+    14, 510, 355, "GameFontNormalSmall")
+
+local RES_CHANNEL_TOOLTIP =
+    "Resurrection has independent channel choices. Say and Yell " ..
+    "are available without a group; unavailable Party or Raid " ..
+    "channels are skipped. Self only shows local chat. Whisper " ..
+    "uses the named recipient only after Resurrection STARTS."
+
+local resChannels = {}
+local resChannelDefinitions = {
+    { "SAY", "Say", 14, 540 },
+    { "PARTY", "Party", 204, 540 },
+    { "RAID", "Raid", 14, 570 },
+    { "SELF", "Self (local chat)", 204, 570 },
+    { "YELL", "Yell", 14, 600 },
+    { "WHISPER", "Whisper", 204, 600 }
+}
+
+local resIndex
+for resIndex = 1, table.getn(resChannelDefinitions) do
+    local item = resChannelDefinitions[resIndex]
+    local channel = item[1]
+    resChannels[channel] = Checkbox(
+        "PriestCompanionResurrection" .. channel,
+        item[2], item[3], item[4],
+        function(value)
+            announcer.SetResChannel(channel, value)
+        end,
+        RES_CHANNEL_TOOLTIP
+    )
+end
+
+Label("Custom message (use {target} and optional {spell})",
+    14, 648, 360, "GameFontNormalSmall")
+
+local resMessageBox = CreateFrame(
+    "EditBox", "PriestCompanionResurrectionMessage",
+    child, "InputBoxTemplate"
+)
+resMessageBox:SetPoint("TOPLEFT", child, "TOPLEFT", 21, -674)
+resMessageBox:SetWidth(335)
+resMessageBox:SetHeight(20)
+resMessageBox:SetAutoFocus(false)
+resMessageBox:SetMaxLetters(140)
+resMessageBox:SetTextInsets(4, 4, 0, 0)
+
+local resLeftTexture = getfenv(0)[resMessageBox:GetName() .. "Left"]
+if resLeftTexture then
+    local point, relative, relativePoint, x, y =
+        resLeftTexture:GetPoint(1)
+    if point then
+        resLeftTexture:ClearAllPoints()
+        resLeftTexture:SetPoint(point, relative, relativePoint, 0, y)
+    end
+end
+
+local resDefaultButton = CreateFrame(
+    "Button", "PriestCompanionResurrectionMessageDefault",
+    child, "UIPanelButtonTemplate"
+)
+resDefaultButton:SetWidth(92)
+resDefaultButton:SetHeight(24)
+resDefaultButton:SetPoint(
+    "TOPLEFT", child, "TOPLEFT", 21, -707
+)
+resDefaultButton:SetText("Default")
+
+local resSaveButton = CreateFrame(
+    "Button", "PriestCompanionResurrectionMessageSave",
+    child, "UIPanelButtonTemplate"
+)
+resSaveButton:SetWidth(92)
+resSaveButton:SetHeight(24)
+resSaveButton:SetPoint(
+    "TOPLEFT", child, "TOPLEFT", 126, -707
+)
+resSaveButton:SetText("Save")
+
+Label("Preview (not sent)", 14, 752, 350, "GameFontNormalSmall")
+local resPreview = Label("", 15, 775, 350)
+
+local resDraftDirty = false
+local settingResDraft = false
+
+local function UpdateResPreview()
+    resPreview:SetText(
+        announcer.FormatResurrectionMessage(
+            "Tankname", resMessageBox:GetText()
+        ) or ""
+    )
+end
+
+local function SetResDraft(text)
+    settingResDraft = true
+    resMessageBox:SetText(text or "")
+    settingResDraft = false
+    resDraftDirty = resMessageBox:GetText() ~= announcer.GetResMessage()
+    UpdateResPreview()
+end
+
+local function SaveResMessage()
+    local saved = announcer.SetResMessage(resMessageBox:GetText())
+    SetResDraft(saved)
+    resMessageBox:ClearFocus()
+end
+
+resMessageBox:SetScript("OnTextChanged", function()
+    if not settingResDraft then
+        resDraftDirty = this:GetText() ~= announcer.GetResMessage()
+    end
+    UpdateResPreview()
+end)
+resMessageBox:SetScript("OnEnterPressed", SaveResMessage)
+resMessageBox:SetScript("OnEscapePressed", function()
+    SetResDraft(announcer.GetResMessage())
+    this:ClearFocus()
+end)
+resMessageBox:SetScript("OnEditFocusGained", function()
+    this:HighlightText()
+end)
+
+resDefaultButton:SetScript("OnClick", function()
+    SetResDraft(announcer.GetDefaultResMessage())
+end)
+resSaveButton:SetScript("OnClick", SaveResMessage)
+
+-- Unsaved drafts for either spell survive checkbox changes but are
+-- discarded when the player leaves Options > Announcer.
 panel:SetScript("OnHide", function()
     messageBox:ClearFocus()
     SetMessageDraft(announcer.GetMessage())
+    resMessageBox:ClearFocus()
+    SetResDraft(announcer.GetResMessage())
 end)
 
 function panel.Refresh()
@@ -326,5 +475,40 @@ function panel.Refresh()
         SetMessageDraft(announcer.GetMessage())
     else
         UpdateMessagePreview()
+    end
+
+    local resAvailable = announcer.GetResurrectionProvider() == "ClassicAPI"
+    if resAvailable then
+        resStatus:SetText(
+            "Cast detection: ClassicAPI (SENT + START)"
+        )
+        resStatus:SetTextColor(0.35, 0.95, 0.40)
+        resEnabled:Enable()
+        resEnabledLabel:SetTextColor(1, 0.82, 0.20)
+    else
+        resStatus:SetText(
+            "Resurrection detection unavailable: ClassicAPI required."
+        )
+        resStatus:SetTextColor(1, 0.34, 0.34)
+        resEnabled:Disable()
+        resEnabledLabel:SetTextColor(0.6, 0.6, 0.6)
+    end
+
+    resEnabled:SetChecked(
+        announcer.GetResOption("enabled") and 1 or nil
+    )
+
+    local resChannel
+    local button
+    for resChannel, button in pairs(resChannels) do
+        button:SetChecked(
+            announcer.GetResChannel(resChannel) and 1 or nil
+        )
+    end
+
+    if not resDraftDirty and not resMessageBox:HasFocus() then
+        SetResDraft(announcer.GetResMessage())
+    else
+        UpdateResPreview()
     end
 end

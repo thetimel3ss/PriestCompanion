@@ -2,6 +2,14 @@
 
 ## [Unreleased]
 
+### Added — Resurrection Announcer and Fear Ward options layout (2026-10-19)
+- Added a distinct **Resurrection Announcer** section inside Options → Announcer, retaining existing Fear Ward selections and settings. Resurrection has its own disabled-by-default enable setting, message, and independently selectable channels: Say, Yell, Party, Raid, Self (local chat), and **Whisper**.
+- Implemented confirmation before announcing: ClassicAPI `UNIT_SPELLCAST_SENT` records the Resurrection recipient and castGUID; `UNIT_SPELLCAST_START` for the same GUID triggers the announcement exactly once only after the cast actually starts. Pre-start failures, unknown recipients, and events without a matching SENT do not announce. This is **not** a claim that the resurrection completed or was accepted.
+- Added per-character saving of Resurrection settings nested under `PriestCompanionCharDB.announcer.resurrection`. Default text is `Casting {spell} on {target}.`; separate Default, Save/Enter, Escape, and unsent live Preview behave like Fear Ward.
+- **Whisper** (Resurrection only, initially off) sends the start announcement directly to the recipient captured from SENT. Other selected chat channels continue independently, and unavailable Party/Raid channels are skipped. Fear Ward's existing channel settings have no Whisper option.
+- Relocated **Prevent overwriting Fear Ward** to the right of **Enable Fear Ward** (same row), retained its checkbox/caption tooltip, and compacted the Resurrection section upward. Both sections preserve the 30px channel-row rhythm.
+- **Live testing pending:** normal Resurrection from action bar and mouseover macro, interruption and failed casts, wrong target, duplicate START events, multiple enabled channels including Whisper, no group and no recipient, text edits and persistence across /reload. Fear Ward regression tests remain applicable.
+
 ### Fixed — ClassicAPI mouseover Fear Ward macro routing (2026-10-19)
 - The maintainer verified that Fear Ward without a target now correctly prevents self-overwriting, while `/cast [@mouseover,help,nodead][help,nodead][@player] Fear Ward` was still recasting on an already-buffed mouseover unit.
 - Traced ClassicAPI's `/cast` macro conditional handler to `C_Spell.CastAtUnit(spell, unit, placeGroundSpell)`; a mouseover-targeted cast bypasses the old `CastSpellByName` hook and the `SpellTargetUnit` targeting cursor.

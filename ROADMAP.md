@@ -118,7 +118,17 @@ All 28 records have `source.note`: 21 world-drop-style entries with `"World drop
 
 ## Next steps
 
-### Announcer — Fear Ward (in progress on `feature/announcer`)
+### Announcer — Fear Ward and Resurrection (in progress on `feature/announcer`)
+
+#### Resurrection Announcer (new, pending in-game validation)
+
+- [x] Add an opt-in Resurrection section in Options → Announcer with separate saved preferences, independently selectable Say/Yell/Party/Raid/Self/**Whisper** channels, and Default/Save/Preview message editing.
+- [x] Correlate ClassicAPI `UNIT_SPELLCAST_SENT` (target, GUID, spell) with `UNIT_SPELLCAST_START` (same GUID, spell) so the message is sent **only after Resurrection begins casting**; deduplicate START and discard pre-start failure. Do not announce completion/acceptance.
+- [x] Whisper the captured named Resurrection recipient only after matched START; never derive an absent recipient from the current target. Default `Casting {spell} on {target}.` prevents a misleading completed-resurrection claim. No Whisper option is added to Fear Ward.
+- [x] Move **Prevent overwriting Fear Ward** beside **Enable Fear Ward**, retaining tooltip and 30px spacing of other checkbox rows; use the freed space for Resurrection settings.
+- [ ] **In-game acceptance:** verify plain Resurrection and mouseover Resurrection, different current target from recipient, spellbook/ranks, pre-START cast failure, midcast cancellation/interruption, duplicate START, absence of SENT, Say+Party+Whisper together, unavailable Party/Raid, whisper to corpse recipient, custom message Default/Save/Preview, settings across reload, ClassicAPI absent, and previously validated Fear Ward behavior.
+
+#### Fear Ward (previously validated paths)
 
 - [x] Add an optional, independent per-character **Prevent overwriting Fear Ward** setting under Options → Announcer (disabled by default). Check the recipient's current aura before supported Lua spell dispatches and prevent duplicate application with a local notice, even when announcements are disabled.
 - [x] **Maintainer's first live checks:** Fear Ward on a recipient without an active buff works; action-bar casts, spellbook casts and typed `/cast Fear Ward` are prevented when that recipient is buffed.
@@ -136,7 +146,7 @@ All 28 records have `source.note`: 21 world-drop-style entries with `"World drop
 - [x] Place Fear Ward and channel help text into native hover tooltips on checkboxes/captions, use exact 30px spacing between Enable Fear Ward, the channel header and each row. Preserve the right column, move Include casts on myself beside Yell, and add independent Yell selection/persistence.
 - [x] Add Default/Save to the custom Fear Ward announcement message: Default loads the original text as a draft, Save/Enter commits, Escape reverts; changing other checkboxes preserves the unsaved draft, and leaving the tab discards it. Preview reflects the draft without sending messages.
 - [ ] **In-game verification:** Fear Ward on self/party/raid members, Say + Raid, Say + Yell + Raid and Party + Say simultaneously, tooltip hover on checkboxes and captions, checkbox spacing, Default/Save/Enter/Escape for the custom text and /reload persistence, success vs failed/out-of-range casts, mouseover casts, changing target immediately, duplicate events, missing target, no ClassicAPI, channel changes mid-session, and settings across /reload.
-- [ ] **Resurrection Announcer:** announce the target on cast initiation/completion carefully without claiming a player accepted resurrection; keep separate settings.
+- [x] **Resurrection Announcer (initial implementation):** opt-in, per-spell multi-channel selection and confirmed cast START announcements, with Whisper addressed to the captured recipient. In-game verification still pending.
 - [ ] **Fear Ward Assistant:** allow a preferred target and cooldown/aura readiness reminders; assess whether automatic casting is supported and permitted by the client/server before implementing any action.
 - [ ] **Resurrection Assistant:** offer a post-wipe dead-player list with player-confirmed resurrection actions; handle combat, range, and player availability.
 - [ ] **Future announcers:** OOM alerts and other optional priest spell announcements. Avoid chat spam and preserve independent channel selection.

@@ -10,6 +10,18 @@ local Announcer = PC.Modules.Announcer
 local FEAR_WARD_ID = 6346
 local FEAR_WARD_NAME = "Fear Ward"
 local DEFAULT_MESSAGE = "Fear Ward cast on {target}."
+local RESURRECTION_NAME = "Resurrection"
+local DEFAULT_RES_MESSAGE = "Casting {spell} on {target}."
+-- Vanilla priest ranks 1-5 plus a later rank if exposed on a custom realm.
+local RESURRECTION_IDS = {
+    [2006] = true,
+    [2010] = true,
+    [10880] = true,
+    [10881] = true,
+    [20770] = true,
+    [25435] = true
+}
+local RES_PENDING_SECONDS = 30
 local PENDING_SECONDS = 15
 local MAX_MESSAGE_BYTES = 140
 
@@ -28,6 +40,22 @@ local DEFAULTS = {
 }
 
 local CHANNELS = { "SAY", "YELL", "PARTY", "RAID", "SELF" }
+-- Whisper belongs to Resurrection only; Fear Ward settings are unchanged.
+local RES_CHANNELS = {
+    "SAY", "YELL", "PARTY", "RAID", "SELF", "WHISPER"
+}
+local resSettings = {
+    enabled = false,
+    message = DEFAULT_RES_MESSAGE,
+    channels = {
+        SAY = true,
+        YELL = false,
+        PARTY = false,
+        RAID = false,
+        SELF = false,
+        WHISPER = false
+    }
+}
 local settings = {
     enabled = DEFAULTS.enabled,
     announceSelf = DEFAULTS.announceSelf,
@@ -43,17 +71,21 @@ local settings = {
 }
 
 local provider = "unavailable"
+local resProvider = "unavailable"
 local pending = {}
 local completed = {}
+local resPending = {}
+local resAnnounced = {}
 local lastMissingTargetWarning = nil
 
 --------------------------------------------------
 -- Settings
 --------------------------------------------------
 
-local function NormalizeMessage(value)
+local function NormalizeMessage(value, defaultText)
+    defaultText = defaultText or DEFAULT_MESSAGE
     if type(value) ~= "string" then
-        return DEFAULT_MESSAGE
+        return defaultText
     end
 
     -- Prevent embedded newlines/control codes from reaching group chat.
@@ -64,7 +96,7 @@ local function NormalizeMessage(value)
     value = string.gsub(value, "%s+$", "")
 
     if value == "" then
-        return DEFAULT_MESSAGE
+        return defaultText
     end
 
     -- Always include the recipient, even after custom message editing.
@@ -93,6 +125,18 @@ local function SaveSettings()
             PARTY = settings.channels.PARTY,
             RAID = settings.channels.RAID,
             SELF = settings.channels.SELF
+        },
+        resurrection = {
+            enabled = resSettings.enabled,
+            message = resSettings.message,
+            channels = {
+                SAY = resSettings.channels.SAY,
+                YELL = resSettings.channels.YELL,
+                PARTY = resSettings.channels.PARTY,
+                RAID = resSettings.channels.RAID,
+                SELF = resSettings.channels.SELF,
+                WHISPER = resSettings.channels.WHISPER
+            }
         }
     }
 end
@@ -122,6 +166,25 @@ local function LoadSettings()
             local channel = CHANNELS[i]
             if type(saved.channels[channel]) == "boolean" then
                 settings.channels[channel] = saved.channels[channel]
+            end
+        end
+    end
+
+    local resurrection = saved.resurrection
+    if type(resurrection) == "table" then
+        if type(resurrection.enabled) == "boolean" then
+            resSettings.enabled = resurrection.enabled
+        end
+        resSettings.message = NormalizeMessage(
+            resurrection.message, DEFAULT_RES_MESSAGE
+        )
+        if type(resurrection.channels) == "table" then
+            local i
+            for i = 1, table.getn(RES_CHANNELS) do
+                local channel = RES_CHANNELS[i]
+                if type(resurrection.channels[channel]) == "boolean" then
+                    resSettings.channels[channel] = resurrection.channels[channel]
+                end
             end
         end
     end
@@ -192,6 +255,73 @@ end
 
 function Announcer.GetProvider()
     return provider
+end
+
+-- Resurrection has its own opt-in, channels, and editable message.
+function Announcer.GetResurrectionProvider()
+    return resProvider
+end
+
+function Announcer.GetResOption(key)
+    if key == "enabled" then
+        return resSettings.enabled
+    end
+    return nil
+end
+
+function Announcer.SetResOption(key, value)
+    if key ~= "enabled" then
+        return false
+    end
+    resSettings.enabled = value and true or false
+    SaveSettings()
+    return true
+end
+
+function Announcer.GetResChannel(channel)
+    return resSettings.channels[channel] == true
+end
+
+function Announcer.SetResChannel(channel, value)
+    if resSettings.channels[channel] == nil then
+        return false
+    end
+    resSettings.channels[channel] = value and true or false
+    SaveSettings()
+    return true
+end
+
+function Announcer.GetResMessage()
+    return resSettings.message
+end
+
+function Announcer.GetDefaultResMessage()
+    return DEFAULT_RES_MESSAGE
+end
+
+function Announcer.SetResMessage(value)
+    resSettings.message = NormalizeMessage(value, DEFAULT_RES_MESSAGE)
+    SaveSettings()
+    return resSettings.message
+end
+
+function Announcer.FormatResurrectionMessage(target, draft)
+    if type(target) ~= "string" or target == "" then
+        return nil
+    end
+
+    local message = resSettings.message
+    if type(draft) == "string" then
+        message = NormalizeMessage(draft, DEFAULT_RES_MESSAGE)
+    end
+
+    message = string.gsub(message, "{target}", function()
+        return target
+    end)
+    message = string.gsub(message, "{spell}", function()
+        return RESURRECTION_NAME
+    end)
+    return message
 end
 
 --------------------------------------------------
@@ -305,6 +435,136 @@ local function Announce(target)
     end
 end
 
+--------------------------------------------------
+-- Resurrection: confirm START, not merely a cast request
+--------------------------------------------------
+
+local function IsResurrection(spellID, spellName)
+    local id = tonumber(spellID)
+    if id and RESURRECTION_IDS[id] then
+        return true
+    end
+
+    if spellName == RESURRECTION_NAME then
+        return true
+    end
+
+    if type(GetSpellInfo) == "function" then
+        local ok, name = pcall(GetSpellInfo, 2006)
+        if ok and name and name == spellName then
+            return true
+        end
+    end
+
+    return false
+end
+
+-- UNIT_SPELLCAST_SENT captures the recipient from the actual cast packet.
+-- The matching START event confirms that the Resurrection cast began,
+-- so a known recipient name is sufficient even for an out-of-party player.
+-- Unknown targets still suppress whisper and every public announcement.
+local function AnnounceResurrection(target, canWhisper)
+    if not resSettings.enabled or not target then
+        return
+    end
+
+    local message = Announcer.FormatResurrectionMessage(target)
+    if not message then
+        return
+    end
+
+    local i
+    for i = 1, table.getn(RES_CHANNELS) do
+        local channel = RES_CHANNELS[i]
+        if resSettings.channels[channel] then
+            if channel == "WHISPER" then
+                -- Do not whisper an unchecked name or an NPC.
+                if canWhisper
+                and type(SendChatMessage) == "function" then
+                    pcall(SendChatMessage, message, "WHISPER", nil, target)
+                end
+            elseif channel == "SELF" then
+                if DEFAULT_CHAT_FRAME then
+                    DEFAULT_CHAT_FRAME:AddMessage(
+                        "|cff66ccffPriest Companion:|r " .. message
+                    )
+                end
+            elseif ChatAvailable(channel)
+            and type(SendChatMessage) == "function" then
+                pcall(SendChatMessage, message, channel)
+            end
+        end
+    end
+end
+
+local function ExpireResurrection(now)
+    local guid
+    local record
+
+    for guid, record in pairs(resPending) do
+        if now - record.at > RES_PENDING_SECONDS then
+            resPending[guid] = nil
+        end
+    end
+
+    for guid, record in pairs(resAnnounced) do
+        if now - record > RES_PENDING_SECONDS then
+            resAnnounced[guid] = nil
+        end
+    end
+end
+
+local function CaptureResurrectionSent(target, guid, spellID, spellName)
+    if not resSettings.enabled
+    or not IsResurrection(spellID, spellName)
+    or not guid or guid == "" then
+        return
+    end
+
+    local now = GetTime()
+    ExpireResurrection(now)
+    local name = ResolveTarget(target)
+
+    resPending[guid] = {
+        target = name,
+        -- Preserve the named recipient from SENT for later START.
+        -- Resurrection cannot be started on NPCs or living units.
+        canWhisper = name ~= nil and name ~= "",
+        at = now
+    }
+end
+
+local function ConfirmResurrectionStart(guid, spellID, spellName)
+    if not resSettings.enabled
+    or resProvider ~= "ClassicAPI"
+    or not IsResurrection(spellID, spellName)
+    or not guid or guid == "" then
+        return
+    end
+
+    local now = GetTime()
+    ExpireResurrection(now)
+
+    if resAnnounced[guid] then
+        return
+    end
+
+    local record = resPending[guid]
+    if not record then
+        -- Never guess the unit from the currently selected target.
+        return
+    end
+
+    resPending[guid] = nil
+    resAnnounced[guid] = now
+
+    if record.target then
+        -- START means casting has begun, NOT that the cast completed or
+        -- the dead player accepted the resurrection offer.
+        AnnounceResurrection(record.target, record.canWhisper)
+    end
+end
+
 local function ExpireCasts(now)
     local guid
     local record
@@ -383,6 +643,7 @@ end
 local function RemoveFailed(guid)
     if guid and guid ~= "" then
         pending[guid] = nil
+        resPending[guid] = nil
     end
 end
 
@@ -704,6 +965,15 @@ if PC.Capabilities and PC.Capabilities.classicAPISupported then
             "UNIT_SPELLCAST_SUCCEEDED")
         if confirmed then
             provider = "ClassicAPI"
+
+            -- Resurrection is a cast-time spell. Its announcement must
+            -- wait for START, after the server acknowledges the cast.
+            local started = pcall(eventFrame.RegisterEvent, eventFrame,
+                "UNIT_SPELLCAST_START")
+            if started then
+                resProvider = "ClassicAPI"
+            end
+
             pcall(eventFrame.RegisterEvent, eventFrame,
                 "UNIT_SPELLCAST_FAILED")
             pcall(eventFrame.RegisterEvent, eventFrame,
@@ -723,6 +993,8 @@ eventFrame:SetScript("OnEvent", function()
     if event == "PLAYER_ENTERING_WORLD" then
         pending = {}
         completed = {}
+        resPending = {}
+        resAnnounced = {}
         return
     end
 
@@ -732,6 +1004,9 @@ eventFrame:SetScript("OnEvent", function()
 
     if event == "UNIT_SPELLCAST_SENT" then
         CaptureSent(arg2, arg3, arg4, arg5)
+        CaptureResurrectionSent(arg2, arg3, arg4, arg5)
+    elseif event == "UNIT_SPELLCAST_START" then
+        ConfirmResurrectionStart(arg2, arg3, arg4)
     elseif event == "UNIT_SPELLCAST_SUCCEEDED" then
         ConfirmSuccess(arg2, arg3, arg4)
     elseif event == "UNIT_SPELLCAST_FAILED"

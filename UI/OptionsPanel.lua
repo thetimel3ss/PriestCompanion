@@ -300,7 +300,7 @@ local function HidePrayerTooltip()
     end
 end
 
-local function AddPrayerCheckbox(key, text, y, helpText)
+local function AddPrayerCheckbox(key, text, y, helpText, labelWidth)
     checkboxIndex = checkboxIndex + 1
 
     local button = CreateFrame(
@@ -323,7 +323,7 @@ local function AddPrayerCheckbox(key, text, y, helpText)
     caption:SetPoint(
         "LEFT", button, "RIGHT", 4, 0
     )
-    caption:SetWidth(328)
+    caption:SetWidth(labelWidth or 328)
     caption:SetJustifyH("LEFT")
     caption:SetText(text)
 
@@ -358,7 +358,7 @@ local function AddPrayerCheckbox(key, text, y, helpText)
         labelHitBox:SetPoint(
             "LEFT", button, "RIGHT", 4, 0
         )
-        labelHitBox:SetWidth(328)
+        labelHitBox:SetWidth(labelWidth or 328)
         labelHitBox:SetHeight(24)
         labelHitBox:RegisterForClicks("LeftButtonUp")
         labelHitBox:SetScript(
@@ -407,9 +407,101 @@ AddPrayerCheckbox(
 )
 AddPrayerCheckbox("outsideCombat", "Show outside combat", 186)
 AddPrayerCheckbox(
+    "autoHide",
+    "Auto-hide after inactivity",
+    216,
+    "Hide the tracker when no compatible healing spell has " ..
+        "been successfully cast for the configured number " ..
+        "of seconds. The next heal shows it again.",
+    210
+)
+
+-- A numeric-only Vanilla input field sits beside Auto-hide.
+local autoHideSecondsBox = CreateFrame(
+    "EditBox",
+    "PriestCompanionPrayerAutoHideSeconds",
+    advancedChild,
+    "InputBoxTemplate"
+)
+autoHideSecondsBox:SetPoint(
+    "TOPLEFT", advancedChild, "TOPLEFT", 280, -217
+)
+autoHideSecondsBox:SetWidth(52)
+autoHideSecondsBox:SetHeight(20)
+autoHideSecondsBox:SetAutoFocus(false)
+autoHideSecondsBox:SetNumeric(true)
+autoHideSecondsBox:SetMaxLetters(3)
+autoHideSecondsBox:SetJustifyH("CENTER")
+autoHideSecondsBox:SetTextInsets(4, 4, 0, 0)
+
+-- Correct the stock InputBoxTemplate's shifted left texture,
+-- using the same adjustment as Puppeteer's edit box.
+local inputLeft = getfenv(0)[autoHideSecondsBox:GetName() .. "Left"]
+if inputLeft then
+    local point, relative, relativePoint, x, y = inputLeft:GetPoint(1)
+    if point then
+        inputLeft:ClearAllPoints()
+        inputLeft:SetPoint(point, relative, relativePoint, 0, y)
+    end
+end
+
+local secondsLabel = CreateLabel(
+    advancedChild, "sec", 340, -219, 36
+)
+
+local function SaveAutoHideSeconds()
+    if prayer then
+        prayer.SetAutoHideSeconds(autoHideSecondsBox:GetText())
+        autoHideSecondsBox:SetText(
+            tostring(prayer.GetOption("autoHideSeconds"))
+        )
+    end
+end
+
+autoHideSecondsBox:SetScript(
+    "OnEnterPressed",
+    function()
+        this:ClearFocus()
+    end
+)
+autoHideSecondsBox:SetScript(
+    "OnEscapePressed",
+    function()
+        if prayer then
+            this:SetText(
+                tostring(prayer.GetOption("autoHideSeconds"))
+            )
+        end
+        this:ClearFocus()
+    end
+)
+autoHideSecondsBox:SetScript(
+    "OnEditFocusGained",
+    function()
+        this:HighlightText()
+    end
+)
+autoHideSecondsBox:SetScript(
+    "OnEditFocusLost",
+    SaveAutoHideSeconds
+)
+autoHideSecondsBox:SetScript(
+    "OnEnter",
+    function()
+        ShowPrayerTooltip(
+            this,
+            "Auto-hide delay (seconds)",
+            "Enter a whole number from 1 to 600. The timer " ..
+                "resets after each confirmed compatible heal."
+        )
+    end
+)
+autoHideSecondsBox:SetScript("OnLeave", HidePrayerTooltip)
+
+AddPrayerCheckbox(
     "locked",
     "Lock position",
-    216,
+    246,
     "When unlocked, drag the tracker to move it and drag " ..
         "an edge or corner to resize. Locking prevents both " ..
         "moving and resizing the tracker."
@@ -445,6 +537,28 @@ function advanced.Refresh()
                 checked = false
             end
             button:SetChecked(checked and 1 or nil)
+        end
+
+        -- The timeout can only be edited when Auto-hide is selected.
+        local hideEnabled = prayer.GetOption("autoHide")
+
+        if hideEnabled then
+            autoHideSecondsBox:EnableMouse(true)
+            autoHideSecondsBox:SetAlpha(1)
+            secondsLabel:SetTextColor(1, 0.82, 0.20)
+        else
+            if autoHideSecondsBox:HasFocus() then
+                autoHideSecondsBox:ClearFocus()
+            end
+            autoHideSecondsBox:EnableMouse(false)
+            autoHideSecondsBox:SetAlpha(0.5)
+            secondsLabel:SetTextColor(0.60, 0.60, 0.60)
+        end
+
+        if not autoHideSecondsBox:HasFocus() then
+            autoHideSecondsBox:SetText(
+                tostring(prayer.GetOption("autoHideSeconds"))
+            )
         end
 
         if points < 1 then

@@ -275,7 +275,7 @@ local talentStatus = CreateLabel(
 )
 
 local requiredNote = CreateLabel(
-    advancedChild, "", 47, -95, 330
+    advancedChild, "", 183, -72, 195
 )
 requiredNote:SetTextColor(1, 0.32, 0.32)
 
@@ -330,53 +330,53 @@ local function AddPrayerCheckbox(key, text, y)
 end
 
 AddPrayerCheckbox("enabled", "Enable Tracker", 66)
-AddPrayerCheckbox("expanded", "Expanded mode (previous heal)", 123)
-AddPrayerCheckbox("showSpellName", "Show spell name", 153)
-AddPrayerCheckbox("showRefund", "Show mana refund eligibility", 183)
-AddPrayerCheckbox("outsideCombat", "Show outside combat", 213)
-AddPrayerCheckbox("locked", "Lock position and size", 243)
+AddPrayerCheckbox("expanded", "Expanded mode (previous heal)", 96)
+AddPrayerCheckbox("showSpellName", "Show spell name", 126)
+AddPrayerCheckbox("showRefund", "Show refund status (border color)", 156)
+AddPrayerCheckbox("outsideCombat", "Show outside combat", 186)
+AddPrayerCheckbox("locked", "Lock position and size", 216)
 
 CreateLabel(
     advancedChild,
     "Unlocked: drag the tracker to move it; drag any edge or " ..
         "corner to resize. Lock also prevents resizing.",
-    15, -277, 345
+    15, -250, 345
 )
 
 CreateLabel(
     advancedChild,
-    "Refund display shows eligibility (% of spell cost), " ..
-        "not measured mana gained.",
-    15, -312, 345,
+    "Green = different heal, red = same heal. " ..
+        "The percentage is a talent rate, not measured mana.",
+    15, -285, 345,
     "GameFontDisableSmall"
 )
 
 local lastHealLabel = CreateLabel(
     advancedChild,
     "Last confirmed heal: none yet",
-    15, -339, 355,
+    15, -312, 355,
     "GameFontDisableSmall"
 )
 
 CreateLabel(
     advancedChild,
     "Quest History Diagnostics",
-    14, -365, 355,
+    14, -338, 355,
     "GameFontNormal"
 )
 
 local turnInLabel = CreateLabel(
-    advancedChild, "", 16, -394, 355
+    advancedChild, "", 16, -367, 355
 )
 local serverLabel = CreateLabel(
-    advancedChild, "", 16, -419, 355
+    advancedChild, "", 16, -392, 355
 )
 
 CreateLabel(
     advancedChild,
     "Registering an event does not prove its delivery. " ..
         "Unknown quest completion remains unknown.",
-    16, -457, 345,
+    16, -430, 345,
     "GameFontDisableSmall"
 )
 
@@ -429,11 +429,11 @@ function advanced.Refresh()
 
             if found then
                 requiredNote:SetText(
-                    "* Requires at least 1 point in Book of Prayer."
+                    "* Talent point required"
                 )
             else
                 requiredNote:SetText(
-                    "* Book of Prayer is not available in your talents."
+                    "* Talent not found"
                 )
             end
         else

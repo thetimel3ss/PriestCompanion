@@ -2,6 +2,12 @@
 
 ## [Unreleased]
 
+### Changed — Cleaner Book of Prayer HUD (2026-10-19)
+- Removed the `30%` / `15%` / `0%` refund footer entirely. The existing Advanced **Show refund status (border color)** checkbox now controls only the green/red/neutral HUD border and subtle background tint.
+- Increased logical compact spell icon size from 36 to 48 and expanded icon size from 40 to 54; when **Show spell name** is unchecked, increase them further to 62 and 64 respectively.
+- Enlarged the primary spell name using the regular `GameFontHighlight` font, improved the readability of the previous spell label, and repositioned icons/arrow to use the freed space. The content continues to scale proportionally with window resizing.
+- Adjusted the Advanced help text to describe border colors rather than percentage. Talent detection, healing-family rules, saved window sizes and the maintainer's positioning changes remain intact. In-game visual validation pending.
+
 ### Improved — Prayer Tracker sizing and visual status (2026-10-19)
 - The floating HUD now uses an internal scaled content frame so the header, spell icons, names, and footer resize proportionally with the window; compact minimum dimensions are 68x68 (previously 104x112) and expanded minimum dimensions are 104x78 (previously 170x118).
 - Replaced the verbose `Eligible: ... mana cost` / `Same spell: no refund` messages with a color-coded HUD border and subtle background: green for eligible family changes, red for repeated families, neutral before a comparison or when the option is disabled. The small footer shows only the talent refund rate (15%/30%) or 0%; no mana amounts are estimated.

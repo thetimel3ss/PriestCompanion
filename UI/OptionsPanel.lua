@@ -407,11 +407,11 @@ AddPrayerCheckbox(
 )
 AddPrayerCheckbox(
     "showManaRefund",
-    "Show estimated mana refund",
+    "Show mana refund",
     186,
-    "Shows an approximate mana amount after an eligible heal. " ..
-        "Requires a supported pre-cast mana cost from ClassicAPI. " ..
-        "No number is shown if the cost cannot be verified."
+    "Shows exact Book of Prayer mana from Nampower when available " ..
+        "(+N mana). Falls back to the ClassicAPI cost-based " ..
+        "estimate (~N mana). No number is shown without data."
 )
 AddPrayerCheckbox("outsideCombat", "Show outside combat", 216)
 AddPrayerCheckbox(

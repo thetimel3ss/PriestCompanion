@@ -46,12 +46,15 @@ local lastIcon = nil
 local previousIcon = nil
 local lastEligible = false
 local lastRefundEstimate = nil
+local lastRefundActual = nil
+local pendingActualRefund = nil
 local lastHealTime = nil
 local pendingCastCost = nil
 local innerFocusReady = false
 local innerFocusBlockNext = false
 local provider = "unavailable"
 local lastCastGUID = nil
+local ConfigureManaProvider = nil
 
 for key, value in pairs(DEFAULTS) do
     settings[key] = value
@@ -105,6 +108,7 @@ function Tracker.GetState()
         previousIcon = previousIcon,
         eligible = lastEligible,
         refundEstimate = lastRefundEstimate,
+        refundActual = lastRefundActual,
         talentPoints = talentPoints,
         provider = provider
     }
@@ -174,6 +178,11 @@ function Tracker.SetOption(key, value)
     end
 
     SaveOption(key, value == true)
+
+    if key == "showManaRefund" and ConfigureManaProvider then
+        ConfigureManaProvider()
+    end
+
     Notify()
     return true
 end
@@ -264,6 +273,8 @@ local function ScanBookOfPrayer()
         previousIcon = nil
         lastEligible = false
         lastRefundEstimate = nil
+        lastRefundActual = nil
+        pendingActualRefund = nil
         lastHealTime = nil
         pendingCastCost = nil
         innerFocusReady = false
@@ -473,6 +484,16 @@ function Tracker.RecordSuccessfulSpell(spellID, spellName, castGUID)
         and not blockRefund
 
     lastRefundEstimate = nil
+    lastRefundActual = nil
+
+    -- Nampower's SPELL_ENERGIZE_ON_SELF may precede the cast-success
+    -- notification. Attach only a recent server refund to this heal.
+    if pendingActualRefund and type(GetTime) == "function"
+    and GetTime() - pendingActualRefund.at <= 0.75 then
+        lastRefundActual = pendingActualRefund.amount
+    end
+    pendingActualRefund = nil
+
     if lastEligible and effectiveCost and effectiveCost > 0 then
         -- Approximate: the server may round fractional refunds either way.
         lastRefundEstimate =
@@ -489,11 +510,143 @@ function Tracker.RecordSuccessfulSpell(spellID, spellName, castGUID)
 end
 
 --------------------------------------------------
+-- Actual Book of Prayer Mana (optional Nampower)
+--------------------------------------------------
+
+local BOOK_OF_PRAYER_ENERGIZE_ID = 52942
+local nampowerEnergizeRegistered = false
+local legacyEnergizeCVarChanged = false
+local legacyEnergizePriorCVar = nil
+
+local function IsLegacyNampower()
+    if type(GetNampowerVersion) ~= "function" then
+        return true
+    end
+
+    local ok, major, minor = pcall(GetNampowerVersion)
+    if not ok then
+        return true
+    end
+
+    major = tonumber(major)
+    minor = tonumber(minor) or 0
+
+    if not major then
+        return true
+    end
+
+    -- Nampower >= 4.5 enables this event via registration alone.
+    return major < 4 or (major == 4 and minor < 5)
+end
+
+local function ReceiveBookOfPrayerMana(spellID, powerType, amount, periodic)
+    if not settings.showManaRefund or talentPoints < 1 then
+        return
+    end
+
+    if tonumber(spellID) ~= BOOK_OF_PRAYER_ENERGIZE_ID
+    or tonumber(powerType) ~= 0 then
+        return
+    end
+
+    -- Ignore unrelated periodic resource gains and zero-valued packets.
+    if tonumber(periodic) == 1 then
+        return
+    end
+
+    amount = tonumber(amount)
+    if not amount or amount <= 0 then
+        return
+    end
+
+    local now = nil
+    if type(GetTime) == "function" then
+        now = GetTime()
+    end
+
+    -- An energize may be delivered just before SUCCEEDED. If another
+    -- compatible cast is in flight, defer until its success event.
+    if pendingCastCost then
+        if now then
+            pendingActualRefund = { amount = amount, at = now }
+        end
+        return
+    end
+
+    -- The server refund belongs to the most recent healing cast.
+    -- Do not put a stale energize value onto a later unrelated spell.
+    if now and lastHealTime and now - lastHealTime <= 0.75 then
+        lastRefundActual = amount
+        Notify()
+    elseif now then
+        pendingActualRefund = { amount = amount, at = now }
+    end
+end
+
+--------------------------------------------------
 -- Optional Spellcast Event Providers
 --------------------------------------------------
 
 local eventFrame = CreateFrame("Frame")
 local pendingTalentRescan = nil
+
+ConfigureManaProvider = function()
+    if not (PC.Capabilities and PC.Capabilities.nampower) then
+        return
+    end
+
+    local requested = settings.showManaRefund and talentPoints > 0
+
+    if requested then
+        if not nampowerEnergizeRegistered then
+            nampowerEnergizeRegistered = pcall(
+                eventFrame.RegisterEvent,
+                eventFrame,
+                "SPELL_ENERGIZE_ON_SELF"
+            )
+        end
+
+        if nampowerEnergizeRegistered
+        and IsLegacyNampower()
+        and type(SetCVar) == "function"
+        and type(GetCVar) == "function" then
+            local ok, value = pcall(GetCVar, "NP_EnableSpellEnergizeEvents")
+            if ok and tostring(value) ~= "1" then
+                local changed = pcall(
+                    SetCVar, "NP_EnableSpellEnergizeEvents", "1"
+                )
+                if changed then
+                    legacyEnergizeCVarChanged = true
+                    legacyEnergizePriorCVar = value
+                end
+            end
+        end
+    else
+        if nampowerEnergizeRegistered then
+            pcall(
+                eventFrame.UnregisterEvent,
+                eventFrame,
+                "SPELL_ENERGIZE_ON_SELF"
+            )
+            nampowerEnergizeRegistered = false
+        end
+
+        -- Only restore a legacy CVar when this addon itself changed it.
+        -- A value enabled beforehand by the player or another addon
+        -- must be left alone.
+        if legacyEnergizeCVarChanged
+        and legacyEnergizePriorCVar ~= nil
+        and type(SetCVar) == "function" then
+            pcall(
+                SetCVar,
+                "NP_EnableSpellEnergizeEvents",
+                tostring(legacyEnergizePriorCVar)
+            )
+            legacyEnergizeCVarChanged = false
+            legacyEnergizePriorCVar = nil
+        end
+    end
+end
 
 local function ScheduleTalentRescan()
     -- A short follow-up covers delayed server talent and spellbook data
@@ -568,6 +721,10 @@ local function LoadSettings()
         end
     end
 
+    if ConfigureManaProvider then
+        ConfigureManaProvider()
+    end
+
     Notify()
 end
 
@@ -598,6 +755,7 @@ eventFrame:SetScript(
         if event == "PLAYER_ENTERING_WORLD" then
             ScanSpellbook()
             ScanBookOfPrayer()
+            ConfigureManaProvider()
             ScheduleTalentRescan()
             Notify()
             return
@@ -620,6 +778,11 @@ eventFrame:SetScript(
         if event == "PLAYER_REGEN_ENABLED"
         or event == "PLAYER_REGEN_DISABLED" then
             Notify()
+            return
+        end
+
+        if event == "SPELL_ENERGIZE_ON_SELF" then
+            ReceiveBookOfPrayerMana(arg3, arg4, arg5, arg6)
             return
         end
 

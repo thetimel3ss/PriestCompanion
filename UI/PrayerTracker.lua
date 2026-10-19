@@ -145,6 +145,16 @@ arrow:SetPoint(
 )
 arrow:SetText(">")
 
+-- Optional prediction only; never represents a measured mana gain.
+local manaText = visual:CreateFontString(
+    nil, "OVERLAY", "GameFontHighlightSmall"
+)
+manaText:SetPoint("BOTTOM", visual, "BOTTOM", 0, 8)
+manaText:SetWidth(194)
+manaText:SetJustifyH("CENTER")
+manaText:SetTextColor(0.40, 1.00, 0.50)
+manaText:Hide()
+
 --------------------------------------------------
 -- Movement and Resizing
 --------------------------------------------------
@@ -490,6 +500,18 @@ local function UpdateDisplay()
     -- This can change with the Show spell name checkbox even when
     -- the outer HUD has not been resized.
     UpdateIconLayout()
+
+    -- Mana is an estimate captured from the client before the cast.
+    -- If no reliable pre-cast cost is available, show no number.
+    if Tracker.GetOption("showManaRefund")
+    and state.eligible and state.refundEstimate then
+        manaText:SetText(
+            "~" .. tostring(state.refundEstimate) .. " mana"
+        )
+        manaText:Show()
+    else
+        manaText:Hide()
+    end
 
     if Tracker.GetOption("showSpellName") then
         currentName:Show()

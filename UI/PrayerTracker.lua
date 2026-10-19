@@ -145,9 +145,10 @@ arrow:SetPoint(
 )
 arrow:SetText(">")
 
--- Optional prediction only; never represents a measured mana gain.
+-- Exact Nampower event values take priority; ClassicAPI estimates
+-- retain a tilde and are not represented as measured mana gains.
 local manaText = visual:CreateFontString(
-    nil, "OVERLAY", "GameFontHighlightSmall"
+    nil, "OVERLAY", "GameFontHighlight"
 )
 manaText:SetPoint("BOTTOM", visual, "BOTTOM", 0, 8)
 manaText:SetWidth(194)
@@ -501,14 +502,22 @@ local function UpdateDisplay()
     -- the outer HUD has not been resized.
     UpdateIconLayout()
 
-    -- Mana is an estimate captured from the client before the cast.
-    -- If no reliable pre-cast cost is available, show no number.
-    if Tracker.GetOption("showManaRefund")
-    and state.eligible and state.refundEstimate then
-        manaText:SetText(
-            "~" .. tostring(state.refundEstimate) .. " mana"
-        )
-        manaText:Show()
+    -- A Nampower energize packet carries an actual server amount.
+    -- Prefer it over the ClassicAPI cost-based fallback estimate.
+    if Tracker.GetOption("showManaRefund") then
+        if state.refundActual then
+            manaText:SetText(
+                "+" .. tostring(state.refundActual) .. " mana"
+            )
+            manaText:Show()
+        elseif state.eligible and state.refundEstimate then
+            manaText:SetText(
+                "~" .. tostring(state.refundEstimate) .. " mana"
+            )
+            manaText:Show()
+        else
+            manaText:Hide()
+        end
     else
         manaText:Hide()
     end

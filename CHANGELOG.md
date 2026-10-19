@@ -2,6 +2,13 @@
 
 ## [Unreleased]
 
+### Improved — Book of Prayer event matching and tracker layout controls (2026-10-19)
+- Tightened the attribution of Nampower Book of Prayer `SPELL_ENERGIZE_ON_SELF` events (spell `52942`, mana `arg5`) to the immediately preceding successful healing cast. Because the energize packet has no cast GUID, match one event only within a conservative 750ms window; when casts overlap that window, prefer to omit the exact figure over attaching another spell's refund. Existing ClassicAPI cost-based predictions remain the fallback when available.
+- Pair pre-success energize packets only with the same ClassicAPI `UNIT_SPELLCAST_SENT` GUID and spell ID. Invalidate pending cost/refund information on every new player cast; also clear a matching pending cast when ClassicAPI reports `UNIT_SPELLCAST_FAILED`, `UNIT_SPELLCAST_FAILED_QUIET`, or `UNIT_SPELLCAST_INTERRUPTED`. These are safeguards against late packets and cancelled spells, **not a claim of definitive server event matching**.
+- Added **Reset Position** under Options → Tracker. It resets saved `x`, `y`, compact width/height, and expanded width/height to their original defaults without changing lock, visibility, mana, or other character preferences. Geometry refreshes immediately, including while locked.
+- Added **Preview Tracker / Close Preview**. Preview uses a separate temporary UI-only sample of Renew → Flash Heal and `+38 mana` with a visible PREVIEW tag, respecting the current icon/name/refund-display preferences. It can be used without talent points and despite combat/auto-hide restrictions, and cannot overwrite healing history or the stored mana result. It ends on leaving the Tracker settings tab; dragging/resizing while unlocked intentionally saves only geometry.
+- The branch and `main` separation, addon version `0.1.2`, optional ClassicAPI/Nampower/SuperWoW behavior and maintainer's title font choice are preserved. In-game acceptance checks still required.
+
 ### Refined — Prayer Tracker spell layout with mana shown (2026-10-19)
 - Kept the mana refund label anchored in its existing bottom position and adjusted spell-icon size and vertical placement instead, in both compact and expanded display modes.
 - When **Show mana refund** is enabled, reserve footer space regardless of whether the last cast returned mana; this prevents the icon from jumping between successive casts. With **Show spell name** enabled, use a smaller icon to avoid the mana label. With the spell name hidden, retain a larger icon (compact: 54; expanded: 64 logical pixels).

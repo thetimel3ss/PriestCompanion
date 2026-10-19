@@ -213,7 +213,7 @@ CreateLabel(
 
 CreateLabel(
     general,
-    "Advanced contains diagnostic status for quest history.",
+    "Advanced contains Book of Prayer tracker settings.",
     18,
     -213,
     385
@@ -260,7 +260,7 @@ local advancedChild = CreateFrame(
     "Frame", nil, advancedScroll
 )
 advancedChild:SetWidth(388)
-advancedChild:SetHeight(500)
+advancedChild:SetHeight(320)
 advancedScroll:SetScrollChild(advancedChild)
 
 CreateLabel(
@@ -283,7 +283,24 @@ local checkboxes = {}
 local checkboxNames = {}
 local checkboxIndex = 0
 
-local function AddPrayerCheckbox(key, text, y)
+local function ShowPrayerTooltip(owner, heading, description)
+    if not GameTooltip then
+        return
+    end
+
+    GameTooltip:SetOwner(owner, "ANCHOR_RIGHT")
+    GameTooltip:SetText(heading, 1, 0.82, 0.20)
+    GameTooltip:AddLine(description, 1, 1, 1, true)
+    GameTooltip:Show()
+end
+
+local function HidePrayerTooltip()
+    if GameTooltip then
+        GameTooltip:Hide()
+    end
+end
+
+local function AddPrayerCheckbox(key, text, y, helpText)
     checkboxIndex = checkboxIndex + 1
 
     local button = CreateFrame(
@@ -324,6 +341,54 @@ local function AddPrayerCheckbox(key, text, y)
         end
     )
 
+    if helpText then
+        -- The checkbox itself and the text area both show the tooltip.
+        -- The text hitbox also lets the user toggle by clicking the label.
+        button:SetScript(
+            "OnEnter",
+            function()
+                ShowPrayerTooltip(this, text, helpText)
+            end
+        )
+        button:SetScript("OnLeave", HidePrayerTooltip)
+
+        local labelHitBox = CreateFrame(
+            "Button", nil, advancedChild
+        )
+        labelHitBox:SetPoint(
+            "LEFT", button, "RIGHT", 4, 0
+        )
+        labelHitBox:SetWidth(328)
+        labelHitBox:SetHeight(24)
+        labelHitBox:RegisterForClicks("LeftButtonUp")
+        labelHitBox:SetScript(
+            "OnEnter",
+            function()
+                ShowPrayerTooltip(this, text, helpText)
+            end
+        )
+        labelHitBox:SetScript(
+            "OnLeave", HidePrayerTooltip
+        )
+        labelHitBox:SetScript(
+            "OnClick",
+            function()
+                if not button:IsEnabled() then
+                    return
+                end
+
+                if prayer then
+                    prayer.SetOption(
+                        key,
+                        not prayer.GetOption(key)
+                    )
+                end
+
+                advanced.Refresh()
+            end
+        )
+    end
+
     checkboxes[key] = button
     checkboxNames[key] = caption
     return button
@@ -332,52 +397,22 @@ end
 AddPrayerCheckbox("enabled", "Enable Tracker", 66)
 AddPrayerCheckbox("expanded", "Expanded mode (previous heal)", 96)
 AddPrayerCheckbox("showSpellName", "Show spell name", 126)
-AddPrayerCheckbox("showRefund", "Show refund status (border color)", 156)
+AddPrayerCheckbox(
+    "showRefund",
+    "Show refund status (border color)",
+    156,
+    "The border turns green after a different healing spell " ..
+        "and red if the same healing family is repeated. " ..
+        "It stays neutral until two qualifying casts are known."
+)
 AddPrayerCheckbox("outsideCombat", "Show outside combat", 186)
-AddPrayerCheckbox("locked", "Lock position and size", 216)
-
-CreateLabel(
-    advancedChild,
-    "Unlocked: drag the tracker to move it; drag any edge or " ..
-        "corner to resize. Lock also prevents resizing.",
-    15, -250, 345
-)
-
-CreateLabel(
-    advancedChild,
-    "Border: green when switching heals, red when repeating. " ..
-        "Neutral until two qualifying casts are known.",
-    15, -285, 345,
-    "GameFontDisableSmall"
-)
-
-local lastHealLabel = CreateLabel(
-    advancedChild,
-    "Last confirmed heal: none yet",
-    15, -312, 355,
-    "GameFontDisableSmall"
-)
-
-CreateLabel(
-    advancedChild,
-    "Quest History Diagnostics",
-    14, -338, 355,
-    "GameFontNormal"
-)
-
-local turnInLabel = CreateLabel(
-    advancedChild, "", 16, -367, 355
-)
-local serverLabel = CreateLabel(
-    advancedChild, "", 16, -392, 355
-)
-
-CreateLabel(
-    advancedChild,
-    "Registering an event does not prove its delivery. " ..
-        "Unknown quest completion remains unknown.",
-    16, -430, 345,
-    "GameFontDisableSmall"
+AddPrayerCheckbox(
+    "locked",
+    "Lock position",
+    216,
+    "When unlocked, drag the tracker to move it and drag " ..
+        "an edge or corner to resize. Locking prevents both " ..
+        "moving and resizing the tracker."
 )
 
 function advanced.Refresh()
@@ -401,17 +436,6 @@ function advanced.Refresh()
         end
 
         talentStatus:SetText(label)
-
-        local state = prayer.GetState()
-        if state.last then
-            lastHealLabel:SetText(
-                "Last confirmed heal: " .. state.last
-            )
-        else
-            lastHealLabel:SetText(
-                "Last confirmed heal: none yet"
-            )
-        end
 
         local key
         local button
@@ -443,46 +467,6 @@ function advanced.Refresh()
         end
     end
 
-    local caps = PC.Capabilities or {}
-    local history = PC.QuestHistory
-    local eventStatus = "Unavailable"
-
-    if caps.questTurnInEvent then
-        eventStatus = "Not registered"
-        if history and history.LiveTurnInRegistered == true then
-            eventStatus = "Registered (delivery unverified)"
-        end
-    end
-
-    turnInLabel:SetText(
-        "QUEST_TURNED_IN: " .. eventStatus
-    )
-
-    local serverStatus = "Not queried"
-
-    if history
-    and type(history.GetServerQueryState) == "function" then
-        local state = history.GetServerQueryState()
-
-        if state then
-            if state.unavailableReason then
-                serverStatus = "Unavailable (" ..
-                    tostring(state.unavailableReason) .. ")"
-            elseif state.active then
-                serverStatus = "Waiting for response"
-            elseif state.responded then
-                serverStatus = "Responded (" ..
-                    tostring(state.received or 0) ..
-                    " IDs processed)"
-            elseif state.attempted then
-                serverStatus = "No response"
-            end
-        end
-    end
-
-    serverLabel:SetText(
-        "Server Query: " .. serverStatus
-    )
 end
 
 if prayer then

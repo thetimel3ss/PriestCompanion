@@ -2,6 +2,13 @@
 
 ## [Unreleased]
 
+### Changed — Options → Tools navigation and two sub-tabs (2026-10-20)
+- Renamed the former **Options → Announcer** tab to **Options → Tools**, reserving this area for both current announcements and future Fear Ward / Resurrection assistants.
+- Split its previous long vertically stacked page into native **Fear Ward** and **Resurrection** sub-tabs with separate scroll areas. Each preserves its own enabled option, multi-channel checkboxes, tooltips, custom message, Default/Save controls and unsent preview.
+- Preserved the existing `PriestCompanionCharDB.announcer` storage, spell provider/event behavior, and the public `PC.UI.AnnouncerPanel` alias for compatibility. Existing callers selecting the legacy `announcer` section transparently navigate to Tools.
+- Unsaved custom message drafts are discarded upon changing sub-tabs or leaving Tools, while saved settings persist. The selected tool sub-tab is maintained when navigating away from and back to Options.
+- **In-game UI validation pending:** native tab look/selection, positioning and scroll bounds, 30px row rhythm, changes to channels/tooltips, Default/Save/Preview across sub-tab switches, settings persistence, and continued Fear Ward protection and Resurrection START announcements.
+
 ### Added — Resurrection Announcer and Fear Ward options layout (2026-10-19)
 - Added a distinct **Resurrection Announcer** section inside Options → Announcer, retaining existing Fear Ward selections and settings. Resurrection has its own disabled-by-default enable setting, message, and independently selectable channels: Say, Yell, Party, Raid, Self (local chat), and **Whisper**.
 - Implemented confirmation before announcing: ClassicAPI `UNIT_SPELLCAST_SENT` records the Resurrection recipient and castGUID; `UNIT_SPELLCAST_START` for the same GUID triggers the announcement exactly once only after the cast actually starts. Pre-start failures, unknown recipients, and events without a matching SENT do not announce. This is **not** a claim that the resurrection completed or was accepted.

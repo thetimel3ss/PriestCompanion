@@ -1,6 +1,6 @@
 -- Priest Companion
--- Options > Announcer: independent Fear Ward and Resurrection messages.
--- Vanilla 1.12 native frames; no automated spell casting.
+-- Options > Tools > Fear Ward / Resurrection.
+-- Two native Vanilla sub-tabs; announcement settings are unchanged.
 
 local PC = PriestCompanion
 local parent = PC.UI.OptionsContent
@@ -13,25 +13,84 @@ end
 local panel = CreateFrame("Frame", nil, parent)
 panel:SetAllPoints(parent)
 panel:Hide()
+
+-- Keep the previous public name for callers from earlier versions.
 PC.UI.AnnouncerPanel = panel
+PC.UI.ToolsPanel = panel
+panel.ActiveSubTab = "fearward"
 
-local scroll = CreateFrame(
-    "ScrollFrame", "PriestCompanionAnnouncerScroll",
-    panel, "UIPanelScrollFrameTemplate"
+--------------------------------------------------
+-- Native sub-tabs
+--------------------------------------------------
+
+local subTabs = CreateFrame(
+    "Frame", "PriestCompanionToolsSubTabs", panel
 )
-scroll:SetPoint("TOPLEFT", panel, "TOPLEFT", 8, -9)
-scroll:SetPoint("BOTTOMRIGHT", panel, "BOTTOMRIGHT", -29, 9)
+subTabs:SetPoint("TOPLEFT", panel, "TOPLEFT", 17, -7)
+subTabs:SetWidth(365)
+subTabs:SetHeight(22)
 
-local child = CreateFrame("Frame", nil, scroll)
-child:SetWidth(388)
-child:SetHeight(832)
-scroll:SetScrollChild(child)
+local function CreateToolTab(index, label, preceding, id)
+    local button = CreateFrame(
+        "Button", "PriestCompanionToolsSubTabsTab" .. tostring(index),
+        subTabs, "TabButtonTemplate"
+    )
+    button:SetText(label)
+    button:SetHeight(22)
+    button:RegisterForClicks("LeftButtonUp")
+    PanelTemplates_TabResize(0, button)
+    button:ClearAllPoints()
+    if preceding then
+        button:SetPoint("LEFT", preceding, "RIGHT", 0, 0)
+    else
+        button:SetPoint("TOPLEFT", subTabs, "TOPLEFT", 0, 0)
+    end
+    button:SetScript("OnClick", function()
+        panel.SelectSubTab(id)
+        PlaySound("igMainMenuOptionCheckBoxOn")
+    end)
+    return button
+end
+
+local fearTab = CreateToolTab(1, "Fear Ward", nil, "fearward")
+CreateToolTab(2, "Resurrection", fearTab, "resurrection")
+PanelTemplates_SetNumTabs(subTabs, 2)
+PanelTemplates_SetTab(subTabs, 1)
+
+--------------------------------------------------
+-- Independent scrollable pages
+--------------------------------------------------
+
+local function CreateToolScroll(name, height)
+    local frame = CreateFrame(
+        "ScrollFrame", name, panel, "UIPanelScrollFrameTemplate"
+    )
+    frame:SetPoint("TOPLEFT", panel, "TOPLEFT", 8, -38)
+    frame:SetPoint("BOTTOMRIGHT", panel, "BOTTOMRIGHT", -29, 9)
+
+    local content = CreateFrame("Frame", nil, frame)
+    content:SetWidth(388)
+    content:SetHeight(height)
+    frame:SetScrollChild(content)
+    return frame, content
+end
+
+local scroll, child = CreateToolScroll(
+    "PriestCompanionAnnouncerScroll", 409
+)
+local resScroll, resChild = CreateToolScroll(
+    "PriestCompanionResurrectionScroll", 410
+)
+resScroll:Hide()
+
+-- Shared layout helpers place elements in whichever page is being built.
+local activeChild = child
 
 local function Label(text, x, y, width, font)
-    local stringFrame = child:CreateFontString(
+    local stringFrame = activeChild:CreateFontString(
         nil, "OVERLAY", font or "GameFontHighlightSmall"
     )
-    stringFrame:SetPoint("TOPLEFT", child, "TOPLEFT", x, -y)
+    stringFrame:SetPoint("TOPLEFT", activeChild, "TOPLEFT", x, -y)
     stringFrame:SetWidth(width)
     stringFrame:SetJustifyH("LEFT")
     stringFrame:SetText(text)
@@ -71,14 +130,15 @@ local function HideTooltip()
 end
 
 local function Checkbox(name, title, x, y, onToggle, helpText, captionWidth)
+    local container = activeChild
     local check = CreateFrame(
-        "CheckButton", name, child, "UICheckButtonTemplate"
+        "CheckButton", name, container, "UICheckButtonTemplate"
     )
     check:SetWidth(24)
     check:SetHeight(24)
-    check:SetPoint("TOPLEFT", child, "TOPLEFT", x, -y)
+    check:SetPoint("TOPLEFT", container, "TOPLEFT", x, -y)
 
-    local label = child:CreateFontString(
+    local label = container:CreateFontString(
         nil, "OVERLAY", "GameFontHighlightSmall"
     )
     label:SetPoint("LEFT", check, "RIGHT", 4, 0)
@@ -100,7 +160,7 @@ local function Checkbox(name, title, x, y, onToggle, helpText, captionWidth)
 
         -- FontStrings do not receive hover events by themselves in Vanilla.
         -- An adjacent button makes the caption hoverable and clickable.
-        local captionHitBox = CreateFrame("Button", nil, child)
+        local captionHitBox = CreateFrame("Button", nil, container)
         captionHitBox:SetPoint("LEFT", check, "RIGHT", 4, 0)
         captionHitBox:SetWidth(captionWidth or 135)
         captionHitBox:SetHeight(24)
@@ -287,12 +347,16 @@ saveButton:SetScript("OnClick", SaveMessage)
 -- Resurrection Announcer
 --------------------------------------------------
 
-Label("Resurrection Announcer", 14, 418, 350, "GameFontNormal")
-local resStatus = Label("", 14, 446, 356)
+-- From this point onward all shared labels/checkboxes belong to the
+-- Resurrection page. Fear Ward controls stay on their own scroll child.
+activeChild = resChild
+
+Label("Resurrection Announcer", 14, 12, 350, "GameFontNormal")
+local resStatus = Label("", 14, 40, 356)
 
 local resEnabled, resEnabledLabel = Checkbox(
     "PriestCompanionResurrectionEnabled",
-    "Enable Resurrection", 14, 480,
+    "Enable Resurrection", 14, 74,
     function(value)
         announcer.SetResOption("enabled", value)
     end,
@@ -302,7 +366,7 @@ local resEnabled, resEnabledLabel = Checkbox(
 )
 
 Label("Announcement channels (multiple selections allowed)",
-    14, 510, 355, "GameFontNormalSmall")
+    14, 104, 355, "GameFontNormalSmall")
 
 local RES_CHANNEL_TOOLTIP =
     "Resurrection has independent channel choices. Say and Yell " ..
@@ -312,12 +376,12 @@ local RES_CHANNEL_TOOLTIP =
 
 local resChannels = {}
 local resChannelDefinitions = {
-    { "SAY", "Say", 14, 540 },
-    { "PARTY", "Party", 204, 540 },
-    { "RAID", "Raid", 14, 570 },
-    { "SELF", "Self (local chat)", 204, 570 },
-    { "YELL", "Yell", 14, 600 },
-    { "WHISPER", "Whisper", 204, 600 }
+    { "SAY", "Say", 14, 134 },
+    { "PARTY", "Party", 204, 134 },
+    { "RAID", "Raid", 14, 164 },
+    { "SELF", "Self (local chat)", 204, 164 },
+    { "YELL", "Yell", 14, 194 },
+    { "WHISPER", "Whisper", 204, 194 }
 }
 
 local resIndex
@@ -335,13 +399,13 @@ for resIndex = 1, table.getn(resChannelDefinitions) do
 end
 
 Label("Custom message (use {target} and optional {spell})",
-    14, 648, 360, "GameFontNormalSmall")
+    14, 242, 360, "GameFontNormalSmall")
 
 local resMessageBox = CreateFrame(
     "EditBox", "PriestCompanionResurrectionMessage",
-    child, "InputBoxTemplate"
+    resChild, "InputBoxTemplate"
 )
-resMessageBox:SetPoint("TOPLEFT", child, "TOPLEFT", 21, -674)
+resMessageBox:SetPoint("TOPLEFT", resChild, "TOPLEFT", 21, -268)
 resMessageBox:SetWidth(335)
 resMessageBox:SetHeight(20)
 resMessageBox:SetAutoFocus(false)
@@ -360,28 +424,28 @@ end
 
 local resDefaultButton = CreateFrame(
     "Button", "PriestCompanionResurrectionMessageDefault",
-    child, "UIPanelButtonTemplate"
+    resChild, "UIPanelButtonTemplate"
 )
 resDefaultButton:SetWidth(92)
 resDefaultButton:SetHeight(24)
 resDefaultButton:SetPoint(
-    "TOPLEFT", child, "TOPLEFT", 21, -707
+    "TOPLEFT", resChild, "TOPLEFT", 21, -301
 )
 resDefaultButton:SetText("Default")
 
 local resSaveButton = CreateFrame(
     "Button", "PriestCompanionResurrectionMessageSave",
-    child, "UIPanelButtonTemplate"
+    resChild, "UIPanelButtonTemplate"
 )
 resSaveButton:SetWidth(92)
 resSaveButton:SetHeight(24)
 resSaveButton:SetPoint(
-    "TOPLEFT", child, "TOPLEFT", 126, -707
+    "TOPLEFT", resChild, "TOPLEFT", 126, -301
 )
 resSaveButton:SetText("Save")
 
-Label("Preview (not sent)", 14, 752, 350, "GameFontNormalSmall")
-local resPreview = Label("", 15, 775, 350)
+Label("Preview (not sent)", 14, 346, 350, "GameFontNormalSmall")
+local resPreview = Label("", 15, 369, 350)
 
 local resDraftDirty = false
 local settingResDraft = false
@@ -428,14 +492,45 @@ resDefaultButton:SetScript("OnClick", function()
 end)
 resSaveButton:SetScript("OnClick", SaveResMessage)
 
--- Unsaved drafts for either spell survive checkbox changes but are
--- discarded when the player leaves Options > Announcer.
-panel:SetScript("OnHide", function()
+-- Navigating between sub-tabs discards only the draft being left;
+-- leaving Tools discards both. Already saved values are untouched.
+local function RestoreFearDraft()
     messageBox:ClearFocus()
     SetMessageDraft(announcer.GetMessage())
+end
+
+local function RestoreResDraft()
     resMessageBox:ClearFocus()
     SetResDraft(announcer.GetResMessage())
+end
+
+scroll:SetScript("OnHide", RestoreFearDraft)
+resScroll:SetScript("OnHide", RestoreResDraft)
+panel:SetScript("OnHide", function()
+    RestoreFearDraft()
+    RestoreResDraft()
 end)
+
+function panel.SelectSubTab(id)
+    if id ~= "resurrection" then
+        id = "fearward"
+    end
+    panel.ActiveSubTab = id
+
+    if id == "resurrection" then
+        scroll:Hide()
+        resScroll:Show()
+        PanelTemplates_SetTab(subTabs, 2)
+    else
+        resScroll:Hide()
+        scroll:Show()
+        PanelTemplates_SetTab(subTabs, 1)
+    end
+
+    if type(panel.Refresh) == "function" then
+        panel.Refresh()
+    end
+end
 
 function panel.Refresh()
     local available = announcer.GetProvider() == "ClassicAPI"
@@ -512,3 +607,9 @@ function panel.Refresh()
         UpdateResPreview()
     end
 end
+
+-- Preserve the selected tool when returning from other Options pages.
+panel:SetScript("OnShow", function()
+    panel.SelectSubTab(panel.ActiveSubTab)
+end)
+

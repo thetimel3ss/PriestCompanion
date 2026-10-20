@@ -92,10 +92,10 @@ local generalTab = CreateSectionTab("general", "General", 1)
 local advancedTab = CreateSectionTab(
     "advanced", "Tracker", 2, generalTab
 )
-local announcerTab = CreateSectionTab(
-    "announcer", "Announcer", 3, advancedTab
+local toolsTab = CreateSectionTab(
+    "tools", "Tools", 3, advancedTab
 )
-CreateSectionTab("mods", "Mods", 4, announcerTab)
+CreateSectionTab("mods", "Mods", 4, toolsTab)
 
 PanelTemplates_SetNumTabs(panel, 4)
 
@@ -224,7 +224,7 @@ CreateLabel(
 
 CreateLabel(
     general,
-    "Announcer configures Fear Ward messages and chat channels.",
+    "Tools contains Fear Ward and Resurrection features.",
     18,
     -250,
     385
@@ -734,8 +734,12 @@ end
 --------------------------------------------------
 
 function panel.SelectSection(id)
+    -- Continue accepting old callers using the Announcer section ID.
+    if id == "announcer" then
+        id = "tools"
+    end
     if id ~= "advanced"
-    and id ~= "announcer"
+    and id ~= "tools"
     and id ~= "mods" then
         id = "general"
     end
@@ -746,13 +750,13 @@ function panel.SelectSection(id)
     advanced:Hide()
 
     local mods = PC.UI.EnvironmentPanel
-    local announcements = PC.UI.AnnouncerPanel
+    local tools = PC.UI.ToolsPanel or PC.UI.AnnouncerPanel
 
     if mods then
         mods:Hide()
     end
-    if announcements then
-        announcements:Hide()
+    if tools then
+        tools:Hide()
     end
 
     local selected = nil
@@ -761,8 +765,8 @@ function panel.SelectSection(id)
         selected = general
     elseif id == "advanced" then
         selected = advanced
-    elseif id == "announcer" then
-        selected = announcements
+    elseif id == "tools" then
+        selected = tools
     else
         selected = mods
     end
@@ -778,7 +782,7 @@ function panel.SelectSection(id)
     -- Blizzard handles selected textures, widths and border joins.
     if id == "advanced" then
         PanelTemplates_SetTab(panel, 2)
-    elseif id == "announcer" then
+    elseif id == "tools" then
         PanelTemplates_SetTab(panel, 3)
     elseif id == "mods" then
         PanelTemplates_SetTab(panel, 4)
@@ -798,6 +802,6 @@ panel:SetScript(
     end
 )
 
--- Mods and Announcer content are added by their own UI files later in the TOC.
+-- Mods and Tools content are attached by their UI files later in the TOC.
 general:Hide()
 advanced:Hide()

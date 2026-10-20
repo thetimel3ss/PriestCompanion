@@ -118,11 +118,15 @@ All 28 records have `source.note`: 21 world-drop-style entries with `"World drop
 
 ## Next steps
 
-### Announcer — Fear Ward and Resurrection (in progress on `feature/announcer`)
+### Tools — Fear Ward and Resurrection (in progress on `feature/announcer`)
+
+- [x] Rename Options → Announcer to **Options → Tools**, with native **Fear Ward** and **Resurrection** sub-tabs to accommodate later assistant/automation features alongside each spell's announcements.
+- [x] Give each tool its own scroll area and settings UI, keeping existing saved data and cast/event logic intact. Preserve the legacy `announcer` section ID and `PC.UI.AnnouncerPanel` alias for compatibility.
+- [ ] **Sub-tab acceptance tests:** verify switching, native tab selected textures, layout bounds, scroll positions, tooltips, 30px row spacing, independent channel toggles, Default/Save/Preview, discarding unsaved text when switching, saved options after /reload, and regression checks for Fear Ward and Resurrection.
 
 #### Resurrection Announcer (new, pending in-game validation)
 
-- [x] Add an opt-in Resurrection section in Options → Announcer with separate saved preferences, independently selectable Say/Yell/Party/Raid/Self/**Whisper** channels, and Default/Save/Preview message editing.
+- [x] Add an opt-in Resurrection section in Options → Tools → Resurrection with separate saved preferences, independently selectable Say/Yell/Party/Raid/Self/**Whisper** channels, and Default/Save/Preview message editing.
 - [x] Correlate ClassicAPI `UNIT_SPELLCAST_SENT` (target, GUID, spell) with `UNIT_SPELLCAST_START` (same GUID, spell) so the message is sent **only after Resurrection begins casting**; deduplicate START and discard pre-start failure. Do not announce completion/acceptance.
 - [x] Whisper the captured named Resurrection recipient only after matched START; never derive an absent recipient from the current target. Default `Casting {spell} on {target}.` prevents a misleading completed-resurrection claim. No Whisper option is added to Fear Ward.
 - [x] Move **Prevent overwriting Fear Ward** beside **Enable Fear Ward**, retaining tooltip and 30px spacing of other checkbox rows; use the freed space for Resurrection settings.
@@ -130,7 +134,7 @@ All 28 records have `source.note`: 21 world-drop-style entries with `"World drop
 
 #### Fear Ward (previously validated paths)
 
-- [x] Add an optional, independent per-character **Prevent overwriting Fear Ward** setting under Options → Announcer (disabled by default). Check the recipient's current aura before supported Lua spell dispatches and prevent duplicate application with a local notice, even when announcements are disabled.
+- [x] Add an optional, independent per-character **Prevent overwriting Fear Ward** setting under Options → Tools → Fear Ward (disabled by default). Check the recipient's current aura before supported Lua spell dispatches and prevent duplicate application with a local notice, even when announcements are disabled.
 - [x] **Maintainer's first live checks:** Fear Ward on a recipient without an active buff works; action-bar casts, spellbook casts and typed `/cast Fear Ward` are prevented when that recipient is buffed.
 - [x] **Follow-up implementation:** cover no-target self-casts, explicit SuperWoW recipient arguments and `SpellTargetUnit` cursor targeting; preserve the initial working paths.
 - [x] **Self-cast retest:** the maintainer confirmed no-target Fear Ward correctly blocks recasting when the priest already has Fear Ward.
@@ -140,7 +144,7 @@ All 28 records have `source.note`: 21 world-drop-style entries with `"World drop
 - [ ] **Remaining live verification:** test mouseover-absent fallback to selected target and player, numeric spell IDs, direct actionbar/spellbook/typed /cast regression after the latest change, other DLL macro paths, and SuperWoW `CastSpellByName("Fear Ward", "mouseover")` / Lua `SpellTargetUnit` as available. No universal cast interception is claimed.
 - [ ] **Aura verification:** confirm spellID 6346 and aura name/texture on OctoWoW, verify protection against a buff applied by another priest, and test the absence of ClassicAPI.
 
-- [x] Create a separate Options → Announcer tab and per-character preferences for Fear Ward, initially disabled.
+- [x] Create the original Options → Announcer tab and per-character Fear Ward preferences (now accessed via Options → Tools → Fear Ward).
 - [x] Allow multiple selected announcement channels at once: Say, Yell, Party, Raid and local-only Self. Skip unavailable group channels rather than rerouting; allow an independent toggle for self-cast announcements.
 - [x] Support customizable message text and preview, retaining the target placeholder. Announce only after confirmed ClassicAPI SENT → SUCCEEDED GUID match; skip failed casts, duplicate success, or unknown recipients without assuming a target.
 - [x] Place Fear Ward and channel help text into native hover tooltips on checkboxes/captions, use exact 30px spacing between Enable Fear Ward, the channel header and each row. Preserve the right column, move Include casts on myself beside Yell, and add independent Yell selection/persistence.

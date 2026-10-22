@@ -7,7 +7,7 @@ PC.Modules.ResurrectionAssistant = PC.Modules.ResurrectionAssistant or {}
 local Assistant = PC.Modules.ResurrectionAssistant
 
 local RES_PRIORITY = {
-    SHAMAN = 1, PALADIN = 2, PRIEST = 3, DRUID = 4,
+    PRIEST = 1, SHAMAN = 2, PALADIN = 3, DRUID = 4,
     MAGE = 5, HUNTER = 6, WARLOCK = 7, WARRIOR = 8, ROGUE = 9
 }
 local OFFER_SECONDS = 70

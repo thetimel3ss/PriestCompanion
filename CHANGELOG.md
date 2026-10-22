@@ -2,6 +2,11 @@
 
 ## [Unreleased]
 
+### Changed and validated — Resurrection Assistant baseline (2026-10-22)
+- Changed candidate priority to **Priest first**, followed by Shaman, Paladin, Druid, Mage, Hunter, Warlock, Warrior and Rogue. An eligible manually selected dead target still overrides class order.
+- **In-game party tests passed:** with one living teammate, counts were 0 eligible / 0 incoming / 0 released; after the teammate died without release, 1 / 0 / 0; after release, 0 / 0 / 1. The Assistant reported being blocked in combat and refreshed its results after combat ended.
+- The new priority ordering itself, raid scenarios, external resurrection protocols and regressions still require in-game validation. No automatic cast or popup has been added.
+
 ### Added — Resurrection Assistant candidate engine (2026-10-22)
 - Introduced `feature/resurrection-assistant` from the validated `feature/announcer` commit; the prior branch and `main` are untouched.
 - Added `Core/ResurrectionAssistant.lua` to both TOCs for event-driven party/raid death detection and priority-based candidate selection. The initial implementation **does not cast spells or display the popup**.

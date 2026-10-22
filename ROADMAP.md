@@ -123,7 +123,8 @@ All 28 records have `source.note`: 21 world-drop-style entries with `"World drop
 - [x] Rename Options → Announcer to **Options → Tools**, with native **Fear Ward** and **Resurrection** sub-tabs to accommodate later assistant/automation features alongside each spell's announcements.
 - [x] Give each tool its own scroll area and settings UI, keeping existing saved data and cast/event logic intact. Preserve the legacy `announcer` section ID and `PC.UI.AnnouncerPanel` alias for compatibility.
 - [x] **Basic sub-tab navigation tested in OctoWoW:** the maintainer confirmed that the Fear Ward and Resurrection sub-tabs work in Options → Tools.
-- [ ] **Additional sub-tab acceptance:** verify selected-tab visuals, layout bounds, scroll positions, tooltips, 30px row spacing, independent channel toggles, Default/Save/Preview, unsaved draft handling during tab switching, saved options after /reload, and Fear Ward regression behavior.
+- [x] **Persistence after /reload:** the maintainer confirmed that customized Resurrection/Whisper messages and previously selected settings remain saved after a UI reload.
+- [ ] **Additional sub-tab acceptance:** verify selected-tab visuals, layout bounds, scroll positions, tooltips, 30px row spacing, independent channel toggles, Default/Save/Preview behavior, unsaved draft handling during tab switching, and Fear Ward regression behavior.
 
 #### Resurrection Announcer (core live cast/whisper/corpse tests passed; further edge cases pending)
 
@@ -136,14 +137,14 @@ All 28 records have `source.note`: 21 world-drop-style entries with `"World drop
 - [x] **Identified target, cast interrupted:** the configured interruption message is sent and the recipient is also notified by Whisper.
 - [x] **Outside-range attempt:** the maintainer confirmed that the client prevents the Resurrection cast from starting, and no announcement is emitted. This does not independently exercise a server-side pre-START failure after SENT.
 - [x] **Successful cast completion:** the maintainer confirmed that a Resurrection finishing normally does not generate a false interruption announcement.
-- [ ] **Remaining acceptance tests:** pre-START failure after SENT (if reproducible), duplicate START/FAILED/INTERRUPTED events, interruption toggle off, released corpse with recoverable name, mouseover and target-switching casts, independent message Default/Save/Preview and /reload persistence, multiple channels and unavailable group channels, ClassicAPI absent.
+- [ ] **Remaining acceptance tests:** pre-START failure after SENT (if reproducible), duplicate START/FAILED/INTERRUPTED events, interruption toggle off, released corpse with recoverable name, mouseover and target-switching casts, separate Default/Save/Preview interactions, multiple channels and unavailable group channels, ClassicAPI absent. Saved changes surviving /reload were confirmed.
 
 - [x] Add an opt-in Resurrection section in Options → Tools → Resurrection with separate saved preferences, independently selectable Say/Yell/Party/Raid/Self/**Whisper** channels, and Default/Save/Preview message editing.
 - [x] Correlate ClassicAPI `UNIT_SPELLCAST_SENT` (target, GUID, spell) with `UNIT_SPELLCAST_START` (same GUID, spell) so the message is sent **only after Resurrection begins casting**; deduplicate START and discard pre-start failure. Do not announce completion/acceptance.
 - [x] Whisper the captured named Resurrection recipient only after matched START; never derive an absent recipient from the current target. Default `Casting {spell} on {target}.` prevents a misleading completed-resurrection claim. No Whisper option is added to Fear Ward.
 - [x] Move **Prevent overwriting Fear Ward** beside **Enable Fear Ward**, retaining tooltip and 30px spacing of other checkbox rows; use the freed space for Resurrection settings.
 - [x] **Basic Resurrection announcement confirmed in-game:** the maintainer reports that Resurrection notices are being sent successfully. The exact selected channels and START/failure timing were not separately confirmed in this test report.
-- [ ] **Other in-game acceptance:** distinguish pre-START rejection after SENT from client-side out-of-range prevention, verify different ranks/spellbook, mouseover and target switching, duplicate/absent event handling, channel combinations and unavailable channels, saved text after /reload, ClassicAPI absent, and previously validated Fear Ward behavior. Corpse/Whisper/interruption paths and normal completion without false interruption are confirmed.
+- [ ] **Other in-game acceptance:** distinguish pre-START rejection after SENT from client-side out-of-range prevention, verify different ranks/spellbook, mouseover and target switching, duplicate/absent event handling, channel combinations and unavailable channels, ClassicAPI absent, and previously validated Fear Ward behavior. Customized settings persisting after /reload are already verified. Corpse/Whisper/interruption paths and normal completion without false interruption are confirmed.
 
 #### Fear Ward (previously validated paths)
 

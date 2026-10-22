@@ -2,6 +2,16 @@
 
 ## [Unreleased]
 
+### Improved — Book of Prayer Tracker window size and eight-edge resizing (2026-10-22)
+- Adopted the Resurrection Assistant's **40%–120%** window size controls for Book of Prayer Tracker. Compact and Expanded each retain their own proportional scale; added an Options → Tracker slider, tooltip and per-mode **Reset current size** button.
+- Reused all eight existing Tracker edge/corner drag regions, now scaled appropriately for small windows. Manual resizing selects the manipulated edge/corner axis and normalizes icon, text and outer frame proportionally when released; the slider refreshes from resize notifications without additional polling.
+- Backward compatibility: existing per-character width/height entries are used to derive initial scale when new scale settings are absent, preserving the effective size as far as the new limits permit. The original Save/Reset geometry controls also maintain the new scales.
+- Book of Prayer healing, mana refund, Nampower/ClassicAPI fallback, casting callbacks and auto-hide logic are unchanged. **Static review only; in-game Tracker sizing tests pending.**
+
+### Validated — Resurrection Assistant HUD basics (2026-10-22)
+- After the full-window Button OnClick fix, the maintainer confirmed that clicking starts Resurrection again, the green/yellow colors and released-corpse fallback work, and window resizing also works in-game.
+- Class-priority and incoming-resurrection/duplicate-detection testing remain deferred. Drag-without-cast, rapid rejected clicks and Preview safety still require targeted validation.
+
 ### Improved — Resurrection Assistant compact size and edge resizing (2026-10-22)
 - Reduced the HUD scaling range from 70%–180% to **40%–120%**, retaining separate compact and expanded scales. Older saved values outside the new range are clamped at read time, not silently reset to 100%.
 - Replaced bottom-right-only resizing with **eight draggable edge/corner zones**, modeled after Book of Prayer Tracker; resize regions shrink for small windows so the central HUD can still be clicked to cast.

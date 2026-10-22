@@ -118,6 +118,13 @@ All 28 records have `source.note`: 21 world-drop-style entries with `"World drop
 
 ## Next steps
 
+### Book of Prayer Tracker — uniform window scaling (`feature/resurrection-assistant`)
+
+- [x] Bring Tracker window sizing in line with the Resurrection Assistant: **40%–120%** uniform scale, independent compact and expanded sizes, adjustment by any of its existing eight edges or corners and an Options → Tracker **Window size (per mode)** slider.
+- [x] Preserve existing saved `prayerTracker` settings and migrate legacy independent width/height geometry to a proportional, bounded scale at load time. Keep saved position, lock, reset confirmation, auto-hide, preview, mana-value presentation and refund border logic unchanged.
+- [x] Add **Reset current size** (100% for the selected mode); **Reset Position** still resets the position and *both* mode sizes. Keep the slider's percentage synchronized when the user drags a border/corner.
+- [ ] **Tracker in-game acceptance:** Compact and Expanded at 40% and 120%; eight edge/corner handles; slider following manual resize; independent per-mode sizes and persistence across `/reload`; Lock blocking resize/movement; Reset current size; Reset Position confirmation; Preview layout and styling; show spell name / mana refund icon reflow; Book of Prayer talent and mana tracking still working.
+
 ### Resurrection Assistant — detection and selection (`feature/resurrection-assistant`)
 
 - [x] Create a branch from the validated `feature/announcer` head, preserving the original branch and `main`.
@@ -145,8 +152,9 @@ All 28 records have `source.note`: 21 world-drop-style entries with `"World drop
 - [x] **Preview HUD:** show a test-only state without a dead player. Preview never calls the casting function, even if the window is clicked; options and drag/size adjustments update live; switching tabs or closing Options ends preview.
 - [x] **Resurrection settings tooltips:** updated for each new checkbox, scale control, reset actions and Preview. No icon tooltip is added.
 - [x] **Regression reproduced in game after the compact HUD rework:** the eligible-target and yellow released-corpse states were correctly detected, but clicking the redesigned HUD did not cast or prepare the cursor. A subsequent click could display "Resurrection was just requested." The prior UI version using an actual Button's OnClick was functional.
-- [x] **Interaction fix prepared (awaiting in-game verification):** use a real full-surface WoW Button and a LeftButtonUp OnClick handler, as in the last known functional version, instead of triggering casts on a plain Frame's OnMouseUp; suppress click after dragging/resizing. Only start the repeat-click timer after the dispatch succeeds. No change to target detection, color, preview, or Announcer.
-- [ ] **Priority immediate re-tests:** normal green target click starts Resurrection; released-corpse yellow click prepares the world cursor; one click triggers one attempt; a drag never casts; after a rejected cast, another click does not produce a stale "just requested" notice; Preview never casts.
+- [x] **Interaction fix validated in OctoWoW:** after the return to a real full-surface WoW Button and LeftButtonUp OnClick, the maintainer confirmed the window casts successfully again. The green/yellow border states, released-corpse targeting fallback and HUD resizing also worked as expected.
+- [x] **Post-fix main interaction tests (2026-10-22):** full-window casting, state colors, released-corpse fallback and HUD resizing passed in-game.
+- [ ] **Remaining interaction edge cases:** drag/resize gestures never cast, rapid-click handling after a rejected cast, and Preview never casting were not independently confirmed in these latest tests.
 - [ ] **Other new HUD in-game tests:** compact vs expanded and /reload persistence; optional nickname/class visibility and icon scaling; class color; Lock Position preventing move and resize while still casting on click; saved per-mode slider scaling at exactly 40% and 120%; drag-to-resize using all four edges and four corners at minimum and maximum sizes; correct scaling/position persistence on /reload; reset size and position; Preview without target and click never casting; preview termination on tab change; combat hide/reappear; previous Announcer behavior.
 - [ ] **Other compatibility acceptance:** solo/raid, out-of-range members, ClassicAPI present/absent, external resurrection messages/timeout handling and untested priority order. Refine any behaviors that in-game tests uncover.
 

@@ -165,6 +165,9 @@ local appliedGeometryRevision = nil
 local appliedX = nil
 local appliedY = nil
 local previewActive = false
+local resizing = false
+local resizeDirection = nil
+local resizeStartScale = nil
 
 -- Preview contents are UI-only; the real cast history is never modified.
 local previewState = {
@@ -193,10 +196,8 @@ resizeHint:SetPoint(
     "BOTTOMRIGHT", frame, "BOTTOMRIGHT", -4, 4
 )
 
-local function SaveGeometry()
-    if Tracker.GetOption("locked") then
-        return
-    end
+local function SaveGeometry(direction, startingScale)
+    if Tracker.GetOption("locked") then return end
 
     local centerX, centerY = frame:GetCenter()
     local parentX, parentY = UIParent:GetCenter()
@@ -204,15 +205,19 @@ local function SaveGeometry()
     if centerX and parentX and centerY and parentY then
         local x = centerX - parentX
         local y = centerY - parentY
-        appliedX = x
-        appliedY = y
 
-        Tracker.SaveGeometry(
-            x,
-            y,
-            frame:GetWidth(),
-            frame:GetHeight()
-        )
+        if direction then
+            -- Resizing changes the anchoring edge. After snapping to a
+            -- proportional scale, restore the just-saved center.
+            appliedX, appliedY = nil, nil
+            Tracker.SaveGeometry(
+                x, y, frame:GetWidth(), frame:GetHeight(),
+                direction, startingScale
+            )
+        else
+            appliedX, appliedY = x, y
+            Tracker.SaveGeometry(x, y)
+        end
     end
 end
 
@@ -291,8 +296,12 @@ local function CreateResizeEdge(
     handle:SetScript(
         "OnMouseDown",
         function()
-            if not Tracker.GetOption("locked")
+            if arg1 == "LeftButton"
+            and not Tracker.GetOption("locked")
             and type(frame.StartSizing) == "function" then
+                resizing = true
+                resizeDirection = this.edge
+                resizeStartScale = Tracker.GetWindowScale()
                 frame:StartSizing(this.edge)
             end
         end
@@ -301,8 +310,15 @@ local function CreateResizeEdge(
     handle:SetScript(
         "OnMouseUp",
         function()
+            if not resizing or resizeDirection ~= this.edge then
+                return
+            end
             frame:StopMovingOrSizing()
-            SaveGeometry()
+            local direction = resizeDirection
+            local startScale = resizeStartScale
+            resizing = false
+            resizeDirection, resizeStartScale = nil, nil
+            SaveGeometry(direction, startScale)
         end
     )
 
@@ -318,10 +334,33 @@ CreateResizeEdge("TOPRIGHT", 12, 12, "TOPRIGHT", "TOPRIGHT", 0, 0)
 CreateResizeEdge("BOTTOMLEFT", 12, 12, "BOTTOMLEFT", "BOTTOMLEFT", 0, 0)
 CreateResizeEdge("BOTTOMRIGHT", 12, 12, "BOTTOMRIGHT", "BOTTOMRIGHT", 0, 0)
 
+local function UpdateResizeEdges(scale, locked)
+    local edgeSize = math.max(3, math.floor(8 * scale + 0.5))
+    local cornerSize = math.max(6, math.floor(12 * scale + 0.5))
+    local i
+    for i = 1, table.getn(edges) do
+        local handle = edges[i]
+        local direction = handle.edge
+        if direction == "TOP" or direction == "BOTTOM" then
+            handle:SetHeight(edgeSize)
+        elseif direction == "LEFT" or direction == "RIGHT" then
+            handle:SetWidth(edgeSize)
+        else
+            handle:SetWidth(cornerSize)
+            handle:SetHeight(cornerSize)
+        end
+        handle:EnableMouse(not locked)
+    end
+    resizeHint:SetWidth(cornerSize)
+    resizeHint:SetHeight(cornerSize)
+end
+
 frame:SetScript(
     "OnHide",
     function()
         frame:StopMovingOrSizing()
+        resizing = false
+        resizeDirection, resizeStartScale = nil, nil
     end
 )
 
@@ -339,11 +378,27 @@ local function UpdateIconLayout()
     -- The outer border stays crisp at small window sizes.
     local scaleX = frame:GetWidth() / baseWidth
     local scaleY = frame:GetHeight() / baseHeight
-    local scale = math.min(scaleX, scaleY)
+    local scale = Tracker.GetWindowScale()
 
-    if scale < 0.1 then
-        scale = 0.1
+    -- While an edge is moving, respond to its axis immediately.
+    -- A corner uses the axis with the larger departure from the
+    -- starting scale. Final dimensions snap to a uniform scale.
+    if resizing and resizeDirection then
+        if resizeDirection == "LEFT" or resizeDirection == "RIGHT" then
+            scale = scaleX
+        elseif resizeDirection == "TOP" or resizeDirection == "BOTTOM" then
+            scale = scaleY
+        elseif math.abs(scaleX - resizeStartScale) >=
+            math.abs(scaleY - resizeStartScale) then
+            scale = scaleX
+        else
+            scale = scaleY
+        end
     end
+    if scale < 0.40 then scale = 0.40 end
+    if scale > 1.20 then scale = 1.20 end
+
+    UpdateResizeEdges(scale, Tracker.GetOption("locked"))
 
     visual:SetWidth(baseWidth)
     visual:SetHeight(baseHeight)
@@ -442,47 +497,22 @@ frame:SetScript(
 )
 
 local function SetDimensions(expanded)
-    local width
-    local height
-    local minWidth
-    local minHeight
+    local baseWidth = expanded and 212 or 118
+    local baseHeight = expanded and 130 or 112
+    local scale = Tracker.GetWindowScale(expanded)
 
-    if expanded then
-        width = Tracker.GetOption("expandedWidth") or 212
-        height = Tracker.GetOption("expandedHeight") or 130
-        minWidth = 104
-        minHeight = 78
-    else
-        width = Tracker.GetOption("compactWidth") or 118
-        height = Tracker.GetOption("compactHeight") or 112
-        minWidth = 68
-        minHeight = 68
-    end
-
-    if width < minWidth then
-        width = minWidth
-    end
-
-    if height < minHeight then
-        height = minHeight
-    end
-
-    if width > 360 then
-        width = 360
-    end
-    if height > 240 then
-        height = 240
-    end
-
+    -- Compact minimum: about 47x45 px; expanded: about 85x52 px.
+    -- Unlike the old independent-size layout, both modes maintain the
+    -- same proportions as the Resurrection Assistant.
     if type(frame.SetMinResize) == "function" then
-        frame:SetMinResize(minWidth, minHeight)
+        frame:SetMinResize(baseWidth * 0.40, baseHeight * 0.40)
     end
     if type(frame.SetMaxResize) == "function" then
-        frame:SetMaxResize(360, 240)
+        frame:SetMaxResize(baseWidth * 1.20, baseHeight * 1.20)
     end
 
-    frame:SetWidth(width)
-    frame:SetHeight(height)
+    frame:SetWidth(baseWidth * scale)
+    frame:SetHeight(baseHeight * scale)
     UpdateIconLayout()
 
     if expanded then
@@ -533,10 +563,7 @@ local function UpdateDisplay()
         resizeHint:Show()
     end
 
-    local i
-    for i = 1, table.getn(edges) do
-        edges[i]:EnableMouse(not locked)
-    end
+    UpdateResizeEdges(Tracker.GetWindowScale(), locked)
 
     local state = Tracker.GetState()
 

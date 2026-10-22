@@ -271,7 +271,7 @@ local advancedChild = CreateFrame(
     "Frame", nil, advancedScroll
 )
 advancedChild:SetWidth(388)
-advancedChild:SetHeight(390)
+advancedChild:SetHeight(505)
 advancedScroll:SetScrollChild(advancedChild)
 
 CreateLabel(
@@ -620,6 +620,96 @@ previewButton:SetScript(
 )
 previewButton:SetScript("OnLeave", HidePrayerTooltip)
 
+--------------------------------------------------
+-- Window size: independent Compact and Expanded scales
+--------------------------------------------------
+
+CreateLabel(
+    advancedChild, "Window size (per mode)",
+    16, -371, 340, "GameFontNormalSmall"
+)
+
+local windowScaleSlider = CreateFrame(
+    "Slider", "PriestCompanionPrayerWindowScale",
+    advancedChild, "OptionsSliderTemplate"
+)
+windowScaleSlider:SetWidth(194)
+windowScaleSlider:SetHeight(17)
+windowScaleSlider:SetPoint(
+    "TOPLEFT", advancedChild, "TOPLEFT", 26, -405
+)
+windowScaleSlider:SetMinMaxValues(0.40, 1.20)
+if type(windowScaleSlider.SetValueStep) == "function" then
+    windowScaleSlider:SetValueStep(0.05)
+end
+
+local windowScaleLabel = CreateLabel(
+    advancedChild, "100%", 236, -401, 105,
+    "GameFontHighlightSmall"
+)
+local syncingWindowScale = false
+local function RefreshWindowScale()
+    if not prayer then return end
+    syncingWindowScale = true
+    local value = prayer.GetWindowScale()
+    windowScaleSlider:SetValue(value)
+    windowScaleLabel:SetText(
+        tostring(math.floor(value * 100 + 0.5)) .. "%"
+    )
+    syncingWindowScale = false
+end
+
+windowScaleSlider:SetScript(
+    "OnValueChanged",
+    function()
+        if syncingWindowScale or not prayer then return end
+        local value = math.floor(this:GetValue() * 20 + 0.5) / 20
+        prayer.SetWindowScale(value)
+    end
+)
+windowScaleSlider:SetScript(
+    "OnEnter",
+    function()
+        ShowPrayerTooltip(
+            this, "Window size",
+            "Scale the entire Book of Prayer HUD from 40% to 120%, " ..
+            "including icons, spell names and mana text. Compact and " ..
+            "Expanded remember separate sizes. When unlocked, resize " ..
+            "by dragging any window edge or corner, like Resurrection."
+        )
+    end
+)
+windowScaleSlider:SetScript("OnLeave", HidePrayerTooltip)
+
+local resetWindowScaleButton = CreateFrame(
+    "Button", "PriestCompanionPrayerResetWindowScale",
+    advancedChild, "UIPanelButtonTemplate"
+)
+resetWindowScaleButton:SetWidth(154)
+resetWindowScaleButton:SetHeight(24)
+resetWindowScaleButton:SetPoint(
+    "TOPLEFT", advancedChild, "TOPLEFT", 16, -443
+)
+resetWindowScaleButton:SetText("Reset current size")
+resetWindowScaleButton:SetScript(
+    "OnClick",
+    function()
+        if prayer then prayer.SetWindowScale(1) end
+    end
+)
+resetWindowScaleButton:SetScript(
+    "OnEnter",
+    function()
+        ShowPrayerTooltip(
+            this, "Reset current size",
+            "Set the currently selected Compact or Expanded window " ..
+            "back to 100%. The other mode keeps its saved size. " ..
+            "Reset Position above still resets both modes."
+        )
+    end
+)
+resetWindowScaleButton:SetScript("OnLeave", HidePrayerTooltip)
+
 -- Do not leave the simulated HUD visible after closing Options
 -- or navigating away from the Tracker section.
 advanced:SetScript(
@@ -656,6 +746,7 @@ function advanced.Refresh()
         end
 
         talentStatus:SetText(label)
+        RefreshWindowScale()
 
         local hud = PC.UI.PrayerTracker
         if hud and type(hud.IsPreviewActive) == "function"

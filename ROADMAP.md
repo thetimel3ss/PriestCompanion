@@ -127,6 +127,11 @@ All 28 records have `source.note`: 21 world-drop-style entries with `"World drop
 
 #### Resurrection Announcer (initial live announcement test passed; edge cases pending)
 
+- [x] Add a separate Resurrection Whisper template, default `Casting {spell} on you. Please don't release!`, editable independently of public text with Default/Save/Preview and per-character persistence.
+- [x] Add optional **Announce interrupted casts** (default off), editable public cancellation text and short Whisper notice, guarded by matching START and interrupted/failed GUIDs. Never announce pre-START failures or post-success cancellation.
+- [x] For released-player corpse clicks, allow SENT with an empty target to match START. Try `UnitSpellTargetName("player")` briefly; if still unresolved, announce a generic corpse recipient on public channels only (no guessed Whisper).
+- [ ] **New acceptance tests:** cast on a released corpse through the world cursor, recovered name versus generic public fallback, Whisper skipped when unknown, independent Whisper text, interrupted cast toggle on/off, no notice for failed pre-START attempts, no false interruption after successful casts, tab switching, and saved settings across /reload.
+
 - [x] Add an opt-in Resurrection section in Options → Tools → Resurrection with separate saved preferences, independently selectable Say/Yell/Party/Raid/Self/**Whisper** channels, and Default/Save/Preview message editing.
 - [x] Correlate ClassicAPI `UNIT_SPELLCAST_SENT` (target, GUID, spell) with `UNIT_SPELLCAST_START` (same GUID, spell) so the message is sent **only after Resurrection begins casting**; deduplicate START and discard pre-start failure. Do not announce completion/acceptance.
 - [x] Whisper the captured named Resurrection recipient only after matched START; never derive an absent recipient from the current target. Default `Casting {spell} on {target}.` prevents a misleading completed-resurrection claim. No Whisper option is added to Fear Ward.

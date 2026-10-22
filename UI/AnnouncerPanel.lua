@@ -79,7 +79,7 @@ local scroll, child = CreateToolScroll(
     "PriestCompanionAnnouncerScroll", 409
 )
 local resScroll, resChild = CreateToolScroll(
-    "PriestCompanionResurrectionScroll", 410
+    "PriestCompanionResurrectionScroll", 744
 )
 resScroll:Hide()
 
@@ -365,6 +365,19 @@ local resEnabled, resEnabledLabel = Checkbox(
     "a declined resurrection is not treated as success."
 )
 
+local resInterruptedBox = Checkbox(
+    "PriestCompanionResurrectionInterrupted",
+    "Announce interrupted casts", 204, 74,
+    function(value)
+        announcer.SetResOption("announceInterrupted", value)
+    end,
+    "Optional. After Resurrection actually starts, report a cast " ..
+    "that is interrupted or fails. Attempts rejected before START " ..
+    "do not announce. Uses the currently selected channels; " ..
+    "Whisper receives a short interruption notice.",
+    155
+)
+
 Label("Announcement channels (multiple selections allowed)",
     14, 104, 355, "GameFontNormalSmall")
 
@@ -372,7 +385,8 @@ local RES_CHANNEL_TOOLTIP =
     "Resurrection has independent channel choices. Say and Yell " ..
     "are available without a group; unavailable Party or Raid " ..
     "channels are skipped. Self only shows local chat. Whisper " ..
-    "uses the named recipient only after Resurrection STARTS."
+    "uses its own editable wording for the recipient; no Whisper " ..
+    "is sent if a released corpse's name cannot be confirmed."
 
 local resChannels = {}
 local resChannelDefinitions = {
@@ -492,6 +506,197 @@ resDefaultButton:SetScript("OnClick", function()
 end)
 resSaveButton:SetScript("OnClick", SaveResMessage)
 
+--------------------------------------------------
+-- Independent Whisper and interruption message templates
+--------------------------------------------------
+
+-- Whisper is addressed directly to the recipient, so no {target}
+-- placeholder is required. Default and Save only change that text.
+Label("Whisper message (recipient only)",
+    14, 403, 355, "GameFontNormalSmall")
+
+local resWhisperBox = CreateFrame(
+    "EditBox", "PriestCompanionResurrectionWhisperMessage",
+    resChild, "InputBoxTemplate"
+)
+resWhisperBox:SetPoint("TOPLEFT", resChild, "TOPLEFT", 21, -428)
+resWhisperBox:SetWidth(335)
+resWhisperBox:SetHeight(20)
+resWhisperBox:SetAutoFocus(false)
+resWhisperBox:SetMaxLetters(140)
+resWhisperBox:SetTextInsets(4, 4, 0, 0)
+
+local whisperLeft = getfenv(0)[resWhisperBox:GetName() .. "Left"]
+if whisperLeft then
+    local point, relative, relativePoint, x, y = whisperLeft:GetPoint(1)
+    if point then
+        whisperLeft:ClearAllPoints()
+        whisperLeft:SetPoint(point, relative, relativePoint, 0, y)
+    end
+end
+
+local whisperDefaultButton = CreateFrame(
+    "Button", "PriestCompanionResurrectionWhisperDefault",
+    resChild, "UIPanelButtonTemplate"
+)
+whisperDefaultButton:SetWidth(92)
+whisperDefaultButton:SetHeight(24)
+whisperDefaultButton:SetPoint(
+    "TOPLEFT", resChild, "TOPLEFT", 21, -460
+)
+whisperDefaultButton:SetText("Default")
+
+local whisperSaveButton = CreateFrame(
+    "Button", "PriestCompanionResurrectionWhisperSave",
+    resChild, "UIPanelButtonTemplate"
+)
+whisperSaveButton:SetWidth(92)
+whisperSaveButton:SetHeight(24)
+whisperSaveButton:SetPoint(
+    "TOPLEFT", resChild, "TOPLEFT", 126, -460
+)
+whisperSaveButton:SetText("Save")
+
+Label("Whisper preview (not sent)", 14, 501, 350, "GameFontNormalSmall")
+local whisperPreview = Label("", 15, 524, 350)
+local whisperDraftDirty = false
+local settingWhisperDraft = false
+
+local function UpdateWhisperPreview()
+    whisperPreview:SetText(
+        announcer.FormatResWhisperMessage(resWhisperBox:GetText()) or ""
+    )
+end
+
+local function SetWhisperDraft(value)
+    settingWhisperDraft = true
+    resWhisperBox:SetText(value or "")
+    settingWhisperDraft = false
+    whisperDraftDirty =
+        resWhisperBox:GetText() ~= announcer.GetResWhisperMessage()
+    UpdateWhisperPreview()
+end
+
+local function SaveWhisperMessage()
+    local saved = announcer.SetResWhisperMessage(resWhisperBox:GetText())
+    SetWhisperDraft(saved)
+    resWhisperBox:ClearFocus()
+end
+
+resWhisperBox:SetScript("OnTextChanged", function()
+    if not settingWhisperDraft then
+        whisperDraftDirty =
+            this:GetText() ~= announcer.GetResWhisperMessage()
+    end
+    UpdateWhisperPreview()
+end)
+resWhisperBox:SetScript("OnEnterPressed", SaveWhisperMessage)
+resWhisperBox:SetScript("OnEscapePressed", function()
+    SetWhisperDraft(announcer.GetResWhisperMessage())
+    this:ClearFocus()
+end)
+resWhisperBox:SetScript("OnEditFocusGained", function()
+    this:HighlightText()
+end)
+whisperDefaultButton:SetScript("OnClick", function()
+    SetWhisperDraft(announcer.GetDefaultResWhisperMessage())
+end)
+whisperSaveButton:SetScript("OnClick", SaveWhisperMessage)
+
+-- Interruption is opt-in. Its public template is distinct from
+-- the usual cast-start message; Whisper uses a short direct alert.
+Label("Interrupted cast message",
+    14, 560, 350, "GameFontNormalSmall")
+
+local resCancelBox = CreateFrame(
+    "EditBox", "PriestCompanionResurrectionCancelMessage",
+    resChild, "InputBoxTemplate"
+)
+resCancelBox:SetPoint("TOPLEFT", resChild, "TOPLEFT", 21, -586)
+resCancelBox:SetWidth(335)
+resCancelBox:SetHeight(20)
+resCancelBox:SetAutoFocus(false)
+resCancelBox:SetMaxLetters(140)
+resCancelBox:SetTextInsets(4, 4, 0, 0)
+
+local cancelLeft = getfenv(0)[resCancelBox:GetName() .. "Left"]
+if cancelLeft then
+    local point, relative, relativePoint, x, y = cancelLeft:GetPoint(1)
+    if point then
+        cancelLeft:ClearAllPoints()
+        cancelLeft:SetPoint(point, relative, relativePoint, 0, y)
+    end
+end
+
+local cancelDefaultButton = CreateFrame(
+    "Button", "PriestCompanionResurrectionCancelDefault",
+    resChild, "UIPanelButtonTemplate"
+)
+cancelDefaultButton:SetWidth(92)
+cancelDefaultButton:SetHeight(24)
+cancelDefaultButton:SetPoint(
+    "TOPLEFT", resChild, "TOPLEFT", 21, -618
+)
+cancelDefaultButton:SetText("Default")
+
+local cancelSaveButton = CreateFrame(
+    "Button", "PriestCompanionResurrectionCancelSave",
+    resChild, "UIPanelButtonTemplate"
+)
+cancelSaveButton:SetWidth(92)
+cancelSaveButton:SetHeight(24)
+cancelSaveButton:SetPoint(
+    "TOPLEFT", resChild, "TOPLEFT", 126, -618
+)
+cancelSaveButton:SetText("Save")
+
+Label("Interruption preview (not sent)",
+    14, 662, 350, "GameFontNormalSmall")
+local cancelPreview = Label("", 15, 685, 350)
+local cancelDraftDirty = false
+local settingCancelDraft = false
+
+local function UpdateCancelPreview()
+    cancelPreview:SetText(
+        announcer.FormatResCancelMessage(
+            "Tankname", resCancelBox:GetText()
+        ) or ""
+    )
+end
+
+local function SetCancelDraft(value)
+    settingCancelDraft = true
+    resCancelBox:SetText(value or "")
+    settingCancelDraft = false
+    cancelDraftDirty = resCancelBox:GetText() ~= announcer.GetResCancelMessage()
+    UpdateCancelPreview()
+end
+
+local function SaveCancelMessage()
+    local saved = announcer.SetResCancelMessage(resCancelBox:GetText())
+    SetCancelDraft(saved)
+    resCancelBox:ClearFocus()
+end
+
+resCancelBox:SetScript("OnTextChanged", function()
+    if not settingCancelDraft then
+        cancelDraftDirty = this:GetText() ~= announcer.GetResCancelMessage()
+    end
+    UpdateCancelPreview()
+end)
+resCancelBox:SetScript("OnEnterPressed", SaveCancelMessage)
+resCancelBox:SetScript("OnEscapePressed", function()
+    SetCancelDraft(announcer.GetResCancelMessage())
+    this:ClearFocus()
+end)
+resCancelBox:SetScript("OnEditFocusGained", function()
+    this:HighlightText()
+end)
+cancelDefaultButton:SetScript("OnClick", function()
+    SetCancelDraft(announcer.GetDefaultResCancelMessage())
+end)
+cancelSaveButton:SetScript("OnClick", SaveCancelMessage)
+
 -- Navigating between sub-tabs discards only the draft being left;
 -- leaving Tools discards both. Already saved values are untouched.
 local function RestoreFearDraft()
@@ -502,6 +707,10 @@ end
 local function RestoreResDraft()
     resMessageBox:ClearFocus()
     SetResDraft(announcer.GetResMessage())
+    resWhisperBox:ClearFocus()
+    SetWhisperDraft(announcer.GetResWhisperMessage())
+    resCancelBox:ClearFocus()
+    SetCancelDraft(announcer.GetResCancelMessage())
 end
 
 scroll:SetScript("OnHide", RestoreFearDraft)
@@ -592,6 +801,9 @@ function panel.Refresh()
     resEnabled:SetChecked(
         announcer.GetResOption("enabled") and 1 or nil
     )
+    resInterruptedBox:SetChecked(
+        announcer.GetResOption("announceInterrupted") and 1 or nil
+    )
 
     local resChannel
     local button
@@ -605,6 +817,16 @@ function panel.Refresh()
         SetResDraft(announcer.GetResMessage())
     else
         UpdateResPreview()
+    end
+    if not whisperDraftDirty and not resWhisperBox:HasFocus() then
+        SetWhisperDraft(announcer.GetResWhisperMessage())
+    else
+        UpdateWhisperPreview()
+    end
+    if not cancelDraftDirty and not resCancelBox:HasFocus() then
+        SetCancelDraft(announcer.GetResCancelMessage())
+    else
+        UpdateCancelPreview()
     end
 end
 

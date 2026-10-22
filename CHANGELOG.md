@@ -2,13 +2,17 @@
 
 ## [Unreleased]
 
+### Validated — Resurrection Assistant button basic interactions (2026-10-22)
+- The maintainer confirmed four in-game checks in OctoWoW: (1) a dead party member makes the button appear and clicking casts Resurrection; (2) released-body mode prepares the spell for a manual corpse click; (3) the button hides in combat and returns after combat; (4) the floating window position is persistent.
+- Class priority across multiple dead members, HealComm/LibPredict duplicate detection and other advanced compatibility scenarios remain pending at the maintainer's request. No functional code changed during this validation.
+
 ### Added — Clickable Resurrection Assistant button (2026-10-22)
 - Added a compact, draggable, event-driven Resurrection button that appears when a party/raid member is dead and eligible **outside combat**. The button uses change notifications, not a frame-by-frame group scan.
 - Each click starts **at most one Resurrection attempt**. Candidates are revalidated at click time; an eligible selected target overrides the Priest-first class priority. ClassicAPI `C_Spell.CastAtUnit` is preferred, while the base Vanilla implementation uses `CastSpellByName` and `SpellTargetUnit` after clearing an unrelated selection.
 - When all remaining dead group members have released their spirit, the button prepares Resurrection for a manual world click rather than guessing a corpse's unit token. The existing Announcer continues to handle all chat messages.
 - Added the per-character **Show Resurrection button** checkbox (enabled by default) and **Reset button position** under Options → Tools → Resurrection. The floating window can be dragged by its header; its coordinates persist across `/reload`.
 - Activated manual `/pc res` for exactly one cast attempt; `/pc res status` and `/pc res next` remain diagnostic. Hiding the floating button does not disable the manual command.
-- **In-game validation pending:** button targeting, released corpse cursor, combat hiding, persistent position/checkbox, no wrongful duplicate cast, and original Announcer regression. Class priority and HealComm/LibPredict duplicate-detection tests remain deferred as requested.
+- **Subsequently validated in game:** button targeting, released corpse cursor, combat hiding/reappearance and persistent window position. Checkbox behavior, advanced duplicate prevention and Announcer regression tests are still open; class priority and HealComm/LibPredict tests remain deferred as requested.
 
 ### Changed and validated — Resurrection Assistant baseline (2026-10-22)
 - Changed candidate priority to **Priest first**, followed by Shaman, Paladin, Druid, Mage, Hunter, Warlock, Warrior and Rogue. An eligible manually selected dead target still overrides class order.

@@ -2,6 +2,11 @@
 
 ## [Unreleased]
 
+### Validated — Basic Tools navigation and Resurrection announcements (2026-10-22)
+- In OctoWoW, the maintainer confirmed that the **Fear Ward** and **Resurrection** sub-tabs under Options → Tools work.
+- The maintainer also confirmed that **Resurrection announcements are being sent**. This validates the basic user-visible announcement flow, not each available channel or precise START-versus-failure behavior.
+- Continue testing Whisper delivery, START timing, interruptions, target switching, channel combinations, settings persistence and detailed sub-tab UI interactions before treating the feature as fully validated.
+
 ### Changed — Options → Tools navigation and two sub-tabs (2026-10-20)
 - Renamed the former **Options → Announcer** tab to **Options → Tools**, reserving this area for both current announcements and future Fear Ward / Resurrection assistants.
 - Split its previous long vertically stacked page into native **Fear Ward** and **Resurrection** sub-tabs with separate scroll areas. Each preserves its own enabled option, multi-channel checkboxes, tooltips, custom message, Default/Save controls and unsent preview.

@@ -122,15 +122,17 @@ All 28 records have `source.note`: 21 world-drop-style entries with `"World drop
 
 - [x] Rename Options → Announcer to **Options → Tools**, with native **Fear Ward** and **Resurrection** sub-tabs to accommodate later assistant/automation features alongside each spell's announcements.
 - [x] Give each tool its own scroll area and settings UI, keeping existing saved data and cast/event logic intact. Preserve the legacy `announcer` section ID and `PC.UI.AnnouncerPanel` alias for compatibility.
-- [ ] **Sub-tab acceptance tests:** verify switching, native tab selected textures, layout bounds, scroll positions, tooltips, 30px row spacing, independent channel toggles, Default/Save/Preview, discarding unsaved text when switching, saved options after /reload, and regression checks for Fear Ward and Resurrection.
+- [x] **Basic sub-tab navigation tested in OctoWoW:** the maintainer confirmed that the Fear Ward and Resurrection sub-tabs work in Options → Tools.
+- [ ] **Additional sub-tab acceptance:** verify selected-tab visuals, layout bounds, scroll positions, tooltips, 30px row spacing, independent channel toggles, Default/Save/Preview, unsaved draft handling during tab switching, saved options after /reload, and Fear Ward regression behavior.
 
-#### Resurrection Announcer (new, pending in-game validation)
+#### Resurrection Announcer (initial live announcement test passed; edge cases pending)
 
 - [x] Add an opt-in Resurrection section in Options → Tools → Resurrection with separate saved preferences, independently selectable Say/Yell/Party/Raid/Self/**Whisper** channels, and Default/Save/Preview message editing.
 - [x] Correlate ClassicAPI `UNIT_SPELLCAST_SENT` (target, GUID, spell) with `UNIT_SPELLCAST_START` (same GUID, spell) so the message is sent **only after Resurrection begins casting**; deduplicate START and discard pre-start failure. Do not announce completion/acceptance.
 - [x] Whisper the captured named Resurrection recipient only after matched START; never derive an absent recipient from the current target. Default `Casting {spell} on {target}.` prevents a misleading completed-resurrection claim. No Whisper option is added to Fear Ward.
 - [x] Move **Prevent overwriting Fear Ward** beside **Enable Fear Ward**, retaining tooltip and 30px spacing of other checkbox rows; use the freed space for Resurrection settings.
-- [ ] **In-game acceptance:** verify plain Resurrection and mouseover Resurrection, different current target from recipient, spellbook/ranks, pre-START cast failure, midcast cancellation/interruption, duplicate START, absence of SENT, Say+Party+Whisper together, unavailable Party/Raid, whisper to corpse recipient, custom message Default/Save/Preview, settings across reload, ClassicAPI absent, and previously validated Fear Ward behavior.
+- [x] **Basic Resurrection announcement confirmed in-game:** the maintainer reports that Resurrection notices are being sent successfully. The exact selected channels and START/failure timing were not separately confirmed in this test report.
+- [ ] **Remaining in-game acceptance:** verify plain Resurrection versus mouseover Resurrection, different current target from recipient, spellbook/ranks, no notice before START or on pre-START failure, midcast cancellation/interruption, duplicate START, absent SENT, Say+Party+Whisper together, unavailable Party/Raid, whisper to corpse recipient, custom message Default/Save/Preview, settings across /reload, ClassicAPI absent, and previously validated Fear Ward behavior.
 
 #### Fear Ward (previously validated paths)
 

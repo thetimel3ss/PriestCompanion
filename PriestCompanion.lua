@@ -99,7 +99,10 @@ function PC.OnSlashCommand(message)
             "/priest options - Open Options > General"
         )
         DEFAULT_CHAT_FRAME:AddMessage(
-            "/pc res status - Preview eligible Resurrection targets (no cast)"
+            "/pc res status - Preview eligible Resurrection targets"
+        )
+        DEFAULT_CHAT_FRAME:AddMessage(
+            "/pc res - Cast once on the next eligible Resurrection target"
         )
 
         return
@@ -124,11 +127,22 @@ function PC.OnSlashCommand(message)
     end
 
     if message == "res" then
-        DEFAULT_CHAT_FRAME:AddMessage(
-            "|cff66ccffPriest Companion:|r " ..
-            "Resurrection cast is not implemented yet; " ..
-            "use /pc res status to preview candidates."
-        )
+        local assistant = PC.Modules.ResurrectionAssistant
+        if not assistant or type(assistant.TryResurrect) ~= "function" then
+            DEFAULT_CHAT_FRAME:AddMessage(
+                "|cffff0000Priest Companion:|r " ..
+                "Resurrection Assistant is unavailable."
+            )
+            return
+        end
+        local ok, result = assistant.TryResurrect()
+        if not ok or (result and
+        string.find(result, "Click the released", 1, true)) then
+            DEFAULT_CHAT_FRAME:AddMessage(
+                "|cff66ccffPriest Companion:|r " ..
+                (result or "No eligible target.")
+            )
+        end
         return
     end
 

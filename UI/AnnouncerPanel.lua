@@ -5,6 +5,7 @@
 local PC = PriestCompanion
 local parent = PC.UI.OptionsContent
 local announcer = PC.Modules.Announcer
+local assistant = PC.Modules.ResurrectionAssistant
 
 if not parent or not announcer then
     return
@@ -79,7 +80,7 @@ local scroll, child = CreateToolScroll(
     "PriestCompanionAnnouncerScroll", 409
 )
 local resScroll, resChild = CreateToolScroll(
-    "PriestCompanionResurrectionScroll", 744
+    "PriestCompanionResurrectionScroll", 866
 )
 resScroll:Hide()
 
@@ -697,6 +698,45 @@ cancelDefaultButton:SetScript("OnClick", function()
 end)
 cancelSaveButton:SetScript("OnClick", SaveCancelMessage)
 
+--------------------------------------------------
+-- Resurrection Assistant (optional floating button)
+--------------------------------------------------
+
+Label("Resurrection Assistant", 14, 735, 355, "GameFontNormal")
+
+local assistantButtonBox = Checkbox(
+    "PriestCompanionResurrectionAssistantShowButton",
+    "Show Resurrection button", 14, 766,
+    function(value)
+        if assistant then assistant.SetButtonEnabled(value) end
+    end,
+    "Show the movable Resurrection button when a party or raid " ..
+    "member dies outside combat. Clicking casts once. If only " ..
+    "released corpses remain, the button prepares manual targeting. " ..
+    "This works independently of the Resurrection Announcer.",
+    161
+)
+
+local assistantResetButton = CreateFrame(
+    "Button", "PriestCompanionResurrectionAssistantReset",
+    resChild, "UIPanelButtonTemplate"
+)
+assistantResetButton:SetWidth(150)
+assistantResetButton:SetHeight(24)
+assistantResetButton:SetPoint(
+    "TOPLEFT", resChild, "TOPLEFT", 216, -766
+)
+assistantResetButton:SetText("Reset button position")
+assistantResetButton:SetScript("OnClick", function()
+    if assistant then assistant.ResetButtonPosition() end
+end)
+
+Label(
+    "Outside combat only. Drag its title to move. " ..
+    "One Resurrection per click.",
+    14, 808, 355
+)
+
 -- Navigating between sub-tabs discards only the draft being left;
 -- leaving Tools discards both. Already saved values are untouched.
 local function RestoreFearDraft()
@@ -804,6 +844,14 @@ function panel.Refresh()
     resInterruptedBox:SetChecked(
         announcer.GetResOption("announceInterrupted") and 1 or nil
     )
+    if assistant then
+        assistantButtonBox:SetChecked(
+            assistant.GetButtonEnabled() and 1 or nil
+        )
+    else
+        assistantButtonBox:Disable()
+        assistantResetButton:Disable()
+    end
 
     local resChannel
     local button

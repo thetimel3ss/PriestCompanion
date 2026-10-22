@@ -2,6 +2,14 @@
 
 ## [Unreleased]
 
+### Added — Clickable Resurrection Assistant button (2026-10-22)
+- Added a compact, draggable, event-driven Resurrection button that appears when a party/raid member is dead and eligible **outside combat**. The button uses change notifications, not a frame-by-frame group scan.
+- Each click starts **at most one Resurrection attempt**. Candidates are revalidated at click time; an eligible selected target overrides the Priest-first class priority. ClassicAPI `C_Spell.CastAtUnit` is preferred, while the base Vanilla implementation uses `CastSpellByName` and `SpellTargetUnit` after clearing an unrelated selection.
+- When all remaining dead group members have released their spirit, the button prepares Resurrection for a manual world click rather than guessing a corpse's unit token. The existing Announcer continues to handle all chat messages.
+- Added the per-character **Show Resurrection button** checkbox (enabled by default) and **Reset button position** under Options → Tools → Resurrection. The floating window can be dragged by its header; its coordinates persist across `/reload`.
+- Activated manual `/pc res` for exactly one cast attempt; `/pc res status` and `/pc res next` remain diagnostic. Hiding the floating button does not disable the manual command.
+- **In-game validation pending:** button targeting, released corpse cursor, combat hiding, persistent position/checkbox, no wrongful duplicate cast, and original Announcer regression. Class priority and HealComm/LibPredict duplicate-detection tests remain deferred as requested.
+
 ### Changed and validated — Resurrection Assistant baseline (2026-10-22)
 - Changed candidate priority to **Priest first**, followed by Shaman, Paladin, Druid, Mage, Hunter, Warlock, Warrior and Rogue. An eligible manually selected dead target still overrides class order.
 - **In-game party tests passed:** with one living teammate, counts were 0 eligible / 0 incoming / 0 released; after the teammate died without release, 1 / 0 / 0; after release, 0 / 0 / 1. The Assistant reported being blocked in combat and refreshed its results after combat ended.
@@ -9,7 +17,7 @@
 
 ### Added — Resurrection Assistant candidate engine (2026-10-22)
 - Introduced `feature/resurrection-assistant` from the validated `feature/announcer` commit; the prior branch and `main` are untouched.
-- Added `Core/ResurrectionAssistant.lua` to both TOCs for event-driven party/raid death detection and priority-based candidate selection. The initial implementation **does not cast spells or display the popup**.
+- Added `Core/ResurrectionAssistant.lua` to both TOCs for event-driven party/raid death detection and priority-based candidate selection. At the time of that initial commit, the Assistant did not cast spells or display a popup; the following change adds the click-only action.
 - During the priest's combat, roster/health/death detection and addon-message processing pause completely. `PLAYER_REGEN_ENABLED` refreshes the roster after combat; no per-frame scanning runs.
 - Filters dead but not released/ghost players, disconnections, incoming resurrection offers, and optionally known range/line-of-sight failures. An eligible dead player currently targeted has precedence, followed by the fixed class order (Shaman, Paladin, Priest, Druid, Mage, Hunter, Warlock, Warrior, Rogue).
 - Reads optional pfUI LibPredict and HealComm data, parses HealComm/CTRA start/cancel messages only from current group members, and supports ClassicAPI remote START when a named target can be resolved. No pfUI or Ace dependency is added to Priest Companion.

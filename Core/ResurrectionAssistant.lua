@@ -1,6 +1,6 @@
--- Priest Companion - Resurrection Assistant (detection and selection only)
--- Vanilla Lua 5.0-compatible. No spellcasts, targeting or continuous scanning.
--- Phase 1: event-driven party/raid snapshots, outside player combat only.
+-- Priest Companion - Resurrection Assistant
+-- Vanilla Lua 5.0-compatible. Event-driven death detection outside combat.
+-- Resurrection actions are only dispatched by an explicit button click.
 
 local PC = PriestCompanion
 PC.Modules.ResurrectionAssistant = PC.Modules.ResurrectionAssistant or {}
@@ -18,6 +18,61 @@ local incoming = {}
 local inCombat = false
 local initialized = false
 local revision = 0
+local listeners = {}
+local rebuildingRoster = false
+
+local function Notify()
+    revision = revision + 1
+    if rebuildingRoster then return end
+    local i
+    for i = 1, table.getn(listeners) do
+        pcall(listeners[i])
+    end
+end
+
+function Assistant.AddListener(listener)
+    if type(listener) == "function" then
+        table.insert(listeners, listener)
+    end
+end
+
+local function Options()
+    if type(PriestCompanionCharDB) ~= "table" then return nil end
+    if type(PriestCompanionCharDB.resurrectionAssistant) ~= "table" then
+        PriestCompanionCharDB.resurrectionAssistant = {}
+    end
+    return PriestCompanionCharDB.resurrectionAssistant
+end
+
+function Assistant.GetButtonEnabled()
+    local db = Options()
+    return db == nil or db.showButton ~= false
+end
+
+function Assistant.SetButtonEnabled(value)
+    local db = Options()
+    if db then db.showButton = value and true or false end
+    Notify()
+end
+
+function Assistant.GetButtonPosition()
+    local db = Options()
+    if db and type(db.x) == "number" and type(db.y) == "number" then
+        return db.x, db.y
+    end
+    return 200, -90
+end
+
+function Assistant.SetButtonPosition(x, y)
+    if type(x) ~= "number" or type(y) ~= "number" then return end
+    local db = Options()
+    if db then db.x, db.y = x, y end
+end
+
+function Assistant.ResetButtonPosition()
+    Assistant.SetButtonPosition(200, -90)
+    Notify()
+end
 
 local function Now()
     return GetTime()
@@ -86,7 +141,7 @@ local function MarkIncoming(sender, target)
         incoming[targetName] = {}
     end
     incoming[targetName][sender] = Now() + OFFER_SECONDS
-    revision = revision + 1
+    Notify()
 end
 
 local function StopIncoming(sender)
@@ -94,7 +149,7 @@ local function StopIncoming(sender)
     for target, senders in pairs(incoming) do
         if senders[sender] then
             senders[sender] = nil
-            revision = revision + 1
+            Notify()
         end
         if not next(senders) then
             incoming[target] = nil
@@ -176,10 +231,12 @@ local function UpdateUnit(unit)
         -- event; never associate an old unit slot with a new character.
         rosterByUnit[unit] = nil
         rosterByName[old.name] = nil
-        revision = revision + 1
+        Notify()
         return
     end
 
+    local priorConnected, priorDead, priorGhost =
+        old.connected, old.dead, old.ghost
     old.connected = type(UnitIsConnected) ~= "function"
         or UnitIsConnected(unit) and true or false
     old.dead = UnitIsDead(unit) and true or false
@@ -189,7 +246,10 @@ local function UpdateUnit(unit)
     if not old.dead and not old.ghost then
         incoming[name] = nil
     end
-    revision = revision + 1
+
+    -- Many UNIT_HEALTH events contain no eligibility changes.
+    if old.connected ~= priorConnected or old.dead ~= priorDead
+    or old.ghost ~= priorGhost then Notify() end
 end
 
 function Assistant.RefreshRoster()
@@ -230,6 +290,7 @@ function Assistant.RefreshRoster()
         end
     end
 
+    rebuildingRoster = true
     rosterByUnit = newUnits
     rosterByName = newNames
 
@@ -245,7 +306,8 @@ function Assistant.RefreshRoster()
     end
 
     initialized = true
-    revision = revision + 1
+    rebuildingRoster = false
+    Notify()
     return true
 end
 
@@ -346,6 +408,147 @@ function Assistant.GetNextCandidate()
     return candidates[1]
 end
 
+-- The UI asks for this state ONLY after a change event. A released
+-- corpse is deliberately never treated as a directly addressable unit.
+local function GetActionState()
+    if not initialized or not CanConsiderPlayers() then return nil end
+
+    local candidate = Assistant.GetNextCandidate()
+    if candidate then
+        return {
+            mode = "target",
+            name = candidate.name,
+            class = candidate.class,
+            unit = candidate.unit
+        }
+    end
+    local unit, data
+    for unit, data in pairs(rosterByUnit) do
+        if data.ghost and data.connected then
+            return { mode = "corpse" }
+        end
+    end
+    return nil
+end
+
+function Assistant.GetButtonState()
+    if not Assistant.GetButtonEnabled() then return nil end
+    return GetActionState()
+end
+
+local lastClickAt = nil
+local function BusyCasting()
+    if type(SpellIsTargeting) == "function" and SpellIsTargeting() then
+        return true
+    end
+    if type(C_Spell) == "table"
+    and type(C_Spell.UnitCastingInfo) == "function" then
+        local ok, casting = pcall(C_Spell.UnitCastingInfo, "player")
+        if ok and casting then return true end
+    end
+    -- On a Vanilla client without ClassicAPI, use available cast bars.
+    if CastingBarFrame
+    and (CastingBarFrame.casting or CastingBarFrame.channeling) then
+        return true
+    end
+    if type(pfGetCastInfo) == "function" then
+        local ok, casting = pcall(pfGetCastInfo, "player")
+        if ok and casting then return true end
+    end
+    return false
+end
+
+function Assistant.TryResurrect()
+    -- Called only from a player's UI click. Never from OnEvent/OnUpdate.
+    if not CanConsiderPlayers() then
+        return false, "Resurrection is unavailable during combat."
+    end
+    if BusyCasting() then
+        return false, "Finish your current spell or target selection first."
+    end
+    local state = GetActionState()
+    if not state then
+        return false, "No eligible Resurrection target."
+    end
+    if type(CastSpellByName) ~= "function" then
+        return false, "Casting API unavailable."
+    end
+    local now = Now()
+    if lastClickAt and now - lastClickAt < 0.75 then
+        return false, "Resurrection was just requested."
+    end
+    lastClickAt = now
+
+    if state.mode == "target" then
+        -- Revalidate at click time; saved unit tokens can be reassigned.
+        local candidate = Assistant.GetNextCandidate()
+        if not candidate or candidate.name ~= state.name
+        or candidate.unit ~= state.unit then
+            return false, "The Resurrection target changed."
+        end
+
+        -- ClassicAPI unit casting does not modify the player's selection.
+        -- If it declines the cast, do not retry through another method.
+        if type(C_Spell) == "table"
+        and type(C_Spell.CastAtUnit) == "function" then
+            local ok, started = pcall(
+                C_Spell.CastAtUnit, "Resurrection", candidate.unit
+            )
+            if not ok or not started then
+                return false, "Unable to cast Resurrection on " .. candidate.name .. "."
+            end
+            return true, candidate.name
+        end
+
+        -- Vanilla fallback. Clear another selected target first so the
+        -- client provides a spell-target cursor; restore selection later.
+        local previous = UnitExists("target")
+        local same = previous and UnitName("target") == candidate.name
+        if previous and not same and type(ClearTarget) == "function" then
+            ClearTarget()
+        end
+        local castOK = pcall(CastSpellByName, "Resurrection")
+        local targeting = type(SpellIsTargeting) == "function"
+            and SpellIsTargeting()
+        if castOK and targeting then
+            if type(SpellCanTargetUnit) ~= "function"
+            or SpellCanTargetUnit(candidate.unit) then
+                local ok = pcall(SpellTargetUnit, candidate.unit)
+                castOK = ok and not SpellIsTargeting()
+            else
+                castOK = false
+            end
+            if not castOK and type(SpellStopTargeting) == "function" then
+                SpellStopTargeting()
+            end
+        elseif not same then
+            -- No cursor and the intended target was not selected:
+            -- never report an unverified or potentially wrong cast.
+            castOK = false
+        end
+        if previous and not same
+        and type(TargetLastTarget) == "function" then
+            TargetLastTarget()
+        end
+        if not castOK then
+            return false, "Unable to cast Resurrection on " .. candidate.name .. "."
+        end
+        return true, candidate.name
+    end
+
+    -- Released-player corpse: no resolvable unit token. The player must
+    -- click the actual corpse after the spell cursor is activated.
+    if UnitExists("target") and type(ClearTarget) == "function" then
+        ClearTarget()
+    end
+    local ok = pcall(CastSpellByName, "Resurrection")
+    if not ok or type(SpellIsTargeting) ~= "function"
+    or not SpellIsTargeting() then
+        return false, "Could not activate manual corpse targeting."
+    end
+    return true, "Click the released player's corpse in the world."
+end
+
 function Assistant.GetSummary()
     if CombatBlocked() then
         return { paused = true, reason = "combat" }
@@ -407,7 +610,7 @@ function Assistant.PrintStatus()
         DEFAULT_CHAT_FRAME:AddMessage(head .. "No eligible group target.")
     end
     DEFAULT_CHAT_FRAME:AddMessage(
-        head .. "Preview only; no spells are cast in this phase."
+        head .. "Use the Resurrection button to cast once per click."
     )
 end
 
@@ -497,7 +700,7 @@ end
 events:SetScript("OnEvent", function()
     if event == "PLAYER_REGEN_DISABLED" then
         inCombat = true
-        revision = revision + 1
+        Notify()
         return
     end
 

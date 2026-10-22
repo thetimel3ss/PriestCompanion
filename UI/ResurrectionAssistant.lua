@@ -47,8 +47,8 @@ frame:SetBackdrop({
 })
 frame:Hide()
 
--- All artwork is non-interactive. A single frame handles the cast click
--- regardless of where the player clicks (except the resize corner).
+-- All artwork is non-interactive. The central area casts on click;
+-- eight narrow edge/corner handles exclusively resize the window.
 local visual = CreateFrame("Frame", nil, frame)
 visual:EnableMouse(false)
 visual:SetPoint("TOPLEFT", frame, "TOPLEFT", 0, 0)
@@ -71,23 +71,15 @@ previewText:SetText("PREVIEW - NO CAST")
 previewText:SetTextColor(0.40, 0.75, 1.00)
 previewText:Hide()
 
-local grip = CreateFrame("Frame", nil, frame)
-grip:SetWidth(17)
-grip:SetHeight(17)
-grip:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -2, 2)
-grip:EnableMouse(true)
-local gripTexture = grip:CreateTexture(nil, "OVERLAY")
-gripTexture:SetAllPoints(grip)
-gripTexture:SetTexture(
-    "Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Up"
-)
-
 local appliedX, appliedY
 local appliedExpanded, appliedScale
 local previewActive = false
 local dragConsumedClick = false
 local dragging = false
 local sizing = false
+local resizeDirection = nil
+local resizeStartScale = nil
+local resizeHandles = {}
 local Refresh
 
 local function ClassRGB(class)
@@ -145,10 +137,126 @@ local function SavePosition()
     end
 end
 
+-- Same eight resize regions used by the Book of Prayer tracker.
+-- The corner/edge hit boxes shrink with the HUD so the center remains
+-- a useful Resurrection click target even at 40% scale.
+local function CreateResizeRegion(direction)
+    local handle = CreateFrame("Frame", nil, frame)
+    handle.direction = direction
+    handle:EnableMouse(true)
+    if direction == "TOP" or direction == "BOTTOM" then
+        local top = direction == "TOP"
+        handle:SetPoint(top and "TOPLEFT" or "BOTTOMLEFT",
+            frame, top and "TOPLEFT" or "BOTTOMLEFT", 12, 0)
+        handle:SetPoint(top and "TOPRIGHT" or "BOTTOMRIGHT",
+            frame, top and "TOPRIGHT" or "BOTTOMRIGHT", -12, 0)
+    elseif direction == "LEFT" or direction == "RIGHT" then
+        local left = direction == "LEFT"
+        handle:SetPoint(left and "TOPLEFT" or "TOPRIGHT",
+            frame, left and "TOPLEFT" or "TOPRIGHT", 0, -12)
+        handle:SetPoint(left and "BOTTOMLEFT" or "BOTTOMRIGHT",
+            frame, left and "BOTTOMLEFT" or "BOTTOMRIGHT", 0, 12)
+    else
+        handle:SetPoint(direction, frame, direction, 0, 0)
+    end
+
+    handle:SetScript("OnMouseDown", function()
+        if arg1 ~= "LeftButton" or Assistant.IsPaused()
+        or Assistant.GetDisplayOption("locked")
+        or type(frame.StartSizing) ~= "function" then return end
+        dragConsumedClick = true
+        sizing = true
+        resizeDirection = this.direction
+        resizeStartScale = Assistant.GetButtonScale()
+        frame:StartSizing(this.direction)
+    end)
+
+    handle:SetScript("OnMouseUp", function()
+        if not sizing or resizeDirection ~= this.direction then return end
+        frame:StopMovingOrSizing()
+        sizing = false
+        dragConsumedClick = true
+
+        local baseW, baseH, expanded = BaseDimensions()
+        local horizontal = frame:GetWidth() / baseW
+        local vertical = frame:GetHeight() / baseH
+        local direction = resizeDirection
+        local nextScale
+        if direction == "LEFT" or direction == "RIGHT" then
+            nextScale = horizontal
+        elseif direction == "TOP" or direction == "BOTTOM" then
+            nextScale = vertical
+        elseif math.abs(horizontal - resizeStartScale) >=
+            math.abs(vertical - resizeStartScale) then
+            nextScale = horizontal
+        else
+            nextScale = vertical
+        end
+
+        resizeDirection = nil
+        resizeStartScale = nil
+        Assistant.SetButtonScale(nextScale, expanded)
+        SavePosition()
+    end)
+
+    table.insert(resizeHandles, handle)
+    return handle
+end
+
+CreateResizeRegion("TOP")
+CreateResizeRegion("BOTTOM")
+CreateResizeRegion("LEFT")
+CreateResizeRegion("RIGHT")
+CreateResizeRegion("TOPLEFT")
+CreateResizeRegion("TOPRIGHT")
+CreateResizeRegion("BOTTOMLEFT")
+local bottomRightRegion = CreateResizeRegion("BOTTOMRIGHT")
+
+local resizeArtwork = bottomRightRegion:CreateTexture(nil, "OVERLAY")
+resizeArtwork:SetPoint("BOTTOMRIGHT", bottomRightRegion, "BOTTOMRIGHT", 0, 0)
+resizeArtwork:SetTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Up")
+
+local function UpdateResizeRegions(locked, scale)
+    -- Keep edge hit regions proportional, never the fixed 8-17 pixels
+    -- that would consume most of a 40% compact button.
+    local edgeSize = math.max(3, math.floor(8 * scale + 0.5))
+    local cornerSize = math.max(6, math.floor(12 * scale + 0.5))
+    local i, handle, direction
+    for i = 1, table.getn(resizeHandles) do
+        handle = resizeHandles[i]
+        direction = handle.direction
+        if direction == "TOP" or direction == "BOTTOM" then
+            handle:SetHeight(edgeSize)
+        elseif direction == "LEFT" or direction == "RIGHT" then
+            handle:SetWidth(edgeSize)
+        else
+            handle:SetWidth(cornerSize)
+            handle:SetHeight(cornerSize)
+        end
+        handle:EnableMouse(not locked)
+    end
+    resizeArtwork:SetWidth(cornerSize)
+    resizeArtwork:SetHeight(cornerSize)
+    if locked then
+        resizeArtwork:Hide()
+    else
+        resizeArtwork:Show()
+    end
+end
+
+
 local function UpdateSize()
     local width, height, expanded = BaseDimensions()
     local scale = Assistant.GetButtonScale(expanded)
-    if expanded ~= appliedExpanded or scale ~= appliedScale then
+    if type(frame.SetMinResize) == "function" then
+        frame:SetMinResize(width * 0.40, height * 0.40)
+    end
+    if type(frame.SetMaxResize) == "function" then
+        frame:SetMaxResize(width * 1.20, height * 1.20)
+    end
+    if expanded ~= appliedExpanded or scale ~= appliedScale
+    or math.abs(frame:GetWidth() - width * scale) > 0.3
+    or math.abs(frame:GetHeight() - height * scale) > 0.3 then
         frame:SetWidth(width * scale)
         frame:SetHeight(height * scale)
         visual:SetWidth(width)
@@ -158,6 +266,31 @@ local function UpdateSize()
         appliedScale = scale
     end
 end
+
+-- Match the Prayer Tracker's live visual response while a border is
+-- being dragged. The outer frame snaps to its saved uniform scale when
+-- the gesture ends; no polling is required.
+frame:SetScript("OnSizeChanged", function()
+    if not sizing or not resizeDirection then return end
+    local baseW, baseH = BaseDimensions()
+    local hScale = frame:GetWidth() / baseW
+    local vScale = frame:GetHeight() / baseH
+    local effectiveScale
+    if resizeDirection == "LEFT" or resizeDirection == "RIGHT" then
+        effectiveScale = hScale
+    elseif resizeDirection == "TOP" or resizeDirection == "BOTTOM" then
+        effectiveScale = vScale
+    elseif math.abs(hScale - resizeStartScale) >=
+        math.abs(vScale - resizeStartScale) then
+        effectiveScale = hScale
+    else
+        effectiveScale = vScale
+    end
+    if effectiveScale < 0.40 then effectiveScale = 0.40 end
+    if effectiveScale > 1.20 then effectiveScale = 1.20 end
+    visual:SetScale(effectiveScale)
+    UpdateResizeRegions(false, effectiveScale)
+end)
 
 local function LayoutCompact()
     title:Hide()
@@ -288,11 +421,10 @@ Refresh = function()
         LayoutCompact()
     end
     UpdateAppearance(state)
-    if Assistant.GetDisplayOption("locked") then
-        grip:Hide()
-    else
-        grip:Show()
-    end
+    UpdateResizeRegions(
+        Assistant.GetDisplayOption("locked"),
+        Assistant.GetButtonScale()
+    )
     frame:Show()
 end
 
@@ -347,31 +479,10 @@ frame:SetScript("OnDragStop", function()
     end
 end)
 
-grip:SetScript("OnMouseDown", function()
-    if arg1 ~= "LeftButton"
-    or Assistant.GetDisplayOption("locked") or Assistant.IsPaused()
-    or type(frame.StartSizing) ~= "function" then return end
-    dragConsumedClick = true
-    sizing = true
-    frame:StartSizing("BOTTOMRIGHT")
-end)
-
-grip:SetScript("OnMouseUp", function()
-    if not sizing then return end
-    frame:StopMovingOrSizing()
-    sizing = false
-    dragConsumedClick = true
-    local width, height, expanded = BaseDimensions()
-    local widthFactor = frame:GetWidth() / width
-    local heightFactor = frame:GetHeight() / height
-    local newScale = math.max(widthFactor, heightFactor)
-    Assistant.SetButtonScale(newScale, expanded)
-    SavePosition()
-end)
-
 frame:SetScript("OnHide", function()
     frame:StopMovingOrSizing()
     dragging, sizing = false, false
+    resizeDirection, resizeStartScale = nil, nil
 end)
 
 -- Preview is visual-only and never touches the selected group target.

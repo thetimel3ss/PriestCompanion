@@ -2,6 +2,12 @@
 
 ## [Unreleased]
 
+### Improved — Resurrection Assistant compact size and edge resizing (2026-10-22)
+- Reduced the HUD scaling range from 70%–180% to **40%–120%**, retaining separate compact and expanded scales. Older saved values outside the new range are clamped at read time, not silently reset to 100%.
+- Replaced bottom-right-only resizing with **eight draggable edge/corner zones**, modeled after Book of Prayer Tracker; resize regions shrink for small windows so the central HUD can still be clicked to cast.
+- The Tracker's actual minimum dimensions are 68×68 px (Compact) and 104×78 px (Expanded), with 360×240 px maximum. The Assistant intentionally supports a smaller minimum (40% of its base dimensions) and maintains proportional scaling of icon and text even when resized from a single edge.
+- Updated Options → Tools → Resurrection scale slider and descriptive tooltips. Existing cast OnClick handler, preview suppression, Lock Position and out-of-combat event filtering are retained. **Static review only; in-game resize/cast validation pending.**
+
 ### Fixed (requires in-game retest) — Resurrection HUD casting interaction (2026-10-22)
 - The maintainer reported that the new compact/expanded window correctly showed an eligible player or a yellow released-corpse state but clicking did not start Resurrection or activate manual corpse targeting. Further clicks could incorrectly report "Resurrection was just requested."
 - Replaced casting from a plain Frame's `OnMouseUp` with a real WoW Button using `RegisterForClicks("LeftButtonUp")` and `OnClick`, matching the previously validated Resurrection popup. The full HUD remains clickable; drag/resize gestures are suppressed from triggering casts.

@@ -757,9 +757,9 @@ local assistantLockedBox = Checkbox(
     function(value)
         if assistant then assistant.SetDisplayOption("locked", value) end
     end,
-    "Prevent moving and resizing the Resurrection HUD, but keep " ..
-    "the full HUD clickable to cast. Uncheck to drag anywhere " ..
-    "or resize from the bottom-right corner."
+    "Prevent moving or resizing the Resurrection HUD, but keep " ..
+    "its center clickable to cast. Uncheck to drag the window " ..
+    "or resize it from any edge or corner (Tracker-style)."
 )
 
 local assistantResetButton = CreateFrame(
@@ -791,13 +791,28 @@ local scaleSlider = CreateFrame(
 scaleSlider:SetWidth(194)
 scaleSlider:SetHeight(17)
 scaleSlider:SetPoint("TOPLEFT", resChild, "TOPLEFT", 25, -916)
-scaleSlider:SetMinMaxValues(0.70, 1.80)
+scaleSlider:SetMinMaxValues(0.40, 1.20)
 if type(scaleSlider.SetValueStep) == "function" then
     scaleSlider:SetValueStep(0.05)
 end
 
 local scaleLabel = Label("100%", 232, 912, 110, "GameFontHighlightSmall")
 local syncingScale = false
+local function SyncAssistantScale()
+    if not assistant then return end
+    syncingScale = true
+    local value = assistant.GetButtonScale()
+    scaleSlider:SetValue(value)
+    scaleLabel:SetText(
+        tostring(math.floor(value * 100 + 0.5)) .. "%"
+    )
+    syncingScale = false
+end
+-- Keep the slider in sync if the player resizes the HUD directly via
+-- its edge/corner handles while Options is open.
+if assistant and type(assistant.AddListener) == "function" then
+    assistant.AddListener(SyncAssistantScale)
+end
 scaleSlider:SetScript("OnValueChanged", function()
     if syncingScale or not assistant then return end
     local value = math.floor(this:GetValue() * 20 + 0.5) / 20
@@ -806,9 +821,10 @@ scaleSlider:SetScript("OnValueChanged", function()
 end)
 scaleSlider:SetScript("OnEnter", function()
     ShowTooltip(this, "Window size",
-        "Adjust the size of the entire HUD, including the icon and " ..
-        "both texts. Compact and Expanded modes keep separate sizes. " ..
-        "While unlocked, drag the bottom-right grip to resize in-game.")
+        "Scale the entire HUD from 40% to 120%, including the icon " ..
+        "and text. Compact and Expanded retain independent sizes. " ..
+        "When unlocked, drag any edge or corner to resize. " ..
+        "The center remains clickable for Resurrection.")
 end)
 scaleSlider:SetScript("OnLeave", HideTooltip)
 
@@ -866,9 +882,9 @@ assistantPreviewButton:SetScript("OnClick", function()
 end)
 assistantPreviewButton:SetScript("OnEnter", function()
     ShowTooltip(this, "Preview HUD",
-        "Temporarily display the HUD without a dead group member. " ..
-        "Preview is blue and NEVER casts Resurrection when clicked. " ..
-        "Unlock to drag/resize; options update live. " ..
+        "Display the HUD without a dead group member. Preview is blue " ..
+        "and NEVER casts Resurrection. Unlock to drag or resize " ..
+        "using the window's edges/corners; changes update live. " ..
         "Switching tabs or closing Options stops preview.")
 end)
 assistantPreviewButton:SetScript("OnLeave", HideTooltip)
@@ -1009,13 +1025,7 @@ function panel.Refresh()
             assistant.GetDisplayOption("locked") and 1 or nil
         )
 
-        syncingScale = true
-        local value = assistant.GetButtonScale()
-        scaleSlider:SetValue(value)
-        scaleLabel:SetText(
-            tostring(math.floor(value * 100 + 0.5)) .. "%"
-        )
-        syncingScale = false
+        SyncAssistantScale()
     else
         assistantButtonBox:Disable()
         assistantExpandedBox:Disable()

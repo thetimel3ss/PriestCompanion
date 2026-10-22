@@ -80,9 +80,11 @@ function Assistant.GetButtonScale(expanded)
     end
     local db = Options()
     local scale = db and tonumber(db[ScaleKey(expanded)]) or 1
-    if not scale or scale < 0.70 or scale > 1.80 then
-        return 1
-    end
+    if not scale or scale ~= scale then return 1 end
+    -- Clamp legacy values from the earlier 70%-180% setting instead
+    -- of reverting the user's saved scale to 100%.
+    if scale < 0.40 then return 0.40 end
+    if scale > 1.20 then return 1.20 end
     return scale
 end
 
@@ -92,8 +94,9 @@ function Assistant.SetButtonScale(value, expanded)
     end
     local number = tonumber(value)
     if not number then return end
-    if number < 0.70 then number = 0.70 end
-    if number > 1.80 then number = 1.80 end
+    if number ~= number then return end
+    if number < 0.40 then number = 0.40 end
+    if number > 1.20 then number = 1.20 end
     number = math.floor(number * 20 + 0.5) / 20
     local db = Options()
     if db then db[ScaleKey(expanded)] = number end

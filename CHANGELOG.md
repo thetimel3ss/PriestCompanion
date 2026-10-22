@@ -7,7 +7,7 @@
 - **Interrupted released-corpse cast:** the generic interruption notice reaches the selected chat channels and Whisper is skipped for the unidentified recipient.
 - **Named Resurrection target with Whisper enabled:** the recipient receives the configured personalized Whisper.
 - **Interrupted named-target Resurrection:** the configured interruption message is sent and the target also receives a Whisper notification.
-- All four scenarios were confirmed in OctoWoW by the maintainer. This does not yet verify pre-START failures, duplicate event handling, channel combinations, message persistence, or name recovery when a released corpse becomes identifiable. No code changes were required.
+- All four scenarios were confirmed in OctoWoW by the maintainer. The maintainer additionally confirmed that an out-of-range Resurrection attempt is stopped by the client without any announcement, and a normally completed cast does not produce a false interruption notice. Client-side out-of-range rejection does not independently validate a server-side failure after SENT but before START. Duplicate event handling, channel combinations, message persistence, and name recovery for released corpses remain unverified. No code changes were required.
 
 ### Improved — Resurrection Whisper, interruptions and released corpses (2026-10-22)
 - Continue requiring matched ClassicAPI `UNIT_SPELLCAST_SENT` and `UNIT_SPELLCAST_START` GUIDs before sending the cast-start announcement; no claim of completion/acceptance. Attempts failing before START stay silent.

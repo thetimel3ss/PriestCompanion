@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Validated — Book of Prayer Tracker core functionality (2026-10-22)
+- After the window scaling update, the maintainer confirmed in-game that heals are still recorded, mana tracking remains functional, and refund status border colors behave correctly.
+- Compact/Expanded size limits, eight-edge resizing, scale slider synchronization, persistence, Lock Position and Preview remain awaiting separate in-game validation. No runtime code changes in this validation commit.
+
 ### Improved — Book of Prayer Tracker window size and eight-edge resizing (2026-10-22)
 - Adopted the Resurrection Assistant's **40%–120%** window size controls for Book of Prayer Tracker. Compact and Expanded each retain their own proportional scale; added an Options → Tracker slider, tooltip and per-mode **Reset current size** button.
 - Reused all eight existing Tracker edge/corner drag regions, now scaled appropriately for small windows. Manual resizing selects the manipulated edge/corner axis and normalizes icon, text and outer frame proportionally when released; the slider refreshes from resize notifications without additional polling.

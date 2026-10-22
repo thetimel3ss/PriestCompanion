@@ -118,6 +118,18 @@ All 28 records have `source.note`: 21 world-drop-style entries with `"World drop
 
 ## Next steps
 
+### Resurrection Assistant — detection and selection (`feature/resurrection-assistant`)
+
+- [x] Create a branch from the validated `feature/announcer` head, preserving the original branch and `main`.
+- [x] Add `Core/ResurrectionAssistant.lua` to the regular and ClassicAPI TOCs. Detection and prioritization only; **no casting, targeting, popup or automatic resurrections in this phase**.
+- [x] Implement event-driven party/raid snapshots and per-unit health/flags updates, skipping the player, disconnected units and released ghosts. Prefer a manually selected eligible group target, then Shaman → Paladin → Priest → Druid → Mage → Hunter → Warlock → Warrior → Rogue.
+- [x] **Strict combat gate:** `PLAYER_REGEN_DISABLED` suspends all roster/death evaluation and candidate selection. All health/group/addon messages are ignored while the priest is in combat. `PLAYER_REGEN_ENABLED` rebuilds the roster once, so deaths during combat are discovered only afterwards. No OnUpdate polling or background roster scanning.
+- [x] Interoperate with optional pfUI LibPredict and HealComm library queries; receive HealComm/CTRA start/stop broadcasts directly, but only from members of the current party/raid. Expire unconfirmed offers; optionally consume ClassicAPI remote cast START observations when the recipient is available. No extra libraries are bundled, and the vanilla core remains Lua 5.0 compatible.
+- [x] Validate current target status when explicitly querying candidates, and apply optional distance / line-of-sight checks when present. An unknown distance does not prove a target is within cast range; the game's cast validation remains authoritative.
+- [x] Add read-only `/pc res status` (or `/pc res next`) to inspect the current eligible target and counts. Plain `/pc res` intentionally does not cast yet.
+- [ ] **In-game validation:** solo/party/raid; priority and selected-target override; out-of-range and released ghosts excluded; pfUI/HealComm installed or absent; incoming HealComm/CTRA starts, stops, expiry, multiple casters and roster changes; combat pause without messages/scans and single refresh after exiting combat; communication while priest is in combat ignored; ClassicAPI remote START when visible; Vanilla without ClassicAPI. Check that the existing Announcer still works.
+- [ ] **Next phase:** implement one-cast-per-click manual action/macro, then optional death-triggered button, only after the candidate engine passes the initial tests. Released corpses continue to require a manual world click when their unit is unavailable.
+
 ### Tools — Fear Ward and Resurrection (in progress on `feature/announcer`)
 
 - [x] Rename Options → Announcer to **Options → Tools**, with native **Fear Ward** and **Resurrection** sub-tabs to accommodate later assistant/automation features alongside each spell's announcements.

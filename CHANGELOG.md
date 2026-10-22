@@ -2,6 +2,15 @@
 
 ## [Unreleased]
 
+### Added — Resurrection Assistant candidate engine (2026-10-22)
+- Introduced `feature/resurrection-assistant` from the validated `feature/announcer` commit; the prior branch and `main` are untouched.
+- Added `Core/ResurrectionAssistant.lua` to both TOCs for event-driven party/raid death detection and priority-based candidate selection. The initial implementation **does not cast spells or display the popup**.
+- During the priest's combat, roster/health/death detection and addon-message processing pause completely. `PLAYER_REGEN_ENABLED` refreshes the roster after combat; no per-frame scanning runs.
+- Filters dead but not released/ghost players, disconnections, incoming resurrection offers, and optionally known range/line-of-sight failures. An eligible dead player currently targeted has precedence, followed by the fixed class order (Shaman, Paladin, Priest, Druid, Mage, Hunter, Warlock, Warrior, Rogue).
+- Reads optional pfUI LibPredict and HealComm data, parses HealComm/CTRA start/cancel messages only from current group members, and supports ClassicAPI remote START when a named target can be resolved. No pfUI or Ace dependency is added to Priest Companion.
+- Added read-only `/pc res status` and `/pc res next` for in-game diagnosis. `/pc res` explains that casting has not been implemented.
+- **Static checks only; in-game testing pending** for events, group changes, combat pause, priority, external communication, missing providers, ghost handling, and regression behavior.
+
 ### Validated — Resurrection settings persistence after reload (2026-10-22)
 - In OctoWoW, the maintainer confirmed that the final save-and-reload test passed: customized Resurrection/Whisper messages and selected settings persisted after `/reload`.
 - This validates saved changes surviving a UI reload, not every Default/Save/Preview interaction or other edge cases. No runtime changes were needed.

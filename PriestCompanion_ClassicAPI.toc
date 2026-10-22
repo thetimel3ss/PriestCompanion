@@ -27,6 +27,7 @@ Data\HealingSpells.lua
 
 Core\PrayerTracker.lua
 Core\Announcer.lua
+Core\ResurrectionAssistant.lua
 
 UI\MainFrame.lua
 UI\SourceTooltip.lua

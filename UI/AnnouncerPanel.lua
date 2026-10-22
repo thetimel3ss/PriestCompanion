@@ -80,7 +80,7 @@ local scroll, child = CreateToolScroll(
     "PriestCompanionAnnouncerScroll", 409
 )
 local resScroll, resChild = CreateToolScroll(
-    "PriestCompanionResurrectionScroll", 866
+    "PriestCompanionResurrectionScroll", 1100
 )
 resScroll:Hide()
 
@@ -699,43 +699,185 @@ end)
 cancelSaveButton:SetScript("OnClick", SaveCancelMessage)
 
 --------------------------------------------------
--- Resurrection Assistant (optional floating button)
+-- Resurrection Assistant (compact / expanded HUD)
 --------------------------------------------------
 
-Label("Resurrection Assistant", 14, 735, 355, "GameFontNormal")
+Label("Resurrection Assistant", 14, 729, 355, "GameFontNormal")
 
 local assistantButtonBox = Checkbox(
     "PriestCompanionResurrectionAssistantShowButton",
-    "Show Resurrection button", 14, 766,
+    "Show Resurrection button", 14, 763,
     function(value)
         if assistant then assistant.SetButtonEnabled(value) end
     end,
-    "Show the movable Resurrection button when a party or raid " ..
-    "member dies outside combat. Clicking casts once. If only " ..
-    "released corpses remain, the button prepares manual targeting. " ..
-    "This works independently of the Resurrection Announcer.",
+    "Show the Resurrection HUD when an eligible party/raid member " ..
+    "is dead outside combat. The whole HUD is clickable: each click " ..
+    "attempts one Resurrection. A released corpse requires a manual " ..
+    "world click. This option does not disable /pc res.",
     161
+)
+
+local assistantExpandedBox = Checkbox(
+    "PriestCompanionResurrectionAssistantExpanded",
+    "Expanded mode", 204, 763,
+    function(value)
+        if assistant then assistant.SetDisplayOption("expanded", value) end
+    end,
+    "Expanded mode keeps the original wide HUD with a heading, " ..
+    "spell icon and action text. Compact mode uses the Tracker-like " ..
+    "vertical icon with optional name and class labels."
+)
+
+local assistantNameBox = Checkbox(
+    "PriestCompanionResurrectionAssistantShowName",
+    "Show player name", 14, 801,
+    function(value)
+        if assistant then assistant.SetDisplayOption("showName", value) end
+    end,
+    "Show the recipient nickname below the icon in compact mode, " ..
+    "or beside it in expanded mode. The nickname adopts the " ..
+    "recipient's class color. Hiding it leaves more space for " ..
+    "the Resurrection icon."
+)
+
+local assistantClassBox = Checkbox(
+    "PriestCompanionResurrectionAssistantShowClass",
+    "Show player class", 204, 801,
+    function(value)
+        if assistant then assistant.SetDisplayOption("showClass", value) end
+    end,
+    "Show the recipient's class using the same class color as the " ..
+    "nickname. In compact mode the icon automatically grows when " ..
+    "the name or class is hidden."
+)
+
+local assistantLockedBox = Checkbox(
+    "PriestCompanionResurrectionAssistantLocked",
+    "Lock position", 14, 839,
+    function(value)
+        if assistant then assistant.SetDisplayOption("locked", value) end
+    end,
+    "Prevent moving and resizing the Resurrection HUD, but keep " ..
+    "the full HUD clickable to cast. Uncheck to drag anywhere " ..
+    "or resize from the bottom-right corner."
 )
 
 local assistantResetButton = CreateFrame(
     "Button", "PriestCompanionResurrectionAssistantReset",
     resChild, "UIPanelButtonTemplate"
 )
-assistantResetButton:SetWidth(150)
+assistantResetButton:SetWidth(151)
 assistantResetButton:SetHeight(24)
 assistantResetButton:SetPoint(
-    "TOPLEFT", resChild, "TOPLEFT", 216, -766
+    "TOPLEFT", resChild, "TOPLEFT", 215, -839
 )
-assistantResetButton:SetText("Reset button position")
+assistantResetButton:SetText("Reset position")
 assistantResetButton:SetScript("OnClick", function()
     if assistant then assistant.ResetButtonPosition() end
 end)
+assistantResetButton:SetScript("OnEnter", function()
+    ShowTooltip(this, "Reset position",
+        "Move the Resurrection HUD to its default location. " ..
+        "Works even if Lock position is checked.")
+end)
+assistantResetButton:SetScript("OnLeave", HideTooltip)
 
-Label(
-    "Outside combat only. Drag its title to move. " ..
-    "One Resurrection per click.",
-    14, 808, 355
+Label("Window size (per mode)", 14, 883, 355, "GameFontNormalSmall")
+
+local scaleSlider = CreateFrame(
+    "Slider", "PriestCompanionResurrectionAssistantScale",
+    resChild, "OptionsSliderTemplate"
 )
+scaleSlider:SetWidth(194)
+scaleSlider:SetHeight(17)
+scaleSlider:SetPoint("TOPLEFT", resChild, "TOPLEFT", 25, -916)
+scaleSlider:SetMinMaxValues(0.70, 1.80)
+if type(scaleSlider.SetValueStep) == "function" then
+    scaleSlider:SetValueStep(0.05)
+end
+
+local scaleLabel = Label("100%", 232, 912, 110, "GameFontHighlightSmall")
+local syncingScale = false
+scaleSlider:SetScript("OnValueChanged", function()
+    if syncingScale or not assistant then return end
+    local value = math.floor(this:GetValue() * 20 + 0.5) / 20
+    scaleLabel:SetText(tostring(math.floor(value * 100 + 0.5)) .. "%")
+    assistant.SetButtonScale(value)
+end)
+scaleSlider:SetScript("OnEnter", function()
+    ShowTooltip(this, "Window size",
+        "Adjust the size of the entire HUD, including the icon and " ..
+        "both texts. Compact and Expanded modes keep separate sizes. " ..
+        "While unlocked, drag the bottom-right grip to resize in-game.")
+end)
+scaleSlider:SetScript("OnLeave", HideTooltip)
+
+local previewActive = false
+local assistantPreviewButton = CreateFrame(
+    "Button", "PriestCompanionResurrectionAssistantPreview",
+    resChild, "UIPanelButtonTemplate"
+)
+assistantPreviewButton:SetWidth(145)
+assistantPreviewButton:SetHeight(25)
+assistantPreviewButton:SetPoint(
+    "TOPLEFT", resChild, "TOPLEFT", 21, -963
+)
+
+local assistantScaleResetButton = CreateFrame(
+    "Button", "PriestCompanionResurrectionAssistantScaleReset",
+    resChild, "UIPanelButtonTemplate"
+)
+assistantScaleResetButton:SetWidth(145)
+assistantScaleResetButton:SetHeight(25)
+assistantScaleResetButton:SetPoint(
+    "TOPLEFT", resChild, "TOPLEFT", 215, -963
+)
+assistantScaleResetButton:SetText("Reset current size")
+assistantScaleResetButton:SetScript("OnClick", function()
+    if assistant then assistant.ResetButtonScale() end
+    panel.Refresh()
+end)
+assistantScaleResetButton:SetScript("OnEnter", function()
+    ShowTooltip(this, "Reset current size",
+        "Restore 100% scale for the selected Compact or Expanded mode. " ..
+        "The other mode keeps its own saved scale.")
+end)
+assistantScaleResetButton:SetScript("OnLeave", HideTooltip)
+
+local function StopAssistantPreview()
+    previewActive = false
+    local hud = PC.UI and PC.UI.ResurrectionAssistantButton
+    if hud and hud.SetPreview then hud.SetPreview(false) end
+end
+
+local function UpdatePreviewLabel()
+    if previewActive then
+        assistantPreviewButton:SetText("Stop preview")
+    else
+        assistantPreviewButton:SetText("Preview HUD")
+    end
+end
+
+assistantPreviewButton:SetScript("OnClick", function()
+    previewActive = not previewActive
+    local hud = PC.UI and PC.UI.ResurrectionAssistantButton
+    if hud and hud.SetPreview then hud.SetPreview(previewActive) end
+    UpdatePreviewLabel()
+end)
+assistantPreviewButton:SetScript("OnEnter", function()
+    ShowTooltip(this, "Preview HUD",
+        "Temporarily display the HUD without a dead group member. " ..
+        "Preview is blue and NEVER casts Resurrection when clicked. " ..
+        "Unlock to drag/resize; options update live. " ..
+        "Switching tabs or closing Options stops preview.")
+end)
+assistantPreviewButton:SetScript("OnLeave", HideTooltip)
+UpdatePreviewLabel()
+
+Label("Green = available. Yellow = click corpse manually.",
+    14, 1017, 355)
+Label("Preview is blue and never casts. Combat hides the HUD.",
+    14, 1039, 355)
 
 -- Navigating between sub-tabs discards only the draft being left;
 -- leaving Tools discards both. Already saved values are untouched.
@@ -754,10 +896,16 @@ local function RestoreResDraft()
 end
 
 scroll:SetScript("OnHide", RestoreFearDraft)
-resScroll:SetScript("OnHide", RestoreResDraft)
+resScroll:SetScript("OnHide", function()
+    RestoreResDraft()
+    StopAssistantPreview()
+    UpdatePreviewLabel()
+end)
 panel:SetScript("OnHide", function()
     RestoreFearDraft()
     RestoreResDraft()
+    StopAssistantPreview()
+    UpdatePreviewLabel()
 end)
 
 function panel.SelectSubTab(id)
@@ -848,9 +996,36 @@ function panel.Refresh()
         assistantButtonBox:SetChecked(
             assistant.GetButtonEnabled() and 1 or nil
         )
+        assistantExpandedBox:SetChecked(
+            assistant.GetDisplayOption("expanded") and 1 or nil
+        )
+        assistantNameBox:SetChecked(
+            assistant.GetDisplayOption("showName") and 1 or nil
+        )
+        assistantClassBox:SetChecked(
+            assistant.GetDisplayOption("showClass") and 1 or nil
+        )
+        assistantLockedBox:SetChecked(
+            assistant.GetDisplayOption("locked") and 1 or nil
+        )
+
+        syncingScale = true
+        local value = assistant.GetButtonScale()
+        scaleSlider:SetValue(value)
+        scaleLabel:SetText(
+            tostring(math.floor(value * 100 + 0.5)) .. "%"
+        )
+        syncingScale = false
     else
         assistantButtonBox:Disable()
+        assistantExpandedBox:Disable()
+        assistantNameBox:Disable()
+        assistantClassBox:Disable()
+        assistantLockedBox:Disable()
         assistantResetButton:Disable()
+        assistantPreviewButton:Disable()
+        assistantScaleResetButton:Disable()
+        scaleSlider:Disable()
     end
 
     local resChannel

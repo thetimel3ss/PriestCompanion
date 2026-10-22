@@ -2,6 +2,15 @@
 
 ## [Unreleased]
 
+### Improved — Resurrection Assistant compact/expanded HUD (2026-10-22)
+- Reworked the Resurrection Assistant's floating window to support **Compact** and **Expanded** layouts. Compact defaults to a centered Resurrection icon, colored player nickname below it and optional class line, in the style of Book of Prayer Tracker. Hiding labels automatically enlarges the icon; Expanded retains a wide heading/details presentation.
+- The **entire window is clickable** to make exactly one user-initiated cast attempt, except for a small dedicated resize corner. Dragging the window or its resize grip does not initiate a cast. Lock Position disables movement/resize but preserves clicking.
+- Added per-character visual options: Expanded mode (default off), Show player name (default on), Show player class (default off), Lock position (default off), mode-specific scales (70–180%), Reset current size, Reset position, and updated tooltips. Existing saved visibility/position data remain compatible.
+- Display colors: green for an eligible unit target, yellow for released-corpses requiring a world click, blue for Preview; player nickname and class line inherit that character's class color.
+- A **Preview HUD** button shows a clearly labeled mock target even with no dead party members. It updates with live options and is strictly visual: clicking while Preview is active never casts. Preview stops on tab change or closing Options. No icon tooltip is used.
+- Added an out-of-combat player-target-change refresh so the HUD follows the eligible selected recipient instead of waiting for a death/roster event. No OnUpdate roster polling or in-combat scans were added.
+- **Static review only; in-game validation pending.** Class-priority ordering and HealComm/LibPredict duplicate-resurrection tests remain deferred as requested.
+
 ### Validated — Resurrection Assistant button basic interactions (2026-10-22)
 - The maintainer confirmed four in-game checks in OctoWoW: (1) a dead party member makes the button appear and clicking casts Resurrection; (2) released-body mode prepares the spell for a manual corpse click; (3) the button hides in combat and returns after combat; (4) the floating window position is persistent.
 - Class priority across multiple dead members, HealComm/LibPredict duplicate detection and other advanced compatibility scenarios remain pending at the maintainer's request. No functional code changed during this validation.

@@ -44,6 +44,66 @@ local function Options()
     return PriestCompanionCharDB.resurrectionAssistant
 end
 
+-- Display settings are intentionally independent from the Announcer.
+-- The older saved showButton/x/y fields are retained unchanged.
+local DISPLAY_DEFAULTS = {
+    expanded = false,
+    showName = true,
+    showClass = false,
+    locked = false
+}
+
+function Assistant.GetDisplayOption(key)
+    local default = DISPLAY_DEFAULTS[key]
+    if default == nil then return nil end
+    local db = Options()
+    if db and type(db[key]) == "boolean" then
+        return db[key]
+    end
+    return default
+end
+
+function Assistant.SetDisplayOption(key, value)
+    if DISPLAY_DEFAULTS[key] == nil then return end
+    local db = Options()
+    if db then db[key] = value and true or false end
+    Notify()
+end
+
+local function ScaleKey(expanded)
+    return expanded and "expandedScale" or "compactScale"
+end
+
+function Assistant.GetButtonScale(expanded)
+    if expanded == nil then
+        expanded = Assistant.GetDisplayOption("expanded")
+    end
+    local db = Options()
+    local scale = db and tonumber(db[ScaleKey(expanded)]) or 1
+    if not scale or scale < 0.70 or scale > 1.80 then
+        return 1
+    end
+    return scale
+end
+
+function Assistant.SetButtonScale(value, expanded)
+    if expanded == nil then
+        expanded = Assistant.GetDisplayOption("expanded")
+    end
+    local number = tonumber(value)
+    if not number then return end
+    if number < 0.70 then number = 0.70 end
+    if number > 1.80 then number = 1.80 end
+    number = math.floor(number * 20 + 0.5) / 20
+    local db = Options()
+    if db then db[ScaleKey(expanded)] = number end
+    Notify()
+end
+
+function Assistant.ResetButtonScale()
+    Assistant.SetButtonScale(1)
+end
+
 function Assistant.GetButtonEnabled()
     local db = Options()
     return db == nil or db.showButton ~= false
@@ -680,6 +740,7 @@ end
 
 local events = CreateFrame("Frame")
 events:RegisterEvent("PLAYER_ENTERING_WORLD")
+events:RegisterEvent("PLAYER_TARGET_CHANGED")
 events:RegisterEvent("PLAYER_REGEN_DISABLED")
 events:RegisterEvent("PLAYER_REGEN_ENABLED")
 events:RegisterEvent("PARTY_MEMBERS_CHANGED")
@@ -731,6 +792,10 @@ events:SetScript("OnEvent", function()
         end
     elseif event == "CHAT_MSG_ADDON" then
         OnAddonMessage(arg1, arg2, arg4)
+    elseif event == "PLAYER_TARGET_CHANGED" then
+        -- The selected target overrides class priority when eligible.
+        -- This also refreshes the name shown in the floating HUD.
+        Notify()
     elseif event == "UNIT_SPELLCAST_START" then
         if arg1 ~= "player" then
             OnRemoteResurrectionStart(arg1, arg3, arg4)

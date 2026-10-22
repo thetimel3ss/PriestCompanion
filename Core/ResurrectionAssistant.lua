@@ -537,8 +537,9 @@ function Assistant.TryResurrect()
     if lastClickAt and now - lastClickAt < 0.75 then
         return false, "Resurrection was just requested."
     end
-    lastClickAt = now
 
+    -- Only throttle a cast successfully dispatched to the game. A
+    -- declined/failed attempt must not suppress the player's next click.
     if state.mode == "target" then
         -- Revalidate at click time; saved unit tokens can be reassigned.
         local candidate = Assistant.GetNextCandidate()
@@ -557,6 +558,7 @@ function Assistant.TryResurrect()
             if not ok or not started then
                 return false, "Unable to cast Resurrection on " .. candidate.name .. "."
             end
+            lastClickAt = now
             return true, candidate.name
         end
 
@@ -593,6 +595,7 @@ function Assistant.TryResurrect()
         if not castOK then
             return false, "Unable to cast Resurrection on " .. candidate.name .. "."
         end
+        lastClickAt = now
         return true, candidate.name
     end
 
@@ -606,6 +609,7 @@ function Assistant.TryResurrect()
     or not SpellIsTargeting() then
         return false, "Could not activate manual corpse targeting."
     end
+    lastClickAt = now
     return true, "Click the released player's corpse in the world."
 end
 

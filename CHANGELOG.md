@@ -2,6 +2,12 @@
 
 ## [Unreleased]
 
+### Fixed (requires in-game retest) — Resurrection HUD casting interaction (2026-10-22)
+- The maintainer reported that the new compact/expanded window correctly showed an eligible player or a yellow released-corpse state but clicking did not start Resurrection or activate manual corpse targeting. Further clicks could incorrectly report "Resurrection was just requested."
+- Replaced casting from a plain Frame's `OnMouseUp` with a real WoW Button using `RegisterForClicks("LeftButtonUp")` and `OnClick`, matching the previously validated Resurrection popup. The full HUD remains clickable; drag/resize gestures are suppressed from triggering casts.
+- Changed the repeat-request throttle to record a click only after a successful cast dispatch or successfully prepared corpse cursor. Failed requests can be retried without an obsolete throttle message.
+- Detection and manual corpse fallback, colors, modes, preview, saved HUD options and the Announcer logic were otherwise preserved. **Static review only; the live casting regression requires another in-game test.**
+
 ### Improved — Resurrection Assistant compact/expanded HUD (2026-10-22)
 - Reworked the Resurrection Assistant's floating window to support **Compact** and **Expanded** layouts. Compact defaults to a centered Resurrection icon, colored player nickname below it and optional class line, in the style of Book of Prayer Tracker. Hiding labels automatically enlarges the icon; Expanded retains a wide heading/details presentation.
 - The **entire window is clickable** to make exactly one user-initiated cast attempt, except for a small dedicated resize corner. Dragging the window or its resize grip does not initiate a cast. Lock Position disables movement/resize but preserves clicking.

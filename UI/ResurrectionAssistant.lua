@@ -23,12 +23,13 @@ local fallbackColors = {
 }
 
 local frame = CreateFrame(
-    "Frame", "PriestCompanionResurrectionAssistantButton", UIParent
+    "Button", "PriestCompanionResurrectionAssistantButton", UIParent
 )
 PC.UI.ResurrectionAssistantButton = frame
 frame:SetFrameStrata("MEDIUM")
 frame:SetMovable(true)
 frame:EnableMouse(true)
+frame:RegisterForClicks("LeftButtonUp")
 frame:RegisterForDrag("LeftButton")
 if type(frame.SetResizable) == "function" then
     frame:SetResizable(true)
@@ -84,7 +85,7 @@ gripTexture:SetTexture(
 local appliedX, appliedY
 local appliedExpanded, appliedScale
 local previewActive = false
-local clickArmed = false
+local dragConsumedClick = false
 local dragging = false
 local sizing = false
 local Refresh
@@ -312,19 +313,20 @@ local function DoCast()
     end
 end
 
+-- Vanilla casts work from a Button's OnClick, as in the previously
+-- validated HUD. OnMouseUp of a plain Frame can conflict with the
+-- client's mouse release / spell-target cursor handling.
+-- Keep dragConsumedClick set through OnDragStop; reset it ONLY on
+-- the next mouse down, so a drag can never become a cast on release.
 frame:SetScript("OnMouseDown", function()
-    if arg1 == "LeftButton" then
-        clickArmed = true
-    end
+    dragConsumedClick = false
 end)
 
-frame:SetScript("OnMouseUp", function()
-    if arg1 == "LeftButton" and clickArmed
-    and not dragging and not sizing then
-        clickArmed = false
+frame:SetScript("OnClick", function()
+    -- RegisterForClicks limits this handler to LeftButtonUp. Match the
+    -- prior working widget, which cast from an unconditional OnClick.
+    if not dragConsumedClick and not dragging and not sizing then
         DoCast()
-    else
-        clickArmed = false
     end
 end)
 
@@ -332,7 +334,7 @@ frame:SetScript("OnDragStart", function()
     if Assistant.GetDisplayOption("locked") or Assistant.IsPaused() then
         return
     end
-    clickArmed = false
+    dragConsumedClick = true
     dragging = true
     frame:StartMoving()
 end)
@@ -349,7 +351,7 @@ grip:SetScript("OnMouseDown", function()
     if arg1 ~= "LeftButton"
     or Assistant.GetDisplayOption("locked") or Assistant.IsPaused()
     or type(frame.StartSizing) ~= "function" then return end
-    clickArmed = false
+    dragConsumedClick = true
     sizing = true
     frame:StartSizing("BOTTOMRIGHT")
 end)
@@ -358,7 +360,7 @@ grip:SetScript("OnMouseUp", function()
     if not sizing then return end
     frame:StopMovingOrSizing()
     sizing = false
-    clickArmed = false
+    dragConsumedClick = true
     local width, height, expanded = BaseDimensions()
     local widthFactor = frame:GetWidth() / width
     local heightFactor = frame:GetHeight() / height
@@ -369,7 +371,7 @@ end)
 
 frame:SetScript("OnHide", function()
     frame:StopMovingOrSizing()
-    clickArmed, dragging, sizing = false, false, false
+    dragging, sizing = false, false
 end)
 
 -- Preview is visual-only and never touches the selected group target.

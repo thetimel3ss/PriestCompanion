@@ -2,12 +2,19 @@
 
 ## [Unreleased]
 
+### Validated — Released corpses, Whisper and Resurrection interruptions (2026-10-22)
+- **Released corpse:** a world-cursor cast on a player who has released their spirit sends the generic Resurrection start announcement.
+- **Interrupted released-corpse cast:** the generic interruption notice reaches the selected chat channels and Whisper is skipped for the unidentified recipient.
+- **Named Resurrection target with Whisper enabled:** the recipient receives the configured personalized Whisper.
+- **Interrupted named-target Resurrection:** the configured interruption message is sent and the target also receives a Whisper notification.
+- All four scenarios were confirmed in OctoWoW by the maintainer. This does not yet verify pre-START failures, duplicate event handling, channel combinations, message persistence, or name recovery when a released corpse becomes identifiable. No code changes were required.
+
 ### Improved — Resurrection Whisper, interruptions and released corpses (2026-10-22)
 - Continue requiring matched ClassicAPI `UNIT_SPELLCAST_SENT` and `UNIT_SPELLCAST_START` GUIDs before sending the cast-start announcement; no claim of completion/acceptance. Attempts failing before START stay silent.
 - Add a separate editable **Whisper message**, default `Casting {spell} on you. Please don't release!`, with Default, Save/Enter, Escape and unsent preview. Public message remains independent and all settings persist per character.
 - Add optional **Announce interrupted casts** (disabled by default). For matching INTERRUPTED/FAILED after START, send one cancellation notice to selected channels. Public cancel message is editable with Default/Save/Preview; Whisper uses `Resurrection on you was interrupted.`. Never report an attempt failing before START or a cast already marked successful as an interrupted one.
 - For a released player's corpse clicked in the world, SENT may lack a resolvable unit token. Preserve this cast, correlate with START, briefly check `UnitSpellTargetName("player")`, and then emit a generic public announcement for `a released player's corpse` if no name can be verified. Never whisper an unknown recipient; provide a throttled local diagnostic.
-- Keep Fear Ward functionality unchanged. **In-game retests pending:** corpse click, name recovery, Whisper delivery, interruptions, failure-before-START, duplicate events, text persistence, and /reload.
+- Keep Fear Ward functionality unchanged. **In-game validation now confirms** generic corpse casts/interruption, Whisper on named targets, and cancellation Whisper. **Still pending:** pre-START failure suppression, duplicate events, corpse-name recovery, text persistence, and /reload.
 
 ### Validated — Basic Tools navigation and Resurrection announcements (2026-10-22)
 - In OctoWoW, the maintainer confirmed that the **Fear Ward** and **Resurrection** sub-tabs under Options → Tools work.

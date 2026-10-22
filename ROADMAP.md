@@ -124,7 +124,8 @@ All 28 records have `source.note`: 21 world-drop-style entries with `"World drop
 - [x] Preserve existing saved `prayerTracker` settings and migrate legacy independent width/height geometry to a proportional, bounded scale at load time. Keep saved position, lock, reset confirmation, auto-hide, preview, mana-value presentation and refund border logic unchanged.
 - [x] Add **Reset current size** (100% for the selected mode); **Reset Position** still resets the position and *both* mode sizes. Keep the slider's percentage synchronized when the user drags a border/corner.
 - [x] **Core Tracker regression tested in OctoWoW (2026-10-22):** successful healing casts continue to be registered, mana values are tracked normally, and refund status border colors remain correct following the new window scaling implementation.
-- [ ] **Tracker layout and controls acceptance (still pending):** Compact and Expanded at 40% and 120%; eight edge/corner handles; slider following manual resize; independent per-mode sizes and persistence across `/reload`; Lock blocking resize/movement; Reset current size; Reset Position confirmation; Preview layout and styling; show spell name / mana refund icon reflow.
+- [x] **Tracker interface validated in OctoWoW (2026-10-22):** the maintainer confirmed the new window scale control, border/edge resizing, saved layout persistence, Lock Position and Preview all function as expected.
+- [ ] **Additional Tracker edge cases (not individually confirmed):** exact 40% and 120% extremes in both Compact/Expanded modes; independent size persistence per mode; Reset current size and Reset Position confirmation; spell-name/mana-refund icon reflow at minimum scale. Core heal, mana and refund-border behavior has already passed.
 
 ### Resurrection Assistant — detection and selection (`feature/resurrection-assistant`)
 

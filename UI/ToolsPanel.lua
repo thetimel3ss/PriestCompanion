@@ -14,15 +14,22 @@ panel:Hide()
 PC.UI.ToolsPanel = panel
 panel.ActiveSubTab = "resurrection"
 
--- Existing option pages retain their controls and saved settings.
--- Reparent rather than rebuilding checkboxes/sliders: their handlers
--- and confirmation dialogs remain unchanged.
-assistantPanel:SetParent(panel)
+-- Reserve the first 32 pixels for the sub-tabs and constrain both
+-- page viewports to the remaining Options content area. Previously
+-- the pages were stretched across the whole Tools frame; their
+-- scroll views could overlap the header and appear outside the
+-- intended content area on some client scales.
+local viewport = CreateFrame("Frame", nil, panel)
+viewport:SetPoint("TOPLEFT", panel, "TOPLEFT", 0, -32)
+viewport:SetPoint("BOTTOMRIGHT", panel, "BOTTOMRIGHT", 0, 0)
+
+-- Reuse the existing options controls and their saved-variable keys.
+assistantPanel:SetParent(viewport)
 assistantPanel:ClearAllPoints()
-assistantPanel:SetAllPoints(panel)
-trackerPanel:SetParent(panel)
+assistantPanel:SetAllPoints(viewport)
+trackerPanel:SetParent(viewport)
 trackerPanel:ClearAllPoints()
-trackerPanel:SetAllPoints(panel)
+trackerPanel:SetAllPoints(viewport)
 assistantPanel:Hide()
 trackerPanel:Hide()
 
@@ -32,6 +39,7 @@ local subTabs = CreateFrame(
 subTabs:SetPoint("TOPLEFT", panel, "TOPLEFT", 17, -7)
 subTabs:SetWidth(370)
 subTabs:SetHeight(22)
+subTabs:SetFrameLevel(viewport:GetFrameLevel() + 4)
 
 local function MakeTab(index, text, previous, id)
     local button = CreateFrame(
@@ -42,6 +50,9 @@ local function MakeTab(index, text, previous, id)
     button:SetHeight(22)
     button:RegisterForClicks("LeftButtonUp")
     PanelTemplates_TabResize(0, button)
+    -- Fixed, equal widths keep both lengthy names within Options.
+    -- The native template otherwise expands each tab independently.
+    button:SetWidth(174)
     button:ClearAllPoints()
     if previous then
         button:SetPoint("LEFT", previous, "RIGHT", 0, 0)

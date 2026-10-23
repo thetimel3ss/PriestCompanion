@@ -15,7 +15,7 @@ local scroll = CreateFrame(
     "ScrollFrame", "PriestCompanionAssistantOptionsScroll",
     panel, "UIPanelScrollFrameTemplate"
 )
-scroll:SetPoint("TOPLEFT", panel, "TOPLEFT", 8, -38)
+scroll:SetPoint("TOPLEFT", panel, "TOPLEFT", 8, -6)
 scroll:SetPoint("BOTTOMRIGHT", panel, "BOTTOMRIGHT", -29, 9)
 
 local child = CreateFrame("Frame", nil, scroll)

@@ -264,7 +264,7 @@ local advancedScroll = CreateFrame(
     "UIPanelScrollFrameTemplate"
 )
 advancedScroll:SetPoint(
-    "TOPLEFT", advanced, "TOPLEFT", 8, -38
+    "TOPLEFT", advanced, "TOPLEFT", 8, -6
 )
 advancedScroll:SetPoint(
     "BOTTOMRIGHT", advanced, "BOTTOMRIGHT", -29, 9

@@ -2,6 +2,12 @@
 
 ## [Unreleased]
 
+### Fixed (requires in-game verification) — Tools panel viewport (2026-10-23)
+- The maintainer reported the reorganized Options > Tools panel extending beyond or overlapping the addon window.
+- Introduced an explicit Tools content viewport beneath its sub-tabs, limited both tab widths and adjusted the already-existing Assistant/Tracker scroll frame anchors to the new viewport. The goal is to keep both options pages inside the main addon frame without changing any user options.
+- Resurrection casting, Tracker heal/mana tracking, Announcer event processing and saved settings were not modified.
+- **Static geometry review only**; verify the two Tools sub-tabs, scrolling and preview behavior in OctoWoW.
+
 ### Reorganized — Options > Announcer and Tools (2026-10-23)
 - Changed Options top-level pages to **General, Announcer, Tools, Mods**.
 - Moved **Fear Ward Announcer** and **Resurrection Announcer** to the Announcer page, retaining their two existing sub-tabs, channels, messages and saved settings. Future Mana/OOM announcer belongs here but is not implemented yet.

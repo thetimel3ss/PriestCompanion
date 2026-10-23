@@ -2,6 +2,11 @@
 
 ## [Unreleased]
 
+### Validated — Tools scrolling and sub-tab sizing (2026-10-23)
+- The maintainer confirmed in OctoWoW that the rebuilt Tools panel now works correctly: the Resurrection Assistant and Book of Prayer Tracker pages stay within the addon window when scrolling, and both sub-tabs have correctly sized labels/buttons.
+- These in-game results validate the direct ScrollFrame construction introduced in the prior commit. Preview switching, option persistence and Announcer integration remain separate checks.
+- Documentation only; no runtime code or saved settings changed.
+
 ### Rebuilt — Tools sub-tabs and scroll clipping (2026-10-23)
 - The maintainer confirmed the earlier containment changes still failed: scrolling either Tools page moved its controls past the main addon window, and manually sized tab buttons did not match their text.
 - Removed the flawed approach of reparenting already-created scroll frames. Tools now **creates both scroll frames and their scroll children directly**, using the same creation order, parentage, template and anchoring as the working Announcer page. Tracker's existing controls were extracted into `UI/PrayerTrackerOptionsPanel.lua`; Assistant controls now populate the pre-created scroll child. Both vanilla and ClassicAPI TOC flavors load Tools before the two option modules.

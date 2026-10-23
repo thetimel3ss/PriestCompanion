@@ -2,6 +2,12 @@
 
 ## [Unreleased]
 
+### Rebuilt — Tools sub-tabs and scroll clipping (2026-10-23)
+- The maintainer confirmed the earlier containment changes still failed: scrolling either Tools page moved its controls past the main addon window, and manually sized tab buttons did not match their text.
+- Removed the flawed approach of reparenting already-created scroll frames. Tools now **creates both scroll frames and their scroll children directly**, using the same creation order, parentage, template and anchoring as the working Announcer page. Tracker's existing controls were extracted into `UI/PrayerTrackerOptionsPanel.lua`; Assistant controls now populate the pre-created scroll child. Both vanilla and ClassicAPI TOC flavors load Tools before the two option modules.
+- Replaced fixed tab widths with native `PanelTemplates_TabResize` so text and button textures resize together; extra-long localized captions are shortened only if necessary to fit.
+- Saved options, control identifiers, preview termination on tab change and all runtime spells/healing/announcement modules remain unchanged. **In-game verification required** for clipping and tab sizes.
+
 ### Corrected — Tools scroll-frame hierarchy follows Announcer (2026-10-23)
 - The maintainer confirmed the original Tools containment fix was ineffective. Direct source comparison showed Announcer attaches its independently scrolling subpages directly to its panel; Tools instead reparented entire full-size option pages within another viewport.
 - Reworked Tools to **parent the Resurrection Assistant and Book of Prayer scroll frames directly to the Tools panel**, with the exact Announcer geometry (top-left 8,-38; bottom-right -29,9) and mutually exclusive visibility. The preexisting Assistant/Tracker page frames remain logical holders for their original Refresh and OnHide/Preview cleanup callbacks.

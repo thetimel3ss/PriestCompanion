@@ -1,27 +1,16 @@
 -- Priest Companion - Tools > Resurrection Assistant options.
--- Separate from the Resurrection Announcer; reuses the same saved keys.
+-- ToolsPanel owns the ScrollFrame and scroll child directly, matching
+-- the working Announcer structure. These controls are not reparented.
 
 local PC = PriestCompanion
-local parent = PC.UI.OptionsContent
 local assistant = PC.Modules.ResurrectionAssistant
-if not parent or not assistant then return end
+local scroll = PC.UI.ResurrectionAssistantOptionsPanel
+local child = PC.UI.ToolsAssistantContent
+if not scroll or not child or not assistant then return end
 
-local panel = CreateFrame("Frame", nil, parent)
-panel:SetAllPoints(parent)
-panel:Hide()
-PC.UI.ResurrectionAssistantOptionsPanel = panel
-
-local scroll = CreateFrame(
-    "ScrollFrame", "PriestCompanionAssistantOptionsScroll",
-    panel, "UIPanelScrollFrameTemplate"
-)
-scroll:SetPoint("TOPLEFT", panel, "TOPLEFT", 8, -6)
-scroll:SetPoint("BOTTOMRIGHT", panel, "BOTTOMRIGHT", -29, 9)
-
-local child = CreateFrame("Frame", nil, scroll)
-child:SetWidth(388)
-child:SetHeight(400)
-scroll:SetScrollChild(child)
+-- Keep the existing checkbox/slider callbacks independent of the
+-- parent Tools tab navigation; a settings change must not change tabs.
+local panel = {}
 
 local function Label(text, x, y, width, font)
     local fontString = child:CreateFontString(
@@ -322,10 +311,11 @@ function panel.Refresh()
     UpdatePreviewLabel()
 end
 
-panel:SetScript("OnHide", function()
+scroll.Refresh = panel.Refresh
+scroll:SetScript("OnHide", function()
     StopAssistantPreview()
     UpdatePreviewLabel()
 end)
-panel:SetScript("OnShow", function()
+scroll:SetScript("OnShow", function()
     panel.Refresh()
 end)

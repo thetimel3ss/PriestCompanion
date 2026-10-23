@@ -35,7 +35,8 @@ UI\WandPanel.lua
 UI\OptionsPanel.lua
 UI\EnvironmentPanel.lua
 UI\AnnouncerPanel.lua
-UI\ResurrectionAssistantOptionsPanel.lua
 UI\ToolsPanel.lua
+UI\ResurrectionAssistantOptionsPanel.lua
+UI\PrayerTrackerOptionsPanel.lua
 UI\ResurrectionAssistant.lua
 UI\PrayerTracker.lua

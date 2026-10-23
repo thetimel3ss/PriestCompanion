@@ -2,6 +2,11 @@
 
 ## [Unreleased]
 
+### Corrected — Tools scroll-frame hierarchy follows Announcer (2026-10-23)
+- The maintainer confirmed the original Tools containment fix was ineffective. Direct source comparison showed Announcer attaches its independently scrolling subpages directly to its panel; Tools instead reparented entire full-size option pages within another viewport.
+- Reworked Tools to **parent the Resurrection Assistant and Book of Prayer scroll frames directly to the Tools panel**, with the exact Announcer geometry (top-left 8,-38; bottom-right -29,9) and mutually exclusive visibility. The preexisting Assistant/Tracker page frames remain logical holders for their original Refresh and OnHide/Preview cleanup callbacks.
+- Preserved the original named scroll frames, all option widgets, selected sub-tabs, saved preferences and unchanged runtime spell/healing/announce code. **Awaiting OctoWoW in-game validation** of layout, scrolling, Preview cancellation and sub-tab switching.
+
 ### Fixed (requires in-game verification) — Tools panel viewport (2026-10-23)
 - The maintainer reported the reorganized Options > Tools panel extending beyond or overlapping the addon window.
 - Introduced an explicit Tools content viewport beneath its sub-tabs, limited both tab widths and adjusted the already-existing Assistant/Tracker scroll frame anchors to the new viewport. The goal is to keep both options pages inside the main addon frame without changing any user options.

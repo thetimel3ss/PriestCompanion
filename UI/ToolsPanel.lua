@@ -1,12 +1,19 @@
 -- Priest Companion - Options > Tools
--- Class utilities: Resurrection Assistant and Book of Prayer Tracker.
--- Options > Announcer owns notifications and chat messages separately.
+-- Mirrors the proven Options > Announcer layout: native sub-tabs
+-- and independent scroll frames anchored directly to the page.
+-- Existing controls and saved variables remain owned by their
+-- original options modules; only their scroll-frame parents change.
 
 local PC = PriestCompanion
 local parent = PC.UI.OptionsContent
 local assistantPanel = PC.UI.ResurrectionAssistantOptionsPanel
 local trackerPanel = PC.UI.PrayerTrackerOptionsPanel
-if not parent or not assistantPanel or not trackerPanel then return end
+local assistantScroll = getfenv(0)["PriestCompanionAssistantOptionsScroll"]
+local trackerScroll = getfenv(0)["PriestCompanionAdvancedScroll"]
+if not parent or not assistantPanel or not trackerPanel
+or not assistantScroll or not trackerScroll then
+    return
+end
 
 local panel = CreateFrame("Frame", nil, parent)
 panel:SetAllPoints(parent)
@@ -14,24 +21,9 @@ panel:Hide()
 PC.UI.ToolsPanel = panel
 panel.ActiveSubTab = "resurrection"
 
--- Reserve the first 32 pixels for the sub-tabs and constrain both
--- page viewports to the remaining Options content area. Previously
--- the pages were stretched across the whole Tools frame; their
--- scroll views could overlap the header and appear outside the
--- intended content area on some client scales.
-local viewport = CreateFrame("Frame", nil, panel)
-viewport:SetPoint("TOPLEFT", panel, "TOPLEFT", 0, -32)
-viewport:SetPoint("BOTTOMRIGHT", panel, "BOTTOMRIGHT", 0, 0)
-
--- Reuse the existing options controls and their saved-variable keys.
-assistantPanel:SetParent(viewport)
-assistantPanel:ClearAllPoints()
-assistantPanel:SetAllPoints(viewport)
-trackerPanel:SetParent(viewport)
-trackerPanel:ClearAllPoints()
-trackerPanel:SetAllPoints(viewport)
-assistantPanel:Hide()
-trackerPanel:Hide()
+--------------------------------------------------
+-- Native sub-tabs (same structure as Announcer)
+--------------------------------------------------
 
 local subTabs = CreateFrame(
     "Frame", "PriestCompanionUtilitySubTabs", panel
@@ -39,23 +31,21 @@ local subTabs = CreateFrame(
 subTabs:SetPoint("TOPLEFT", panel, "TOPLEFT", 17, -7)
 subTabs:SetWidth(370)
 subTabs:SetHeight(22)
-subTabs:SetFrameLevel(viewport:GetFrameLevel() + 4)
 
-local function MakeTab(index, text, previous, id)
+local function CreateToolTab(index, label, preceding, id)
     local button = CreateFrame(
-        "Button", "PriestCompanionUtilitySubTabsTab" .. index,
+        "Button", "PriestCompanionUtilitySubTabsTab" .. tostring(index),
         subTabs, "TabButtonTemplate"
     )
-    button:SetText(text)
+    button:SetText(label)
     button:SetHeight(22)
     button:RegisterForClicks("LeftButtonUp")
     PanelTemplates_TabResize(0, button)
-    -- Fixed, equal widths keep both lengthy names within Options.
-    -- The native template otherwise expands each tab independently.
+    -- These long labels otherwise exceed the available Options width.
     button:SetWidth(174)
     button:ClearAllPoints()
-    if previous then
-        button:SetPoint("LEFT", previous, "RIGHT", 0, 0)
+    if preceding then
+        button:SetPoint("LEFT", preceding, "RIGHT", 0, 0)
     else
         button:SetPoint("TOPLEFT", subTabs, "TOPLEFT", 0, 0)
     end
@@ -66,30 +56,77 @@ local function MakeTab(index, text, previous, id)
     return button
 end
 
-local assistantTab = MakeTab(
+local assistantTab = CreateToolTab(
     1, "Resurrection Assistant", nil, "resurrection"
 )
-MakeTab(2, "Book of Prayer Tracker", assistantTab, "tracker")
+CreateToolTab(2, "Book of Prayer Tracker", assistantTab, "tracker")
 PanelTemplates_SetNumTabs(subTabs, 2)
 PanelTemplates_SetTab(subTabs, 1)
 
+--------------------------------------------------
+-- Independent scrollable pages (same as Announcer)
+--------------------------------------------------
+
+-- The old approach nested two full-size page frames inside an
+-- additional viewport. Reparent only the scroll frames directly
+-- under Tools. The owner page frames remain for Refresh/OnHide
+-- callbacks, which preserve preview cleanup and option behavior.
+assistantScroll:SetParent(panel)
+assistantScroll:ClearAllPoints()
+assistantScroll:SetPoint("TOPLEFT", panel, "TOPLEFT", 8, -38)
+assistantScroll:SetPoint("BOTTOMRIGHT", panel, "BOTTOMRIGHT", -29, 9)
+
+trackerScroll:SetParent(panel)
+trackerScroll:ClearAllPoints()
+trackerScroll:SetPoint("TOPLEFT", panel, "TOPLEFT", 8, -38)
+trackerScroll:SetPoint("BOTTOMRIGHT", panel, "BOTTOMRIGHT", -29, 9)
+
+-- Ensure both scroll pages render above the Options background but
+-- below the native sub-tabs, independent of their former parent levels.
+assistantScroll:SetFrameLevel(panel:GetFrameLevel() + 1)
+trackerScroll:SetFrameLevel(panel:GetFrameLevel() + 1)
+
+-- Move logical owner frames without moving the visible scroll content.
+assistantPanel:SetParent(panel)
+assistantPanel:ClearAllPoints()
+assistantPanel:SetAllPoints(panel)
+trackerPanel:SetParent(panel)
+trackerPanel:ClearAllPoints()
+trackerPanel:SetAllPoints(panel)
+
+assistantPanel:Hide()
+trackerPanel:Hide()
+assistantScroll:Hide()
+trackerScroll:Hide()
+
+-- Keep native tabs above the scroll frame, as in Announcer.
+subTabs:SetFrameLevel(panel:GetFrameLevel() + 3)
+
 function panel.SelectSubTab(id)
-    if id ~= "tracker" then id = "resurrection" end
+    if id ~= "tracker" then
+        id = "resurrection"
+    end
     panel.ActiveSubTab = id
+
+    assistantScroll:Hide()
+    trackerScroll:Hide()
     assistantPanel:Hide()
     trackerPanel:Hide()
 
-    local selected
     if id == "tracker" then
-        selected = trackerPanel
+        trackerPanel:Show()
+        trackerScroll:Show()
         PanelTemplates_SetTab(subTabs, 2)
+        if type(trackerPanel.Refresh) == "function" then
+            trackerPanel.Refresh()
+        end
     else
-        selected = assistantPanel
+        assistantPanel:Show()
+        assistantScroll:Show()
         PanelTemplates_SetTab(subTabs, 1)
-    end
-    selected:Show()
-    if type(selected.Refresh) == "function" then
-        selected.Refresh()
+        if type(assistantPanel.Refresh) == "function" then
+            assistantPanel.Refresh()
+        end
     end
 end
 
@@ -100,9 +137,12 @@ end
 panel:SetScript("OnShow", function()
     panel.Refresh()
 end)
+
 panel:SetScript("OnHide", function()
-    -- Explicitly hide active pages, triggering both preview cleanup
-    -- handlers even when the user changes a parent Options tab.
+    -- Hide the visible scrolls explicitly: they are no longer
+    -- children of their original logical owner frames.
+    assistantScroll:Hide()
+    trackerScroll:Hide()
     assistantPanel:Hide()
     trackerPanel:Hide()
 end)

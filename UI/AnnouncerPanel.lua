@@ -184,7 +184,7 @@ end
 
 local enabledBox, enabledLabel = Checkbox(
     "PriestCompanionAnnouncerEnabled",
-    "Enable Fear Ward", 14, 77,
+    "Enable", 14, 77,
     function(value)
         announcer.SetOption("enabled", value)
     end,
@@ -195,7 +195,7 @@ local enabledBox, enabledLabel = Checkbox(
 -- of the page. A wider right caption keeps its two-line title contained.
 local protectionBox = Checkbox(
     "PriestCompanionFearWardPreventOverwrite",
-    "Prevent overwriting Fear Ward", 204, 77,
+    "Prevent Overwriting", 204, 77,
     function(value)
         announcer.SetOption("preventOverwrite", value)
     end,
@@ -354,7 +354,7 @@ local resStatus = Label("", 14, 40, 356)
 
 local resEnabled, resEnabledLabel = Checkbox(
     "PriestCompanionResurrectionEnabled",
-    "Enable Resurrection", 14, 74,
+    "Enable", 14, 74,
     function(value)
         announcer.SetResOption("enabled", value)
     end,

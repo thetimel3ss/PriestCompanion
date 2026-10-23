@@ -2,6 +2,11 @@
 
 ## [Unreleased]
 
+### Changed — Announcer checkbox labels (2026-10-23)
+- In Announcer > Fear Ward, shortened `Enable Fear Ward` to `Enable` and `Prevent overwriting Fear Ward` to `Prevent Overwriting`.
+- In Announcer > Resurrection, shortened `Enable Resurrection` to `Enable`.
+- Label-only update; callback logic, option keys, tooltips' descriptions and SavedVariables remain unchanged. In-game check pending before merging the branch into `main`.
+
 ### Validated — Tools scrolling and sub-tab sizing (2026-10-23)
 - The maintainer confirmed in OctoWoW that the rebuilt Tools panel now works correctly: the Resurrection Assistant and Book of Prayer Tracker pages stay within the addon window when scrolling, and both sub-tabs have correctly sized labels/buttons.
 - These in-game results validate the direct ScrollFrame construction introduced in the prior commit. Preview switching, option persistence and Announcer integration remain separate checks.

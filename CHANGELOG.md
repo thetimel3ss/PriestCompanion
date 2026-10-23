@@ -2,6 +2,17 @@
 
 ## [Unreleased]
 
+### Reorganized — Options > Announcer and Tools (2026-10-23)
+- Changed Options top-level pages to **General, Announcer, Tools, Mods**.
+- Moved **Fear Ward Announcer** and **Resurrection Announcer** to the Announcer page, retaining their two existing sub-tabs, channels, messages and saved settings. Future Mana/OOM announcer belongs here but is not implemented yet.
+- Created separate Tools sub-tabs for **Resurrection Assistant** and **Book of Prayer Tracker**. Extracted Assistant appearance/preview controls to their own panel and reused the original Tracker options widgets. The Assistant options no longer appear below Resurrection announcements.
+- Preserved existing saved-variable keys, on-click spell behavior, window scale and preview callbacks. Kept a compatibility path for callers using the legacy Tracker section ID.
+- The runtime Resurrection Assistant, Prayer Tracker and Announcer core modules were not modified. **UI static checks completed; in-game navigation and state regression testing pending.**
+
+### Research note — MetaHunt reference (2026-10-23)
+- Reviewed MetaHunt's modular Hunter toolkit as design inspiration: separate features/options modules, searchable data compendium with maps, contextual widgets, scalable navigation and efficient event-driven scanning. This review informs future Priest Companion features only; none of MetaHunt's code or dependencies were incorporated.
+- The future Mana/OOM Announcer remains planned under Options > Announcer.
+
 ### Validated — Book of Prayer Tracker interface controls (2026-10-22)
 - The maintainer confirmed in-game that window scaling, resizing from borders, persistence of the window layout, Lock Position and Preview all function correctly.
 - Healing registration, mana tracking and refund-state colors were already validated in the previous test.

@@ -89,11 +89,11 @@ local function CreateSectionTab(id, label, index, previous)
 end
 
 local generalTab = CreateSectionTab("general", "General", 1)
-local advancedTab = CreateSectionTab(
-    "advanced", "Tracker", 2, generalTab
+local announcerTab = CreateSectionTab(
+    "announcer", "Announcer", 2, generalTab
 )
 local toolsTab = CreateSectionTab(
-    "tools", "Tools", 3, advancedTab
+    "tools", "Tools", 3, announcerTab
 )
 CreateSectionTab("mods", "Mods", 4, toolsTab)
 
@@ -216,7 +216,7 @@ CreateLabel(
 
 CreateLabel(
     general,
-    "Tracker contains Book of Prayer settings.",
+    "Tools contains Resurrection Assistant and Book of Prayer Tracker.",
     18,
     -213,
     385
@@ -224,7 +224,7 @@ CreateLabel(
 
 CreateLabel(
     general,
-    "Tools contains Fear Ward and Resurrection features.",
+    "Announcer contains Fear Ward and Resurrection announcements.",
     18,
     -250,
     385
@@ -251,6 +251,9 @@ end
 
 local advanced = CreateFrame("Frame", nil, content)
 advanced:SetAllPoints(content)
+-- The Book of Prayer options live under Tools > Book of Prayer.
+-- Preserve the frame and its existing controls without re-creation.
+PC.UI.PrayerTrackerOptionsPanel = advanced
 
 local prayer = PC.Modules.PrayerTracker
 
@@ -261,7 +264,7 @@ local advancedScroll = CreateFrame(
     "UIPanelScrollFrameTemplate"
 )
 advancedScroll:SetPoint(
-    "TOPLEFT", advanced, "TOPLEFT", 8, -10
+    "TOPLEFT", advanced, "TOPLEFT", 8, -38
 )
 advancedScroll:SetPoint(
     "BOTTOMRIGHT", advanced, "BOTTOMRIGHT", -29, 9
@@ -825,53 +828,48 @@ end
 --------------------------------------------------
 
 function panel.SelectSection(id)
-    -- Continue accepting old callers using the Announcer section ID.
-    if id == "announcer" then
+    -- Compatibility for old callers that opened Options > Tracker.
+    -- The Tracker page is now nested below Options > Tools.
+    if id == "advanced" or id == "tracker" then
         id = "tools"
+        local toolPanel = PC.UI.ToolsPanel
+        if toolPanel then toolPanel.ActiveSubTab = "tracker" end
     end
-    if id ~= "advanced"
-    and id ~= "tools"
+
+    if id ~= "announcer" and id ~= "tools"
     and id ~= "mods" then
         id = "general"
     end
-
     panel.ActiveSection = id
 
     general:Hide()
     advanced:Hide()
 
     local mods = PC.UI.EnvironmentPanel
-    local tools = PC.UI.ToolsPanel or PC.UI.AnnouncerPanel
+    local announcer = PC.UI.AnnouncerPanel
+    local tools = PC.UI.ToolsPanel
+    if mods then mods:Hide() end
+    if announcer then announcer:Hide() end
+    if tools then tools:Hide() end
 
-    if mods then
-        mods:Hide()
-    end
-    if tools then
-        tools:Hide()
-    end
-
-    local selected = nil
-
+    local selected
     if id == "general" then
         selected = general
-    elseif id == "advanced" then
-        selected = advanced
+    elseif id == "announcer" then
+        selected = announcer
     elseif id == "tools" then
         selected = tools
     else
         selected = mods
     end
-
     if selected then
         selected:Show()
-
         if type(selected.Refresh) == "function" then
             selected.Refresh()
         end
     end
 
-    -- Blizzard handles selected textures, widths and border joins.
-    if id == "advanced" then
+    if id == "announcer" then
         PanelTemplates_SetTab(panel, 2)
     elseif id == "tools" then
         PanelTemplates_SetTab(panel, 3)

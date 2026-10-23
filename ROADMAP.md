@@ -118,6 +118,16 @@ All 28 records have `source.note`: 21 world-drop-style entries with `"World drop
 
 ## Next steps
 
+### Options navigation — Announcer and Tools separated (`feature/resurrection-assistant`)
+
+- [x] Change the four Options top tabs to **General | Announcer | Tools | Mods**. Keep the normal default General page and an alias for legacy `advanced` / `tracker` navigation that opens Tools > Book of Prayer Tracker.
+- [x] Put **Fear Ward** and **Resurrection** as independent sub-tabs under **Announcer**. Keep channel, custom message, Whisper, interruption and overwrite prevention controls with their existing SavedVariables.
+- [x] Put **Resurrection Assistant** and **Book of Prayer Tracker** as independent sub-tabs under **Tools**. Move Assistant's HUD settings out of the long Resurrection Announcer page; reparent the existing Tracker controls instead of rebuilding them.
+- [x] Keep existing control names, option keys, per-character scales, preview functions, slash commands and all cast/event core files unchanged. The Assistant and Tracker previews end when their sub-tab is hidden.
+- [ ] **Options navigation acceptance in-game:** General, Announcer, Tools and Mods top tabs; correct pressed styles; Fear Ward and Resurrection announcements still work; Assistant and Tracker controls persist; independent Preview stops when switching; sliders/scroll regions do not overlap sub-tabs; legacy Tracker caller opens Tools > Tracker; no Lua errors on /reload.
+- [ ] **Future Announcer section:** add **Mana / OOM** as a third Announcer sub-tab after implementation of that module; not part of the navigation-only change.
+- [ ] **MetaHunt inspiration review (future, separate scope):** modular option pages, event-efficient module gating, searchable reference data/book, class-specific widgets and optional mana warnings; do not port Hunter-specific features or make Nampower mandatory.
+
 ### Book of Prayer Tracker — uniform window scaling (`feature/resurrection-assistant`)
 
 - [x] Bring Tracker window sizing in line with the Resurrection Assistant: **40%–120%** uniform scale, independent compact and expanded sizes, adjustment by any of its existing eight edges or corners and an Options → Tracker **Window size (per mode)** slider.

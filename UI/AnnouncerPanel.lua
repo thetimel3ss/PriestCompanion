@@ -1,6 +1,6 @@
 -- Priest Companion
 -- Options > Announcer > Fear Ward / Resurrection.
--- Fear Ward, Resurrection and Mana announcers have independent settings.
+-- Fear Ward, Resurrection, Mana and Aggro have independent settings.
 
 local PC = PriestCompanion
 local parent = PC.UI.OptionsContent
@@ -54,8 +54,9 @@ local fearTab = CreateAnnouncerTab(1, "Fear Ward", nil, "fearward")
 local resTab = CreateAnnouncerTab(
     2, "Resurrection", fearTab, "resurrection"
 )
-CreateAnnouncerTab(3, "Mana", resTab, "mana")
-PanelTemplates_SetNumTabs(subTabs, 3)
+local manaTab = CreateAnnouncerTab(3, "Mana", resTab, "mana")
+CreateAnnouncerTab(4, "Aggro", manaTab, "aggro")
+PanelTemplates_SetNumTabs(subTabs, 4)
 PanelTemplates_SetTab(subTabs, 1)
 
 --------------------------------------------------
@@ -85,10 +86,16 @@ local resScroll, resChild = CreateToolScroll(
 local manaScroll, manaChild = CreateToolScroll(
     "PriestCompanionManaAnnouncerScroll", 824
 )
+local aggroScroll, aggroChild = CreateToolScroll(
+    "PriestCompanionAggroAnnouncerScroll", 916
+)
 resScroll:Hide()
 manaScroll:Hide()
+aggroScroll:Hide()
 PC.UI.ManaAnnouncerScroll = manaScroll
 PC.UI.ManaAnnouncerContent = manaChild
+PC.UI.AggroAnnouncerScroll = aggroScroll
+PC.UI.AggroAnnouncerContent = aggroChild
 
 -- Shared layout helpers place elements in whichever page is being built.
 local activeChild = child
@@ -727,10 +734,12 @@ panel:SetScript("OnHide", function()
     RestoreFearDraft()
     RestoreResDraft()
     manaScroll:Hide()
+    aggroScroll:Hide()
 end)
 
 function panel.SelectSubTab(id)
-    if id ~= "resurrection" and id ~= "mana" then
+    if id ~= "resurrection" and id ~= "mana"
+    and id ~= "aggro" then
         id = "fearward"
     end
     panel.ActiveSubTab = id
@@ -738,16 +747,25 @@ function panel.SelectSubTab(id)
     if id == "resurrection" then
         scroll:Hide()
         manaScroll:Hide()
+        aggroScroll:Hide()
         resScroll:Show()
         PanelTemplates_SetTab(subTabs, 2)
     elseif id == "mana" then
         scroll:Hide()
         resScroll:Hide()
+        aggroScroll:Hide()
         manaScroll:Show()
         PanelTemplates_SetTab(subTabs, 3)
+    elseif id == "aggro" then
+        scroll:Hide()
+        resScroll:Hide()
+        manaScroll:Hide()
+        aggroScroll:Show()
+        PanelTemplates_SetTab(subTabs, 4)
     else
         resScroll:Hide()
         manaScroll:Hide()
+        aggroScroll:Hide()
         scroll:Show()
         PanelTemplates_SetTab(subTabs, 1)
     end
@@ -846,6 +864,10 @@ function panel.Refresh()
     local manaUI = PC.UI.ManaAnnouncerPanel
     if manaUI and type(manaUI.Refresh) == "function" then
         manaUI.Refresh()
+    end
+    local aggroUI = PC.UI.AggroAnnouncerPanel
+    if aggroUI and type(aggroUI.Refresh) == "function" then
+        aggroUI.Refresh()
     end
 end
 

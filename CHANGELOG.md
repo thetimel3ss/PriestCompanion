@@ -2,6 +2,15 @@
 
 ## [Unreleased]
 
+### Added — Aggro and Survival Announcer (2026-10-24; awaiting in-game testing)
+- Created `feature/aggro-announcer` from the validated Mana Announcer branch; `main` is untouched.
+- Added Announcer > Aggro native sub-tab with independent per-character opt-in settings, Aggro Warning, Near Death and Death Announcement.
+- Uses event-driven health and death tracking; Near Death is 30% by default with a 15-point recovery margin, and death fires once per death.
+- Vanilla fallback detects hostile targets pointing to the player via self/party/raid target-of-target, sampled every 0.75s only when Aggro is enabled, with confirmation/debouncing and 15-second aggro cooldown. Optional threat API requires tanking status >=2, not merely nonzero threat.
+- Added independent multi-select Say/Party/Raid/Yell/Self, custom three-message Default/Save/Preview with safe placeholders, and confirmation-protected Reset to Defaults. Initial master toggle is disabled, as with Mana.
+- Based on functional research of Dusk HealerProtection, Vanilla BanzaiAlert and modern RL HealerProtection / Sekhmet / HealerAlerts; external addon code was not copied.
+- **Not yet validated in OctoWoW.** Compatibility, UI and alert transitions must pass before any merge.
+
 ### Added — Mana settings reset (2026-10-24; feature branch, partially validated in-game)
 - Added a bottom-of-page **Reset to Defaults** button and native Vanilla OK/Cancel confirmation, with Escape cancellation. Resets only the current character's Mana Announcer options: Low Mana 30%, OOM 5%, cooldown 15 seconds, both warning checkboxes on, **Say as the only enabled channel**, and both original message templates.
 - Preserves the original opt-in behavior (**Enable off**, Only in combat off); existing saved channel selections are not changed until the user confirms Reset. Newly initialized characters also default to Say-only.

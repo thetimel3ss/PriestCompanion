@@ -118,6 +118,19 @@ All 28 records have `source.note`: 21 world-drop-style entries with `"World drop
 
 ## Next steps
 
+### Aggro / Survival Announcer — initial implementation (`feature/aggro-announcer`)
+
+- [x] Branch from tested `feature/mana-announcer` without touching `main` or rewriting Mana functionality.
+- [x] Add **Options > Announcer > Aggro** as a fourth native sub-tab with independent, directly constructed scroll content and per-character `PriestCompanionCharDB.aggroAnnouncer` settings.
+- [x] Include independently enabled Aggro Warning, Near Death and Death Announcement under an opt-in master Enable. Defaults: all three checked, master off; Near Death 30%, aggro cooldown 15s, Say-only channels and customizable messages with Default/Save/Preview.
+- [x] Use vanilla `UNIT_HEALTH`/`UNIT_MAXHEALTH`, `PLAYER_DEAD` and revival events; Near Death re-arms after recovery more than 15 percentage points above the threshold; Death fires once per death.
+- [x] Aggro uses optional real `UnitThreatSituation >= 2` if present; otherwise checks hostile current-target and party/raid target-of-target every 0.75s, requiring two consistent observations and two misses for recovery. Do not depend on ClassicAPI for threat (its Vanilla threat APIs are unavailable).
+- [x] Add Vanilla-safe, confirmation-protected Reset to Defaults; avoid raw percentage format tokens in native popup strings.
+- [ ] **In-game acceptance:** tab layout/scroll, checkbox behavior, editing and channels, reset OK/Cancel/Escape and /reload; cross-tab regressions for Mana/Fear Ward/Resurrection.
+- [ ] **Near Death / Death:** verify 30% crossing, no spam, recovery above 45% before repeat, death exactly once and revival re-arm; test fall damage outside combat and /reload while low HP.
+- [ ] **Aggro:** test solo, party and raid (including mouseover healer without hostile target), tank picking aggro up, swapping hostile target, crowd control, multiple mobs and disabled warning without periodic scan; evaluate noisy/slow detections and channel suppression.
+- [ ] **Compatibility:** Vanilla no extensions, ClassicAPI present, odd unit IDs/target-of-target availability, death/resurrect while in combat, unsupported optional threat APIs. **Do not merge to main pending gameplay validation.**
+
 ### Mana Announcer — first functional build (`feature/mana-announcer`)
 
 - [x] Create feature branch from released `main` version 0.3.0; keep `main` unchanged until acceptance.

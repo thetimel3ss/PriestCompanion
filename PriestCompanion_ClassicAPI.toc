@@ -28,6 +28,7 @@ Data\HealingSpells.lua
 Core\PrayerTracker.lua
 Core\Announcer.lua
 Core\ManaAnnouncer.lua
+Core\AggroAnnouncer.lua
 Core\ResurrectionAssistant.lua
 
 UI\MainFrame.lua
@@ -38,6 +39,7 @@ UI\OptionsPanel.lua
 UI\EnvironmentPanel.lua
 UI\AnnouncerPanel.lua
 UI\ManaAnnouncerPanel.lua
+UI\AggroAnnouncerPanel.lua
 UI\ToolsPanel.lua
 UI\ResurrectionAssistantOptionsPanel.lua
 UI\PrayerTrackerOptionsPanel.lua

@@ -8,14 +8,14 @@
 - A confirmed reset saves once, clears pending mana-alert baselines and unsaved message drafts, and refreshes all controls. Fear Ward and Resurrection preferences remain untouched.
 - **In-game validation (2026-10-24):** the maintainer confirmed the reset works, survives /reload, and Cancel leaves settings unchanged. Fixed Vanilla StaticPopup's percent formatting error by escaping the displayed 30% and 5% as 30%% and 5%% in its format string. Escape, unsaved text drafts, exact default-value audit and scroll containment remain unverified.
 
-### Added — Mana Announcer (2026-10-24; feature branch, in-game testing pending)
+### Added — Mana Announcer (2026-10-24; feature branch, main behavior validated in-game)
 - Created `feature/mana-announcer` from stable `main` version 0.3.0.
 - Added **Announcer > Mana** sub-tab. Controls include master Enable, Low Mana/OOM toggles, independent percentage thresholds (Low Mana defaults to 30%, OOM to 5%), announcement cooldown, combat-only condition, multiselect channels and editable messages with unsent previews.
 - Implemented independent self-mana announcements using Vanilla `UNIT_MANA` and `UNIT_MAXMANA` events. Per-character configuration is stored separately from the existing Fear Ward and Resurrection Announcers.
 - Events are edge-triggered rather than sent on every regen tick. Separate 5-point recovery margins and configurable cooldown mitigate spam; OOM may immediately follow a recent Low Mana message as severity increases. The OOM slider ranges from 0% to one point below Low Mana, automatically adjusting when Low Mana is lowered. Existing saved Low Mana percentages remain unchanged.
 - Channel availability is checked at send time. No optional DLL is required, and existing healing/casting modules were not changed.
 - Research references: HealerProtection (OctoWoW), T-OoM and TimeToDrink. No external source code was copied.
-- **In-game validation:** the initial Mana Announcer warning and the Vanilla slider EnableMouse fix were confirmed working; revised 30%/5% defaults, configurable OOM threshold, escalation, spam prevention, /reload persistence, messages/channels and unchanged Fear Ward/Resurrection behavior remain to be retested.
+- **In-game validation (2026-10-24):** the maintainer confirmed all five targeted functional tests passed in OctoWoW: Low Mana alert at 30%, OOM at 5% even within the Low Mana cooldown, suppression of repeated regeneration-tick announcements, alert rearming after recovery above 35% and 10%, and **Only in combat** blocking out-of-combat alerts. Earlier tests also confirmed the Vanilla slider fix and the reset confirmation, cancel and /reload persistence. Additional channel/message, threshold-boundary and compatibility tests remain open.
 
 ## [0.3.0] - 2026-10-24
 

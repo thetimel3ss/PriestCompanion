@@ -15,7 +15,8 @@ local DEFAULTS = {
     lowEnabled = true,
     oomEnabled = true,
     combatOnly = false,
-    threshold = 20,
+    threshold = 30,
+    oomThreshold = 5,
     cooldown = 15
 }
 local settings = {
@@ -24,6 +25,7 @@ local settings = {
     oomEnabled = DEFAULTS.oomEnabled,
     combatOnly = DEFAULTS.combatOnly,
     threshold = DEFAULTS.threshold,
+    oomThreshold = DEFAULTS.oomThreshold,
     cooldown = DEFAULTS.cooldown,
     channels = { SAY = false, PARTY = true, RAID = true,
         YELL = false, SELF = false },
@@ -162,7 +164,7 @@ local function Baseline()
     lastMaxMana = maximum
     local percent = 100 * mana / maximum
     lowArmed = percent > settings.threshold
-    oomArmed = mana > 0
+    oomArmed = percent > settings.oomThreshold
 end
 
 local function Rebaseline()
@@ -171,8 +173,8 @@ local function Rebaseline()
     Baseline()
 end
 
--- A 5-percentage-point recovery margin re-arms low-mana alerts;
--- OOM re-arms only after sufficient recovery too (never every tick).
+-- Each threshold re-arms after recovering 5 percentage points above
+-- its configured value (never on every regeneration tick).
 local function Inspect(allowAnnouncement)
     local mana, maximum = ReadMana()
     if not mana then
@@ -190,28 +192,31 @@ local function Inspect(allowAnnouncement)
     if percent >= math.min(100, settings.threshold + 5) then
         lowArmed = true
     end
-    if percent >= 5 then oomArmed = true end
+    if percent >= math.min(100, settings.oomThreshold + 5) then
+        oomArmed = true
+    end
 
     if not settings.enabled or
     (settings.combatOnly and not inCombat) then
         -- Suppress ineligible transitions rather than replay after
         -- returning to combat/turning the option back on.
         if percent <= settings.threshold then lowArmed = false end
-        if mana == 0 then oomArmed = false end
+        if percent <= settings.oomThreshold then oomArmed = false end
         return
     end
 
     if not allowAnnouncement then return end
 
     local kind = nil
-    if mana == 0 and settings.oomEnabled and oomArmed then
+    if percent <= settings.oomThreshold
+    and settings.oomEnabled and oomArmed then
         kind = "oom"
     elseif percent <= settings.threshold
     and settings.lowEnabled and lowArmed then
         kind = "low"
     end
 
-    if mana == 0 then oomArmed = false end
+    if percent <= settings.oomThreshold then oomArmed = false end
     if percent <= settings.threshold then lowArmed = false end
     if not kind then return end
 
@@ -235,6 +240,7 @@ local function SaveSettings()
         oomEnabled = settings.oomEnabled,
         combatOnly = settings.combatOnly,
         threshold = settings.threshold,
+        oomThreshold = settings.oomThreshold,
         cooldown = settings.cooldown,
         lowMessage = settings.lowMessage,
         oomMessage = settings.oomMessage,
@@ -259,8 +265,13 @@ local function LoadSettings()
                 settings[key] = saved[key]
             end
         end
-        settings.threshold = Clamp(saved.threshold or 20, 1, 99)
-        settings.cooldown = Clamp(saved.cooldown or 15, 5, 120)
+        settings.threshold = Clamp(
+            saved.threshold or DEFAULTS.threshold, 1, 99)
+        local oomValue = saved.oomThreshold
+        if oomValue == nil then oomValue = DEFAULTS.oomThreshold end
+        settings.oomThreshold = Clamp(oomValue, 0, settings.threshold - 1)
+        settings.cooldown = Clamp(
+            saved.cooldown or DEFAULTS.cooldown, 5, 120)
         settings.lowMessage = NormalizeMessage(saved.lowMessage, LOW_DEFAULT)
         settings.oomMessage = NormalizeMessage(saved.oomMessage, OOM_DEFAULT)
         if type(saved.channels) == "table" then
@@ -284,6 +295,11 @@ function Mana.SetOption(key, value)
     if DEFAULTS[key] == nil then return false end
     if key == "threshold" then
         settings.threshold = Clamp(value, 1, 99)
+        -- Keep OOM strictly below Low Mana, including slider changes.
+        settings.oomThreshold = math.min(
+            settings.oomThreshold, settings.threshold - 1)
+    elseif key == "oomThreshold" then
+        settings.oomThreshold = Clamp(value, 0, settings.threshold - 1)
     elseif key == "cooldown" then
         settings.cooldown = Clamp(value, 5, 120)
     else

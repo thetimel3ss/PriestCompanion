@@ -98,7 +98,7 @@ Checkbox("PriestCompanionManaLowEnabled", "Low Mana", 14, 97,
 Checkbox("PriestCompanionManaOOMEnabled", "Out of Mana", 204, 97,
     function() return mana.GetOption("oomEnabled") end,
     function(v) mana.SetOption("oomEnabled", v) end,
-    "Send an OOM warning when mana reaches zero.", 155)
+    "Send an OOM warning when mana reaches the configured percentage.", 155)
 
 Label("Low Mana threshold", 14, 144, 265, "GameFontNormalSmall")
 local thresholdSlider = CreateFrame(
@@ -114,7 +114,21 @@ if type(thresholdSlider.SetValueStep) == "function" then
 end
 local thresholdValue = Label("", 232, 170, 115)
 
-Label("Cooldown between announcements", 14, 215, 340,
+Label("Out of Mana threshold", 14, 214, 265, "GameFontNormalSmall")
+local oomSlider = CreateFrame(
+    "Slider", "PriestCompanionManaOOMThreshold", child,
+    "OptionsSliderTemplate"
+)
+oomSlider:SetWidth(194)
+oomSlider:SetHeight(17)
+oomSlider:SetPoint("TOPLEFT", child, "TOPLEFT", 25, -242)
+oomSlider:SetMinMaxValues(0, 99)
+if type(oomSlider.SetValueStep) == "function" then
+    oomSlider:SetValueStep(1)
+end
+local oomValue = Label("", 232, 240, 115)
+
+Label("Cooldown between announcements", 14, 284, 340,
     "GameFontNormalSmall")
 local cooldownSlider = CreateFrame(
     "Slider", "PriestCompanionManaCooldown", child,
@@ -122,12 +136,12 @@ local cooldownSlider = CreateFrame(
 )
 cooldownSlider:SetWidth(194)
 cooldownSlider:SetHeight(17)
-cooldownSlider:SetPoint("TOPLEFT", child, "TOPLEFT", 25, -243)
+cooldownSlider:SetPoint("TOPLEFT", child, "TOPLEFT", 25, -312)
 cooldownSlider:SetMinMaxValues(5, 120)
 if type(cooldownSlider.SetValueStep) == "function" then
     cooldownSlider:SetValueStep(1)
 end
-local cooldownValue = Label("", 232, 240, 115)
+local cooldownValue = Label("", 232, 310, 115)
 local syncing = false
 
 thresholdSlider:SetScript("OnValueChanged", function()
@@ -136,7 +150,16 @@ thresholdSlider:SetScript("OnValueChanged", function()
     if value ~= mana.GetOption("threshold") then
         mana.SetOption("threshold", value)
     end
-    thresholdValue:SetText(value .. "%")
+    -- Lowering Low Mana may clamp the saved OOM threshold.
+    scroll.Refresh()
+end)
+oomSlider:SetScript("OnValueChanged", function()
+    if syncing then return end
+    local value = math.floor(this:GetValue() + 0.5)
+    if value ~= mana.GetOption("oomThreshold") then
+        mana.SetOption("oomThreshold", value)
+    end
+    scroll.Refresh()
 end)
 cooldownSlider:SetScript("OnValueChanged", function()
     if syncing then return end
@@ -148,26 +171,33 @@ cooldownSlider:SetScript("OnValueChanged", function()
 end)
 thresholdSlider:SetScript("OnEnter", function()
     ShowTooltip(this, "Low Mana threshold",
-        "Announce when your mana drops to or below this percentage. " ..
-        "A 5-point recovery margin prevents repeat warnings.")
+        "Announce when mana drops to or below this percentage. " ..
+        "Must remain above Out of Mana. If reduced, OOM adjusts down.")
 end)
 thresholdSlider:SetScript("OnLeave", HideTooltip)
+oomSlider:SetScript("OnEnter", function()
+    ShowTooltip(this, "Out of Mana threshold",
+        "Announce at or below this percentage (0 means empty mana). " ..
+        "The maximum is always one point below Low Mana. " ..
+        "Recovery of 5 percentage points rearms this warning.")
+end)
+oomSlider:SetScript("OnLeave", HideTooltip)
 cooldownSlider:SetScript("OnEnter", function()
     ShowTooltip(this, "Announcement cooldown",
         "Minimum time between warnings. OOM may still announce " ..
-        "immediately after Low Mana when mana reaches zero. " ..
+        "immediately after Low Mana when its threshold is reached. " ..
         "Each warning triggers once per mana drop.")
 end)
 cooldownSlider:SetScript("OnLeave", HideTooltip)
 
 Label("Announcement channels (multiple selections allowed)",
-    14, 284, 355, "GameFontNormalSmall")
+    14, 352, 355, "GameFontNormalSmall")
 local channels = {
-    { "SAY", "Say", 14, 309 },
-    { "PARTY", "Party", 204, 309 },
-    { "RAID", "Raid", 14, 339 },
-    { "SELF", "Self (local chat)", 204, 339 },
-    { "YELL", "Yell", 14, 369 }
+    { "SAY", "Say", 14, 377 },
+    { "PARTY", "Party", 204, 377 },
+    { "RAID", "Raid", 14, 407 },
+    { "SELF", "Self (local chat)", 204, 407 },
+    { "YELL", "Yell", 14, 437 }
 }
 local i
 for i = 1, table.getn(channels) do
@@ -182,7 +212,7 @@ for i = 1, table.getn(channels) do
 end
 
 Label("Low Mana message (tokens: {percent}, {mana}, {maxmana}, {name})",
-    14, 407, 355, "GameFontNormalSmall")
+    14, 475, 355, "GameFontNormalSmall")
 
 local editors = {}
 local function CreateMessageEditor(kind, name, startY)
@@ -272,13 +302,13 @@ local function CreateMessageEditor(kind, name, startY)
     SetDraft(mana.GetMessage(kind))
 end
 
-CreateMessageEditor("low", "PriestCompanionManaLowMessage", 430)
-Label("Out of Mana message (same tokens)", 14, 531,
+CreateMessageEditor("low", "PriestCompanionManaLowMessage", 498)
+Label("Out of Mana message (same tokens)", 14, 599,
     350, "GameFontNormalSmall")
-CreateMessageEditor("oom", "PriestCompanionManaOOMMessage", 554)
+CreateMessageEditor("oom", "PriestCompanionManaOOMMessage", 622)
 
 Label("Default restores a draft; Save persists it. Preview is not sent.",
-    14, 660, 355)
+    14, 728, 355)
 
 function scroll.Refresh()
     local j
@@ -288,10 +318,20 @@ function scroll.Refresh()
     end
     syncing = true
     local threshold = mana.GetOption("threshold")
+    local oomThreshold = mana.GetOption("oomThreshold")
     local cooldown = mana.GetOption("cooldown")
     thresholdSlider:SetValue(threshold)
+    -- Keep the UI range valid even at Low Mana = 1 (OOM forced to 0).
+    oomSlider:SetMinMaxValues(0, math.max(1, threshold - 1))
+    oomSlider:SetValue(oomThreshold)
+    if threshold <= 1 then
+        oomSlider:Disable()
+    else
+        oomSlider:Enable()
+    end
     cooldownSlider:SetValue(cooldown)
     thresholdValue:SetText(threshold .. "%")
+    oomValue:SetText(oomThreshold .. "%")
     cooldownValue:SetText(cooldown .. " sec")
     syncing = false
     editors.low.refresh()

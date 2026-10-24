@@ -4,12 +4,12 @@
 
 ### Added — Mana Announcer (2026-10-24; feature branch, in-game testing pending)
 - Created `feature/mana-announcer` from stable `main` version 0.3.0.
-- Added **Announcer > Mana** sub-tab. Controls include master Enable, Low Mana/OOM toggles, low-mana threshold, announcement cooldown, combat-only condition, multiselect channels and editable messages with unsent previews.
+- Added **Announcer > Mana** sub-tab. Controls include master Enable, Low Mana/OOM toggles, independent percentage thresholds (Low Mana defaults to 30%, OOM to 5%), announcement cooldown, combat-only condition, multiselect channels and editable messages with unsent previews.
 - Implemented independent self-mana announcements using Vanilla `UNIT_MANA` and `UNIT_MAXMANA` events. Per-character configuration is stored separately from the existing Fear Ward and Resurrection Announcers.
-- Events are edge-triggered rather than sent on every regen tick. 5-point recovery margin and configurable cooldown mitigate spam; OOM may immediately follow a recent Low Mana message as severity increases.
+- Events are edge-triggered rather than sent on every regen tick. Separate 5-point recovery margins and configurable cooldown mitigate spam; OOM may immediately follow a recent Low Mana message as severity increases. The OOM slider ranges from 0% to one point below Low Mana, automatically adjusting when Low Mana is lowered. Existing saved Low Mana percentages remain unchanged.
 - Channel availability is checked at send time. No optional DLL is required, and existing healing/casting modules were not changed.
 - Research references: HealerProtection (OctoWoW), T-OoM and TimeToDrink. No external source code was copied.
-- **In-game validation pending:** mana threshold transitions, OOM escalation, spam prevention, /reload persistence, messages/channels and unchanged Fear Ward/Resurrection behavior.
+- **In-game validation:** the initial Mana Announcer warning was confirmed working; revised 30%/5% defaults, configurable OOM threshold, escalation, spam prevention, /reload persistence, messages/channels and unchanged Fear Ward/Resurrection behavior remain to be retested.
 
 ## [0.3.0] - 2026-10-24
 

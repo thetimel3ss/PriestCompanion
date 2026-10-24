@@ -83,7 +83,7 @@ local resScroll, resChild = CreateToolScroll(
     "PriestCompanionResurrectionScroll", 744
 )
 local manaScroll, manaChild = CreateToolScroll(
-    "PriestCompanionManaAnnouncerScroll", 694
+    "PriestCompanionManaAnnouncerScroll", 780
 )
 resScroll:Hide()
 manaScroll:Hide()

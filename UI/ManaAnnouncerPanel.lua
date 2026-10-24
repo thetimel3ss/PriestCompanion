@@ -315,7 +315,7 @@ Label("Default restores a draft; Save persists it. Preview is not sent.",
 local RESET_MANA_POPUP = "PRIEST_COMPANION_RESET_MANA_ANNOUNCER"
 StaticPopupDialogs[RESET_MANA_POPUP] = {
     text = "Reset all Mana Announcer settings for this character?" ..
-        "\n\nThis sets Low Mana to 30%, Out of Mana to 5%, " ..
+        "\n\nThis sets Low Mana to 30%%, Out of Mana to 5%%, " ..
         "and the cooldown to 15 seconds. Both alerts stay selected; " ..
         "only Say is selected. Default messages are restored and " ..
         "the main Enable checkbox is turned off.",

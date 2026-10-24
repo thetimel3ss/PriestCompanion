@@ -324,11 +324,11 @@ function scroll.Refresh()
     -- Keep the UI range valid even at Low Mana = 1 (OOM forced to 0).
     oomSlider:SetMinMaxValues(0, math.max(1, threshold - 1))
     oomSlider:SetValue(oomThreshold)
-    if threshold <= 1 then
-        oomSlider:Disable()
-    else
-        oomSlider:Enable()
-    end
+    -- Vanilla Slider frames do not implement :Enable() / :Disable().
+    -- At Low Mana = 1%, OOM is fixed at 0%, so block mouse edits.
+    local oomEditable = threshold > 1
+    oomSlider:EnableMouse(oomEditable)
+    oomSlider:SetAlpha(oomEditable and 1 or 0.5)
     cooldownSlider:SetValue(cooldown)
     thresholdValue:SetText(threshold .. "%")
     oomValue:SetText(oomThreshold .. "%")

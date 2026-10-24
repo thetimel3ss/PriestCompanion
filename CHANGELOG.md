@@ -2,10 +2,11 @@
 
 ## [Unreleased]
 
-### Added — Mana settings reset (2026-10-24; feature branch, in-game validation pending)
+### Added — Mana settings reset (2026-10-24; feature branch, partially validated in-game)
 - Added a bottom-of-page **Reset to Defaults** button and native Vanilla OK/Cancel confirmation, with Escape cancellation. Resets only the current character's Mana Announcer options: Low Mana 30%, OOM 5%, cooldown 15 seconds, both warning checkboxes on, **Say as the only enabled channel**, and both original message templates.
 - Preserves the original opt-in behavior (**Enable off**, Only in combat off); existing saved channel selections are not changed until the user confirms Reset. Newly initialized characters also default to Say-only.
-- A confirmed reset saves once, clears pending mana-alert baselines and unsaved message drafts, and refreshes all controls. Fear Ward and Resurrection preferences remain untouched. **In-game testing pending** for confirmation, cancellation, page layout and /reload persistence.
+- A confirmed reset saves once, clears pending mana-alert baselines and unsaved message drafts, and refreshes all controls. Fear Ward and Resurrection preferences remain untouched.
+- **In-game validation (2026-10-24):** the maintainer confirmed the reset works, survives /reload, and Cancel leaves settings unchanged. Fixed Vanilla StaticPopup's percent formatting error by escaping the displayed 30% and 5% as 30%% and 5%% in its format string. Escape, unsaved text drafts, exact default-value audit and scroll containment remain unverified.
 
 ### Added — Mana Announcer (2026-10-24; feature branch, in-game testing pending)
 - Created `feature/mana-announcer` from stable `main` version 0.3.0.

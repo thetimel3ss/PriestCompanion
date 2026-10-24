@@ -22,7 +22,9 @@ local DEFAULTS = {
     compactWidth = 118,
     compactHeight = 112,
     expandedWidth = 212,
-    expandedHeight = 130
+    expandedHeight = 130,
+    compactScale = 1,
+    expandedScale = 1
 }
 
 local BOOL_OPTIONS = {
@@ -208,27 +210,97 @@ function Tracker.SetOption(key, value)
     return true
 end
 
-function Tracker.SaveGeometry(x, y, width, height)
-    if settings.locked then
-        return
-    end
+--------------------------------------------------
+-- Tracker window scale
+-- Keep the old width/height variables for backward compatibility.
+-- Both display modes now save proportional sizes between 40%-120%.
+--------------------------------------------------
 
-    if type(x) == "number" then
+local function WindowMode(expanded)
+    if expanded then
+        return "expandedScale", "expandedWidth", "expandedHeight",
+            212, 130
+    end
+    return "compactScale", "compactWidth", "compactHeight", 118, 112
+end
+
+local function ClampWindowScale(raw)
+    local value = tonumber(raw)
+    if not value or value ~= value then return nil end
+    if value < 0.40 then value = 0.40 end
+    if value > 1.20 then value = 1.20 end
+    return value
+end
+
+local function RoundedWindowScale(raw)
+    local value = ClampWindowScale(raw)
+    if not value then return nil end
+    return math.floor(value * 20 + 0.5) / 20
+end
+
+function Tracker.GetWindowScale(expanded)
+    if expanded == nil then expanded = settings.expanded end
+    local key = WindowMode(expanded)
+    return ClampWindowScale(settings[key]) or 1
+end
+
+local function SaveModeWindowScale(value, expanded)
+    local key, widthKey, heightKey, baseWidth, baseHeight =
+        WindowMode(expanded)
+    SaveOption(key, value)
+    SaveOption(widthKey, baseWidth * value)
+    SaveOption(heightKey, baseHeight * value)
+end
+
+function Tracker.SetWindowScale(raw, expanded)
+    if expanded == nil then expanded = settings.expanded end
+    local scale = RoundedWindowScale(raw)
+    if not scale then return false end
+    SaveModeWindowScale(scale, expanded)
+    geometryRevision = geometryRevision + 1
+    Notify()
+    return true
+end
+
+-- Saving a window drag only updates position. A border/corner drag
+-- selects the dominant axis and snaps the window back to a uniform
+-- scale, matching the Resurrection Assistant HUD.
+function Tracker.SaveGeometry(x, y, width, height, direction, startingScale)
+    if settings.locked then return end
+
+    if type(x) == "number" and x == x then
         SaveOption("x", x)
     end
-    if type(y) == "number" then
+    if type(y) == "number" and y == y then
         SaveOption("y", y)
     end
-    if type(width) == "number"
-    and type(height) == "number" then
-        if settings.expanded then
-            SaveOption("expandedWidth", width)
-            SaveOption("expandedHeight", height)
+
+    if type(width) == "number" and type(height) == "number" then
+        local _, _, _, baseWidth, baseHeight =
+            WindowMode(settings.expanded)
+        local widthScale = width / baseWidth
+        local heightScale = height / baseHeight
+        local scale
+        if direction == "LEFT" or direction == "RIGHT" then
+            scale = widthScale
+        elseif direction == "TOP" or direction == "BOTTOM" then
+            scale = heightScale
         else
-            SaveOption("compactWidth", width)
-            SaveOption("compactHeight", height)
+            local previous = startingScale or
+                Tracker.GetWindowScale()
+            if math.abs(widthScale - previous) >=
+                math.abs(heightScale - previous) then
+                scale = widthScale
+            else
+                scale = heightScale
+            end
         end
+        scale = RoundedWindowScale(scale)
+        if scale then SaveModeWindowScale(scale, settings.expanded) end
     end
+
+    geometryRevision = geometryRevision + 1
+    Notify()
 end
 
 -- Reset only placement and saved sizes, not any behavior preferences.
@@ -241,7 +313,8 @@ function Tracker.ResetGeometry()
     local fields = {
         "x", "y",
         "compactWidth", "compactHeight",
-        "expandedWidth", "expandedHeight"
+        "expandedWidth", "expandedHeight",
+        "compactScale", "expandedScale"
     }
     local i
 
@@ -881,6 +954,29 @@ local function LoadSettings()
             elseif type(saved[key]) == "number" then
                 settings[key] = saved[key]
             end
+        end
+    end
+
+    -- Legacy builds stored separate widths/heights. Preserve their
+    -- effective visual size on first load, then use uniform scaling.
+    -- A skewed older layout uses the smaller dimension ratio so no
+    -- content is clipped when migrated.
+    local i
+    local modes = { false, true }
+    for i = 1, table.getn(modes) do
+        local expanded = modes[i]
+        local scaleKey, widthKey, heightKey, baseWidth, baseHeight =
+            WindowMode(expanded)
+        if type(saved) ~= "table"
+        or type(saved[scaleKey]) ~= "number" then
+            local legacyScale = math.min(
+                (settings[widthKey] or baseWidth) / baseWidth,
+                (settings[heightKey] or baseHeight) / baseHeight
+            )
+            settings[scaleKey] = ClampWindowScale(legacyScale) or 1
+        else
+            settings[scaleKey] =
+                ClampWindowScale(settings[scaleKey]) or 1
         end
     end
 

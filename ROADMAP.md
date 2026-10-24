@@ -2,8 +2,8 @@
 
 The roadmap tracks outstanding improvements and ongoing verification. Released functionality belongs in [CHANGELOG.md](CHANGELOG.md), not here.
 
-**Review date:** 2026-10-19  
-**Current release:** `0.2.0` (`main`)  
+**Review date:** 2026-10-24  
+**Current release:** `0.3.0` (`main`)  
 **Future development:** separate feature branches from `main`
 
 ## Current scope and confirmed decisions
@@ -117,6 +117,115 @@ All 28 records have `source.note`: 21 world-drop-style entries with `"World drop
 `Sources[21801]` and `Sources[60805]` no longer contain aggregate-only NPC IDs (15319/91910). `Sources[80799]` no longer has the contradictory `mobCount = 1`. The item entries and their source details are otherwise preserved.
 
 ## Next steps
+
+### Options navigation — Announcer and Tools separated (`feature/resurrection-assistant`)
+
+- [x] Change the four Options top tabs to **General | Announcer | Tools | Mods**. Keep the normal default General page and an alias for legacy `advanced` / `tracker` navigation that opens Tools > Book of Prayer Tracker.
+- [x] Put **Fear Ward** and **Resurrection** as independent sub-tabs under **Announcer**. Keep channel, custom message, Whisper, interruption and overwrite prevention controls with their existing SavedVariables.
+- [x] Put **Resurrection Assistant** and **Book of Prayer Tracker** as independent sub-tabs under **Tools**. Move Assistant's HUD settings out of the long Resurrection Announcer page; reparent the existing Tracker controls instead of rebuilding them.
+- [x] Keep existing control names, option keys, per-character scales, preview functions, slash commands and all cast/event core files unchanged. The Assistant and Tracker previews end when their sub-tab is hidden.
+- [x] **Tools scroll containment rebuilt from Announcer (validated in OctoWoW on 2026-10-23):** previous viewport and ScrollFrame-reparenting changes did not fix content that visibly escaped the main frame when scrolling. Replaced Tools' nested/reparented pages with a *direct copy of Announcer's frame lifecycle*: Tools creates its own two UIPanelScrollFrameTemplate scrolls and scroll children as immediate children, sets SetScrollChild once and never reparents them. Moved Tracker options into their own module and adapted Assistant options to populate the already-created scroll child. Preserved names of existing controls, preview cleanup, scaling, saved data and spell/heal/announcer cores. Removed fixed-width tab resizing: the native template now sizes tabs to their captions, with shortened captions only if both cannot fit.
+- [x] **Tools layout retested successfully in OctoWoW (2026-10-23):** the maintainer confirmed both Resurrection Assistant and Book of Prayer Tracker option pages now scroll within the addon window, and the sub-tab buttons correctly fit their titles.
+- [x] **Announcer regression check (2026-10-24):** maintainer confirmed both Fear Ward and Resurrection announcers continue working after the Options reorganization and final checkbox label changes.
+- [ ] **Other Options integration checks (not specifically reconfirmed):** Preview cleanup when switching Tools sub-tabs, saved settings across /reload after the reorganization, and special slider boundary cases.
+- [ ] **Remaining Options navigation acceptance:** verify General, Announcer, Tools and Mods top-tab pressed styles; settings persistence across /reload; Preview stops on navigation; the legacy Tracker caller opens Tools > Tracker; no Lua errors. Tools scrolling/tab sizing and Fear Ward/Resurrection announcers were already validated.
+- [ ] **Future Announcer section:** add **Mana / OOM** as a third Announcer sub-tab after implementation of that module; not part of the navigation-only change.
+- [ ] **MetaHunt inspiration review (future, separate scope):** modular option pages, event-efficient module gating, searchable reference data/book, class-specific widgets and optional mana warnings; do not port Hunter-specific features or make Nampower mandatory.
+
+### Book of Prayer Tracker — uniform window scaling (`feature/resurrection-assistant`)
+
+- [x] Bring Tracker window sizing in line with the Resurrection Assistant: **40%–120%** uniform scale, independent compact and expanded sizes, adjustment by any of its existing eight edges or corners and an Options → Tracker **Window size (per mode)** slider.
+- [x] Preserve existing saved `prayerTracker` settings and migrate legacy independent width/height geometry to a proportional, bounded scale at load time. Keep saved position, lock, reset confirmation, auto-hide, preview, mana-value presentation and refund border logic unchanged.
+- [x] Add **Reset current size** (100% for the selected mode); **Reset Position** still resets the position and *both* mode sizes. Keep the slider's percentage synchronized when the user drags a border/corner.
+- [x] **Core Tracker regression tested in OctoWoW (2026-10-22):** successful healing casts continue to be registered, mana values are tracked normally, and refund status border colors remain correct following the new window scaling implementation.
+- [x] **Tracker interface validated in OctoWoW (2026-10-22):** the maintainer confirmed the new window scale control, border/edge resizing, saved layout persistence, Lock Position and Preview all function as expected.
+- [ ] **Additional Tracker edge cases (not individually confirmed):** exact 40% and 120% extremes in both Compact/Expanded modes; independent size persistence per mode; Reset current size and Reset Position confirmation; spell-name/mana-refund icon reflow at minimum scale. Core heal, mana and refund-border behavior has already passed.
+
+### Resurrection Assistant — detection and selection (`feature/resurrection-assistant`)
+
+- [x] Create a branch from the validated `feature/announcer` head, preserving the original branch and `main`.
+- [x] Add `Core/ResurrectionAssistant.lua` to the regular and ClassicAPI TOCs. The initial detection-only implementation was reviewed separately before introducing an explicitly clicked cast action.
+- [x] Implement event-driven party/raid snapshots and per-unit health/flags updates, skipping the player, disconnected units and released ghosts. Prefer a manually selected eligible group target, then Priest → Shaman → Paladin → Druid → Mage → Hunter → Warlock → Warrior → Rogue.
+- [x] **Strict combat gate:** `PLAYER_REGEN_DISABLED` suspends all roster/death evaluation and candidate selection. All health/group/addon messages are ignored while the priest is in combat. `PLAYER_REGEN_ENABLED` rebuilds the roster once, so deaths during combat are discovered only afterwards. No OnUpdate polling or background roster scanning.
+- [x] Interoperate with optional pfUI LibPredict and HealComm library queries; receive HealComm/CTRA start/stop broadcasts directly, but only from members of the current party/raid. Expire unconfirmed offers; optionally consume ClassicAPI remote cast START observations when the recipient is available. No extra libraries are bundled, and the vanilla core remains Lua 5.0 compatible.
+- [x] Validate current target status when explicitly querying candidates, and apply optional distance / line-of-sight checks when present. An unknown distance does not prove a target is within cast range; the game's cast validation remains authoritative.
+- [x] Keep read-only `/pc res status` (or `/pc res next`) for inspection. Add `/pc res` as a **manually invoked, single-attempt Resurrection command** for use in a macro; it never starts a cast from an event or timer.
+- [x] **First five in-game tests (party, 2026-10-22):** with a living member, `/pc res status` returned 0 eligible / 0 incoming / 0 released; after death without release, 1 eligible / 0 incoming / 0 released; after release, 0 eligible / 0 incoming / 1 released; during combat, the assistant reported itself paused; after leaving combat, the candidate information refreshed.
+- [x] **Priest-first priority updated:** Priest → Shaman → Paladin → Druid → Mage → Hunter → Warlock → Warrior → Rogue. A manually selected eligible dead party/raid member still takes precedence.
+- [x] **Raid wipe in-game validation (maintainer confirmation, 2026-10-23):** Resurrection Assistant followed the configured class-priority queue with multiple deaths, did not cast on players already being resurrected by another healer, and correctly respected the out-of-combat restriction. This confirms the core real-raid priority and duplicate-avoidance behavior.
+- [x] **Manual target override validated (2026-10-24):** the maintainer confirmed selecting an eligible deceased player manually correctly overrides the automatic resurrection-priority queue.
+- [ ] **Remaining incoming-resurrection edge cases:** verify optional pfUI/LibPredict, HealComm and CTRA providers individually, interrupted/failed resurrection cancellation, stale incoming offers and expiry, and multiple simultaneous casters. The raid test validated duplicate-resurrection suppression but did not isolate these cases.
+- [x] **Death-triggered floating button:** `UI/ResurrectionAssistant.lua` subscribes to the core's state-change notifications, not `OnUpdate`. The button appears out of combat for an eligible dead party/raid member; clicking makes one attempt on a newly revalidated candidate. With no eligible unit but a released party/raid member, it prepares manual world-corpse targeting. Supports dragging, saved per-character position, reset and visibility checkbox in Options → Tools → Resurrection Assistant (enabled by default).
+- [x] **Cast dispatch:** prefer optional ClassicAPI `C_Spell.CastAtUnit` without changing the player's target. Vanilla fallback clears an unrelated target, uses `CastSpellByName` + `SpellTargetUnit`, and restores selection when possible. The Announcer remains responsible for cast-start/interruption chat messages. The button is hidden in combat and triggers no detection while in combat.
+- [x] **Button tested in OctoWoW:** when a party member dies without releasing, the floating button appears and clicking casts Resurrection on the candidate.
+- [x] **Released corpse tested:** after release, clicking the button prepares the Resurrection spell for a manual world-corpse click.
+- [x] **Combat visibility tested:** entering combat hides the popup; exiting combat restores it according to the available candidate state, with no in-combat roster scanning.
+- [x] **Window persistence tested:** the maintainer confirmed the floating window retained its position.
+- [ ] **Remaining floating-button acceptance:** disabled Show button vs independent `/pc res`; checkbox persistence across /reload; Reset position; no button for disconnected units; Vanilla without ClassicAPI; already-casting behavior. Announcer regression and competing-healer duplicate avoidance have passed; interruption/expiry cases remain untested.
+- [x] **Compact / Expanded Resurrection HUD:** compact Tracker-style layout with centered clickable Resurrection icon, optional nickname below it and class at the bottom; the icon expands to occupy space freed when labels are hidden. Expanded retains the existing wide presentation with more context. Defaults: compact, name on, class off, unlocked.
+- [x] **Whole-window click:** the frame itself is the cast button. Movement is distinguished from click; drag and bottom-right resize gestures must not fire a cast. A resize grip is hidden while Lock Position is active. The position remains per character.
+- [x] **Size / scale (updated):** per-mode saved uniform scale in the range **40%–120%**, adjustable from the Resurrection settings and by **eight edge/corner resize regions** when unlocked, following the Book of Prayer Tracker's interaction pattern. Edge and corner resize zones shrink at smaller scales to preserve the central casting click area. Compact and Expanded retain independent sizes, and Reset current size affects only the selected mode. Previously saved out-of-range scales are clamped to the new limits.
+- [x] **Tracker comparison:** Book of Prayer Tracker accepts independent width/height sizes with minimum compact 68×68 px and expanded 104×78 px (overall maximum 360×240 px). The Assistant intentionally allows a smaller 40% uniform scale: compact base 108×116 reaches approximately 43×46 px, while expanded base 238×96 reaches approximately 95×38 px. Its resize gestures snap back to proportional icon/text sizing rather than saving asymmetric dimensions.
+- [x] **Colors / class labels:** green border for eligible target, yellow for released-body manual fallback, blue for Preview. Character names and class text use the target's class color; unresolved released corpses are never assigned a guessed class.
+- [x] **Preview HUD:** show a test-only state without a dead player. Preview never calls the casting function, even if the window is clicked; options and drag/size adjustments update live; switching tabs or closing Options ends preview.
+- [x] **Resurrection settings tooltips:** updated for each new checkbox, scale control, reset actions and Preview. No icon tooltip is added.
+- [x] **Regression reproduced in game after the compact HUD rework:** the eligible-target and yellow released-corpse states were correctly detected, but clicking the redesigned HUD did not cast or prepare the cursor. A subsequent click could display "Resurrection was just requested." The prior UI version using an actual Button's OnClick was functional.
+- [x] **Interaction fix validated in OctoWoW:** after the return to a real full-surface WoW Button and LeftButtonUp OnClick, the maintainer confirmed the window casts successfully again. The green/yellow border states, released-corpse targeting fallback and HUD resizing also worked as expected.
+- [x] **Post-fix main interaction tests (2026-10-22):** full-window casting, state colors, released-corpse fallback and HUD resizing passed in-game.
+- [ ] **Remaining interaction edge cases:** drag/resize gestures never cast, rapid-click handling after a rejected cast, and Preview never casting were not independently confirmed in these latest tests.
+- [ ] **Other new HUD in-game tests:** compact vs expanded and /reload persistence; optional nickname/class visibility and icon scaling; class color; Lock Position preventing move and resize while still casting on click; saved per-mode slider scaling at exactly 40% and 120%; drag-to-resize using all four edges and four corners at minimum and maximum sizes; correct scaling/position persistence on /reload; reset size and position; Preview without target and click never casting; preview termination on tab change. Combat hide/reappear and Announcer regression have passed.
+- [ ] **Other compatibility acceptance:** out-of-range/line-of-sight failures, disconnected members, ClassicAPI absent, provider-specific external resurrection messages/timeout handling and untested priority combinations. Raid ordering and suppression of already-incoming resurrections have passed in live use. Refine any behaviors that in-game tests uncover.
+
+### Tools — Fear Ward and Resurrection (in progress on `feature/announcer`)
+
+- [x] Rename Options → Announcer to **Options → Tools**, with native **Fear Ward** and **Resurrection** sub-tabs to accommodate later assistant/automation features alongside each spell's announcements.
+- [x] Give each tool its own scroll area and settings UI, keeping existing saved data and cast/event logic intact. Preserve the legacy `announcer` section ID and `PC.UI.AnnouncerPanel` alias for compatibility.
+- [x] **Basic sub-tab navigation tested in OctoWoW:** the maintainer confirmed that the Fear Ward and Resurrection sub-tabs work in Options → Tools.
+- [x] **Persistence after /reload:** the maintainer confirmed that customized Resurrection/Whisper messages and previously selected settings remain saved after a UI reload.
+- [ ] **Additional sub-tab acceptance:** verify selected-tab visuals, layout bounds, scroll positions, tooltips, 30px row spacing, independent channel toggles, Default/Save/Preview behavior, unsaved draft handling during tab switching, and Fear Ward regression behavior.
+
+#### Resurrection Announcer (core live cast/whisper/corpse tests passed; further edge cases pending)
+
+- [x] Add a separate Resurrection Whisper template, default `Casting {spell} on you. Please don't release!`, editable independently of public text with Default/Save/Preview and per-character persistence.
+- [x] Add optional **Announce interrupted casts** (default off), editable public cancellation text and short Whisper notice, guarded by matching START and interrupted/failed GUIDs. Never announce pre-START failures or post-success cancellation.
+- [x] For released-player corpse clicks, allow SENT with an empty target to match START. Try `UnitSpellTargetName("player")` briefly; if still unresolved, announce a generic corpse recipient on public channels only (no guessed Whisper).
+- [x] **Released corpse, cast started:** when Resurrection is selected and the caster clicks the released player's body in the world, an announcement is sent using the generic corpse description.
+- [x] **Released corpse, cast interrupted:** the interruption announcement is sent to the enabled chat channels with a generic corpse description; Whisper is correctly skipped because the recipient name is unknown.
+- [x] **Identified target, Whisper enabled:** a normal Resurrection cast sends the configured recipient-specific Whisper message.
+- [x] **Identified target, cast interrupted:** the configured interruption message is sent and the recipient is also notified by Whisper.
+- [x] **Outside-range attempt:** the maintainer confirmed that the client prevents the Resurrection cast from starting, and no announcement is emitted. This does not independently exercise a server-side pre-START failure after SENT.
+- [x] **Successful cast completion:** the maintainer confirmed that a Resurrection finishing normally does not generate a false interruption announcement.
+- [ ] **Remaining acceptance tests:** pre-START failure after SENT (if reproducible), duplicate START/FAILED/INTERRUPTED events, interruption toggle off, released corpse with recoverable name, mouseover and target-switching casts, separate Default/Save/Preview interactions, multiple channels and unavailable group channels, ClassicAPI absent. Saved changes surviving /reload were confirmed.
+
+- [x] Add an opt-in Resurrection section in Options → Tools → Resurrection with separate saved preferences, independently selectable Say/Yell/Party/Raid/Self/**Whisper** channels, and Default/Save/Preview message editing.
+- [x] Correlate ClassicAPI `UNIT_SPELLCAST_SENT` (target, GUID, spell) with `UNIT_SPELLCAST_START` (same GUID, spell) so the message is sent **only after Resurrection begins casting**; deduplicate START and discard pre-start failure. Do not announce completion/acceptance.
+- [x] Whisper the captured named Resurrection recipient only after matched START; never derive an absent recipient from the current target. Default `Casting {spell} on {target}.` prevents a misleading completed-resurrection claim. No Whisper option is added to Fear Ward.
+- [x] Move **Prevent overwriting Fear Ward** beside **Enable Fear Ward**, retaining tooltip and 30px spacing of other checkbox rows; use the freed space for Resurrection settings.
+- [x] **Basic Resurrection announcement confirmed in-game:** the maintainer reports that Resurrection notices are being sent successfully. The exact selected channels and START/failure timing were not separately confirmed in this test report.
+- [ ] **Other in-game acceptance:** distinguish pre-START rejection after SENT from client-side out-of-range prevention, verify different ranks/spellbook, mouseover and target switching, duplicate/absent event handling, channel combinations and unavailable channels, ClassicAPI absent, and previously validated Fear Ward behavior. Customized settings persisting after /reload are already verified. Corpse/Whisper/interruption paths and normal completion without false interruption are confirmed.
+
+#### Fear Ward (previously validated paths)
+
+- [x] Add an optional, independent per-character **Prevent overwriting Fear Ward** setting under Options → Tools → Fear Ward (disabled by default). Check the recipient's current aura before supported Lua spell dispatches and prevent duplicate application with a local notice, even when announcements are disabled.
+- [x] **Maintainer's first live checks:** Fear Ward on a recipient without an active buff works; action-bar casts, spellbook casts and typed `/cast Fear Ward` are prevented when that recipient is buffed.
+- [x] **Follow-up implementation:** cover no-target self-casts, explicit SuperWoW recipient arguments and `SpellTargetUnit` cursor targeting; preserve the initial working paths.
+- [x] **Self-cast retest:** the maintainer confirmed no-target Fear Ward correctly blocks recasting when the priest already has Fear Ward.
+- [x] **ClassicAPI macro path fix:** ClassicAPI's `/cast [@unit]` uses `C_Spell.CastAtUnit`; added a before-cast guard for the explicit unit (including mouseover) rather than the selected target. The exact macro `/cast [@mouseover,help,nodead][help,nodead][@player] Fear Ward` is the regression case.
+- [x] **Mouseover regression verified in-game:** with `/cast [@mouseover,help,nodead][help,nodead][@player] Fear Ward`, the maintainer confirmed that an already-buffed mouseover target is protected and the macro does not reapply Fear Ward. This validates the ClassicAPI `C_Spell.CastAtUnit` guard for that scenario only.
+- [x] **Additional mouseover live tests:** the maintainer confirmed Fear Ward casts normally when the mouseover recipient has no Fear Ward, and that a buffed selected target does not block Fear Ward on a different, unbuffed mouseover recipient. Together with the previous buffed-mouseover block, these cover the main mouseover recipient precedence checks.
+- [ ] **Remaining live verification:** test mouseover-absent fallback to selected target and player, numeric spell IDs, direct actionbar/spellbook/typed /cast regression after the latest change, other DLL macro paths, and SuperWoW `CastSpellByName("Fear Ward", "mouseover")` / Lua `SpellTargetUnit` as available. No universal cast interception is claimed.
+- [ ] **Aura verification:** confirm spellID 6346 and aura name/texture on OctoWoW, verify protection against a buff applied by another priest, and test the absence of ClassicAPI.
+
+- [x] Create the original Options → Announcer tab and per-character Fear Ward preferences (now accessed via Options → Tools → Fear Ward).
+- [x] Allow multiple selected announcement channels at once: Say, Yell, Party, Raid and local-only Self. Skip unavailable group channels rather than rerouting; allow an independent toggle for self-cast announcements.
+- [x] Support customizable message text and preview, retaining the target placeholder. Announce only after confirmed ClassicAPI SENT → SUCCEEDED GUID match; skip failed casts, duplicate success, or unknown recipients without assuming a target.
+- [x] Place Fear Ward and channel help text into native hover tooltips on checkboxes/captions, use exact 30px spacing between Enable Fear Ward, the channel header and each row. Preserve the right column, move Include casts on myself beside Yell, and add independent Yell selection/persistence.
+- [x] Add Default/Save to the custom Fear Ward announcement message: Default loads the original text as a draft, Save/Enter commits, Escape reverts; changing other checkboxes preserves the unsaved draft, and leaving the tab discards it. Preview reflects the draft without sending messages.
+- [ ] **In-game verification:** Fear Ward on self/party/raid members, Say + Raid, Say + Yell + Raid and Party + Say simultaneously, tooltip hover on checkboxes and captions, checkbox spacing, Default/Save/Enter/Escape for the custom text and /reload persistence, success vs failed/out-of-range casts, mouseover casts, changing target immediately, duplicate events, missing target, no ClassicAPI, channel changes mid-session, and settings across /reload.
+- [x] **Resurrection Announcer (initial implementation):** opt-in, per-spell multi-channel selection and confirmed cast START announcements, with Whisper addressed to the captured recipient. In-game verification still pending.
+- [ ] **Fear Ward Assistant:** allow a preferred target and cooldown/aura readiness reminders; assess whether automatic casting is supported and permitted by the client/server before implementing any action.
+- [ ] **Resurrection Assistant:** offer a post-wipe dead-player list with player-confirmed resurrection actions; handle combat, range, and player availability.
+- [ ] **Future announcers:** OOM alerts and other optional priest spell announcements. Avoid chat spam and preserve independent channel selection.
 
 ### Native tabbed Options UI and client diagnostics — released in v0.2.0
 

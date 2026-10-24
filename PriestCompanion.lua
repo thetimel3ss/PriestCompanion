@@ -11,7 +11,7 @@ PC.version =
     GetAddOnMetadata(
         PC.name,
         "Version"
-    ) or "0.2.0"
+    ) or "0.3.0"
 
 --------------------------------------------------
 -- SavedVariables
@@ -98,12 +98,51 @@ function PC.OnSlashCommand(message)
         DEFAULT_CHAT_FRAME:AddMessage(
             "/priest options - Open Options > General"
         )
+        DEFAULT_CHAT_FRAME:AddMessage(
+            "/pc res status - Preview eligible Resurrection targets"
+        )
+        DEFAULT_CHAT_FRAME:AddMessage(
+            "/pc res - Cast once on the next eligible Resurrection target"
+        )
 
         return
     end
 
     if message == "options" then
         PC.ShowOptions()
+        return
+    end
+
+    if message == "res status" or message == "res next" then
+        local assistant = PC.Modules.ResurrectionAssistant
+        if assistant and type(assistant.PrintStatus) == "function" then
+            assistant.PrintStatus()
+        else
+            DEFAULT_CHAT_FRAME:AddMessage(
+                "|cffff0000Priest Companion:|r " ..
+                "Resurrection Assistant is unavailable."
+            )
+        end
+        return
+    end
+
+    if message == "res" then
+        local assistant = PC.Modules.ResurrectionAssistant
+        if not assistant or type(assistant.TryResurrect) ~= "function" then
+            DEFAULT_CHAT_FRAME:AddMessage(
+                "|cffff0000Priest Companion:|r " ..
+                "Resurrection Assistant is unavailable."
+            )
+            return
+        end
+        local ok, result = assistant.TryResurrect()
+        if not ok or (result and
+        string.find(result, "Click the released", 1, true)) then
+            DEFAULT_CHAT_FRAME:AddMessage(
+                "|cff66ccffPriest Companion:|r " ..
+                (result or "No eligible target.")
+            )
+        end
         return
     end
 

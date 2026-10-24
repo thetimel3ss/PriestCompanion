@@ -118,6 +118,16 @@ All 28 records have `source.note`: 21 world-drop-style entries with `"World drop
 
 ## Next steps
 
+### Mana Announcer — upcoming (`feature/mana-announcer`)
+
+- [x] Create the dedicated `feature/mana-announcer` branch from the released `main` at version `0.3.0`.
+- [ ] Add **Options > Announcer > Mana** as the third native sub-tab alongside Fear Ward and Resurrection, reusing their established scroll layout and preserving both existing Announcers.
+- [ ] Agree and implement the first mana-notification triggers: low mana at a configurable percentage and **Out of Mana (OOM)** at zero. Keep the feature disabled by default and avoid repeated announcements until the condition clears or a configured cooldown permits a new alert.
+- [ ] Configure notification channels, customizable messages, conditions and sensible anti-spam behavior; save preferences per character and validate persistence with `/reload`.
+- [ ] Analyze relevant reference ideas from HealerProtection, T-OoM and TimeToDrink, retaining only options appropriate to Priest and Vanilla 1.12.1. Keep ClassicAPI/SuperWoW/Nampower integrations optional and capability-based.
+- [ ] Validate in-game during spellcasting/combat, party and raid, mana regeneration, changing mana pools, repeated zero mana, and channel availability before merging.
+- **Naming:** `Mana Announcer` is the feature name (and branch suffix); **OOM** is one alert type. The UI sub-tab should be labeled **Mana**.
+
 ### Options navigation — Announcer and Tools separated (`feature/resurrection-assistant`)
 
 - [x] Change the four Options top tabs to **General | Announcer | Tools | Mods**. Keep the normal default General page and an alias for legacy `advanced` / `tracker` navigation that opens Tools > Book of Prayer Tracker.

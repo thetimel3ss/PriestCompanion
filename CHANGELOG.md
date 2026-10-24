@@ -24,7 +24,8 @@
 - Events are edge-triggered rather than sent on every regen tick. Separate 5-point recovery margins and configurable cooldown mitigate spam; OOM may immediately follow a recent Low Mana message as severity increases. The OOM slider ranges from 0% to one point below Low Mana, automatically adjusting when Low Mana is lowered. Existing saved Low Mana percentages remain unchanged.
 - Channel availability is checked at send time. No optional DLL is required, and existing healing/casting modules were not changed.
 - Research references: HealerProtection (OctoWoW), T-OoM and TimeToDrink. No external source code was copied.
-- **In-game validation (2026-10-24):** the maintainer confirmed all five targeted functional tests passed in OctoWoW: Low Mana alert at 30%, OOM at 5% even within the Low Mana cooldown, suppression of repeated regeneration-tick announcements, alert rearming after recovery above 35% and 10%, and **Only in combat** blocking out-of-combat alerts. Earlier tests also confirmed the Vanilla slider fix and the reset confirmation, cancel and /reload persistence. Additional channel/message, threshold-boundary and compatibility tests remain open.
+- **In-game validation (2026-10-24):** the maintainer confirmed all five targeted functional tests passed in OctoWoW: Low Mana alert at 30%, OOM at 5% even within the Low Mana cooldown, suppression of repeated regeneration-tick announcements, alert rearming after recovery above 35% and 10%, and **Only in combat** blocking out-of-combat alerts. Earlier tests also confirmed the Vanilla slider fix and the reset confirmation, cancel and /reload persistence.
+- **Final Mana acceptance confirmation (2026-10-24):** the maintainer subsequently confirmed the requested channel/message combinations, slider limits (including OOM 0% and automatic clamp) and Fear Ward/Resurrection regression checks all passed. Optional corner cases remain tracked; no merge has been performed.
 
 ## [0.3.0] - 2026-10-24
 

@@ -19,19 +19,23 @@ local DEFAULTS = {
     oomThreshold = 5,
     cooldown = 15
 }
-local settings = {
-    enabled = DEFAULTS.enabled,
-    lowEnabled = DEFAULTS.lowEnabled,
-    oomEnabled = DEFAULTS.oomEnabled,
-    combatOnly = DEFAULTS.combatOnly,
-    threshold = DEFAULTS.threshold,
-    oomThreshold = DEFAULTS.oomThreshold,
-    cooldown = DEFAULTS.cooldown,
-    channels = { SAY = false, PARTY = true, RAID = true,
-        YELL = false, SELF = false },
-    lowMessage = LOW_DEFAULT,
-    oomMessage = OOM_DEFAULT
-}
+-- The same defaults initialize new characters and confirmed full resets.
+local function NewSettings()
+    local result = {}
+    local key, value
+    for key, value in pairs(DEFAULTS) do
+        result[key] = value
+    end
+    result.channels = {
+        SAY = true, PARTY = false, RAID = false,
+        YELL = false, SELF = false
+    }
+    result.lowMessage = LOW_DEFAULT
+    result.oomMessage = OOM_DEFAULT
+    return result
+end
+
+local settings = NewSettings()
 
 local lastAnnouncement = nil
 local lastKind = nil
@@ -350,6 +354,14 @@ function Mana.PreviewMessage(kind, draft)
     local mana, maximum = ReadMana()
     if not mana then mana, maximum = 200, 1000 end
     return Format(kind, mana, maximum, draft)
+end
+
+-- Restore only the Mana Announcer preferences. Save once and discard the
+-- old threshold state so a reset cannot immediately trigger a warning.
+function Mana.ResetDefaults()
+    settings = NewSettings()
+    SaveSettings()
+    Rebaseline()
 end
 
 function Mana.GetStatus()

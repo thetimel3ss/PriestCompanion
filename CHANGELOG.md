@@ -2,6 +2,11 @@
 
 ## [Unreleased]
 
+### Added — Mana settings reset (2026-10-24; feature branch, in-game validation pending)
+- Added a bottom-of-page **Reset to Defaults** button and native Vanilla OK/Cancel confirmation, with Escape cancellation. Resets only the current character's Mana Announcer options: Low Mana 30%, OOM 5%, cooldown 15 seconds, both warning checkboxes on, **Say as the only enabled channel**, and both original message templates.
+- Preserves the original opt-in behavior (**Enable off**, Only in combat off); existing saved channel selections are not changed until the user confirms Reset. Newly initialized characters also default to Say-only.
+- A confirmed reset saves once, clears pending mana-alert baselines and unsaved message drafts, and refreshes all controls. Fear Ward and Resurrection preferences remain untouched. **In-game testing pending** for confirmation, cancellation, page layout and /reload persistence.
+
 ### Added — Mana Announcer (2026-10-24; feature branch, in-game testing pending)
 - Created `feature/mana-announcer` from stable `main` version 0.3.0.
 - Added **Announcer > Mana** sub-tab. Controls include master Enable, Low Mana/OOM toggles, independent percentage thresholds (Low Mana defaults to 30%, OOM to 5%), announcement cooldown, combat-only condition, multiselect channels and editable messages with unsent previews.
@@ -9,7 +14,7 @@
 - Events are edge-triggered rather than sent on every regen tick. Separate 5-point recovery margins and configurable cooldown mitigate spam; OOM may immediately follow a recent Low Mana message as severity increases. The OOM slider ranges from 0% to one point below Low Mana, automatically adjusting when Low Mana is lowered. Existing saved Low Mana percentages remain unchanged.
 - Channel availability is checked at send time. No optional DLL is required, and existing healing/casting modules were not changed.
 - Research references: HealerProtection (OctoWoW), T-OoM and TimeToDrink. No external source code was copied.
-- **In-game validation:** the initial Mana Announcer warning was confirmed working; revised 30%/5% defaults, configurable OOM threshold, escalation, spam prevention, /reload persistence, messages/channels and unchanged Fear Ward/Resurrection behavior remain to be retested.
+- **In-game validation:** the initial Mana Announcer warning and the Vanilla slider EnableMouse fix were confirmed working; revised 30%/5% defaults, configurable OOM threshold, escalation, spam prevention, /reload persistence, messages/channels and unchanged Fear Ward/Resurrection behavior remain to be retested.
 
 ## [0.3.0] - 2026-10-24
 

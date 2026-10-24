@@ -310,6 +310,48 @@ CreateMessageEditor("oom", "PriestCompanionManaOOMMessage", 622)
 Label("Default restores a draft; Save persists it. Preview is not sent.",
     14, 728, 355)
 
+-- Put the full reset after both message editors, away from normal toggles.
+-- Cancel/Escape makes no changes, including to the unsaved text drafts.
+local RESET_MANA_POPUP = "PRIEST_COMPANION_RESET_MANA_ANNOUNCER"
+StaticPopupDialogs[RESET_MANA_POPUP] = {
+    text = "Reset all Mana Announcer settings for this character?" ..
+        "\n\nThis sets Low Mana to 30%, Out of Mana to 5%, " ..
+        "and the cooldown to 15 seconds. Both alerts stay selected; " ..
+        "only Say is selected. Default messages are restored and " ..
+        "the main Enable checkbox is turned off.",
+    button1 = OKAY or "OK",
+    button2 = CANCEL or "Cancel",
+    OnAccept = function()
+        mana.ResetDefaults()
+        -- Explicitly discard drafts, even if the EditBoxes have focus.
+        editors.low.restore()
+        editors.oom.restore()
+        scroll.Refresh()
+    end,
+    timeout = 0,
+    whileDead = 1,
+    hideOnEscape = 1
+}
+
+local resetButton = CreateFrame(
+    "Button", "PriestCompanionManaResetDefaults",
+    child, "UIPanelButtonTemplate"
+)
+resetButton:SetWidth(160)
+resetButton:SetHeight(24)
+resetButton:SetPoint("TOPLEFT", child, "TOPLEFT", 200, -766)
+resetButton:SetText("Reset to Defaults")
+resetButton:SetScript("OnClick", function()
+    StaticPopup_Show(RESET_MANA_POPUP)
+end)
+resetButton:SetScript("OnEnter", function()
+    ShowTooltip(this, "Reset to Defaults",
+        "Confirm to reset only Mana Announcer settings for this " ..
+        "character, including thresholds, alerts, channels, " ..
+        "cooldown and both messages.")
+end)
+resetButton:SetScript("OnLeave", HideTooltip)
+
 function scroll.Refresh()
     local j
     for j = 1, table.getn(boxes) do

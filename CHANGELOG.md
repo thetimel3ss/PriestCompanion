@@ -2,6 +2,13 @@
 
 ## [Unreleased]
 
+### Validated — Resurrection Assistant raid wipe behavior (2026-10-23)
+- The maintainer tested the Resurrection Assistant during an actual raid wipe and confirmed the configured class-priority resurrection queue worked correctly while multiple players were dead.
+- The Assistant skipped players who were already being resurrected by other players, avoiding duplicate resurrection attempts.
+- The out-of-combat gate behaved correctly during the raid scenario.
+- These tests validate the principal multi-target raid flow. Selected-target override, interrupted/expired incoming resurrections, provider-specific pfUI/LibPredict/HealComm/CTRA cases, out-of-range behavior, and no-ClassicAPI compatibility remain separate edge cases.
+- Documentation only; no runtime code or SavedVariables changed.
+
 ### Changed — Announcer checkbox labels (2026-10-23)
 - In Announcer > Fear Ward, shortened `Enable Fear Ward` to `Enable` and `Prevent overwriting Fear Ward` to `Prevent Overwriting`.
 - In Announcer > Resurrection, shortened `Enable Resurrection` to `Enable`.

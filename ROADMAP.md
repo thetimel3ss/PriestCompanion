@@ -118,15 +118,19 @@ All 28 records have `source.note`: 21 world-drop-style entries with `"World drop
 
 ## Next steps
 
-### Mana Announcer — upcoming (`feature/mana-announcer`)
+### Mana Announcer — first functional build (`feature/mana-announcer`)
 
-- [x] Create the dedicated `feature/mana-announcer` branch from the released `main` at version `0.3.0`.
-- [ ] Add **Options > Announcer > Mana** as the third native sub-tab alongside Fear Ward and Resurrection, reusing their established scroll layout and preserving both existing Announcers.
-- [ ] Agree and implement the first mana-notification triggers: low mana at a configurable percentage and **Out of Mana (OOM)** at zero. Keep the feature disabled by default and avoid repeated announcements until the condition clears or a configured cooldown permits a new alert.
-- [ ] Configure notification channels, customizable messages, conditions and sensible anti-spam behavior; save preferences per character and validate persistence with `/reload`.
-- [ ] Analyze relevant reference ideas from HealerProtection, T-OoM and TimeToDrink, retaining only options appropriate to Priest and Vanilla 1.12.1. Keep ClassicAPI/SuperWoW/Nampower integrations optional and capability-based.
-- [ ] Validate in-game during spellcasting/combat, party and raid, mana regeneration, changing mana pools, repeated zero mana, and channel availability before merging.
-- **Naming:** `Mana Announcer` is the feature name (and branch suffix); **OOM** is one alert type. The UI sub-tab should be labeled **Mana**.
+- [x] Create feature branch from released `main` version 0.3.0; keep `main` unchanged until acceptance.
+- [x] Add **Options > Announcer > Mana** as third native sub-tab, with a scroll area constructed directly alongside Fear Ward and Resurrection (no reparenting). Keep existing settings and UI intact.
+- [x] Implement **self-mana** low threshold (configurable from 1–99%, initially 20%) and zero-mana/OOM alerts, each individually enabled under the disabled-by-default master Enable option. Optional **Only in combat** checkbox defaults off.
+- [x] Add **Say, Party, Raid, Yell and Self** independent multi-select channels. Party/Raid chat is automatically skipped when its group does not exist; per-character settings saved under `PriestCompanionCharDB.manaAnnouncer`.
+- [x] Add independently editable Low Mana and OOM messages with unsent preview, Default draft/Save and tokens `{name}`, `{mana}`, `{maxmana}` and `{percent}`. Messages sanitized and capped at 140 bytes.
+- [x] Event-driven self mana tracking (`UNIT_MANA`, `UNIT_MAXMANA`) without `OnUpdate`; reset baseline at login/zoning, combat and resurrection; avoid instant startup announcements.
+- [x] Anti-spam: threshold edge firing, 5 percentage-point recovery to rearm, cooldown 5–120 seconds (default 15), global throttling and critical OOM escalation immediately after Low Mana. Skips announcements while disabled and when selected channel is unavailable.
+- [x] Review reference addons: HealerProtection (Vanilla event-driven mana alerts, channel validation, reset margin), T-OoM (separate thresholds, customization and per-character preferences), TimeToDrink (mana threshold/cooldown, healer-party use case). Only self mana is in scope for first release; no reference code bundled.
+- [ ] **In-game acceptance:** enable each alert, set 20% threshold, cross the threshold, then reach 0 mana; verify no continuous spam during mana ticks and that OOM still announces promptly after Low Mana. Recover above the recovery margin and retest.
+- [ ] **Configuration acceptance:** test independently selected Say/Party/Raid/Yell/Self channels, ungrouped Party/Raid skips, optional Only in combat, messages and placeholders, Default vs Save, /reload persistence and no cross-effect on Fear Ward/Resurrection.
+- [ ] **Compatibility acceptance:** Vanilla-only and ClassicAPI flavors, player death/resurrection, zoning, mana pool changes, zero-at-login and other unusual resource sequences. No merge to main until confirmed.
 
 ### Options navigation — Announcer and Tools separated (`feature/resurrection-assistant`)
 

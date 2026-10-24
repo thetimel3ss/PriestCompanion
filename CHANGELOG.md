@@ -2,6 +2,15 @@
 
 ## [Unreleased]
 
+### Added — Mana Announcer (2026-10-24; feature branch, in-game testing pending)
+- Created `feature/mana-announcer` from stable `main` version 0.3.0.
+- Added **Announcer > Mana** sub-tab. Controls include master Enable, Low Mana/OOM toggles, low-mana threshold, announcement cooldown, combat-only condition, multiselect channels and editable messages with unsent previews.
+- Implemented independent self-mana announcements using Vanilla `UNIT_MANA` and `UNIT_MAXMANA` events. Per-character configuration is stored separately from the existing Fear Ward and Resurrection Announcers.
+- Events are edge-triggered rather than sent on every regen tick. 5-point recovery margin and configurable cooldown mitigate spam; OOM may immediately follow a recent Low Mana message as severity increases.
+- Channel availability is checked at send time. No optional DLL is required, and existing healing/casting modules were not changed.
+- Research references: HealerProtection (OctoWoW), T-OoM and TimeToDrink. No external source code was copied.
+- **In-game validation pending:** mana threshold transitions, OOM escalation, spam prevention, /reload persistence, messages/channels and unchanged Fear Ward/Resurrection behavior.
+
 ## [0.3.0] - 2026-10-24
 
 ### Release summary

@@ -1,6 +1,6 @@
 -- Priest Companion
 -- Options > Announcer > Fear Ward / Resurrection.
--- Announcement controls only; future OOM announcer belongs here.
+-- Fear Ward, Resurrection and Mana announcers have independent settings.
 
 local PC = PriestCompanion
 local parent = PC.UI.OptionsContent
@@ -51,8 +51,11 @@ local function CreateAnnouncerTab(index, label, preceding, id)
 end
 
 local fearTab = CreateAnnouncerTab(1, "Fear Ward", nil, "fearward")
-CreateAnnouncerTab(2, "Resurrection", fearTab, "resurrection")
-PanelTemplates_SetNumTabs(subTabs, 2)
+local resTab = CreateAnnouncerTab(
+    2, "Resurrection", fearTab, "resurrection"
+)
+CreateAnnouncerTab(3, "Mana", resTab, "mana")
+PanelTemplates_SetNumTabs(subTabs, 3)
 PanelTemplates_SetTab(subTabs, 1)
 
 --------------------------------------------------
@@ -79,7 +82,13 @@ local scroll, child = CreateToolScroll(
 local resScroll, resChild = CreateToolScroll(
     "PriestCompanionResurrectionScroll", 744
 )
+local manaScroll, manaChild = CreateToolScroll(
+    "PriestCompanionManaAnnouncerScroll", 694
+)
 resScroll:Hide()
+manaScroll:Hide()
+PC.UI.ManaAnnouncerScroll = manaScroll
+PC.UI.ManaAnnouncerContent = manaChild
 
 -- Shared layout helpers place elements in whichever page is being built.
 local activeChild = child
@@ -717,20 +726,28 @@ resScroll:SetScript("OnHide", RestoreResDraft)
 panel:SetScript("OnHide", function()
     RestoreFearDraft()
     RestoreResDraft()
+    manaScroll:Hide()
 end)
 
 function panel.SelectSubTab(id)
-    if id ~= "resurrection" then
+    if id ~= "resurrection" and id ~= "mana" then
         id = "fearward"
     end
     panel.ActiveSubTab = id
 
     if id == "resurrection" then
         scroll:Hide()
+        manaScroll:Hide()
         resScroll:Show()
         PanelTemplates_SetTab(subTabs, 2)
+    elseif id == "mana" then
+        scroll:Hide()
+        resScroll:Hide()
+        manaScroll:Show()
+        PanelTemplates_SetTab(subTabs, 3)
     else
         resScroll:Hide()
+        manaScroll:Hide()
         scroll:Show()
         PanelTemplates_SetTab(subTabs, 1)
     end
@@ -825,6 +842,10 @@ function panel.Refresh()
         SetCancelDraft(announcer.GetResCancelMessage())
     else
         UpdateCancelPreview()
+    end
+    local manaUI = PC.UI.ManaAnnouncerPanel
+    if manaUI and type(manaUI.Refresh) == "function" then
+        manaUI.Refresh()
     end
 end
 

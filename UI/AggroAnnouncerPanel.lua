@@ -162,8 +162,7 @@ end
 
 local editors = {}
 local function MessageEditor(kind, y, title)
-    Label(title .. " (tokens: {name}, {percent}, {health}, " ..
-        "{maxhealth}, {enemy})", 14, y, 360, "GameFontNormalSmall")
+    Label(title, 14, y, 360, "GameFontNormalSmall")
     local edit = CreateFrame(
         "EditBox", "PriestCompanionAggroMessage" .. kind,
         child, "InputBoxTemplate")
@@ -172,6 +171,11 @@ local function MessageEditor(kind, y, title)
     edit:SetHeight(24)
     edit:SetAutoFocus(false)
     edit:SetMaxLetters(140)
+    edit:SetScript("OnEnter", function()
+        Tooltip(this, title, "Available tokens: {name}, {percent}, " ..
+            "{health}, {maxhealth} and {enemy}.")
+    end)
+    edit:SetScript("OnLeave", HideTooltip)
     local defaultButton = CreateFrame(
         "Button", "PriestCompanionAggroDefault" .. kind,
         child, "UIPanelButtonTemplate")

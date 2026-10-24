@@ -185,6 +185,8 @@ local function InspectHealth()
         sampledHealth = false
         return
     end
+    -- A zero-health update belongs to PLAYER_DEAD, not Near Death.
+    if health <= 0 then return end
     local percent = 100 * health / maximum
     if not sampledHealth then
         BaselineHealth()

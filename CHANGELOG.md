@@ -2,17 +2,26 @@
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-10-24
+
+### Release summary
+- **Announcer:** Fear Ward and Resurrection cast announcements with independent channel and custom-message settings, protected Fear Ward overwrite handling, Resurrection Whisper and cancellation messaging. The maintainer confirmed both announcers work correctly in game.
+- **Resurrection Assistant:** manually clicked floating HUD with predefined class-priority resurrection queue, manually selected target override, incoming-resurrection avoidance, released-corpse targeting fallback, and strict out-of-combat handling. Priority, manual override, duplicate avoidance and combat gating were confirmed in raid/party tests.
+- **Book of Prayer Tracker:** improved compact/expanded window resizing, independent 40%-120% scales, previews, position locking and persistent settings; healing/mana observations and status colors confirmed unchanged.
+- **Options UI:** reorganized navigation as General / Announcer / Tools / Mods; Announcer includes Fear Ward and Resurrection, Tools includes Resurrection Assistant and Book of Prayer Tracker. Tools scroll clipping and native subtab sizing verified in OctoWoW.
+- Remaining non-blocking acceptance cases (interrupted and expired incoming Resurrection attempts, unusual range/line-of-sight conditions, alternate providers, Vanilla without ClassicAPI, and some HUD corner cases) remain tracked in `ROADMAP.md`.
+
 ### Validated — Resurrection Assistant raid wipe behavior (2026-10-23)
 - The maintainer tested the Resurrection Assistant during an actual raid wipe and confirmed the configured class-priority resurrection queue worked correctly while multiple players were dead.
 - The Assistant skipped players who were already being resurrected by other players, avoiding duplicate resurrection attempts.
 - The out-of-combat gate behaved correctly during the raid scenario.
-- These tests validate the principal multi-target raid flow. Selected-target override, interrupted/expired incoming resurrections, provider-specific pfUI/LibPredict/HealComm/CTRA cases, out-of-range behavior, and no-ClassicAPI compatibility remain separate edge cases.
+- These tests validate the principal multi-target raid flow. Manually selected eligible targets were also subsequently verified to override class ordering. Interrupted/expired incoming resurrections, provider-specific pfUI/LibPredict/HealComm/CTRA cases, out-of-range behavior, and no-ClassicAPI compatibility remain separate edge cases.
 - Documentation only; no runtime code or SavedVariables changed.
 
 ### Changed — Announcer checkbox labels (2026-10-23)
 - In Announcer > Fear Ward, shortened `Enable Fear Ward` to `Enable` and `Prevent overwriting Fear Ward` to `Prevent Overwriting`.
 - In Announcer > Resurrection, shortened `Enable Resurrection` to `Enable`.
-- Label-only update; callback logic, option keys, tooltips' descriptions and SavedVariables remain unchanged. In-game check pending before merging the branch into `main`.
+- Label-only update; callback logic, option keys, tooltips' descriptions and SavedVariables remain unchanged. The maintainer subsequently confirmed both Announcers function correctly in-game.
 
 ### Validated — Tools scrolling and sub-tab sizing (2026-10-23)
 - The maintainer confirmed in OctoWoW that the rebuilt Tools panel now works correctly: the Resurrection Assistant and Book of Prayer Tracker pages stay within the addon window when scrolling, and both sub-tabs have correctly sized labels/buttons.

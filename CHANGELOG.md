@@ -2,6 +2,11 @@
 
 ## [Unreleased]
 
+### Added — Shield Tracker learned-value reset (2026-10-26)
+- Add a two-click confirmation control in Options > Tools > Shield Tracker to clear learned PW: Shield capacities for the player and all observed external priest casters. Closing the options page cancels a pending confirmation.
+- If a trusted shield is currently active, replace its learned maximum with the rank base estimate while retaining observed absorbed damage; the cleared samples stay empty in saved character settings.
+- Local mocked checks cover persistence clearing, active-shield fallback, double-click confirmation and cancellation on page close. Live in-game confirmation remains part of the pending Shield Tracker test matrix.
+
 ### Validated — Shield Tracker in-game checks (2026-10-26)
 - Maintainer reports the visual and functional checks passed, learned values persist, and controls persist. The `~` marker remains intentional: each learned value came from a previous shield, so modifiers may differ on a later cast.
 - Provider compatibility matrix remains pending.

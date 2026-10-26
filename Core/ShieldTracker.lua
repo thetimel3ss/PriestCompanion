@@ -367,6 +367,23 @@ end
 function Tracker.ResetPosition()
     settings.x, settings.y = 0, -220; Save(); Notify()
 end
+function Tracker.ResetLearned()
+    settings.learned, settings.learnedByCaster = {}, {}
+    Save()
+    if state.active and not state.removalPendingAt and state.learnable and state.spellID then
+        local base = baseAbsorb[state.spellID]
+        if base then
+            state.maximum = base
+            state.learnedCapacity = false
+            state.reason = "Rank base estimate; caster modifiers not included"
+            state.remaining = math.max(0, base - (state.absorbedTotal or 0))
+            if state.remaining == 0 then
+                Unknown("Base estimate exhausted; aura determines shield presence")
+            end
+        end
+    end
+    Notify()
+end
 local function HandleClassic()
     local data = { CombatLogGetCurrentEventInfo() }
     if not IsPlayer(data[8]) then return end

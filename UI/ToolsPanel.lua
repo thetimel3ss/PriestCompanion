@@ -90,7 +90,7 @@ local trackerScroll, trackerChild = CreateToolScroll(
     "PriestCompanionAdvancedScroll", 505
 )
 trackerScroll:Hide()
-local shieldScroll, shieldChild = CreateToolScroll("PriestCompanionShieldOptionsScroll", 430)
+local shieldScroll, shieldChild = CreateToolScroll("PriestCompanionShieldOptionsScroll", 480)
 shieldScroll:Hide()
 PC.UI.ShieldTrackerOptionsPanel = shieldScroll
 PC.UI.ToolsShieldContent = shieldChild

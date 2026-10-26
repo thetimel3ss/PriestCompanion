@@ -130,6 +130,7 @@ All 28 records have `source.note`: 21 world-drop-style entries with `"World drop
 - [x] Learn per-rank capacity from an observed shield after a recent damaging hit and aura removal, with no known competing absorb; keep local and external caster values separate. Narrow the correlation window, skip removals near known expiry, and cancel learning on explicit dispel events. Very close expiry or unavailable dispel events remain ambiguous.
 - [x] Visual acceptance: maintainer reports bar, countdown, unknown/preview states, tooltip removal and retained options-page guidance passed in game.
 - [x] Basic functionality, learned-value persistence and control persistence confirmed by the maintainer.
+- [x] Add confirmation-protected reset for local and external-caster learned values; an eligible active shield falls back to its rank base estimate. Local mocked regression checks pass.
 - [ ] Compatibility and remaining cases: Vanilla/ClassicAPI/Nampower >=4.5/SuperWoW and mixed stacks; all available ranks, including the untested other-priest shield path on the player; physical/spell/periodic/full-absorb damage, overlapping absorbs, break-and-learn separately for local and external casters followed by reload and later casts, expiry/dispel shortly after a hit, death, and enable mid-shield. Check locked drag/reset, preview cleanup and minimap actions. Base/learned values may differ if talent, gear or server modifiers change.
 - [ ] Release/version/merge only after explicit maintainer approval. Multiple shield-type attribution remains outside this increment.
 

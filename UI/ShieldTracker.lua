@@ -161,6 +161,24 @@ reset:SetHeight(24)
 reset:SetPoint("LEFT", previewButton, "RIGHT", 18, 0)
 reset:SetText("Reset position")
 reset:SetScript("OnClick", function() StopMoving(); tracker.ResetPosition() end)
+local resetLearned = CreateFrame("Button", nil, child, "UIPanelButtonTemplate")
+resetLearned:SetWidth(145)
+resetLearned:SetHeight(24)
+resetLearned:SetPoint("TOPLEFT", child, "TOPLEFT", 14, -414)
+resetLearned:SetText("Reset learned values")
+local resetLearnedArmed = false
+resetLearned:SetScript("OnClick", function()
+    if not resetLearnedArmed then
+        resetLearnedArmed = true
+        resetLearned:SetText("Confirm reset")
+        return
+    end
+    tracker.ResetLearned()
+    resetLearnedArmed = false
+    resetLearned:SetText("Reset learned values")
+end)
+Label("Clears saved values for you and other priest casters; an active shield returns to its rank base estimate.",
+    174, 414, 200)
 RefreshOptions = function()
     enable:SetChecked(tracker.GetOption("enabled") and 1 or nil)
     locked:SetChecked(tracker.GetOption("locked") and 1 or nil)
@@ -170,6 +188,10 @@ RefreshOptions = function()
 end
 scroll.Refresh = function() RefreshOptions(); Render() end
 scroll:SetScript("OnShow", scroll.Refresh)
-scroll:SetScript("OnHide", function() hud.SetPreview(false) end)
+scroll:SetScript("OnHide", function()
+    hud.SetPreview(false)
+    resetLearnedArmed = false
+    resetLearned:SetText("Reset learned values")
+end)
 tracker.AddListener(function() Render(); if scroll:IsShown() then RefreshOptions() end end)
 Render()

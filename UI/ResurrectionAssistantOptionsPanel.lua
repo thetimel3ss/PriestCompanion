@@ -63,6 +63,7 @@ local function Checkbox(name, title, x, y, onToggle, helpText, captionWidth)
         panel.Refresh()
     end)
 
+    local captionHitBox
     if helpText then
         check:SetScript("OnEnter", function()
             ShowTooltip(this, title, helpText)
@@ -71,7 +72,7 @@ local function Checkbox(name, title, x, y, onToggle, helpText, captionWidth)
 
         -- FontStrings do not receive hover events by themselves in Vanilla.
         -- An adjacent button makes the caption hoverable and clickable.
-        local captionHitBox = CreateFrame("Button", nil, container)
+        captionHitBox = CreateFrame("Button", nil, container)
         captionHitBox:SetPoint("LEFT", check, "RIGHT", 4, 0)
         captionHitBox:SetWidth(captionWidth or 135)
         captionHitBox:SetHeight(24)
@@ -92,17 +93,30 @@ local function Checkbox(name, title, x, y, onToggle, helpText, captionWidth)
         end)
     end
 
-    return check, label
+    return check, label, captionHitBox
 end
 
 -- Resurrection Assistant (compact / expanded HUD)
 --------------------------------------------------
 
 Label("Resurrection Assistant", 14, 12, 355, "GameFontNormal")
+local StopAssistantPreview
 
-local assistantButtonBox = Checkbox(
+local assistantEnableBox = Checkbox(
+    "PriestCompanionResurrectionAssistantEnable",
+    "Enable", 14, 47,
+    function(value)
+        assistant.SetEnabled(value)
+        if not value and StopAssistantPreview then StopAssistantPreview() end
+    end,
+    "Enable/disable all Resurrection Assistant roster monitoring " ..
+    "and the floating HUD. Show Resurrection button only controls " ..
+    "visibility. Preferences remain saved while disabled.", 145
+)
+
+local assistantButtonBox, assistantButtonLabel, assistantButtonHitBox = Checkbox(
     "PriestCompanionResurrectionAssistantShowButton",
-    "Show Resurrection button", 14, 47,
+    "Show Resurrection button", 14, 85,
     function(value)
         if assistant then assistant.SetButtonEnabled(value) end
     end,
@@ -113,9 +127,9 @@ local assistantButtonBox = Checkbox(
     161
 )
 
-local assistantExpandedBox = Checkbox(
+local assistantExpandedBox, assistantExpandedLabel, assistantExpandedHitBox = Checkbox(
     "PriestCompanionResurrectionAssistantExpanded",
-    "Expanded mode", 204, 47,
+    "Expanded mode", 204, 85,
     function(value)
         if assistant then assistant.SetDisplayOption("expanded", value) end
     end,
@@ -124,9 +138,9 @@ local assistantExpandedBox = Checkbox(
     "vertical icon with optional name and class labels."
 )
 
-local assistantNameBox = Checkbox(
+local assistantNameBox, assistantNameLabel, assistantNameHitBox = Checkbox(
     "PriestCompanionResurrectionAssistantShowName",
-    "Show player name", 14, 85,
+    "Show player name", 14, 123,
     function(value)
         if assistant then assistant.SetDisplayOption("showName", value) end
     end,
@@ -136,9 +150,9 @@ local assistantNameBox = Checkbox(
     "the Resurrection icon."
 )
 
-local assistantClassBox = Checkbox(
+local assistantClassBox, assistantClassLabel, assistantClassHitBox = Checkbox(
     "PriestCompanionResurrectionAssistantShowClass",
-    "Show player class", 204, 85,
+    "Show player class", 204, 123,
     function(value)
         if assistant then assistant.SetDisplayOption("showClass", value) end
     end,
@@ -147,9 +161,9 @@ local assistantClassBox = Checkbox(
     "the name or class is hidden."
 )
 
-local assistantLockedBox = Checkbox(
+local assistantLockedBox, assistantLockedLabel, assistantLockedHitBox = Checkbox(
     "PriestCompanionResurrectionAssistantLocked",
-    "Lock position", 14, 123,
+    "Lock position", 14, 161,
     function(value)
         if assistant then assistant.SetDisplayOption("locked", value) end
     end,
@@ -165,7 +179,7 @@ local assistantResetButton = CreateFrame(
 assistantResetButton:SetWidth(151)
 assistantResetButton:SetHeight(24)
 assistantResetButton:SetPoint(
-    "TOPLEFT", child, "TOPLEFT", 215, -123
+    "TOPLEFT", child, "TOPLEFT", 215, -161
 )
 assistantResetButton:SetText("Reset position")
 assistantResetButton:SetScript("OnClick", function()
@@ -178,7 +192,7 @@ assistantResetButton:SetScript("OnEnter", function()
 end)
 assistantResetButton:SetScript("OnLeave", HideTooltip)
 
-Label("Window size (per mode)", 14, 167, 355, "GameFontNormalSmall")
+Label("Window size (per mode)", 14, 205, 355, "GameFontNormalSmall")
 
 local scaleSlider = CreateFrame(
     "Slider", "PriestCompanionResurrectionAssistantScale",
@@ -186,13 +200,13 @@ local scaleSlider = CreateFrame(
 )
 scaleSlider:SetWidth(194)
 scaleSlider:SetHeight(17)
-scaleSlider:SetPoint("TOPLEFT", child, "TOPLEFT", 25, -200)
+scaleSlider:SetPoint("TOPLEFT", child, "TOPLEFT", 25, -238)
 scaleSlider:SetMinMaxValues(0.40, 1.20)
 if type(scaleSlider.SetValueStep) == "function" then
     scaleSlider:SetValueStep(0.05)
 end
 
-local scaleLabel = Label("100%", 232, 196, 110, "GameFontHighlightSmall")
+local scaleLabel = Label("100%", 232, 234, 110, "GameFontHighlightSmall")
 local syncingScale = false
 local function SyncAssistantScale()
     if not assistant then return end
@@ -232,7 +246,7 @@ local assistantPreviewButton = CreateFrame(
 assistantPreviewButton:SetWidth(145)
 assistantPreviewButton:SetHeight(25)
 assistantPreviewButton:SetPoint(
-    "TOPLEFT", child, "TOPLEFT", 21, -247
+    "TOPLEFT", child, "TOPLEFT", 21, -285
 )
 
 local assistantScaleResetButton = CreateFrame(
@@ -242,7 +256,7 @@ local assistantScaleResetButton = CreateFrame(
 assistantScaleResetButton:SetWidth(145)
 assistantScaleResetButton:SetHeight(25)
 assistantScaleResetButton:SetPoint(
-    "TOPLEFT", child, "TOPLEFT", 215, -247
+    "TOPLEFT", child, "TOPLEFT", 215, -285
 )
 assistantScaleResetButton:SetText("Reset current size")
 assistantScaleResetButton:SetScript("OnClick", function()
@@ -256,7 +270,7 @@ assistantScaleResetButton:SetScript("OnEnter", function()
 end)
 assistantScaleResetButton:SetScript("OnLeave", HideTooltip)
 
-local function StopAssistantPreview()
+StopAssistantPreview = function()
     previewActive = false
     local hud = PC.UI and PC.UI.ResurrectionAssistantButton
     if hud and hud.SetPreview then hud.SetPreview(false) end
@@ -271,6 +285,7 @@ local function UpdatePreviewLabel()
 end
 
 assistantPreviewButton:SetScript("OnClick", function()
+    if not assistant.GetEnabled() then return end
     previewActive = not previewActive
     local hud = PC.UI and PC.UI.ResurrectionAssistantButton
     if hud and hud.SetPreview then hud.SetPreview(previewActive) end
@@ -287,11 +302,13 @@ assistantPreviewButton:SetScript("OnLeave", HideTooltip)
 UpdatePreviewLabel()
 
 Label("Green = available. Yellow = click corpse manually.",
-    14, 301, 355)
+    14, 339, 355)
 Label("Preview is blue and never casts. Combat hides the HUD.",
-    14, 323, 355)
+    14, 361, 355)
 
 function panel.Refresh()
+    local enabled = assistant.GetEnabled()
+    assistantEnableBox:SetChecked(enabled and 1 or nil)
     assistantButtonBox:SetChecked(
         assistant.GetButtonEnabled() and 1 or nil
     )
@@ -307,6 +324,40 @@ function panel.Refresh()
     assistantLockedBox:SetChecked(
         assistant.GetDisplayOption("locked") and 1 or nil
     )
+    local dependents = {
+        {assistantButtonBox, assistantButtonLabel, assistantButtonHitBox},
+        {assistantExpandedBox, assistantExpandedLabel, assistantExpandedHitBox},
+        {assistantNameBox, assistantNameLabel, assistantNameHitBox},
+        {assistantClassBox, assistantClassLabel, assistantClassHitBox},
+        {assistantLockedBox, assistantLockedLabel, assistantLockedHitBox}
+    }
+    local i
+    for i = 1, table.getn(dependents) do
+        local entry = dependents[i]
+        if enabled then
+            entry[1]:Enable()
+            if entry[3] then entry[3]:Enable() end
+            entry[2]:SetTextColor(1, 1, 1)
+        else
+            entry[1]:Disable()
+            if entry[3] then entry[3]:Disable() end
+            entry[2]:SetTextColor(0.55, 0.55, 0.55)
+        end
+    end
+    if enabled then
+        assistantResetButton:Enable()
+        assistantPreviewButton:Enable()
+        assistantScaleResetButton:Enable()
+        scaleSlider:EnableMouse(true)
+        scaleSlider:SetAlpha(1)
+    else
+        if previewActive then StopAssistantPreview() end
+        assistantResetButton:Disable()
+        assistantPreviewButton:Disable()
+        assistantScaleResetButton:Disable()
+        scaleSlider:EnableMouse(false)
+        scaleSlider:SetAlpha(0.5)
+    end
     SyncAssistantScale()
     UpdatePreviewLabel()
 end

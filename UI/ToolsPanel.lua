@@ -83,7 +83,7 @@ local function CreateToolScroll(name, height)
 end
 
 local assistantScroll, assistantChild = CreateToolScroll(
-    "PriestCompanionAssistantOptionsScroll", 400
+    "PriestCompanionAssistantOptionsScroll", 445
 )
 local trackerScroll, trackerChild = CreateToolScroll(
     "PriestCompanionAdvancedScroll", 505

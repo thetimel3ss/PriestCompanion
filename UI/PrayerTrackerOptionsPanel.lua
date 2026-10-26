@@ -83,6 +83,8 @@ local function AddPrayerCheckbox(key, text, y, helpText, labelWidth)
     caption:SetJustifyH("LEFT")
     caption:SetText(text)
 
+    button.optionCaption = caption
+
     button:SetScript(
         "OnClick",
         function()
@@ -111,6 +113,7 @@ local function AddPrayerCheckbox(key, text, y, helpText, labelWidth)
         local labelHitBox = CreateFrame(
             "Button", nil, advancedChild
         )
+        button.optionHitBox = labelHitBox
         labelHitBox:SetPoint(
             "LEFT", button, "RIGHT", 4, 0
         )
@@ -511,8 +514,15 @@ function advanced.Refresh()
             button:SetChecked(checked and 1 or nil)
         end
 
+        local enabled = prayer.GetOption("enabled") and points > 0
+        PC.UI.SetModuleOptionsEnabled(advancedChild, checkboxes.enabled, enabled)
+        if not enabled and hud and type(hud.IsPreviewActive) == "function"
+        and hud.IsPreviewActive()
+        then hud.SetPreview(false) end
+        if not enabled then previewButton:SetText("Preview Tracker") end
+
         -- The timeout can only be edited when Auto-hide is selected.
-        local hideEnabled = prayer.GetOption("autoHide")
+        local hideEnabled = enabled and prayer.GetOption("autoHide")
 
         if hideEnabled then
             autoHideSecondsBox:EnableMouse(true)

@@ -2,11 +2,16 @@
 
 The roadmap tracks outstanding improvements and ongoing verification. Released functionality belongs in [CHANGELOG.md](CHANGELOG.md), not here.
 
-**Review date:** 2026-10-24  
-**Current release:** `0.3.0` (`main`)  
+**Review date:** 2026-10-26
+**Current release:** `0.4.0`
 **Future development:** separate feature branches from `main`
 
+**Release decision (2026-10-26):** maintainer authorized v0.4.0 and integration into main. Remaining open checks are follow-up verification, not a claim of executed tests or a current merge hold.
+
 ## Current scope and confirmed decisions
+
+- **Maintainer closure (2026-10-26):** Mana Announcer and Resurrection Assistant are complete for the requested scope. Their former optional acceptance/compatibility checklists are retired, not asserted to have been individually executed. Reopen only for a reported bug or an explicitly requested enhancement.
+- **Reference-data scope closed (2026-10-26):** Wand Progression / Source Details, filters, reputation and maps satisfy the current requested scope. Further acquisition-type/recipe presentation, structured reputation, content filters, map/NPC completion, map icons and related pfQuest enrichment are dropped from the active plan. Existing limitations below are reference information, not an outstanding work queue. Do not resume these areas without a new maintainer request.
 
 - **Wand Progression database: complete for the current OctoWoW database.** `Data/Wands.lua` exposes 146 wands, each with an item entry and at least one acquisition source. The deliberately excluded Grungy Firestick (61374) remains for reference in Items/Sources only. Later server additions or corrections are normal maintenance, not an unfinished database.
 - **Custom world maps, dungeon maps, and configured floors:** the maintainer has validated the maps and floors currently configured in game. New map metadata, floor alignment changes, and newly entered NPC coordinates still merit in-game checks.
@@ -118,6 +123,13 @@ All 28 records have `source.note`: 21 world-drop-style entries with `"World drop
 
 ## Next steps
 
+### Consistent Enable controls (2026-10-26)
+
+- [x] Gate dependent options in Fear Ward, Resurrection, Mana, Aggro and Book of Prayer; retain master availability rules, saved selections and existing secondary dependencies. Close Tracker preview on disable.
+- [x] **Maintainer validation:** all affected option pages block controls when their master Enable is unchecked.
+- [ ] **Remaining in-game acceptance (Fear Ward, Resurrection Announcer, Aggro and Tracker only):** for each still-open module, disable and verify checkbox/caption clicks, sliders, message editing, Default/Save/Reset and Preview are blocked. Reenable and confirm saved selections, damage-only blocked when Aggro Warning is off, and auto-hide delay blocked when Auto-hide is off. Verify Tracker HUD/preview hides immediately, no-talent/provider restrictions, tab switching and /reload persistence.
+- **Pending-test documentation audit:** historical checklists can overlap. Closed Mana Announcer, Resurrection Assistant and reference-data scopes carry no active acceptance backlog; remaining open checks apply only to modules still in scope.
+
 ### Opt-in monitoring and expandable Guides (feature/aggro-announcer)
 
 - [x] Gate Aggro events by individual warning toggles (health-only for Near Death, death/revival for enabled survival announcements, combat logs only for damage-based Aggro), with polling disabled when Aggro Warning is off.
@@ -128,7 +140,7 @@ All 28 records have `source.note`: 21 world-drop-style entries with `"World drop
 - [x] Book of Prayer Tracker unsubscribes cast-provider events and optional Nampower refund integration, and removes its periodic OnUpdate when disabled. Re-enabling rescans talents and spellbook.
 - [x] Resurrection Assistant now exposes a master Enable above Show Resurrection button, saving its state per character (default on for existing users), halting roster monitoring and hiding HUD while off. Other options stay saved and are visually disabled while off.
 - [x] Resynchronize combat state when Aggro, Mana or Resurrection Assistant is re-enabled after an interval with no combat-event listeners; Tracker rescans the current talent when enabled after a possible disabled-period respec.
-- [ ] **In-game regression:** verify toggle-off/no-scan and resume-after-enable for all announcers and tools, HUD preview / click behavior, saved options through /reload and recovery from disabled during combat.
+- [ ] **In-game regression:** verify toggle-off/no-scan and resume-after-enable for still-open Fear Ward, Resurrection Announcer, Aggro and Tracker modules, HUD preview / click behavior, saved options through /reload and recovery from disabled during combat.
 - [x] Rename the main Wands tab to **Guides**, preserving the `wands` internal route and the existing Wand Progression view. Future nested tabs can offer BiS lists, consumables and enchants.
 
 ### Aggro / Survival Announcer — initial implementation (`feature/aggro-announcer`)
@@ -149,24 +161,11 @@ All 28 records have `source.note`: 21 world-drop-style entries with `"World drop
 - [x] **Near Death first crossing (2026-10-26):** the maintainer confirmed the first warning occurs below the selected percentage. Another downward crossing after recovering merely above the threshold did not announce; this follows the existing **15 percentage-point rearm margin** (e.g. 30% must recover above 45%, not wait 5 seconds). Aggro's cooldown applies to Aggro Warning only. Updated tooltips and UI hint to clarify this without changing the safe anti-spam behavior.
 - [ ] **Near Death / Death remaining:** verify recovery above threshold +15 points permits a second warning; test death exactly once and revival rearm, fall damage outside combat and /reload while low HP.
 - [ ] **Aggro modes:** test target-based alerts in solo, party and raid (including mouseover healer without hostile target); enable **Only after taking damage** and verify no alert when merely targeted, then an alert after losing HP from an enemy hit. Full PW: Shield absorbs were verified without triggering; still check dodges/misses, DoT-only damage, environmental/fall damage, repeated hits (no spam), a fresh attack after a quiet interval plus cooldown, reset/defaults and /reload persistence. Confirm no OnUpdate scanning in damage mode or when Aggro Warning is off.
-- [ ] **Compatibility:** Vanilla no extensions, ClassicAPI present, odd unit IDs/target-of-target availability, death/resurrect while in combat, unsupported optional threat APIs. **Do not merge to main pending gameplay validation.**
+- [ ] **Compatibility:** Vanilla no extensions, ClassicAPI present, odd unit IDs/target-of-target availability, death/resurrect while in combat, unsupported optional threat APIs. Remaining compatibility cases are follow-up verification for v0.4.0.
 
-### Mana Announcer — first functional build (`feature/mana-announcer`)
+### Mana Announcer — complete (maintainer decision, 2026-10-26)
 
-- [x] Create feature branch from released `main` version 0.3.0; keep `main` unchanged until acceptance.
-- [x] Add **Options > Announcer > Mana** as third native sub-tab, with a scroll area constructed directly alongside Fear Ward and Resurrection (no reparenting). Keep existing settings and UI intact.
-- [x] Implement **self-mana** Low Mana (1–99%, default 30%) and OOM (0% through Low Mana minus 1, default 5%) thresholds, each with its own enable checkbox under the disabled-by-default master Enable option. Optional **Only in combat** defaults off. Lowering Low Mana auto-clamps OOM; saved thresholds are validated on load and previous per-character Low Mana preferences remain intact.
-- [x] Add **Say, Party, Raid, Yell and Self** independent multi-select channels. Party/Raid chat is automatically skipped when its group does not exist; per-character settings saved under `PriestCompanionCharDB.manaAnnouncer`.
-- [x] Add independently editable Low Mana and OOM messages with unsent preview, Default draft/Save and tokens `{name}`, `{mana}`, `{maxmana}` and `{percent}`. Messages sanitized and capped at 140 bytes.
-- [x] Add a bottom-of-tab **Reset to Defaults** button with a Vanilla-style OK/Cancel/Escape confirmation. Restores Low Mana 30%, OOM 5%, cooldown 15s, both warning toggles checked, only Say checked, default messages, and original opt-in defaults (main Enable off; Only in combat off). Changes only `PriestCompanionCharDB.manaAnnouncer`, saves once, rebaselines, discards unsaved drafts, and refreshes the page immediately. The same Say-only channels are used for newly initialized settings; previously saved selections remain intact until reset.
-- [x] Event-driven self mana tracking (`UNIT_MANA`, `UNIT_MAXMANA`) without `OnUpdate`; reset baseline at login/zoning, combat and resurrection; avoid instant startup announcements.
-- [x] Anti-spam: threshold edge firing, separate 5-percentage-point recovery margins above each configured limit, cooldown 5–120 seconds (default 15), global throttling and OOM escalation immediately after Low Mana. Skips announcements while disabled and when selected channel is unavailable.
-- [x] Review reference addons: HealerProtection (Vanilla event-driven mana alerts, channel validation, reset margin), T-OoM (separate thresholds, customization and per-character preferences), TimeToDrink (mana threshold/cooldown, healer-party use case). Only self mana is in scope for first release; no reference code bundled.
-- [x] **Primary mana behavior validated in-game (2026-10-24):** the maintainer confirmed all five requested tests passed: Low Mana warning at 30%, OOM at 5% even during the Low Mana cooldown, no repetitive alerts on regeneration ticks, correct rearming after recovery above 35% (Low Mana) and 10% (OOM), and **Only in combat** suppressing announcements out of combat.
-- [x] **Remaining Mana threshold boundaries (maintainer confirmation, 2026-10-24):** the maintainer confirmed all requested limit tests passed, including OOM at 0% and automatic OOM clamping when Low Mana is reduced. A single mana event skipping both thresholds remains an optional unusual case to reproduce separately.
-- [x] **Reset confirmation validated in-game (2026-10-24):** after escaping literal percentage signs in the Vanilla StaticPopup text, the maintainer confirmed Reset works, the saved reset state persists after /reload, and pressing Cancel leaves the settings unchanged.
-- [x] **Mana configuration acceptance (maintainer confirmation, 2026-10-24):** the maintainer confirmed all requested channel and message tests, slider-limit tests, and Fear Ward/Resurrection regressions passed, after separately confirming the main Mana warnings, combat-only filtering and Reset OK/Cancel/persistence. Unusual compatibility edge cases and specific Escape/unsaved-draft reset behavior remain independent optional checks.
-- [ ] **Compatibility acceptance:** Vanilla-only and ClassicAPI flavors, player death/resurrection, zoning, mana pool changes, zero-at-login, crossing both thresholds in one event and other unusual resource sequences. No merge to main until confirmed.
+Low Mana/OOM alerts, channels, messages, thresholds, combat filtering and reset controls satisfy the requested scope. No remaining feature or acceptance task is scheduled. Implementation and prior validation history are recorded in [CHANGELOG.md](CHANGELOG.md).
 
 ### Options navigation — Announcer and Tools separated (`feature/resurrection-assistant`)
 
@@ -179,7 +178,6 @@ All 28 records have `source.note`: 21 world-drop-style entries with `"World drop
 - [x] **Announcer regression check (2026-10-24):** maintainer confirmed both Fear Ward and Resurrection announcers continue working after the Options reorganization and final checkbox label changes.
 - [ ] **Other Options integration checks (not specifically reconfirmed):** Preview cleanup when switching Tools sub-tabs, saved settings across /reload after the reorganization, and special slider boundary cases.
 - [ ] **Remaining Options navigation acceptance:** verify General, Announcer, Tools and Mods top-tab pressed styles; settings persistence across /reload; Preview stops on navigation; the legacy Tracker caller opens Tools > Tracker; no Lua errors. Tools scrolling/tab sizing and Fear Ward/Resurrection announcers were already validated.
-- [ ] **Future Announcer section:** add **Mana / OOM** as a third Announcer sub-tab after implementation of that module; not part of the navigation-only change.
 - [ ] **MetaHunt inspiration review (future, separate scope):** modular option pages, event-efficient module gating, searchable reference data/book, class-specific widgets and optional mana warnings; do not port Hunter-specific features or make Nampower mandatory.
 
 ### Book of Prayer Tracker — uniform window scaling (`feature/resurrection-assistant`)
@@ -191,40 +189,9 @@ All 28 records have `source.note`: 21 world-drop-style entries with `"World drop
 - [x] **Tracker interface validated in OctoWoW (2026-10-22):** the maintainer confirmed the new window scale control, border/edge resizing, saved layout persistence, Lock Position and Preview all function as expected.
 - [ ] **Additional Tracker edge cases (not individually confirmed):** exact 40% and 120% extremes in both Compact/Expanded modes; independent size persistence per mode; Reset current size and Reset Position confirmation; spell-name/mana-refund icon reflow at minimum scale. Core heal, mana and refund-border behavior has already passed.
 
-### Resurrection Assistant — detection and selection (`feature/resurrection-assistant`)
+### Resurrection Assistant — complete (maintainer decision, 2026-10-26)
 
-- [x] Create a branch from the validated `feature/announcer` head, preserving the original branch and `main`.
-- [x] Add `Core/ResurrectionAssistant.lua` to the regular and ClassicAPI TOCs. The initial detection-only implementation was reviewed separately before introducing an explicitly clicked cast action.
-- [x] Implement event-driven party/raid snapshots and per-unit health/flags updates, skipping the player, disconnected units and released ghosts. Prefer a manually selected eligible group target, then Priest → Shaman → Paladin → Druid → Mage → Hunter → Warlock → Warrior → Rogue.
-- [x] **Strict combat gate:** `PLAYER_REGEN_DISABLED` suspends all roster/death evaluation and candidate selection. All health/group/addon messages are ignored while the priest is in combat. `PLAYER_REGEN_ENABLED` rebuilds the roster once, so deaths during combat are discovered only afterwards. No OnUpdate polling or background roster scanning.
-- [x] Interoperate with optional pfUI LibPredict and HealComm library queries; receive HealComm/CTRA start/stop broadcasts directly, but only from members of the current party/raid. Expire unconfirmed offers; optionally consume ClassicAPI remote cast START observations when the recipient is available. No extra libraries are bundled, and the vanilla core remains Lua 5.0 compatible.
-- [x] Validate current target status when explicitly querying candidates, and apply optional distance / line-of-sight checks when present. An unknown distance does not prove a target is within cast range; the game's cast validation remains authoritative.
-- [x] Keep read-only `/pc res status` (or `/pc res next`) for inspection. Add `/pc res` as a **manually invoked, single-attempt Resurrection command** for use in a macro; it never starts a cast from an event or timer.
-- [x] **First five in-game tests (party, 2026-10-22):** with a living member, `/pc res status` returned 0 eligible / 0 incoming / 0 released; after death without release, 1 eligible / 0 incoming / 0 released; after release, 0 eligible / 0 incoming / 1 released; during combat, the assistant reported itself paused; after leaving combat, the candidate information refreshed.
-- [x] **Priest-first priority updated:** Priest → Shaman → Paladin → Druid → Mage → Hunter → Warlock → Warrior → Rogue. A manually selected eligible dead party/raid member still takes precedence.
-- [x] **Raid wipe in-game validation (maintainer confirmation, 2026-10-23):** Resurrection Assistant followed the configured class-priority queue with multiple deaths, did not cast on players already being resurrected by another healer, and correctly respected the out-of-combat restriction. This confirms the core real-raid priority and duplicate-avoidance behavior.
-- [x] **Manual target override validated (2026-10-24):** the maintainer confirmed selecting an eligible deceased player manually correctly overrides the automatic resurrection-priority queue.
-- [ ] **Remaining incoming-resurrection edge cases:** verify optional pfUI/LibPredict, HealComm and CTRA providers individually, interrupted/failed resurrection cancellation, stale incoming offers and expiry, and multiple simultaneous casters. The raid test validated duplicate-resurrection suppression but did not isolate these cases.
-- [x] **Death-triggered floating button:** `UI/ResurrectionAssistant.lua` subscribes to the core's state-change notifications, not `OnUpdate`. The button appears out of combat for an eligible dead party/raid member; clicking makes one attempt on a newly revalidated candidate. With no eligible unit but a released party/raid member, it prepares manual world-corpse targeting. Supports dragging, saved per-character position, reset and visibility checkbox in Options → Tools → Resurrection Assistant (enabled by default).
-- [x] **Cast dispatch:** prefer optional ClassicAPI `C_Spell.CastAtUnit` without changing the player's target. Vanilla fallback clears an unrelated target, uses `CastSpellByName` + `SpellTargetUnit`, and restores selection when possible. The Announcer remains responsible for cast-start/interruption chat messages. The button is hidden in combat and triggers no detection while in combat.
-- [x] **Button tested in OctoWoW:** when a party member dies without releasing, the floating button appears and clicking casts Resurrection on the candidate.
-- [x] **Released corpse tested:** after release, clicking the button prepares the Resurrection spell for a manual world-corpse click.
-- [x] **Combat visibility tested:** entering combat hides the popup; exiting combat restores it according to the available candidate state, with no in-combat roster scanning.
-- [x] **Window persistence tested:** the maintainer confirmed the floating window retained its position.
-- [ ] **Remaining floating-button acceptance:** disabled Show button vs independent `/pc res`; checkbox persistence across /reload; Reset position; no button for disconnected units; Vanilla without ClassicAPI; already-casting behavior. Announcer regression and competing-healer duplicate avoidance have passed; interruption/expiry cases remain untested.
-- [x] **Compact / Expanded Resurrection HUD:** compact Tracker-style layout with centered clickable Resurrection icon, optional nickname below it and class at the bottom; the icon expands to occupy space freed when labels are hidden. Expanded retains the existing wide presentation with more context. Defaults: compact, name on, class off, unlocked.
-- [x] **Whole-window click:** the frame itself is the cast button. Movement is distinguished from click; drag and bottom-right resize gestures must not fire a cast. A resize grip is hidden while Lock Position is active. The position remains per character.
-- [x] **Size / scale (updated):** per-mode saved uniform scale in the range **40%–120%**, adjustable from the Resurrection settings and by **eight edge/corner resize regions** when unlocked, following the Book of Prayer Tracker's interaction pattern. Edge and corner resize zones shrink at smaller scales to preserve the central casting click area. Compact and Expanded retain independent sizes, and Reset current size affects only the selected mode. Previously saved out-of-range scales are clamped to the new limits.
-- [x] **Tracker comparison:** Book of Prayer Tracker accepts independent width/height sizes with minimum compact 68×68 px and expanded 104×78 px (overall maximum 360×240 px). The Assistant intentionally allows a smaller 40% uniform scale: compact base 108×116 reaches approximately 43×46 px, while expanded base 238×96 reaches approximately 95×38 px. Its resize gestures snap back to proportional icon/text sizing rather than saving asymmetric dimensions.
-- [x] **Colors / class labels:** green border for eligible target, yellow for released-body manual fallback, blue for Preview. Character names and class text use the target's class color; unresolved released corpses are never assigned a guessed class.
-- [x] **Preview HUD:** show a test-only state without a dead player. Preview never calls the casting function, even if the window is clicked; options and drag/size adjustments update live; switching tabs or closing Options ends preview.
-- [x] **Resurrection settings tooltips:** updated for each new checkbox, scale control, reset actions and Preview. No icon tooltip is added.
-- [x] **Regression reproduced in game after the compact HUD rework:** the eligible-target and yellow released-corpse states were correctly detected, but clicking the redesigned HUD did not cast or prepare the cursor. A subsequent click could display "Resurrection was just requested." The prior UI version using an actual Button's OnClick was functional.
-- [x] **Interaction fix validated in OctoWoW:** after the return to a real full-surface WoW Button and LeftButtonUp OnClick, the maintainer confirmed the window casts successfully again. The green/yellow border states, released-corpse targeting fallback and HUD resizing also worked as expected.
-- [x] **Post-fix main interaction tests (2026-10-22):** full-window casting, state colors, released-corpse fallback and HUD resizing passed in-game.
-- [ ] **Remaining interaction edge cases:** drag/resize gestures never cast, rapid-click handling after a rejected cast, and Preview never casting were not independently confirmed in these latest tests.
-- [ ] **Other new HUD in-game tests:** compact vs expanded and /reload persistence; optional nickname/class visibility and icon scaling; class color; Lock Position preventing move and resize while still casting on click; saved per-mode slider scaling at exactly 40% and 120%; drag-to-resize using all four edges and four corners at minimum and maximum sizes; correct scaling/position persistence on /reload; reset size and position; Preview without target and click never casting; preview termination on tab change. Combat hide/reappear and Announcer regression have passed.
-- [ ] **Other compatibility acceptance:** out-of-range/line-of-sight failures, disconnected members, ClassicAPI absent, provider-specific external resurrection messages/timeout handling and untested priority combinations. Raid ordering and suppression of already-incoming resurrections have passed in live use. Refine any behaviors that in-game tests uncover.
+Candidate selection, priority/manual target handling, incoming-resurrection avoidance, combat restrictions, clickable HUD, sizing, preview and master Enable satisfy the requested scope. No remaining feature or acceptance task is scheduled. Earlier optional edge-case checklists are retired by scope decision; see [CHANGELOG.md](CHANGELOG.md) for implementation and recorded test results. Resurrection Announcer remains a separate module.
 
 ### Tools — Fear Ward and Resurrection (in progress on `feature/announcer`)
 
@@ -274,8 +241,7 @@ All 28 records have `source.note`: 21 world-drop-style entries with `"World drop
 - [ ] **In-game verification:** Fear Ward on self/party/raid members, Say + Raid, Say + Yell + Raid and Party + Say simultaneously, tooltip hover on checkboxes and captions, checkbox spacing, Default/Save/Enter/Escape for the custom text and /reload persistence, success vs failed/out-of-range casts, mouseover casts, changing target immediately, duplicate events, missing target, no ClassicAPI, channel changes mid-session, and settings across /reload.
 - [x] **Resurrection Announcer (initial implementation):** opt-in, per-spell multi-channel selection and confirmed cast START announcements, with Whisper addressed to the captured recipient. In-game verification still pending.
 - [ ] **Fear Ward Assistant:** allow a preferred target and cooldown/aura readiness reminders; assess whether automatic casting is supported and permitted by the client/server before implementing any action.
-- [ ] **Resurrection Assistant:** offer a post-wipe dead-player list with player-confirmed resurrection actions; handle combat, range, and player availability.
-- [ ] **Future announcers:** OOM alerts and other optional priest spell announcements. Avoid chat spam and preserve independent channel selection.
+- [ ] **Future announcers:** assess other optional priest spell announcements. Mana/OOM is already complete; preserve independent channels and avoid chat spam.
 
 ### Native tabbed Options UI and client diagnostics — released in v0.2.0
 
@@ -310,28 +276,18 @@ All 28 records have `source.note`: 21 world-drop-style entries with `"World drop
 - [ ] **Client variation:** test with and without ClassicAPI and with each fallback extension separately. If no trustworthy cast events are present, keep tracking unavailable rather than incorrectly treating `SPELLCAST_STOP` as a confirmed heal.
 - [x] **Refund accuracy architecture:** use server-reported Nampower energize data when present and optional ClassicAPI-derived estimates otherwise. Numeric output is user-toggleable, with `+` for actual server data and `~` for an estimate. Session statistics remain out of scope.
 
-### Deferred — Wand Progression enhancements
+### Reference-data enhancements — closed / dropped from active scope (2026-10-26)
 
-- [x] **ClassicAPI code:** use the automatic flavor TOC redirect, add a guarded v1.11.0-capable adapter, detect capabilities separately, and preserve optional quest-history providers.
-- [ ] **ClassicAPI in-game validation after v0.2.0:** complete the acceptance matrix above, specifically live `QUEST_TURNED_IN`, item fallbacks, no-guild server transport, and reload persistence in a dedicated follow-up branch if fixes are needed.
-- [ ] **Source Details:** handle multiple acquisition types for one wand, and multiple matching craft entries, without losing current faction/source filters, layout reuse, or map navigation.
-- [ ] **Structured reputation:** migrate optional requirements from free-text notes to a data structure with faction/standing; preserve backward-compatible notes, then consider reputation- and content-based filters.
-- [ ] **Map/NPC follow-up:** do not guess missing positions for Risen Oilblaze, Watchman Doomgrip, Elisandra Spellbinder, or other `(0, 0)` entries. Add positions only when verified. All registered instances currently have `worldMap`.
-- [ ] **Optional pfQuest review:** use additional quest start/end locations or group-drop hints only where Priest Companion lacks verified data, without creating a hard dependency.
-
-**Deferred until after the above technical review and fixes:**
-- [ ] Differentiate dungeon and raid icons. Consider door/entrance for dungeons and shield/crest for raids; validate exact Vanilla texture paths before selecting assets.
+Wand Progression / Source Details, filters, reputation and maps are complete for the maintainer's current needs. Additional multi-type acquisition displays, multiple craft entries, structured reputation, content filters, missing-location research, dungeon/raid icon changes and related pfQuest enrichment are not scheduled. The data audit above preserves known facts without requiring further work. General optional-client/quest-history compatibility remains documented separately.
 
 ### Later capabilities (scope and feasibility to be assessed)
 
-- [ ] Open-world / dungeon / raid content filters (potentially grouped with reputation filters).
 - [ ] Add more configurable settings to Options → General / Advanced later (quest-history preferences, optional integrations, reset and UI settings). General is currently read-only; Advanced now contains Book of Prayer controls. Restore quest-history diagnostics elsewhere in a future feature.
 - [ ] Minimap launcher.
 - [ ] Priest skills database.
 - [ ] Talent builds.
 - [ ] Best-in-slot lists.
 - [ ] Consumables database.
-- [ ] Mana support and out-of-mana announcements.
 - [ ] Self-buff helpers and optional reagent purchase helpers, subject to client/API constraints.
 
 ### No longer planned as an incomplete feature
@@ -341,5 +297,7 @@ All 28 records have `source.note`: 21 world-drop-style entries with `"World drop
 ## Documentation policy
 
 - `CHANGELOG.md`: actual versioned additions, fixes, and changes; keep prior release entries intact.
-- `ROADMAP.md`: current limitations, decisions, audited data, future enhancements, and priorities.
+- `ROADMAP.md`: current limitations, decisions, audited data, future enhancements, and priorities. Keep implementation/test history in CHANGELOG rather than duplicating it here.
+- A scope closure is not a claim that every historical test passed. Remove retired checks from active work and record the maintainer decision and date; reopen only on explicit request or a reported bug.
+- Published CHANGELOG entries remain historical snapshots. Later validation or scope decisions supersede earlier pending notes; the current backlog is maintained here.
 - New or changed client map metadata should be verified in-game; old validated behavior should not be relabeled as untested.

@@ -46,6 +46,8 @@ local function Checkbox(name, title, x, y, getter, setter, tooltip, width)
     caption:SetWidth(width or 138)
     caption:SetJustifyH("LEFT")
     caption:SetText(title)
+    button.optionCaption = caption
+
     button:SetScript("OnClick", function()
         local value = this:GetChecked()
         setter(value == 1 or value == true)
@@ -57,6 +59,7 @@ local function Checkbox(name, title, x, y, getter, setter, tooltip, width)
         end)
         button:SetScript("OnLeave", HideTooltip)
         local hitbox = CreateFrame("Button", nil, child)
+        button.optionHitBox = hitbox
         hitbox:SetPoint("LEFT", button, "RIGHT", 4, 0)
         hitbox:SetWidth(width or 138)
         hitbox:SetHeight(24)
@@ -358,6 +361,9 @@ function scroll.Refresh()
         local entry = boxes[j]
         entry.button:SetChecked(entry.getter() and 1 or nil)
     end
+    local enabled = mana.GetOption("enabled")
+    PC.UI.SetModuleOptionsEnabled(child,
+        getglobal("PriestCompanionManaEnabled"), enabled)
     syncing = true
     local threshold = mana.GetOption("threshold")
     local oomThreshold = mana.GetOption("oomThreshold")
@@ -368,7 +374,7 @@ function scroll.Refresh()
     oomSlider:SetValue(oomThreshold)
     -- Vanilla Slider frames do not implement :Enable() / :Disable().
     -- At Low Mana = 1%, OOM is fixed at 0%, so block mouse edits.
-    local oomEditable = threshold > 1
+    local oomEditable = enabled and threshold > 1
     oomSlider:EnableMouse(oomEditable)
     oomSlider:SetAlpha(oomEditable and 1 or 0.5)
     cooldownSlider:SetValue(cooldown)

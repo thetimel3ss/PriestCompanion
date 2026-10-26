@@ -2,7 +2,7 @@
 ## Title: Priest Companion
 ## Notes: Wand progression, Book of Prayer tracker, and client diagnostics for Vanilla WoW
 ## Author: Timeless
-## Version: 0.3.0
+## Version: 0.4.0
 ## SavedVariables: PriestCompanionDB
 ## SavedVariablesPerCharacter: PriestCompanionCharDB
 
@@ -31,6 +31,7 @@ Core\ManaAnnouncer.lua
 Core\AggroAnnouncer.lua
 Core\ResurrectionAssistant.lua
 
+UI\OptionState.lua
 UI\MainFrame.lua
 UI\SourceTooltip.lua
 UI\SourceDetails.lua

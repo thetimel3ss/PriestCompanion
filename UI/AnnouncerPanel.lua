@@ -160,6 +160,8 @@ local function Checkbox(name, title, x, y, onToggle, helpText, captionWidth)
     label:SetJustifyH("LEFT")
     label:SetText(title)
 
+    check.optionCaption = label
+
     check:SetScript("OnClick", function()
         local enabled = this:GetChecked()
         onToggle(enabled == 1 or enabled == true)
@@ -175,6 +177,7 @@ local function Checkbox(name, title, x, y, onToggle, helpText, captionWidth)
         -- FontStrings do not receive hover events by themselves in Vanilla.
         -- An adjacent button makes the caption hoverable and clickable.
         local captionHitBox = CreateFrame("Button", nil, container)
+        check.optionHitBox = captionHitBox
         captionHitBox:SetPoint("LEFT", check, "RIGHT", 4, 0)
         captionHitBox:SetWidth(captionWidth or 135)
         captionHitBox:SetHeight(24)
@@ -861,6 +864,10 @@ function panel.Refresh()
     else
         UpdateCancelPreview()
     end
+    PC.UI.SetModuleOptionsEnabled(child, enabledBox,
+        available and announcer.GetOption("enabled"))
+    PC.UI.SetModuleOptionsEnabled(resChild, resEnabled,
+        resAvailable and announcer.GetResOption("enabled"))
     local manaUI = PC.UI.ManaAnnouncerPanel
     if manaUI and type(manaUI.Refresh) == "function" then
         manaUI.Refresh()

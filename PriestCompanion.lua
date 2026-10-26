@@ -11,7 +11,7 @@ PC.version =
     GetAddOnMetadata(
         PC.name,
         "Version"
-    ) or "0.3.0"
+    ) or "0.4.0"
 
 --------------------------------------------------
 -- SavedVariables

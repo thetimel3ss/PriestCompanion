@@ -2,6 +2,26 @@
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-10-26
+
+### Release summary
+- Added configurable Mana/OOM and Aggro/Survival announcements, including damage-only aggro detection and Near Death rearming safeguards.
+- Module Enable controls suspend unnecessary event monitoring and scans. Dependent options lock while disabled; Tracker and Resurrection Assistant HUDs hide when disabled.
+- Renamed the main Wands tab to Guides, retaining Wand Progression and its data.
+- Maintainer confirmed disabled option controls in game and closed Mana Announcer, Resurrection Assistant and reference-data scope. Other recorded edge-case checks remain in ROADMAP; release approval does not assert those tests passed.
+- Maintainer authorized versioning, branch push and integration into main on 2026-10-26. Earlier pending-merge notes below describe historical status and are superseded by this decision.
+
+### Documentation — Maintainer scope closure (2026-10-26)
+- Mana Announcer and Resurrection Assistant are complete for the maintainer's requested scope. Earlier optional test/compatibility lists for these features are retired, not reported as individually executed or passed. This closure supersedes their older pending-acceptance notes; it does not publish or merge the feature branch.
+- Wand Progression / Source Details, filters, reputation and maps meet current needs. Further enhancements and related map/pfQuest enrichment are removed from the active roadmap until explicitly requested again. Known data limitations remain recorded for reference.
+- Removed obsolete future Mana/OOM and Resurrection Assistant tasks and refreshed the roadmap review date. Published release entries remain unchanged; the roadmap is authoritative for current open work.
+
+### Changed — Consistent module Enable controls (2026-10-26)
+- Fear Ward, Resurrection, Mana, Aggro and Book of Prayer options now lock dependent checkboxes (including clickable captions), sliders, message fields and buttons while their master Enable is off. Existing selections and message drafts are retained; Enable remains accessible subject to existing provider/talent requirements.
+- Disabling Book of Prayer also closes its preview and hides its HUD. Auto-hide timeout, Mana OOM minimum and Aggro damage-only dependencies remain enforced after reenabling.
+- **Maintainer validation:** confirmed all affected option pages block their controls when Enable is unchecked. Runtime event/scan gating from the preceding commits is unchanged (no Core files modified).
+- Remaining in-game validation for still-open modules: preview cleanup, restored controls and saved settings after /reload. The maintainer has confirmed the disabled controls; Mana Announcer and Resurrection Assistant are closed by the scope decision above. General, Guides and Mods have no module Enable.
+
 ### Changed — Opt-in event monitoring (2026-10-26; needs in-game acceptance)
 - Aggro subscribes only to events required by active Aggro, Near Death and Death toggles; the 0.75s target scan stays off in damage-only/disabled modes.
 - Mana subscribes to mana/zone/combat events only when its master Enable and at least one warning are active; disabled modules retain only the settings-load event.

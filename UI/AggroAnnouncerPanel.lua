@@ -38,6 +38,8 @@ local function Checkbox(name, title, x, y, getter, setter, help, width)
     caption:SetWidth(width or 140)
     caption:SetJustifyH("LEFT")
     caption:SetText(title)
+    button.optionCaption = caption
+
     button:SetScript("OnClick", function()
         local checked = this:GetChecked()
         setter(checked == 1 or checked == true)
@@ -48,6 +50,7 @@ local function Checkbox(name, title, x, y, getter, setter, help, width)
     end)
     button:SetScript("OnLeave", HideTooltip)
     local hitbox = CreateFrame("Button", nil, child)
+    button.optionHitBox = hitbox
     hitbox:SetPoint("LEFT", button, "RIGHT", 4, 0)
     hitbox:SetWidth(width or 140)
     hitbox:SetHeight(24)
@@ -318,9 +321,12 @@ function scroll.Refresh()
         local item = boxes[j]
         item.button:SetChecked(item.getter() and 1 or nil)
     end
+    local enabled = aggro.GetOption("enabled")
+    PC.UI.SetModuleOptionsEnabled(child,
+        getglobal("PriestCompanionAggroEnable"), enabled)
     -- Disable both click surfaces, not only the checkbutton;
     -- preserve the user's stored damageOnly selection.
-    if aggro.GetOption("aggroEnabled") then
+    if enabled and aggro.GetOption("aggroEnabled") then
         damageOnlyControl.button:Enable()
         damageOnlyControl.hitbox:Enable()
         damageOnlyControl.caption:SetTextColor(1, 1, 1)

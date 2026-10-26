@@ -87,7 +87,7 @@ local manaScroll, manaChild = CreateToolScroll(
     "PriestCompanionManaAnnouncerScroll", 824
 )
 local aggroScroll, aggroChild = CreateToolScroll(
-    "PriestCompanionAggroAnnouncerScroll", 916
+    "PriestCompanionAggroAnnouncerScroll", 952
 )
 resScroll:Hide()
 manaScroll:Hide()

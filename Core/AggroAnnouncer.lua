@@ -13,6 +13,7 @@ local DEFAULT_MESSAGES = {
 local DEFAULTS = {
     enabled = false,
     aggroEnabled = true,
+    damageOnly = false,
     nearEnabled = true,
     deathEnabled = true,
     threshold = 30,
@@ -43,6 +44,15 @@ local aggroHits = 0
 local aggroMisses = 0
 local lastAggroAlert = nil
 local aggroElapsed = 0
+-- Pair a hostile combat-log hit with a real player health decrease.
+-- They may arrive in either order on Vanilla.
+local lastObservedHealth = nil
+local lastObservedMaxHealth = nil
+local hostileHitAt = nil
+local healthLossAt = nil
+local lastDamageAt = nil
+local DAMAGE_PAIR_WINDOW = 1
+local DAMAGE_REARM_SECONDS = 4
 
 local function Clamp(value, minValue, maxValue)
     value = math.floor((tonumber(value) or minValue) + 0.5)
@@ -144,6 +154,7 @@ local function SaveSettings()
     PriestCompanionCharDB.aggroAnnouncer = {
         enabled = settings.enabled,
         aggroEnabled = settings.aggroEnabled,
+        damageOnly = settings.damageOnly,
         nearEnabled = settings.nearEnabled,
         deathEnabled = settings.deathEnabled,
         threshold = settings.threshold,
@@ -159,6 +170,42 @@ local function ResetAggroState()
     aggroMisses = 0
     aggroElapsed = 0
     lastAggroAlert = nil
+    hostileHitAt = nil
+    healthLossAt = nil
+    lastDamageAt = nil
+end
+
+local function DamageModeEnabled()
+    return loaded and settings.enabled and settings.aggroEnabled
+        and settings.damageOnly and inCombat and not dead
+end
+
+local function GetNow()
+    return type(GetTime) == "function" and GetTime() or 0
+end
+
+-- Damage-only mode does not need a hostile target or a polling loop:
+-- combat-log damage and lost player HP are both required.
+local function ConfirmIncomingDamage()
+    if not DamageModeEnabled() or not hostileHitAt
+    or not healthLossAt then return end
+    local elapsed = math.abs(hostileHitAt - healthLossAt)
+    if elapsed > DAMAGE_PAIR_WINDOW then return end
+
+    local now = GetNow()
+    -- Consume both observations to avoid a duplicate event reusing the hit.
+    hostileHitAt = nil
+    healthLossAt = nil
+    local wasQuiet = lastDamageAt == nil
+        or now - lastDamageAt >= DAMAGE_REARM_SECONDS
+    lastDamageAt = now
+    if wasQuiet and (lastAggroAlert == nil
+    or now - lastAggroAlert >= settings.cooldown) then
+        -- No verified enemy identity is available from generic Vanilla
+        -- incoming-damage notifications. {enemy} uses its safe fallback.
+        Announce("aggro")
+        lastAggroAlert = now
+    end
 end
 
 local function BaselineHealth()
@@ -168,6 +215,10 @@ local function BaselineHealth()
         return
     end
     sampledHealth = true
+    lastObservedHealth = health
+    lastObservedMaxHealth = maximum
+    hostileHitAt = nil
+    healthLossAt = nil
     nearArmed = (100 * health / maximum) > settings.threshold
 end
 
@@ -183,6 +234,8 @@ local function InspectHealth()
     local health, maximum = GetHealth()
     if not health then
         sampledHealth = false
+        lastObservedHealth = nil
+        lastObservedMaxHealth = nil
         return
     end
     -- A zero-health update belongs to PLAYER_DEAD, not Near Death.
@@ -192,6 +245,13 @@ local function InspectHealth()
         BaselineHealth()
         return
     end
+    if lastObservedHealth and lastObservedMaxHealth == maximum
+    and health < lastObservedHealth and DamageModeEnabled() then
+        healthLossAt = GetNow()
+        ConfirmIncomingDamage()
+    end
+    lastObservedHealth = health
+    lastObservedMaxHealth = maximum
     if percent > settings.threshold + 15 then
         nearArmed = true
     end
@@ -251,6 +311,7 @@ local function AggroEvidence()
 end
 
 local function InspectAggro()
+    if settings.damageOnly then return end
     if not settings.enabled or not settings.aggroEnabled
     or not inCombat or dead then
         ResetAggroState()
@@ -278,7 +339,8 @@ end
 
 local tickFrame = CreateFrame("Frame")
 local function UpdatePolling()
-    if settings.enabled and settings.aggroEnabled then
+    if settings.enabled and settings.aggroEnabled
+    and not settings.damageOnly then
         tickFrame:SetScript("OnUpdate", function()
             if not inCombat or dead then return end
             aggroElapsed = aggroElapsed + (arg1 or 0)
@@ -385,6 +447,12 @@ eventFrame:RegisterEvent("PLAYER_REGEN_DISABLED")
 eventFrame:RegisterEvent("PLAYER_REGEN_ENABLED")
 eventFrame:RegisterEvent("UNIT_HEALTH")
 eventFrame:RegisterEvent("UNIT_MAXHEALTH")
+-- Vanilla combat-log events for incoming creature/PvP attacks. Misses,
+-- resists and absorbs alone do not pass the required health-loss check.
+eventFrame:RegisterEvent("CHAT_MSG_COMBAT_CREATURE_VS_SELF_HITS")
+eventFrame:RegisterEvent("CHAT_MSG_SPELL_CREATURE_VS_SELF_DAMAGE")
+eventFrame:RegisterEvent("CHAT_MSG_COMBAT_HOSTILEPLAYER_HITS")
+eventFrame:RegisterEvent("CHAT_MSG_SPELL_HOSTILEPLAYER_DAMAGE")
 eventFrame:RegisterEvent("PLAYER_DEAD")
 eventFrame:RegisterEvent("PLAYER_ALIVE")
 eventFrame:RegisterEvent("PLAYER_UNGHOST")
@@ -405,6 +473,14 @@ eventFrame:SetScript("OnEvent", function()
         ResetAggroState()
     elseif event == "UNIT_HEALTH" or event == "UNIT_MAXHEALTH" then
         if arg1 == "player" then InspectHealth() end
+    elseif event == "CHAT_MSG_COMBAT_CREATURE_VS_SELF_HITS"
+    or event == "CHAT_MSG_SPELL_CREATURE_VS_SELF_DAMAGE"
+    or event == "CHAT_MSG_COMBAT_HOSTILEPLAYER_HITS"
+    or event == "CHAT_MSG_SPELL_HOSTILEPLAYER_DAMAGE" then
+        if DamageModeEnabled() then
+            hostileHitAt = GetNow()
+            ConfirmIncomingDamage()
+        end
     elseif event == "PLAYER_DEAD" then
         if not dead and settings.enabled and settings.deathEnabled then
             Announce("death")

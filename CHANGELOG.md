@@ -2,6 +2,12 @@
 
 ## [Unreleased]
 
+### Added — Damage-only Aggro Warning option (2026-10-26; in-game testing pending)
+- Added a per-character **Only after taking damage** checkbox directly below Aggro Warning. Default is off (original target-based aggro behavior remains unchanged); Reset to Defaults also clears this option.
+- In damage-only mode, receive Vanilla creature/hostile-player hit notifications and pair them with a real reduction in the player's health within one second, regardless of event order. Avoid alarms on unconfirmed combat log damage, dodges, full absorbs and fall damage alone; periodic DoTs by themselves do not imply fresh aggro.
+- No target-of-target polling runs in damage-only mode. Consecutive hits are treated as one damage episode until there is at least a four-second break, with the existing configurable cooldown still enforced. Near Death and Death remain unchanged and independent.
+- **Awaiting in-game checks:** source-event ordering on OctoWoW, target-only versus damage-only behavior, sustained attacks, shield absorption, no regression in other announcers.
+
 ### Added — Aggro and Survival Announcer (2026-10-24; awaiting in-game testing)
 - Created `feature/aggro-announcer` from the validated Mana Announcer branch; `main` is untouched.
 - Added Announcer > Aggro native sub-tab with independent per-character opt-in settings, Aggro Warning, Near Death and Death Announcement.

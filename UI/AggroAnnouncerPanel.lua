@@ -79,36 +79,43 @@ Checkbox("PriestCompanionAggroNearDeath", "Near Death", 204, 99,
     function() return aggro.GetOption("nearEnabled") end,
     function(v) aggro.SetOption("nearEnabled", v) end,
     "Announce when your health drops below its configured percentage.", 150)
-Checkbox("PriestCompanionAggroDeath", "Death Announcement", 14, 134,
+Checkbox("PriestCompanionAggroDamageOnly", "Only after taking damage", 14, 134,
+    function() return aggro.GetOption("damageOnly") end,
+    function(v) aggro.SetOption("damageOnly", v) end,
+    "Unchecked: warn when a hostile target aims at you (target-of-target). " ..
+    "Checked: warn only after hostile combat-log damage and a real " ..
+    "health decrease. Absorbed or avoided hits do not warn. " ..
+    "Neither mode requires selecting the enemy yourself.", 180)
+Checkbox("PriestCompanionAggroDeath", "Death Announcement", 14, 170,
     function() return aggro.GetOption("deathEnabled") end,
     function(v) aggro.SetOption("deathEnabled", v) end,
     "Announce once on PLAYER_DEAD. Independent of Near Death.", 180)
 
-Label("Near Death health threshold", 14, 184, 345, "GameFontNormalSmall")
+Label("Near Death health threshold", 14, 220, 345, "GameFontNormalSmall")
 local healthSlider = CreateFrame(
     "Slider", "PriestCompanionAggroHealthThreshold", child,
     "OptionsSliderTemplate")
 healthSlider:SetWidth(194)
 healthSlider:SetHeight(17)
-healthSlider:SetPoint("TOPLEFT", child, "TOPLEFT", 25, -212)
+healthSlider:SetPoint("TOPLEFT", child, "TOPLEFT", 25, -248)
 healthSlider:SetMinMaxValues(1, 99)
 if type(healthSlider.SetValueStep) == "function" then
     healthSlider:SetValueStep(1)
 end
-local healthValue = Label("", 232, 210, 115)
+local healthValue = Label("", 232, 246, 115)
 
-Label("Aggro announcement cooldown", 14, 259, 340, "GameFontNormalSmall")
+Label("Aggro announcement cooldown", 14, 295, 340, "GameFontNormalSmall")
 local cooldownSlider = CreateFrame(
     "Slider", "PriestCompanionAggroCooldown", child,
     "OptionsSliderTemplate")
 cooldownSlider:SetWidth(194)
 cooldownSlider:SetHeight(17)
-cooldownSlider:SetPoint("TOPLEFT", child, "TOPLEFT", 25, -287)
+cooldownSlider:SetPoint("TOPLEFT", child, "TOPLEFT", 25, -323)
 cooldownSlider:SetMinMaxValues(5, 120)
 if type(cooldownSlider.SetValueStep) == "function" then
     cooldownSlider:SetValueStep(1)
 end
-local cooldownValue = Label("", 232, 285, 115)
+local cooldownValue = Label("", 232, 321, 115)
 local syncing = false
 healthSlider:SetScript("OnValueChanged", function()
     if syncing then return end
@@ -134,19 +141,19 @@ end)
 healthSlider:SetScript("OnLeave", HideTooltip)
 cooldownSlider:SetScript("OnEnter", function()
     Tooltip(this, "Aggro cooldown",
-        "Wait between separate aggro warnings if enemies " ..
-        "stop targeting you and later retarget you.")
+        "Minimum delay between new aggro warnings. In damage-only " ..
+        "mode, damage from one continuous attack does not spam.")
 end)
 cooldownSlider:SetScript("OnLeave", HideTooltip)
 
 Label("Announcement channels (multiple selections allowed)",
-    14, 325, 355, "GameFontNormalSmall")
+    14, 361, 355, "GameFontNormalSmall")
 local channels = {
-    { "SAY", "Say", 14, 348 },
-    { "PARTY", "Party", 204, 348 },
-    { "RAID", "Raid", 14, 378 },
-    { "SELF", "Self (local chat)", 204, 378 },
-    { "YELL", "Yell", 14, 408 }
+    { "SAY", "Say", 14, 384 },
+    { "PARTY", "Party", 204, 384 },
+    { "RAID", "Raid", 14, 414 },
+    { "SELF", "Self (local chat)", 204, 414 },
+    { "YELL", "Yell", 14, 444 }
 }
 local i
 for i = 1, table.getn(channels) do
@@ -240,17 +247,18 @@ local function MessageEditor(kind, y, title)
     }
     Restore()
 end
-MessageEditor("aggro", 451, "Aggro message")
-MessageEditor("near", 570, "Near Death message")
-MessageEditor("death", 689, "Death message")
+MessageEditor("aggro", 487, "Aggro message")
+MessageEditor("near", 606, "Near Death message")
+MessageEditor("death", 725, "Death message")
 Label("Default changes drafts; Save persists. Previews are not sent.",
-    14, 812, 355)
+    14, 848, 355)
 
 local POPUP = "PRIEST_COMPANION_RESET_AGGRO_ANNOUNCER"
 StaticPopupDialogs[POPUP] = {
     text = "Reset all Aggro Announcer settings for this character?" ..
         "\n\nThis restores the 30%% health threshold and 15-second " ..
-        "aggro cooldown, checks all three alerts, selects Say only, " ..
+        "aggro cooldown, checks all three alerts, uses target-based " ..
+        "aggro warning, selects Say only, " ..
         "restores the messages and turns the main Enable off.",
     button1 = OKAY or "OK",
     button2 = CANCEL or "Cancel",
@@ -270,7 +278,7 @@ local resetButton = CreateFrame(
     child, "UIPanelButtonTemplate")
 resetButton:SetWidth(160)
 resetButton:SetHeight(24)
-resetButton:SetPoint("TOPLEFT", child, "TOPLEFT", 200, -846)
+resetButton:SetPoint("TOPLEFT", child, "TOPLEFT", 200, -882)
 resetButton:SetText("Reset to Defaults")
 resetButton:SetScript("OnClick", function()
     StaticPopup_Show(POPUP)

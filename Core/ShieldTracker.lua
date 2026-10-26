@@ -3,7 +3,7 @@ local PC = PriestCompanion
 local Tracker = {}
 PC.Modules.ShieldTracker = Tracker
 local frame = CreateFrame("Frame")
-local settings = { enabled = false, locked = false, x = 0, y = -220 }
+local settings = { enabled = false, locked = false, x = 0, y = -220, learned = {} }
 local loaded = false
 local listeners = {}
 local provider = "Vanilla (presence only)"
@@ -19,6 +19,10 @@ local baseAbsorb = {
     [6065] = 301, [6066] = 381, [10898] = 484,
     [10899] = 605, [10900] = 763, [10901] = 942
 }
+local function GetCapacity(id)
+    id = tonumber(id)
+    return (settings.learned and settings.learned[id]) or baseAbsorb[id]
+end
 local competingIcons = {
     "spell_ice_lament", "spell_shadow_detectlesserinvisibility",
     "spell_fire_firearmor", "spell_frost_frostward",
@@ -119,6 +123,16 @@ local function Unknown(reason)
     state.remaining, state.maximum = nil, nil
     state.reason = reason
 end
+local function FinishShield()
+    local candidate = state.breakCandidate
+    if candidate and state.learnable and state.spellID and candidate.amount > 0
+    and GetTime() - candidate.time <= 1 then
+        settings.learned = settings.learned or {}
+        settings.learned[state.spellID] = candidate.amount
+        Save()
+    end
+    state = { active = false }
+end
 RefreshAura = function()
     if not settings.enabled then return end
     if type(UnitIsDeadOrGhost) == "function" and UnitIsDeadOrGhost("player") then
@@ -129,25 +143,39 @@ RefreshAura = function()
     if present == nil then
         state = { active = false, reason = "Aura data unavailable" }
     elseif not present then
-        state = { active = false }
+        FinishShield()
     else
         if not state.active then
             state = { active = true, reason = "Cast not observed / external shield" }
         end
         if state.expiresAt and expiry and expiry > state.expiresAt + 0.5 then
             Unknown("Shield refreshed without observed cast")
+            state.learnable, state.breakCandidate = false, nil
         end
         state.expiresAt = expiry
         if pending and pending.untilTime >= GetTime() then
             -- Only an observed own cast can seed the base-rank estimate.
             if pending.own and not pending.uncertain then
-                state.maximum = baseAbsorb[pending.id]
+                state.spellID = pending.id
+                state.learnable = true
+                state.absorbedTotal = 0
+                state.breakCandidate = nil
+                state.learnedCapacity = settings.learned and settings.learned[pending.id] ~= nil
+                state.maximum = GetCapacity(pending.id)
                 state.remaining = state.maximum
-                state.reason = "Base-rank estimate; modifiers not included"
-            else Unknown("External shield or damage before aura confirmation") end
+                state.reason = state.learnedCapacity
+                    and "Learned previous capacity; current modifiers may differ"
+                    or "Base-rank estimate; modifiers not included"
+            else
+                state.learnable = false
+                Unknown("External shield or damage before aura confirmation")
+            end
             pending = nil
         end
-        if conflict then Unknown("Other possible absorbs active") end
+        if conflict then
+            state.learnable, state.breakCandidate = false, nil
+            Unknown("Other possible absorbs active")
+        end
     end
     UpdateTicker()
     Notify()
@@ -159,26 +187,42 @@ local function ObserveCast(id, caster, target)
     local now = GetTime()
     if lastCastID == id and lastCastTime and now - lastCastTime < 0.15 then return end
     lastCastID, lastCastTime = id, now
+    if state.active then state.learnable, state.breakCandidate = false, nil end
     pending = { id = id, own = IsPlayer(caster), untilTime = now + 1 }
     -- Do not seed against a previous aura until the aura update arrives.
     UpdateTicker()
 end
-local function Absorb(amount)
+local function Absorb(amount, damageTaken)
     if pending then
         RefreshAura()
         if pending then pending.uncertain = true end
     end
     if not state.active then return end
     amount = tonumber(amount)
+    damageTaken = tonumber(damageTaken)
     if not amount or amount < 0 then
         Unknown("Absorbed amount unavailable")
-    elseif amount > 0 and state.remaining then
+        state.learnable, state.breakCandidate = false, nil
+    elseif amount > 0 then
         local present, expiry, conflict = ReadAuras()
-        if conflict then Unknown("Other possible absorbs active")
+        if conflict or present == nil then
+            state.learnable, state.breakCandidate = false, nil
+            Unknown(conflict and "Other possible absorbs active" or "Aura data unavailable")
         else
-            state.remaining = math.max(0, state.remaining - amount)
-            if amount > 0 and state.remaining == 0 then
-                Unknown("Base estimate exhausted; aura determines shield presence")
+            if state.learnable then
+                state.absorbedTotal = (state.absorbedTotal or 0) + amount
+                if damageTaken and damageTaken > 0 then
+                    state.breakCandidate = { amount = state.absorbedTotal, time = GetTime() }
+                end
+            end
+            if state.remaining then
+                state.remaining = math.max(0, state.remaining - amount)
+                if state.remaining == 0 then
+                    Unknown("Base estimate exhausted; aura determines shield presence")
+                end
+            end
+            if not present and state.breakCandidate then
+                FinishShield()
             end
         end
     end
@@ -286,14 +330,16 @@ local function HandleClassic()
         return
     end
     if sub == "SPELL_AURA_REMOVED" and IsShield(data[12]) then
-        state, pending = { active = false }, nil; UpdateTicker(); Notify(); return
+        FinishShield(); UpdateTicker(); Notify(); return
     end
     if type(sub) ~= "string" then return end
     if string.find(sub, "_DAMAGE$", 1) or sub == "DAMAGE_SHIELD" or sub == "DAMAGE_SPLIT" then
         local offset = 14
         if sub == "SWING_DAMAGE" then offset = 11
         elseif sub == "ENVIRONMENTAL_DAMAGE" then offset = 12 end
-        Absorb(data[offset + 6] or 0)
+        local damageTaken
+        if string.find(sub, "_DAMAGE$", 1) then damageTaken = data[offset + 1] end
+        Absorb(data[offset + 6] or 0, damageTaken)
     elseif string.find(sub, "_MISSED$", 1) then
         local offset = sub == "SWING_MISSED" and 11 or 14
         if data[offset + 1] == "ABSORB" then Absorb(data[offset + 3]) end
@@ -309,6 +355,14 @@ frame:SetScript("OnEvent", function()
             if type(saved.locked) == "boolean" then settings.locked = saved.locked end
             if type(saved.x) == "number" then settings.x = saved.x end
             if type(saved.y) == "number" then settings.y = saved.y end
+            if type(saved.learned) == "table" then
+                for id, value in pairs(saved.learned) do
+                    local spellId, capacity = tonumber(id), tonumber(value)
+                    if baseAbsorb[spellId] and capacity and capacity > 0 then
+                        settings.learned[spellId] = math.floor(capacity)
+                    end
+                end
+            end
         end
         loaded = true; Save(); UpdateSubscriptions()
         if settings.enabled then RefreshAura() end
@@ -324,11 +378,11 @@ frame:SetScript("OnEvent", function()
     elseif event == "UNIT_CASTEVENT" and arg3 == "CAST" then ObserveCast(arg4, arg1, arg2)
     elseif event == "AURA_CAST_ON_SELF" then ObserveCast(arg1, arg2, arg3)
     elseif event == "AUTO_ATTACK_SELF" or event == "AUTO_ATTACK_OTHER" then
-        if IsPlayer(arg2) then Absorb(arg8) end
+        if IsPlayer(arg2) then Absorb(arg8, arg3) end
     elseif event == "SPELL_DAMAGE_EVENT_SELF" or event == "SPELL_DAMAGE_EVENT_OTHER" then
         if IsPlayer(arg1) then
             local _, _, amount = string.find(tostring(arg5 or ""), "^(%d+),")
-            Absorb(amount)
+            Absorb(amount, arg4)
         end
     elseif type(arg1) == "string" and string.find(event, "CHAT_MSG_", 1, true) then
         -- Only known incoming English formats; never consume outgoing damage.
@@ -337,9 +391,13 @@ frame:SetScript("OnEvent", function()
             or string.find(arg1, "You suffer", 1, true)
         if incoming then
             local _, _, amount = string.find(arg1, "%((%d+) absorbed%)")
-            if amount then Absorb(amount)
+            local _, _, damage = string.find(arg1, "hits you for (%d+)")
+            if not damage then _, _, damage = string.find(arg1, "crits you for (%d+)") end
+            if not damage then _, _, damage = string.find(arg1, "You suffer (%d+)") end
+            if amount then Absorb(amount, damage)
             elseif string.find(string.lower(arg1), "absorb", 1, true) then Absorb(nil) end
         elseif string.find(string.lower(arg1), "absorb", 1, true) then
+            state.learnable, state.breakCandidate = false, nil
             Unknown("Unattributed absorb message"); Notify()
         end
     end

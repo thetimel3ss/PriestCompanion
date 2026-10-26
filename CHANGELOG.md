@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Changed — Shield Tracker learning and hover behavior (2026-10-26)
+- Learn a per-character, per-rank capacity after an observed self-cast PW: Shield breaks during a hit and the absorption has no known competing shield. Reuse that observed value for future estimates; modifiers can still change between casts. Natural fades, dispels, missed casts and ambiguous absorption do not train the value.
+- Remove the HUD hover tooltip. Keep provider, estimate caveats, learning conditions and other guidance on the Options > Tools > Shield Tracker page.
+
 ### Changed — Shield Tracker countdown precision (2026-10-26)
 - Display the remaining shield duration to three decimal places and turn it red below 5 seconds. Refresh the visible countdown at roughly 10ms intervals while a timed shield is active; pending cast confirmation keeps its slower aura polling.
 

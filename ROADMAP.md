@@ -126,9 +126,10 @@ All 28 records have `source.note`: 21 world-drop-style entries with `"World drop
 ### Shield Tracker prototype (`feature/shield-tracker`)
 
 - [x] Implement opt-in self PW: Shield HUD, aura/time display, ~ base-rank estimates or unknown capacity, single-provider adapters and Tools/minimap integration. No required extension or casting behavior.
-- [x] Restyle HUD as a compact ShieldBuddy-like horizontal bar with icon, centered values, duration and details in a tooltip.
-- [ ] Visual acceptance: bar/icon alignment, three-decimal countdown and red-under-five-seconds state, unknown/preview styling and tooltip/drag/lock behavior.
-- [ ] Maintainer tests: Vanilla/ClassicAPI/Nampower >=4.5/SuperWoW and mixed stacks; all available ranks, self/other priest shields, physical/spell/periodic/full-absorb damage, overlapping absorbs, expiry/death, reload and enable mid-shield. Check Enable persistence, locked drag/reset, preview cleanup and minimap actions. Base estimates intentionally omit talent/gear/server modifiers.
+- [x] Restyle HUD as a compact ShieldBuddy-like horizontal bar with icon, centered values and duration; keep usage and estimate guidance in the Shield Tracker options page.
+- [x] Learn a per-character per-rank capacity from an observed self-cast shield that breaks under damage with no known competing absorb; use it to refine later estimates. Do not learn from expiry, dispel or ambiguous absorption.
+- [ ] Visual acceptance: bar/icon alignment, three-decimal countdown and red-under-five-seconds state, unknown/preview styling, no HUD hover tooltip, and retained guidance on the Shield Tracker options page.
+- [ ] Maintainer tests: Vanilla/ClassicAPI/Nampower >=4.5/SuperWoW and mixed stacks; all available ranks, self/other priest shields, physical/spell/periodic/full-absorb damage, overlapping absorbs, break-and-learn followed by reload and a later cast, expiry/death, and enable mid-shield. Check Enable persistence, locked drag/reset, preview cleanup and minimap actions. Base/learned values may differ if talent, gear or server modifiers change.
 - [ ] Release/version/merge only after explicit maintainer approval. Outgoing/group shields and multiple-shield attribution are outside the first prototype.
 
 ### Enable visual feedback — complete, v0.4.1 (2026-10-26)

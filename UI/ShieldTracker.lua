@@ -65,27 +65,7 @@ end)
 hud:SetScript("OnDragStop", StopMoving)
 hud:SetScript("OnHide", function()
     StopMoving()
-    if GameTooltip and GameTooltip:IsOwned(hud) then GameTooltip:Hide() end
 end)
-hud:SetScript("OnEnter", function()
-    if not GameTooltip or moving then return end
-    local data = tracker.GetState()
-    GameTooltip:SetOwner(hud, "ANCHOR_TOP")
-    GameTooltip:SetText("Power Word: Shield", 1, 0.82, 0.20)
-    if preview then
-        GameTooltip:AddLine("Preview only - no real shield", 0.5, 0.8, 1)
-    elseif data.remaining then
-        GameTooltip:AddLine("~ Base-rank estimate; talent, gear and server modifiers are not included.", 1, 1, 1, true)
-    else
-        GameTooltip:AddLine(data.reason or "Remaining absorption unknown", 1, 1, 1, true)
-    end
-    GameTooltip:AddLine("Events: " .. tracker.GetProvider(), 0.7, 0.7, 0.7)
-    if not tracker.GetOption("locked") then
-        GameTooltip:AddLine("Drag to move", 0.7, 0.7, 0.7)
-    end
-    GameTooltip:Show()
-end)
-hud:SetScript("OnLeave", function() if GameTooltip then GameTooltip:Hide() end end)
 function hud.SetPreview(value)
     preview = value and tracker.GetOption("enabled") and true or false
     Render()
@@ -163,14 +143,16 @@ local locked = Checkbox("PriestCompanionShieldLocked", "Lock position", 99, "loc
 local providerLabel = Label("", 14, 141)
 Label("A gray bar means the shield is present, but its remaining absorption is unknown.",
     14, 179)
-Label("~ values are Vanilla base-rank estimates for observed self-casts. Talents, gear and OctoWoW modifiers are not included.",
+Label("~ values start from the rank's base amount, or a learned value from a previous shield break. Talents, gear and OctoWoW modifiers can still change the result.",
     14, 225)
 Label("External shields, casts missed during reload, and other possible absorption effects use unknown amounts. This prototype does not track shields on other players.",
     14, 283)
+Label("Learning saves a per-rank observed capacity when your shield breaks during a hit and no known competing absorb is active. Expirations, dispels and ambiguous hits are not learned.",
+    14, 330)
 local previewButton = CreateFrame("Button", nil, child, "UIPanelButtonTemplate")
 previewButton:SetWidth(145)
 previewButton:SetHeight(24)
-previewButton:SetPoint("TOPLEFT", child, "TOPLEFT", 14, -357)
+previewButton:SetPoint("TOPLEFT", child, "TOPLEFT", 14, -380)
 previewButton:SetText("Preview Shield")
 previewButton:SetScript("OnClick", function() hud.SetPreview(not preview) end)
 local reset = CreateFrame("Button", nil, child, "UIPanelButtonTemplate")

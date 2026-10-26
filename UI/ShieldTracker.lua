@@ -147,7 +147,7 @@ Label("~ values start from the rank's base amount, or a learned value from a pre
     14, 225)
 Label("External shields, casts missed during reload, and other possible absorption effects use unknown amounts. This prototype does not track shields on other players.",
     14, 283)
-Label("Learning saves a per-rank observed capacity when your shield breaks during a hit and no known competing absorb is active. Expirations, dispels and ambiguous hits are not learned.",
+Label("Learning uses a recent damaging hit plus shield removal, with no known competing absorb. A very close expiry or dispel may be indistinguishable from a break.",
     14, 330)
 local previewButton = CreateFrame("Button", nil, child, "UIPanelButtonTemplate")
 previewButton:SetWidth(145)

@@ -2,8 +2,12 @@
 
 ## [Unreleased]
 
+### Validated — Shield Tracker in-game checks (2026-10-26)
+- Maintainer reports the visual and functional checks passed, learned values persist, and controls persist. The `~` marker remains intentional: each learned value came from a previous shield, so modifiers may differ on a later cast.
+- Provider compatibility matrix remains pending.
+
 ### Changed — Shield Tracker learning and hover behavior (2026-10-26)
-- Learn a per-character, per-rank capacity after an observed self-cast PW: Shield breaks during a hit and the absorption has no known competing shield. Reuse that observed value for future estimates; modifiers can still change between casts. Natural fades, dispels, missed casts and ambiguous absorption do not train the value.
+- Learn a per-character, per-rank capacity after a recent damaging hit and shield removal, when no known competing absorb is active. Reuse that observed value for future estimates; modifiers can still change between casts. The client does not report the aura-removal cause, so an expiry or dispel immediately after a hit may be misclassified; verify this edge case in game.
 - Remove the HUD hover tooltip. Keep provider, estimate caveats, learning conditions and other guidance on the Options > Tools > Shield Tracker page.
 
 ### Changed — Shield Tracker countdown precision (2026-10-26)
@@ -17,7 +21,7 @@
 ### Added — Shield Tracker prototype (2026-10-26)
 - Add opt-in Tools > Shield Tracker and minimap toggle/settings shortcut for PW: Shield received by the player. Movable HUD shows duration and either an explicit ~ base-rank estimate or unknown absorption; no casting or external libraries.
 - Prefer one provider: ClassicAPI combat log, Nampower >=4.5 structured events, SuperWoW English log, or Vanilla aura/time-only fallback. No process-global CVars changed. Disable removes subscriptions, timer and preview; per-character Enable/Lock/position persist.
-- Unknown capacity for external/unobserved casts, overlapping known possible absorbs and exhausted estimates. Base numbers exclude talents, gear and custom-server modifiers. No runtime shield values persisted.
+- Unknown capacity for external/unobserved casts, overlapping known possible absorbs and exhausted estimates. Base numbers exclude talents, gear and custom-server modifiers. Active shield state is not persisted; the later learning enhancement stores only per-rank observed capacity.
 - Local checks passed: Lua 5.4 syntax and TOC order; mocked provider priority/isolation, damage/full-absorb offsets, uncertain/external/competing capacity, mid-shield enable/death cleanup, saved options and Tools navigation/Enable/preview cleanup. Test harnesses remain local and are not included in the repository. Minimap toggle/settings regressions also passed locally. These do not replace Vanilla in-game tests.
 - Pending in-game checks: own/external shields, damage/full absorbs, duration/removal, reload/mid-shield enable, optional-provider combinations, Tools/minimap controls and preview/lock/reset. Feature branch only; version remains 0.5.0 until release approval.
 

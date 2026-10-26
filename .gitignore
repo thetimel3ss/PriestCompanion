@@ -13,3 +13,6 @@ Thumbs.db
 *.tmp
 *.bak
 *~
+
+# Local maintainer instructions
+AGENTS.md

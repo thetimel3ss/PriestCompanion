@@ -10,6 +10,11 @@ local DEFAULT_MESSAGES = {
     near = "Low health: {percent}% ({health}/{maxhealth}).",
     death = "Healer down!"
 }
+-- The rearm condition is strictly > threshold + margin.
+-- 84 + 15 = 99, so full health (100%) can still rearm.
+local NEAR_REARM_MARGIN = 15
+local MAX_NEAR_THRESHOLD = 100 - NEAR_REARM_MARGIN - 1
+
 local DEFAULTS = {
     enabled = false,
     aggroEnabled = true,
@@ -252,7 +257,7 @@ local function InspectHealth()
     end
     lastObservedHealth = health
     lastObservedMaxHealth = maximum
-    if percent > settings.threshold + 15 then
+    if percent > settings.threshold + NEAR_REARM_MARGIN then
         nearArmed = true
     end
     if percent <= settings.threshold then
@@ -367,7 +372,11 @@ local function LoadSettings()
             end
         end
         settings.threshold = Clamp(
-            saved.threshold or DEFAULTS.threshold, 1, 99)
+            saved.threshold or DEFAULTS.threshold, 1, MAX_NEAR_THRESHOLD)
+        -- Normalize legacy 85-99% settings so future /reloads retain 84%.
+        if saved.threshold ~= nil and saved.threshold ~= settings.threshold then
+            saved.threshold = settings.threshold
+        end
         settings.cooldown = Clamp(
             saved.cooldown or DEFAULTS.cooldown, 5, 120)
         if type(saved.channels) == "table" then
@@ -396,7 +405,7 @@ end
 function Aggro.SetOption(key, value)
     if DEFAULTS[key] == nil then return false end
     if key == "threshold" then
-        settings.threshold = Clamp(value, 1, 99)
+        settings.threshold = Clamp(value, 1, MAX_NEAR_THRESHOLD)
     elseif key == "cooldown" then
         settings.cooldown = Clamp(value, 5, 120)
     else

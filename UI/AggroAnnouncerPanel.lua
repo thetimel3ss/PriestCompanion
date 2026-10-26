@@ -125,12 +125,12 @@ local healthSlider = CreateFrame(
 healthSlider:SetWidth(194)
 healthSlider:SetHeight(17)
 healthSlider:SetPoint("TOPLEFT", child, "TOPLEFT", 25, -343)
-healthSlider:SetMinMaxValues(1, 99)
+healthSlider:SetMinMaxValues(1, 84)
 if type(healthSlider.SetValueStep) == "function" then
     healthSlider:SetValueStep(1)
 end
 local healthValue = Label("", 232, 341, 115)
-Label("Rearms after recovery above threshold + 15 points.",
+Label("Range: 1-84%. Rearms above threshold +15 points.",
     14, 372, 355)
 
 Label("Aggro announcement cooldown", 14, 405, 340, "GameFontNormalSmall")
@@ -164,8 +164,9 @@ cooldownSlider:SetScript("OnValueChanged", function()
 end)
 healthSlider:SetScript("OnEnter", function()
     Tooltip(this, "Near Death threshold",
-        "Alert at or below this health percentage. Recover more " ..
-        "than 15 percentage points above it to rearm.")
+        "Set between 1% and 84%. Alert at or below the threshold. " ..
+        "To rearm, recover more than 15 percentage points above " ..
+        "the threshold. At 84%, full health (100%) is needed.")
 end)
 healthSlider:SetScript("OnLeave", HideTooltip)
 cooldownSlider:SetScript("OnEnter", function()

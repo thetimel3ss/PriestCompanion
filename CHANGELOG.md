@@ -2,6 +2,11 @@
 
 ## [Unreleased]
 
+### Fixed — Near Death threshold maximum (2026-10-26)
+- Limited the Near Death health threshold to **1%-84%** in both the Vanilla slider and core settings validation. The strict rearm rule (above threshold +15 percentage points) can now always be reached at 100% health.
+- Saved legacy threshold values of 85%-99% are clamped to 84% when loaded and normalized in the per-character table. Default remains 30%; alert/rearm semantics and other announcers are unchanged.
+- Updated the threshold hint and tooltip. **Awaiting in-game check** of 84% maximum, /reload persistence and rearm at 100% health.
+
 ### Changed — Aggro configuration layout and alert clarification (2026-10-26)
 - Reorganized **Announcer > Aggro**: heading/description, master **Enable**, side-by-side Aggro Warning and Only after taking damage, side-by-side Near Death and Death Announcement, Announcement Channels, Near Death threshold and Aggro-only cooldown, then all three message editors.
 - Clarified that Enable gates **all three** alerts. Near Death has **no 5-second cooldown**; it rearms only after health recovers **more than 15 percentage points above the selected threshold** (30% requires above 45%). Aggro's configurable cooldown does not apply to Near Death/Death. This is explanatory/UI-only; the anti-spam logic and SavedVariables are unchanged.

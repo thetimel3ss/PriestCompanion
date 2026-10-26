@@ -288,7 +288,9 @@ Wand Progression / Source Details, filters, reputation and maps are complete for
 
 - [ ] Add more configurable settings to Options → General / Advanced later (quest-history preferences, optional integrations, reset and UI settings). General now includes minimap visibility/reset controls; Book of Prayer settings live under Tools. Restore quest-history diagnostics elsewhere in a future feature.
 - [x] Initial native minimap launcher implemented on feature/minimap-button with the Priest icon, left/right clicks, drag position, saved visibility and General controls.
-- [ ] **Minimap acceptance:** test appearance in Vanilla, clicks, drag without opening, /reload/relog persistence, General visibility/reset and changed UI/minimap scale. Circular minimap placement is the initial supported shape; test compatibility with minimap addons before expanding shape support. Release and merge require maintainer approval.
+- [x] **Maintainer confirmation (2026-10-26):** original minimap button works correctly in game; individual compatibility cases were not separately reported.
+- [x] Add native right-click shortcuts to Guides, Announcer, both Tools pages and General; add account-wide position lock in menu and General.
+- [ ] **Minimap acceptance:** test each menu destination with the addon open and closed, lock/unlock from both entry points, blocked drag without opening, ordinary clicks while locked, /reload/relog lock persistence, General visibility/reset and changed UI/minimap scale. Circular minimap placement is the initial supported shape; test compatibility with minimap addons before expanding shape support. Release and merge require maintainer approval.
 - [ ] Priest skills database.
 - [ ] Talent builds.
 - [ ] Best-in-slot lists.

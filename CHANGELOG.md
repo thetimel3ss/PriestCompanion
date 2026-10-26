@@ -2,6 +2,11 @@
 
 ## [Unreleased]
 
+### Added — Minimap quick access and position lock (2026-10-26)
+- Right-click now opens a native menu for Guides, Announcer, Resurrection Assistant, Book of Prayer Tracker and General options. Tool shortcuts open the selected options page without enabling or casting anything.
+- Add account-wide Lock position in both the menu and General. Locked dragging cannot reposition or accidentally open the addon; normal clicks, explicit position reset and visibility remain available. Tooltip explains the menu and current lock state.
+- Maintainer confirmed the original minimap button works correctly in game. Local Lua 5.4 syntax, TOC and mocked menu-route/lock/drag/reload checks passed. New menu navigation and lock persistence still require in-game checks.
+
 ### Documentation — Commit and push workflow (2026-10-26)
 - Record standing maintainer authorization to commit and push every completed change to its working branch, preserving history and access from other machines. Main merges and releases still require explicit approval. Added persistent AGENTS.md instructions.
 

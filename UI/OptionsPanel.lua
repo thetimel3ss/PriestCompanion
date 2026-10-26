@@ -243,6 +243,18 @@ minimapBox:SetScript("OnClick", function()
         launcher.SetShownOption(this:GetChecked() == 1 or this:GetChecked() == true)
     end
 end)
+local minimapLock = CreateFrame("CheckButton", "PriestCompanionMinimapLocked",
+    general, "UICheckButtonTemplate")
+minimapLock:SetWidth(24)
+minimapLock:SetHeight(24)
+minimapLock:SetPoint("TOPLEFT", general, "TOPLEFT", 230, -290)
+CreateLabel(general, "Lock position", 260, -295, 150)
+minimapLock:SetScript("OnClick", function()
+    local launcher = PC.UI.MinimapButton
+    if launcher then
+        launcher.SetLockedOption(this:GetChecked() == 1 or this:GetChecked() == true)
+    end
+end)
 local minimapReset = CreateFrame("Button", "PriestCompanionMinimapReset",
     general, "UIPanelButtonTemplate")
 minimapReset:SetWidth(170)
@@ -257,6 +269,7 @@ end)
 function general.Refresh()
     local launcher = PC.UI.MinimapButton
     minimapBox:SetChecked((not launcher or launcher.GetShownOption()) and 1 or nil)
+    minimapLock:SetChecked(launcher and launcher.GetLockedOption() and 1 or nil)
     versionLabel:SetText(
         "Addon Version: " ..
         tostring(PC.version or "unknown")

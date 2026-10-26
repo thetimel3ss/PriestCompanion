@@ -63,21 +63,88 @@ function button.SetShownOption(value)
     end
 end
 
+function button.GetLockedOption()
+    return settings and settings.locked == true or false
+end
+
+function button.SetLockedOption(value)
+    if not settings then return end
+    settings.locked = value and true or false
+    if settings.locked then StopDragging() end
+    local options = PC.UI.OptionsPanel
+    if options and options:IsShown() and type(options.Refresh) == "function" then
+        options.Refresh()
+    end
+end
+
 function button.ResetPosition()
+    StopDragging()
     directionX, directionY = -0.70710678, -0.70710678
     if settings then settings.x, settings.y = directionX, directionY end
     Position()
 end
+
+-- Native menu provides the client's dismissal and screen-edge handling.
+local menu = CreateFrame("Frame", "PriestCompanionMinimapMenu",
+    UIParent, "UIDropDownMenuTemplate")
+local function OpenPage(section, tool)
+    CloseDropDownMenus()
+    if section == "guides" then
+        PC.UI.OpenTab("wands")
+        return
+    end
+    if tool and PC.UI.ToolsPanel then
+        PC.UI.ToolsPanel.ActiveSubTab = tool
+    end
+    PC.UI.OpenTab("options", section)
+end
+local function AddMenuEntry(text, action, checked)
+    local info = UIDropDownMenu_CreateInfo()
+    info.text = text
+    info.notCheckable = checked == nil
+    info.checked = checked
+    info.func = action
+    UIDropDownMenu_AddButton(info)
+end
+UIDropDownMenu_Initialize(menu, function()
+    local title = UIDropDownMenu_CreateInfo()
+    title.text = "Priest Companion"
+    title.isTitle = true
+    title.notCheckable = true
+    UIDropDownMenu_AddButton(title)
+    AddMenuEntry("Guides", function() OpenPage("guides") end)
+    AddMenuEntry("Announcer", function() OpenPage("announcer") end)
+    AddMenuEntry("Resurrection Assistant", function()
+        OpenPage("tools", "resurrection")
+    end)
+    AddMenuEntry("Book of Prayer Tracker", function()
+        OpenPage("tools", "tracker")
+    end)
+    AddMenuEntry("General options", function() OpenPage("general") end)
+    AddMenuEntry("Lock minimap position", function()
+        button.SetLockedOption(not button.GetLockedOption())
+        CloseDropDownMenus()
+    end, button.GetLockedOption())
+    AddMenuEntry("Close", function() CloseDropDownMenus() end)
+end, "MENU")
 
 button:SetScript("OnClick", function()
     if suppressClick then
         suppressClick = false
         return
     end
-    if arg1 == "RightButton" then PC.ShowOptions()
-    else PC.ToggleMainFrame() end
+    if arg1 == "RightButton" then
+        if GameTooltip then GameTooltip:Hide() end
+        ToggleDropDownMenu(1, nil, menu, button, 0, 0)
+    else
+        CloseDropDownMenus()
+        PC.ToggleMainFrame()
+    end
 end)
 button:SetScript("OnDragStart", function()
+    suppressClick = true
+    if button.GetLockedOption() then return end
+    CloseDropDownMenus()
     dragging = true
     suppressClick = true
     if GameTooltip then GameTooltip:Hide() end
@@ -107,8 +174,12 @@ button:SetScript("OnEnter", function()
     GameTooltip:SetOwner(button, "ANCHOR_LEFT")
     GameTooltip:SetText("Priest Companion", 1, 0.82, 0.20)
     GameTooltip:AddLine("Left-click: open/close addon", 1, 1, 1)
-    GameTooltip:AddLine("Right-click: open options", 1, 1, 1)
-    GameTooltip:AddLine("Drag: move around the minimap", 1, 1, 1)
+    GameTooltip:AddLine("Right-click: quick access menu", 1, 1, 1)
+    if button.GetLockedOption() then
+        GameTooltip:AddLine("Position locked (unlock in menu or General)", 1, 0.82, 0.20)
+    else
+        GameTooltip:AddLine("Drag: move around the minimap", 1, 1, 1)
+    end
     GameTooltip:Show()
 end)
 button:SetScript("OnLeave", function()

@@ -2,6 +2,11 @@
 
 ## [Unreleased]
 
+### Changed — Compact shield bar appearance (2026-10-26)
+- Restyle the Shield Tracker HUD after ShieldBuddy's horizontal bar: 200x16 framed light-blue bar, 16x16 icon on the left and centered values, with duration to the right. Replace the large card/title/footer with a compact transparent holder; explanations move to its tooltip.
+- Keep ~ estimate markers, gray unknown-capacity state and a visible PREVIEW label/blue border for simulation. Saved position, lock, Enable and all core shield/provider calculations are unchanged.
+- Local Lua syntax, TOC and mocked Tools/Enable/preview regressions passed; core state/provider checks remain passing. Pending in-game appearance check for bar/icon/text alignment, duration, tooltip and drag/preview behavior.
+
 ### Added — Shield Tracker prototype (2026-10-26)
 - Add opt-in Tools > Shield Tracker and minimap toggle/settings shortcut for PW: Shield received by the player. Movable HUD shows duration and either an explicit ~ base-rank estimate or unknown absorption; no casting or external libraries.
 - Prefer one provider: ClassicAPI combat log, Nampower >=4.5 structured events, SuperWoW English log, or Vanilla aura/time-only fallback. No process-global CVars changed. Disable removes subscriptions, timer and preview; per-character Enable/Lock/position persist.

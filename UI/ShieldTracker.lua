@@ -6,41 +6,48 @@ local child = PC.UI.ToolsShieldContent
 if not tracker or not scroll or not child then return end
 local hud = CreateFrame("Frame", "PriestCompanionShieldTracker", UIParent)
 PC.UI.ShieldTracker = hud
-hud:SetWidth(250)
-hud:SetHeight(86)
+-- Compact horizontal layout: small icon + thin framed bar + duration.
+hud:SetWidth(260)
+hud:SetHeight(20)
 hud:SetFrameStrata("MEDIUM")
 hud:SetMovable(true)
 hud:EnableMouse(true)
 hud:RegisterForDrag("LeftButton")
 hud:SetClampedToScreen(true)
-hud:SetBackdrop({ bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
-    edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border", tile = true,
-    tileSize = 16, edgeSize = 12, insets = { left = 4, right = 4, top = 4, bottom = 4 } })
-hud:SetBackdropColor(0.04, 0.04, 0.09, 0.95)
 hud:Hide()
+local barFrame = CreateFrame("Frame", nil, hud)
+barFrame:SetWidth(200)
+barFrame:SetHeight(16)
+barFrame:SetPoint("LEFT", hud, "LEFT", 18, 0)
+barFrame:EnableMouse(false)
+barFrame:SetBackdrop({ bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
+    edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border", tile = true,
+    tileSize = 8, edgeSize = 9, insets = { left = 2, right = 2, top = 2, bottom = 2 } })
+barFrame:SetBackdropColor(0, 0, 0, 0.5)
+barFrame:SetBackdropBorderColor(0.5, 0.5, 0.5, 1)
 local icon = hud:CreateTexture(nil, "ARTWORK")
 icon:SetTexture("Interface\\Icons\\Spell_Holy_PowerWordShield")
-icon:SetWidth(28)
-icon:SetHeight(28)
-icon:SetPoint("TOPLEFT", hud, "TOPLEFT", 9, -9)
-local heading = hud:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
-heading:SetPoint("TOPLEFT", hud, "TOPLEFT", 44, -10)
-heading:SetText("Power Word: Shield")
+icon:SetWidth(16)
+icon:SetHeight(16)
+icon:SetTexCoord(0.07, 0.93, 0.07, 0.93)
+icon:SetPoint("RIGHT", barFrame, "LEFT", -2, 0)
 local timeText = hud:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
-timeText:SetPoint("TOPRIGHT", hud, "TOPRIGHT", -10, -10)
-local bar = CreateFrame("StatusBar", nil, hud)
-bar:SetWidth(194)
-bar:SetHeight(15)
-bar:SetPoint("TOPLEFT", hud, "TOPLEFT", 44, -28)
+timeText:SetPoint("LEFT", barFrame, "RIGHT", 4, 0)
+timeText:SetWidth(36)
+timeText:SetJustifyH("LEFT")
+local bar = CreateFrame("StatusBar", nil, barFrame)
+bar:SetPoint("TOPLEFT", barFrame, "TOPLEFT", 2, -2)
+bar:SetPoint("BOTTOMRIGHT", barFrame, "BOTTOMRIGHT", -2, 2)
+bar:EnableMouse(false)
 bar:SetStatusBarTexture("Interface\\TargetingFrame\\UI-StatusBar")
 bar:SetMinMaxValues(0, 1)
 local amount = bar:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
 amount:SetPoint("CENTER", bar, "CENTER", 0, 0)
-local note = hud:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
-note:SetPoint("BOTTOMLEFT", hud, "BOTTOMLEFT", 10, 10)
-note:SetWidth(230)
-note:SetHeight(24)
-note:SetJustifyH("LEFT")
+local previewLabel = hud:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+previewLabel:SetPoint("BOTTOM", barFrame, "TOP", 0, 2)
+previewLabel:SetText("PREVIEW")
+previewLabel:SetTextColor(0.5, 0.8, 1)
+previewLabel:Hide()
 local preview = false
 local moving = false
 local Render, RefreshOptions
@@ -56,7 +63,29 @@ hud:SetScript("OnDragStart", function()
     if not tracker.GetOption("locked") then moving = true; hud:StartMoving() end
 end)
 hud:SetScript("OnDragStop", StopMoving)
-hud:SetScript("OnHide", StopMoving)
+hud:SetScript("OnHide", function()
+    StopMoving()
+    if GameTooltip and GameTooltip:IsOwned(hud) then GameTooltip:Hide() end
+end)
+hud:SetScript("OnEnter", function()
+    if not GameTooltip or moving then return end
+    local data = tracker.GetState()
+    GameTooltip:SetOwner(hud, "ANCHOR_TOP")
+    GameTooltip:SetText("Power Word: Shield", 1, 0.82, 0.20)
+    if preview then
+        GameTooltip:AddLine("Preview only - no real shield", 0.5, 0.8, 1)
+    elseif data.remaining then
+        GameTooltip:AddLine("~ Base-rank estimate; talent, gear and server modifiers are not included.", 1, 1, 1, true)
+    else
+        GameTooltip:AddLine(data.reason or "Remaining absorption unknown", 1, 1, 1, true)
+    end
+    GameTooltip:AddLine("Events: " .. tracker.GetProvider(), 0.7, 0.7, 0.7)
+    if not tracker.GetOption("locked") then
+        GameTooltip:AddLine("Drag to move", 0.7, 0.7, 0.7)
+    end
+    GameTooltip:Show()
+end)
+hud:SetScript("OnLeave", function() if GameTooltip then GameTooltip:Hide() end end)
 function hud.SetPreview(value)
     preview = value and tracker.GetOption("enabled") and true or false
     Render()
@@ -72,22 +101,22 @@ Render = function()
     end
     local data = tracker.GetState()
     if not enabled or (not preview and not data.active) then hud:Hide(); return end
-    hud:SetBackdropBorderColor(preview and 0.3 or 0.7, 0.65, 1, 1)
+    barFrame:SetBackdropBorderColor(preview and 0.3 or 0.5,
+        preview and 0.65 or 0.5, preview and 1 or 0.5, 1)
+    if preview then previewLabel:Show() else previewLabel:Hide() end
     if preview then
         data = { remaining = 600, maximum = 942, timeLeft = 18, reason = "Preview - base estimate" }
     end
     if data.remaining and data.maximum then
         bar:SetMinMaxValues(0, data.maximum)
         bar:SetValue(data.remaining)
-        bar:SetStatusBarColor(0.35, 0.65, 1)
+        bar:SetStatusBarColor(0.5, 0.8, 1)
         amount:SetText("~" .. math.floor(data.remaining) .. " / ~" .. math.floor(data.maximum))
-        note:SetText(preview and "PREVIEW - no real shield" or "Base estimate (excludes modifiers)")
     else
         bar:SetMinMaxValues(0, 1)
         bar:SetValue(1)
         bar:SetStatusBarColor(0.4, 0.4, 0.5)
         amount:SetText("Absorb unknown")
-        note:SetText(data.reason or "Shield active")
     end
     if data.timeLeft then timeText:SetText(math.ceil(data.timeLeft) .. "s")
     else timeText:SetText("?s") end

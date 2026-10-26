@@ -2,6 +2,9 @@
 
 ## [Unreleased]
 
+### Changed — Shield Tracker countdown precision (2026-10-26)
+- Display the remaining shield duration to three decimal places and turn it red below 5 seconds. Refresh the visible countdown at roughly 10ms intervals while a timed shield is active; pending cast confirmation keeps its slower aura polling.
+
 ### Changed — Compact shield bar appearance (2026-10-26)
 - Restyle the Shield Tracker HUD after ShieldBuddy's horizontal bar: 200x16 framed light-blue bar, 16x16 icon on the left and centered values, with duration to the right. Replace the large card/title/footer with a compact transparent holder; explanations move to its tooltip.
 - Keep ~ estimate markers, gray unknown-capacity state and a visible PREVIEW label/blue border for simulation. Saved position, lock, Enable and all core shield/provider calculations are unchanged.

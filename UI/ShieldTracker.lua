@@ -7,7 +7,7 @@ if not tracker or not scroll or not child then return end
 local hud = CreateFrame("Frame", "PriestCompanionShieldTracker", UIParent)
 PC.UI.ShieldTracker = hud
 -- Compact horizontal layout: small icon + thin framed bar + duration.
-hud:SetWidth(260)
+hud:SetWidth(274)
 hud:SetHeight(20)
 hud:SetFrameStrata("MEDIUM")
 hud:SetMovable(true)
@@ -33,7 +33,7 @@ icon:SetTexCoord(0.07, 0.93, 0.07, 0.93)
 icon:SetPoint("RIGHT", barFrame, "LEFT", -2, 0)
 local timeText = hud:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
 timeText:SetPoint("LEFT", barFrame, "RIGHT", 4, 0)
-timeText:SetWidth(36)
+timeText:SetWidth(50)
 timeText:SetJustifyH("LEFT")
 local bar = CreateFrame("StatusBar", nil, barFrame)
 bar:SetPoint("TOPLEFT", barFrame, "TOPLEFT", 2, -2)
@@ -118,8 +118,14 @@ Render = function()
         bar:SetStatusBarColor(0.4, 0.4, 0.5)
         amount:SetText("Absorb unknown")
     end
-    if data.timeLeft then timeText:SetText(math.ceil(data.timeLeft) .. "s")
-    else timeText:SetText("?s") end
+    if data.timeLeft then
+        timeText:SetText(string.format("%.3fs", data.timeLeft))
+        if data.timeLeft < 5 then timeText:SetTextColor(1, 0.15, 0.15)
+        else timeText:SetTextColor(0.95, 0.95, 0.95) end
+    else
+        timeText:SetText("?s")
+        timeText:SetTextColor(0.7, 0.7, 0.7)
+    end
     hud:Show()
 end
 local function Label(text, x, y, width, font)

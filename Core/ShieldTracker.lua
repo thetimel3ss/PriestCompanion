@@ -188,7 +188,10 @@ UpdateTicker = function()
     if settings.enabled and (pending or (state.active and state.expiresAt)) then
         frame:SetScript("OnUpdate", function()
             elapsed = elapsed + arg1
-            if elapsed < 0.1 then return end
+            -- Pending casts need only poll aura state at 10 Hz. Once active,
+            -- refresh the visible expiry countdown at roughly 10ms intervals.
+            local interval = pending and 0.1 or 0.01
+            if elapsed < interval then return end
             elapsed = 0
             if pending then
                 if pending.untilTime < GetTime() then pending = nil; UpdateTicker()

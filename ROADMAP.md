@@ -127,7 +127,7 @@ All 28 records have `source.note`: 21 world-drop-style entries with `"World drop
 
 - [x] Implement opt-in self PW: Shield HUD, aura/time display, ~ base-rank estimates or unknown capacity, single-provider adapters and Tools/minimap integration. No required extension or casting behavior.
 - [x] Restyle HUD as a compact ShieldBuddy-like horizontal bar with icon, centered values, duration and details in a tooltip.
-- [ ] Visual acceptance: bar/icon alignment, readable values/duration, unknown/preview styling and tooltip/drag/lock behavior.
+- [ ] Visual acceptance: bar/icon alignment, three-decimal countdown and red-under-five-seconds state, unknown/preview styling and tooltip/drag/lock behavior.
 - [ ] Maintainer tests: Vanilla/ClassicAPI/Nampower >=4.5/SuperWoW and mixed stacks; all available ranks, self/other priest shields, physical/spell/periodic/full-absorb damage, overlapping absorbs, expiry/death, reload and enable mid-shield. Check Enable persistence, locked drag/reset, preview cleanup and minimap actions. Base estimates intentionally omit talent/gear/server modifiers.
 - [ ] Release/version/merge only after explicit maintainer approval. Outgoing/group shields and multiple-shield attribution are outside the first prototype.
 

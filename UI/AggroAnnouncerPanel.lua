@@ -61,7 +61,14 @@ local function Checkbox(name, title, x, y, getter, setter, help, width)
         setter(not (checked == 1 or checked == true))
         scroll.Refresh()
     end)
-    table.insert(boxes, { button = button, getter = getter })
+    local entry = {
+        button = button,
+        caption = caption,
+        hitbox = hitbox,
+        getter = getter
+    }
+    table.insert(boxes, entry)
+    return entry
 end
 
 Label("Aggro and Survival Announcer", 14, 12, 350, "GameFontNormal")
@@ -77,14 +84,19 @@ Checkbox("PriestCompanionAggroWarning", "Aggro Warning", 14, 102,
     "Announce aggro when a hostile unit targets you in combat. " ..
     "With Only after taking damage checked, alert only after a " ..
     "confirmed incoming hit reduces your health.", 145)
-Checkbox("PriestCompanionAggroDamageOnly",
+local damageOnlyControl = Checkbox("PriestCompanionAggroDamageOnly",
     "Only after taking damage", 192, 102,
     function() return aggro.GetOption("damageOnly") end,
-    function(v) aggro.SetOption("damageOnly", v) end,
+    function(v)
+        if aggro.GetOption("aggroEnabled") then
+            aggro.SetOption("damageOnly", v)
+        end
+    end,
     "Unchecked: warn when a hostile target aims at you. " ..
     "Checked: warn only after hostile damage reduces your health. " ..
     "Fully absorbed or avoided attacks do not warn. " ..
-    "Requires Enable and Aggro Warning.", 166)
+    "Requires Enable and Aggro Warning. This checkbox " ..
+    "cannot be changed while Aggro Warning is disabled.", 166)
 Checkbox("PriestCompanionAggroNearDeath", "Near Death", 14, 139,
     function() return aggro.GetOption("nearEnabled") end,
     function(v) aggro.SetOption("nearEnabled", v) end,
@@ -305,6 +317,17 @@ function scroll.Refresh()
     for j = 1, table.getn(boxes) do
         local item = boxes[j]
         item.button:SetChecked(item.getter() and 1 or nil)
+    end
+    -- Disable both click surfaces, not only the checkbutton;
+    -- preserve the user's stored damageOnly selection.
+    if aggro.GetOption("aggroEnabled") then
+        damageOnlyControl.button:Enable()
+        damageOnlyControl.hitbox:Enable()
+        damageOnlyControl.caption:SetTextColor(1, 1, 1)
+    else
+        damageOnlyControl.button:Disable()
+        damageOnlyControl.hitbox:Disable()
+        damageOnlyControl.caption:SetTextColor(1, 0.25, 0.25)
     end
     syncing = true
     local threshold = aggro.GetOption("threshold")

@@ -2,6 +2,11 @@
 
 ## [Unreleased]
 
+### Changed — Damage-only option dependency (2026-10-26)
+- **Only after taking damage** can be selected only when **Aggro Warning** is checked. If Aggro Warning is off, the dependent checkbox and its clickable text area are disabled and the label turns red; reenabling Aggro Warning restores the original interaction and color.
+- Existing character-specific selection is retained while the parent is disabled, so the original preference returns when Aggro Warning is re-enabled. The master Enable and runtime alert behavior are unchanged.
+- The maintainer confirmed **Near Death** now works correctly. In-game testing of the dependency styling and click blocking remains pending.
+
 ### Fixed — Near Death threshold maximum (2026-10-26)
 - Limited the Near Death health threshold to **1%-84%** in both the Vanilla slider and core settings validation. The strict rearm rule (above threshold +15 percentage points) can now always be reached at 100% health.
 - Saved legacy threshold values of 85%-99% are clamped to 84% when loaded and normalized in the per-character table. Default remains 30%; alert/rearm semantics and other announcers are unchanged.

@@ -82,6 +82,9 @@ local settings = {
 
 local provider = "unavailable"
 local resProvider = "unavailable"
+local eventFrame
+local RefreshCastEvents
+local TickResRecipients
 local pending = {}
 local completed = {}
 local resPending = {}
@@ -226,6 +229,10 @@ function Announcer.SetOption(key, value)
     end
     settings[key] = value and true or false
     SaveSettings()
+    if key == "enabled" and RefreshCastEvents then
+        if not settings.enabled then pending, completed = {}, {} end
+        RefreshCastEvents()
+    end
     return true
 end
 
@@ -300,6 +307,12 @@ function Announcer.SetResOption(key, value)
     end
     resSettings[key] = value and true or false
     SaveSettings()
+    if key == "enabled" and RefreshCastEvents then
+        if not resSettings.enabled then
+            resPending, resAnnounced = {}, {}
+        end
+        RefreshCastEvents()
+    end
     return true
 end
 
@@ -1117,9 +1130,8 @@ end
 -- Vanilla 1.12 event dispatch
 --------------------------------------------------
 
-local eventFrame = CreateFrame("Frame")
+eventFrame = CreateFrame("Frame")
 eventFrame:RegisterEvent("VARIABLES_LOADED")
-eventFrame:RegisterEvent("PLAYER_ENTERING_WORLD")
 
 -- Only ClassicAPI currently supplies BOTH a cast GUID and a recipient
 -- in SENT, plus server-confirmed SUCCEEDED with that same GUID.
@@ -1152,9 +1164,39 @@ if PC.Capabilities and PC.Capabilities.classicAPISupported then
     end
 end
 
+local castEvents = {
+    "UNIT_SPELLCAST_SENT", "UNIT_SPELLCAST_SUCCEEDED",
+    "UNIT_SPELLCAST_START", "UNIT_SPELLCAST_FAILED",
+    "UNIT_SPELLCAST_FAILED_QUIET", "UNIT_SPELLCAST_INTERRUPTED"
+}
+RefreshCastEvents = function()
+    local fear = settings.enabled and provider == "ClassicAPI"
+    local resurrection = resSettings.enabled and resProvider == "ClassicAPI"
+    local i
+    for i = 1, table.getn(castEvents) do
+        local name = castEvents[i]
+        local required = fear or resurrection
+        if name == "UNIT_SPELLCAST_START" then
+            required = resurrection
+        end
+        if required then pcall(eventFrame.RegisterEvent, eventFrame, name)
+        else pcall(eventFrame.UnregisterEvent, eventFrame, name) end
+    end
+    if fear or resurrection then
+        eventFrame:RegisterEvent("PLAYER_ENTERING_WORLD")
+    else
+        eventFrame:UnregisterEvent("PLAYER_ENTERING_WORLD")
+    end
+    eventFrame:SetScript("OnUpdate",
+        resurrection and TickResRecipients or nil)
+end
+-- Probing cast API registration does not activate scanning by itself.
+RefreshCastEvents()
+
 eventFrame:SetScript("OnEvent", function()
     if event == "VARIABLES_LOADED" then
         LoadSettings()
+        RefreshCastEvents()
         return
     end
 
@@ -1196,8 +1238,7 @@ end)
 
 -- Recipient names from ClassicAPI's server cast data can arrive after
 -- START. Only unresolved, already-started Resurrection casts are polled.
-eventFrame:SetScript("OnUpdate", function()
-    if resProvider == "ClassicAPI" and resSettings.enabled then
-        UpdateResurrectionRecipients()
-    end
-end)
+TickResRecipients = function()
+    UpdateResurrectionRecipients()
+end
+RefreshCastEvents()

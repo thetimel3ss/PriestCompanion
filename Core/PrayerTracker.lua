@@ -73,6 +73,8 @@ local innerFocusBlockNext = false
 local provider = "unavailable"
 local lastCastGUID = nil
 local ConfigureManaProvider = nil
+local RefreshTrackingEvents
+local ScanSpellbook
 
 for key, value in pairs(DEFAULTS) do
     settings[key] = value
@@ -191,11 +193,18 @@ function Tracker.SetOption(key, value)
         return false
     end
 
-    if key == "enabled" and talentPoints < 1 then
+    if key == "enabled" and value == true and talentPoints < 1 then
+        Tracker.ScanTalents()
+    end
+    if key == "enabled" and value == true and talentPoints < 1 then
         return false
     end
 
     SaveOption(key, value == true)
+    if key == "enabled" and RefreshTrackingEvents then
+        if value == true and ScanSpellbook then ScanSpellbook() end
+        RefreshTrackingEvents()
+    end
 
     if key == "showManaRefund" then
         -- A setting toggle must not replay already-received mana packets.
@@ -436,7 +445,7 @@ local function GetSpellFamily(name)
     return nil
 end
 
-local function ScanSpellbook()
+ScanSpellbook = function()
     if type(GetNumSpellTabs) ~= "function"
     or type(GetSpellTabInfo) ~= "function"
     or type(GetSpellName) ~= "function"
@@ -824,7 +833,8 @@ ConfigureManaProvider = function()
         return
     end
 
-    local requested = settings.showManaRefund and talentPoints > 0
+    local requested = settings.enabled and settings.showManaRefund
+        and talentPoints > 0
 
     if requested then
         if not nampowerEnergizeRegistered then
@@ -933,6 +943,44 @@ eventFrame:RegisterEvent("PLAYER_LEVEL_UP")
 eventFrame:RegisterEvent("PLAYER_REGEN_ENABLED")
 eventFrame:RegisterEvent("PLAYER_REGEN_DISABLED")
 
+local trackerMonitorEvents = {
+    "PLAYER_ENTERING_WORLD", "CHARACTER_POINTS_CHANGED",
+    "SPELLS_CHANGED", "PLAYER_LEVEL_UP",
+    "PLAYER_REGEN_ENABLED", "PLAYER_REGEN_DISABLED"
+}
+local trackerCastEvents = {
+    "UNIT_SPELLCAST_SUCCEEDED", "UNIT_SPELLCAST_SENT",
+    "UNIT_SPELLCAST_FAILED", "UNIT_SPELLCAST_FAILED_QUIET",
+    "UNIT_SPELLCAST_INTERRUPTED", "SPELL_CAST_EVENT", "UNIT_CASTEVENT"
+}
+RefreshTrackingEvents = function()
+    local active = settings.enabled == true
+    local casts = active and talentPoints > 0
+    local i
+    for i = 1, table.getn(trackerMonitorEvents) do
+        local name = trackerMonitorEvents[i]
+        if active then eventFrame:RegisterEvent(name)
+        else eventFrame:UnregisterEvent(name) end
+    end
+    for i = 1, table.getn(trackerCastEvents) do
+        local name = trackerCastEvents[i]
+        local required = casts and (
+            (provider == "ClassicAPI"
+                and string.find(name, "UNIT_SPELLCAST", 1, true) ~= nil)
+            or (provider == "Nampower" and name == "SPELL_CAST_EVENT")
+            or (provider == "SuperWoW" and name == "UNIT_CASTEVENT"))
+        if required then pcall(eventFrame.RegisterEvent, eventFrame, name)
+        else pcall(eventFrame.UnregisterEvent, eventFrame, name) end
+    end
+    if not active then
+        pendingTalentRescan = nil
+        recentHeals, waitingRefunds = {}, {}
+        pendingCastCost = nil
+    end
+    if ConfigureManaProvider then ConfigureManaProvider() end
+end
+RefreshTrackingEvents()
+
 local function LoadSettings()
     PriestCompanionCharDB =
         PriestCompanionCharDB or {}
@@ -980,16 +1028,14 @@ local function LoadSettings()
         end
     end
 
-    if ConfigureManaProvider then
-        ConfigureManaProvider()
-    end
-
+    RefreshTrackingEvents()
     Notify()
 end
 
 eventFrame:SetScript(
     "OnUpdate",
     function()
+        if not settings.enabled then return end
         if pendingTalentRescan then
             pendingTalentRescan =
                 pendingTalentRescan - arg1
@@ -998,6 +1044,7 @@ eventFrame:SetScript(
                 pendingTalentRescan = nil
                 ScanSpellbook()
                 ScanBookOfPrayer()
+                RefreshTrackingEvents()
             end
         end
 
@@ -1033,9 +1080,10 @@ eventFrame:SetScript(
         end
 
         if event == "PLAYER_ENTERING_WORLD" then
+            if not settings.enabled then return end
             ScanSpellbook()
             ScanBookOfPrayer()
-            ConfigureManaProvider()
+            RefreshTrackingEvents()
             ScheduleTalentRescan()
             Notify()
             return
@@ -1044,6 +1092,7 @@ eventFrame:SetScript(
         if event == "CHARACTER_POINTS_CHANGED"
         or event == "PLAYER_LEVEL_UP" then
             ScanBookOfPrayer()
+            RefreshTrackingEvents()
             ScheduleTalentRescan()
             return
         end
@@ -1051,6 +1100,7 @@ eventFrame:SetScript(
         if event == "SPELLS_CHANGED" then
             ScanSpellbook()
             ScanBookOfPrayer()
+            RefreshTrackingEvents()
             ScheduleTalentRescan()
             return
         end
@@ -1124,3 +1174,13 @@ eventFrame:SetScript(
         end
     end
 )
+
+-- Retain the existing timer callback but install it only while enabled.
+local trackingTick = eventFrame:GetScript("OnUpdate")
+local updateTrackingEvents = RefreshTrackingEvents
+RefreshTrackingEvents = function()
+    updateTrackingEvents()
+    eventFrame:SetScript("OnUpdate",
+        settings.enabled and trackingTick or nil)
+end
+RefreshTrackingEvents()

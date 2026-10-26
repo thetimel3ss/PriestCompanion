@@ -2,10 +2,9 @@
 
 ## [Unreleased]
 
-### Testing / blocker — SavedVariables persistence (2026-10-26)
-- Maintainer confirmed both targeting-based and damage-only Aggro warnings work and do not spam on consecutive hits. Shield absorption behavior remains untested.
-- Maintainer reported that checkbox selections across Announcer **and Tools** all revert after `/reload`. This is a cross-module persistence blocker, not yet attributed to any single module. Existing save implementations and both TOC SavedVariables declarations were unchanged by the Aggro feature branch.
-- Investigate saved-table sentinel preservation across `/reload` and the actual per-character `WTF/.../SavedVariables/PriestCompanion.lua` file before touching functional settings code or merging into main.
+### Tested — Aggro warnings and RavenCraft session persistence (2026-10-26)
+- The maintainer confirmed both target-based and damage-only Aggro Warning work without repeated-hit spam. Full Power Word: Shield absorption remains untested.
+- One RavenCraft session temporarily failed to preserve checkbox settings across Announcer and Tools after `/reload`; a test SavedVariable also returned `nil`. **After restarting RavenCraft**, changing addon options and using `/reload` persisted successfully again. The issue is no longer reproducible in the current session and is **not considered an active blocker**. No code was changed for persistence; investigate further only if it reappears.
 
 ### Added — Damage-only Aggro Warning option (2026-10-26; in-game testing pending)
 - Added a per-character **Only after taking damage** checkbox directly below Aggro Warning. Default is off (original target-based aggro behavior remains unchanged); Reset to Defaults also clears this option.

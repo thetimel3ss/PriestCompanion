@@ -49,6 +49,8 @@ local aggroHits = 0
 local aggroMisses = 0
 local lastAggroAlert = nil
 local aggroElapsed = 0
+local eventFrame
+local UpdateActivityEvents
 -- Pair a hostile combat-log hit with a real player health decrease.
 -- They may arrive in either order on Vanilla.
 local lastObservedHealth = nil
@@ -395,6 +397,7 @@ local function LoadSettings()
     end
     loaded = true
     Rebaseline()
+    UpdateActivityEvents()
     UpdatePolling()
 end
 
@@ -413,6 +416,7 @@ function Aggro.SetOption(key, value)
     end
     SaveSettings()
     Rebaseline()
+    UpdateActivityEvents()
     UpdatePolling()
     return true
 end
@@ -446,25 +450,49 @@ function Aggro.ResetDefaults()
     settings = NewSettings()
     SaveSettings()
     Rebaseline()
+    UpdateActivityEvents()
     UpdatePolling()
 end
 
-local eventFrame = CreateFrame("Frame")
+eventFrame = CreateFrame("Frame")
 eventFrame:RegisterEvent("VARIABLES_LOADED")
-eventFrame:RegisterEvent("PLAYER_ENTERING_WORLD")
-eventFrame:RegisterEvent("PLAYER_REGEN_DISABLED")
-eventFrame:RegisterEvent("PLAYER_REGEN_ENABLED")
-eventFrame:RegisterEvent("UNIT_HEALTH")
-eventFrame:RegisterEvent("UNIT_MAXHEALTH")
--- Vanilla combat-log events for incoming creature/PvP attacks. Misses,
--- resists and absorbs alone do not pass the required health-loss check.
-eventFrame:RegisterEvent("CHAT_MSG_COMBAT_CREATURE_VS_SELF_HITS")
-eventFrame:RegisterEvent("CHAT_MSG_SPELL_CREATURE_VS_SELF_DAMAGE")
-eventFrame:RegisterEvent("CHAT_MSG_COMBAT_HOSTILEPLAYER_HITS")
-eventFrame:RegisterEvent("CHAT_MSG_SPELL_HOSTILEPLAYER_DAMAGE")
-eventFrame:RegisterEvent("PLAYER_DEAD")
-eventFrame:RegisterEvent("PLAYER_ALIVE")
-eventFrame:RegisterEvent("PLAYER_UNGHOST")
+local aggroEvents = {
+    "PLAYER_REGEN_DISABLED", "PLAYER_REGEN_ENABLED",
+    "CHAT_MSG_COMBAT_CREATURE_VS_SELF_HITS",
+    "CHAT_MSG_SPELL_CREATURE_VS_SELF_DAMAGE",
+    "CHAT_MSG_COMBAT_HOSTILEPLAYER_HITS",
+    "CHAT_MSG_SPELL_HOSTILEPLAYER_DAMAGE"
+}
+UpdateActivityEvents = function()
+    local active = loaded and settings.enabled
+    local aggroActiveNow = active and settings.aggroEnabled
+    local healthActive = active and (settings.nearEnabled
+        or (aggroActiveNow and settings.damageOnly))
+    local lifeActive = active and (settings.deathEnabled
+        or settings.nearEnabled or settings.aggroEnabled)
+    local function Switch(name, enable)
+        if enable then
+            eventFrame:RegisterEvent(name)
+        else
+            eventFrame:UnregisterEvent(name)
+        end
+    end
+    Switch("PLAYER_ENTERING_WORLD", active)
+    Switch("UNIT_HEALTH", healthActive)
+    Switch("UNIT_MAXHEALTH", healthActive)
+    Switch("PLAYER_DEAD", lifeActive)
+    Switch("PLAYER_ALIVE", lifeActive)
+    Switch("PLAYER_UNGHOST", lifeActive)
+    local i
+    for i = 1, table.getn(aggroEvents) do
+        local name = aggroEvents[i]
+        local needed = aggroActiveNow
+        if string.find(name, "CHAT_MSG_", 1, true) then
+            needed = aggroActiveNow and settings.damageOnly
+        end
+        Switch(name, needed)
+    end
+end
 eventFrame:SetScript("OnEvent", function()
     if event == "VARIABLES_LOADED" then
         LoadSettings()

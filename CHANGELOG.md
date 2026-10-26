@@ -2,6 +2,12 @@
 
 ## [Unreleased]
 
+### Changed — Opt-in event monitoring (2026-10-26; needs in-game acceptance)
+- Aggro subscribes only to events required by active Aggro, Near Death and Death toggles; the 0.75s target scan stays off in damage-only/disabled modes.
+- Mana subscribes to mana/zone/combat events only when its master Enable and at least one warning are active; disabled modules retain only the settings-load event.
+- Resurrection Assistant now has a persisted master Enable (default on for backwards compatibility) to stop all roster/death/addon monitoring and hide the HUD when off, separately from Show Resurrection button.
+- This is a first-stage core change; opt-in behavior and cross-module regression checks need live testing.
+
 ### Changed — Damage-only option dependency (2026-10-26)
 - **Only after taking damage** can be selected only when **Aggro Warning** is checked. If Aggro Warning is off, the dependent checkbox and its clickable text area are disabled and the label turns red; reenabling Aggro Warning restores the original interaction and color.
 - Existing character-specific selection is retained while the parent is disabled, so the original preference returns when Aggro Warning is re-enabled. The master Enable and runtime alert behavior are unchanged.

@@ -20,6 +20,18 @@ local initialized = false
 local revision = 0
 local listeners = {}
 local rebuildingRoster = false
+local events
+local UpdateActivityEvents
+-- Preserve the previously active Assistant for existing characters.
+-- Unlike showButton (HUD visibility), enabled controls all monitoring.
+local function IsEnabled()
+    local db = type(PriestCompanionCharDB) == "table"
+        and PriestCompanionCharDB.resurrectionAssistant
+    return type(db) ~= "table" or db.enabled ~= false
+end
+function Assistant.GetEnabled()
+    return IsEnabled()
+end
 
 local function Notify()
     revision = revision + 1
@@ -107,6 +119,26 @@ function Assistant.ResetButtonScale()
     Assistant.SetButtonScale(1)
 end
 
+function Assistant.SetEnabled(value)
+    local db = Options()
+    if not db then return end
+    local enabled = value and true or false
+    if IsEnabled() == enabled then return end
+    db.enabled = enabled
+    if not enabled then
+        rosterByUnit = {}
+        rosterByName = {}
+        incoming = {}
+        initialized = false
+    end
+    if UpdateActivityEvents then UpdateActivityEvents() end
+    if enabled then
+        Assistant.RefreshRoster()
+    else
+        Notify()
+    end
+end
+
 function Assistant.GetButtonEnabled()
     local db = Options()
     return db == nil or db.showButton ~= false
@@ -153,7 +185,7 @@ local function CombatBlocked()
 end
 
 local function CanConsiderPlayers()
-    if CombatBlocked() then
+    if not IsEnabled() or CombatBlocked() then
         return false
     end
     if type(UnitIsDeadOrGhost) == "function"
@@ -316,7 +348,7 @@ local function UpdateUnit(unit)
 end
 
 function Assistant.RefreshRoster()
-    if CombatBlocked() then
+    if not IsEnabled() or CombatBlocked() then
         return false
     end
     local newUnits, newNames = {}, {}
@@ -422,7 +454,7 @@ local function CopyCandidate(data)
 end
 
 function Assistant.IsPaused()
-    return CombatBlocked()
+    return not IsEnabled() or CombatBlocked()
 end
 
 function Assistant.GetRevision()
@@ -523,6 +555,9 @@ end
 
 function Assistant.TryResurrect()
     -- Called only from a player's UI click. Never from OnEvent/OnUpdate.
+    if not IsEnabled() then
+        return false, "Resurrection Assistant is disabled."
+    end
     if not CanConsiderPlayers() then
         return false, "Resurrection is unavailable during combat."
     end
@@ -617,6 +652,9 @@ function Assistant.TryResurrect()
 end
 
 function Assistant.GetSummary()
+    if not IsEnabled() then
+        return { paused = true, reason = "disabled" }
+    end
     if CombatBlocked() then
         return { paused = true, reason = "combat" }
     end
@@ -656,9 +694,11 @@ function Assistant.PrintStatus()
     local head = "|cff66ccffPriest Companion Resurrection:|r "
     local summary = Assistant.GetSummary()
     if summary.paused then
-        local reason = summary.reason == "combat"
-            and "paused during combat"
-            or "unavailable while your character is dead"
+        local reason = summary.reason == "disabled"
+            and "disabled in Options > Tools"
+            or (summary.reason == "combat"
+                and "paused during combat"
+                or "unavailable while your character is dead")
         DEFAULT_CHAT_FRAME:AddMessage(head .. reason .. ".")
         return
     end
@@ -745,27 +785,48 @@ local function OnRemoteResurrectionStart(unit, spellID, spellName)
     end
 end
 
-local events = CreateFrame("Frame")
-events:RegisterEvent("PLAYER_ENTERING_WORLD")
-events:RegisterEvent("PLAYER_TARGET_CHANGED")
-events:RegisterEvent("PLAYER_REGEN_DISABLED")
-events:RegisterEvent("PLAYER_REGEN_ENABLED")
-events:RegisterEvent("PARTY_MEMBERS_CHANGED")
-events:RegisterEvent("RAID_ROSTER_UPDATE")
-events:RegisterEvent("UNIT_HEALTH")
-events:RegisterEvent("UNIT_FLAGS")
-events:RegisterEvent("PARTY_MEMBER_ENABLE")
-events:RegisterEvent("PARTY_MEMBER_DISABLE")
-events:RegisterEvent("CHAT_MSG_ADDON")
-events:RegisterEvent("PLAYER_ALIVE")
-events:RegisterEvent("PLAYER_UNGHOST")
-
-if PC.Capabilities and PC.Capabilities.classicAPISupported then
-    pcall(events.RegisterEvent, events, "UNIT_SPELLCAST_START")
-    pcall(events.RegisterEvent, events, "UNIT_SPELLCAST_INTERRUPTED")
+events = CreateFrame("Frame")
+local regularEvents = {
+    "PLAYER_ENTERING_WORLD", "PLAYER_TARGET_CHANGED",
+    "PLAYER_REGEN_DISABLED", "PLAYER_REGEN_ENABLED",
+    "PARTY_MEMBERS_CHANGED", "RAID_ROSTER_UPDATE",
+    "UNIT_HEALTH", "UNIT_FLAGS", "PARTY_MEMBER_ENABLE",
+    "PARTY_MEMBER_DISABLE", "CHAT_MSG_ADDON",
+    "PLAYER_ALIVE", "PLAYER_UNGHOST"
+}
+local classicEvents = {
+    "UNIT_SPELLCAST_START", "UNIT_SPELLCAST_INTERRUPTED"
+}
+UpdateActivityEvents = function()
+    local active = IsEnabled()
+    local i
+    for i = 1, table.getn(regularEvents) do
+        if active then
+            events:RegisterEvent(regularEvents[i])
+        else
+            events:UnregisterEvent(regularEvents[i])
+        end
+    end
+    for i = 1, table.getn(classicEvents) do
+        local name = classicEvents[i]
+        if active and PC.Capabilities
+        and PC.Capabilities.classicAPISupported then
+            pcall(events.RegisterEvent, events, name)
+        else
+            pcall(events.UnregisterEvent, events, name)
+        end
+    end
 end
+-- Per-character SavedVariables are ready before PLAYER_ENTERING_WORLD;
+-- delay subscribing until then to honor disabled saved preferences.
+events:RegisterEvent("VARIABLES_LOADED")
 
 events:SetScript("OnEvent", function()
+    if event == "VARIABLES_LOADED" then
+        UpdateActivityEvents()
+        return
+    end
+    if not IsEnabled() then return end
     if event == "PLAYER_REGEN_DISABLED" then
         inCombat = true
         Notify()

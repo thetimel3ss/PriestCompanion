@@ -36,6 +36,8 @@ local function NewSettings()
 end
 
 local settings = NewSettings()
+local eventFrame
+local UpdateActivityEvents
 
 local lastAnnouncement = nil
 local lastKind = nil
@@ -288,6 +290,7 @@ local function LoadSettings()
     end
     loaded = true
     Baseline()
+    UpdateActivityEvents()
 end
 
 function Mana.GetOption(key)
@@ -311,6 +314,7 @@ function Mana.SetOption(key, value)
     end
     SaveSettings()
     Rebaseline()
+    UpdateActivityEvents()
     return true
 end
 
@@ -362,22 +366,33 @@ function Mana.ResetDefaults()
     settings = NewSettings()
     SaveSettings()
     Rebaseline()
+    UpdateActivityEvents()
 end
 
 function Mana.GetStatus()
     return lastMana, lastMaxMana
 end
 
-local eventFrame = CreateFrame("Frame")
+eventFrame = CreateFrame("Frame")
 eventFrame:RegisterEvent("VARIABLES_LOADED")
-eventFrame:RegisterEvent("PLAYER_ENTERING_WORLD")
-eventFrame:RegisterEvent("UNIT_MANA")
-eventFrame:RegisterEvent("UNIT_MAXMANA")
-eventFrame:RegisterEvent("PLAYER_REGEN_ENABLED")
-eventFrame:RegisterEvent("PLAYER_REGEN_DISABLED")
-eventFrame:RegisterEvent("PLAYER_DEAD")
-eventFrame:RegisterEvent("PLAYER_ALIVE")
-eventFrame:RegisterEvent("PLAYER_UNGHOST")
+local monitoredEvents = {
+    "PLAYER_ENTERING_WORLD", "UNIT_MANA", "UNIT_MAXMANA",
+    "PLAYER_REGEN_ENABLED", "PLAYER_REGEN_DISABLED",
+    "PLAYER_DEAD", "PLAYER_ALIVE", "PLAYER_UNGHOST"
+}
+UpdateActivityEvents = function()
+    -- The initial settings load is the only event needed while disabled.
+    local enabled = loaded and settings.enabled
+        and (settings.lowEnabled or settings.oomEnabled)
+    local i
+    for i = 1, table.getn(monitoredEvents) do
+        if enabled then
+            eventFrame:RegisterEvent(monitoredEvents[i])
+        else
+            eventFrame:UnregisterEvent(monitoredEvents[i])
+        end
+    end
+end
 eventFrame:SetScript("OnEvent", function()
     if event == "VARIABLES_LOADED" then
         LoadSettings()

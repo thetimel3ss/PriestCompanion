@@ -118,6 +118,15 @@ All 28 records have `source.note`: 21 world-drop-style entries with `"World drop
 
 ## Next steps
 
+### Opt-in monitoring and expandable Guides (feature/aggro-announcer)
+
+- [x] Gate Aggro events by individual warning toggles (health-only for Near Death, death/revival for enabled survival announcements, combat logs only for damage-based Aggro), with polling disabled when Aggro Warning is off.
+- [x] Stop Mana event subscriptions entirely when master Enable is off (or both warnings off), retaining its startup settings loader.
+- [x] Resurrection Assistant adds independent master Enable (default on to preserve existing behavior); stop roster/death/combat/addon-event subscriptions and hide HUD while off. Existing Show Resurrection button remains a visibility-only choice.
+- [ ] Validate dynamic registrations after /reload, disabling and reenabling during combat, switching each option without stale announcements, preserving all saved values.
+- [ ] Verify Fear Ward/Resurrection cast subscriptions and Tracker provider monitoring are stopped when disabled.
+- [ ] Rename main Wands tab to a broader Guides section (retain internal wand routing and data).
+
 ### Aggro / Survival Announcer — initial implementation (`feature/aggro-announcer`)
 
 - [x] Branch from tested `feature/mana-announcer` without touching `main` or rewriting Mana functionality.

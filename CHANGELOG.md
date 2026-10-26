@@ -5,6 +5,7 @@
 ### Validated — Shield Tracker in-game checks (2026-10-26)
 - Maintainer reports the visual and functional checks passed, learned values persist, and controls persist. The `~` marker remains intentional: each learned value came from a previous shield, so modifiers may differ on a later cast.
 - Provider compatibility matrix remains pending.
+- Live test of the newly added shield-from-another-priest path remains pending.
 
 ### Changed — Shield Tracker learning and hover behavior (2026-10-26)
 - Track PW: Shield applied to the player by another priest, using the observed rank and caster GUID. Save learned capacities separately for the local player and each observed caster/rank so one priest's value cannot seed another priest's estimate.

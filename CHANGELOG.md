@@ -2,31 +2,24 @@
 
 ## [Unreleased]
 
-### Fixed — Tracker menu state without talent (2026-10-26)
-- Tracker's default saved Enable is true, but actual tracking requires Book of Prayer talent points. The minimap menu now follows the options page: without points its row is unchecked/red even if Enable is saved true. Opening Tools refreshes talent eligibility on demand, including after a respec while disabled; no background timer is added.
-- Preserve default/saved settings and existing left-click/core activation guards. No core tracking or refund behavior changed.
-- Maintainer confirmed submenu functionality and saved state survive /reload. Local syntax/TOC and mocked regression checks passed, including saved Enable=true with zero talent points and eligibility changes without overwriting the saved preference. The corrected first-open/no-talent indication still requires an in-game retest.
+## [0.5.0] - 2026-10-26
 
-### Changed — Minimap module submenus (2026-10-26)
-- Announcer and Tools now show hover submenus with arrows. Announcer lists Fear Ward, Resurrection, Mana and Aggro; Tools lists Resurrection Assistant and Book of Prayer Tracker.
-- Left-click toggles the existing module Enable through its core setter; check marks and gold/red captions reflect the saved state. Right-click opens that module's settings without toggling. ClassicAPI requirements for enabling cast announcements and the Tracker's talent validation are preserved.
-- Rename General options to General; remove Lock minimap position from the menu. Position lock remains available in General, and the launcher tooltip now points there.
-- Use isolated Vanilla menu buttons for separate left/right actions, without modifying Blizzard dropdown rows shared with other addons. Click outside, Close or Escape dismisses the menu; idle menus run no OnUpdate.
-- Local Lua 5.4 syntax, TOC and mocked hover/submenu, all six toggle/settings routes, state marks, provider/talent restrictions and launcher regression checks passed. Pending in-game validation of submenu hover, arrows, all six toggles/settings shortcuts, HUD cleanup, availability restrictions and saved values across /reload.
+### Added
+- Priest-icon minimap launcher: left-click opens/closes Priest Companion, right-click opens a quick access menu, and dragging repositions the button around the circular minimap. No optional libraries or client extensions required; OnUpdate runs only during dragging.
+- Announcer and Tools hover submenus with arrows. Announcer offers Fear Ward, Resurrection, Mana and Aggro; Tools offers Resurrection Assistant and Book of Prayer Tracker. Left-click toggles the existing module Enable, with checked/gold or unchecked/red state; right-click opens its settings. Guides and General have direct menu entries.
+- General controls for launcher visibility, position reset and position lock. Settings persist account-wide in PriestCompanionDB.minimap; /pc options recovers a hidden button. Locked position still permits normal clicks and explicit reset.
+- Isolated menu buttons support both mouse buttons without changing Blizzard dropdown rows shared by other addons. Escape, Close and clicking outside dismiss the menu.
 
-### Added — Minimap quick access and position lock (2026-10-26)
-- Right-click now opens a native menu for Guides, Announcer, Resurrection Assistant, Book of Prayer Tracker and General options. Tool shortcuts open the selected options page without enabling or casting anything.
-- Add account-wide Lock position in both the menu and General. Locked dragging cannot reposition or accidentally open the addon; normal clicks, explicit position reset and visibility remain available. Tooltip explains the menu and current lock state.
-- Maintainer confirmed the original minimap button works correctly in game. Local Lua 5.4 syntax, TOC and mocked menu-route/lock/drag/reload checks passed. New menu navigation and lock persistence still require in-game checks.
+### Fixed
+- Book of Prayer menu state requires talent points as well as saved Enable, matching the options page. Tools hover refreshes eligibility on demand, including after a disabled-period respec. Existing saved preferences, talent/provider guards and core tracking behavior remain unchanged.
 
-### Documentation — Commit and push workflow (2026-10-26)
-- Record standing maintainer authorization to commit and push every completed change to its working branch, preserving history and access from other machines. Main merges and releases still require explicit approval. Added persistent AGENTS.md instructions.
+### Validated
+- Maintainer confirmed the launcher, submenu actions and /reload persistence work, then confirmed the no-talent Tracker indication fix. Final checks passed for Escape/outside dismissal, position locking while retaining clicks, and recovery of a hidden button through /pc options.
+- Local Lua 5.4 syntax, TOC loading and mocked menu routes, all six toggles, provider/talent restrictions, state indicators, scaled dragging and persistence checks passed. These checks do not assert universal compatibility with other minimap addons or shapes.
+- Maintainer authorized closing v0.5.0 and integrating into main. Circular minimaps are the current supported shape; other shapes are outside this release scope.
 
-### Added — Minimap launcher (feature/minimap-button, 2026-10-26)
-- Native Vanilla button with the Priest class icon: left-click toggles the addon, right-click opens Options > General, and dragging moves around the circular minimap. No libraries or client extensions required; OnUpdate exists only during dragging.
-- Account-wide visibility and position persist in PriestCompanionDB.minimap. General adds Show minimap button and Reset minimap position controls. Hidden launchers remain recoverable through /pc options.
-- Local checks passed: Lua 5.4 syntax, both TOC manifests and mocked clicks, scaled dragging, drag click suppression, idle ticker removal, visibility/position reload and reset. These are not Vanilla in-game tests.
-- Pending in-game testing: Priest texture, clicks and drag without accidental opening, position/visibility after /reload and relog, reset, UI scaling and interactions with minimap addons. Not released or merged into main.
+### Documentation
+- Added persistent AGENTS.md workflow: use feature branches and commit/push each completed change; main merges and releases require maintainer authorization. Consolidated the completed minimap work and validation in this release entry.
 
 ## [0.4.1] - 2026-10-26
 

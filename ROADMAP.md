@@ -3,10 +3,10 @@
 The roadmap tracks outstanding improvements and ongoing verification. Released functionality belongs in [CHANGELOG.md](CHANGELOG.md), not here.
 
 **Review date:** 2026-10-26
-**Current release:** `0.4.1`
+**Current release:** `0.5.0`
 **Future development:** each new feature gets its own branch from `main`; implement and test there before an explicitly authorized merge into `main`.
 
-**Release decision (2026-10-26):** maintainer authorized v0.4.0 and integration into main. Remaining open checks are follow-up verification, not a claim of executed tests or a current merge hold.
+**Release decision (2026-10-26):** maintainer confirmed the minimap tests passed and authorized closing v0.5.0 and integration into main. Historical checks for unrelated modules remain separate follow-up work.
 
 ## Current scope and confirmed decisions
 
@@ -287,14 +287,7 @@ Wand Progression / Source Details, filters, reputation and maps are complete for
 ### Later capabilities (scope and feasibility to be assessed)
 
 - [ ] Add more configurable settings to Options → General / Advanced later (quest-history preferences, optional integrations, reset and UI settings). General now includes minimap visibility/reset controls; Book of Prayer settings live under Tools. Restore quest-history diagnostics elsewhere in a future feature.
-- [x] Initial native minimap launcher implemented on feature/minimap-button with the Priest icon, left/right clicks, drag position, saved visibility and General controls.
-- [x] **Maintainer confirmation (2026-10-26):** original minimap button works correctly in game; individual compatibility cases were not separately reported.
-- [x] Add native right-click shortcuts to Guides, Announcer, both Tools pages and General; add account-wide position lock in menu and General.
-- [x] Group module shortcuts under Announcer/Tools hover submenus with arrows; left-click toggles each core Enable and right-click opens its settings. General is renamed and position lock remains only in General.
-- [x] **Maintainer validation (2026-10-26):** submenu actions work correctly and changes persist across /reload.
-- [x] Correct Tracker menu check/color to require talent points as well as saved Enable; refresh talent eligibility on Tools hover without adding idle monitoring.
-- [ ] **Tracker menu retest:** with saved/default Enable true and no Book of Prayer points, Tools shows Tracker unchecked/red after login or /reload; with points, saved Enable displays normally. Confirm right-click still opens options and left-click cannot enable without the talent.
-- [ ] **Minimap acceptance:** test submenu hover/arrows, all six module left-click toggles/right-click settings with addon open and closed, checked/colored state, provider/talent restrictions, HUD cleanup, menu dismissal, General lock/unlock, blocked drag without opening, ordinary clicks while locked, /reload/relog state persistence, General visibility/reset and changed UI/minimap scale. Circular minimap placement is the initial supported shape; test compatibility with minimap addons before expanding shape support. Release and merge require maintainer approval.
+- [x] **Minimap launcher — complete, v0.5.0:** Priest icon, Guides/General access, Announcer/Tools hover submenus, left-click module Enable/right-click settings, saved visibility/position/lock and talent-aware Tracker indication. Maintainer confirmed functional, /reload and final dismissal/lock/recovery checks passed. Implementation and validation are recorded in [CHANGELOG.md](CHANGELOG.md). Circular minimaps are the current scope; other shapes and third-party compatibility require a future explicit request.
 - [ ] Priest skills database.
 - [ ] Talent builds.
 - [ ] Best-in-slot lists.

@@ -2,6 +2,11 @@
 
 ## [Unreleased]
 
+### Testing / blocker — SavedVariables persistence (2026-10-26)
+- Maintainer confirmed both targeting-based and damage-only Aggro warnings work and do not spam on consecutive hits. Shield absorption behavior remains untested.
+- Maintainer reported that checkbox selections across Announcer **and Tools** all revert after `/reload`. This is a cross-module persistence blocker, not yet attributed to any single module. Existing save implementations and both TOC SavedVariables declarations were unchanged by the Aggro feature branch.
+- Investigate saved-table sentinel preservation across `/reload` and the actual per-character `WTF/.../SavedVariables/PriestCompanion.lua` file before touching functional settings code or merging into main.
+
 ### Added — Damage-only Aggro Warning option (2026-10-26; in-game testing pending)
 - Added a per-character **Only after taking damage** checkbox directly below Aggro Warning. Default is off (original target-based aggro behavior remains unchanged); Reset to Defaults also clears this option.
 - In damage-only mode, receive Vanilla creature/hostile-player hit notifications and pair them with a real reduction in the player's health within one second, regardless of event order. Avoid alarms on unconfirmed combat log damage, dodges, full absorbs and fall damage alone; periodic DoTs by themselves do not imply fresh aggro.

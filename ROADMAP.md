@@ -127,6 +127,7 @@ All 28 records have `source.note`: 21 world-drop-style entries with `"World drop
 - [x] Fear Ward and Resurrection cast subscriptions now follow each announcer's Enable checkbox. The Resurrection recipient-resolution ticker stops when disabled; Fear Ward's independently enabled overwrite prevention remains unaffected.
 - [x] Book of Prayer Tracker unsubscribes cast-provider events and optional Nampower refund integration, and removes its periodic OnUpdate when disabled. Re-enabling rescans talents and spellbook.
 - [x] Resurrection Assistant now exposes a master Enable above Show Resurrection button, saving its state per character (default on for existing users), halting roster monitoring and hiding HUD while off. Other options stay saved and are visually disabled while off.
+- [x] Resynchronize combat state when Aggro, Mana or Resurrection Assistant is re-enabled after an interval with no combat-event listeners; Tracker rescans the current talent when enabled after a possible disabled-period respec.
 - [ ] **In-game regression:** verify toggle-off/no-scan and resume-after-enable for all announcers and tools, HUD preview / click behavior, saved options through /reload and recovery from disabled during combat.
 - [x] Rename the main Wands tab to **Guides**, preserving the `wands` internal route and the existing Wand Progression view. Future nested tabs can offer BiS lists, consumables and enchants.
 

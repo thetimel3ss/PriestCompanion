@@ -193,7 +193,8 @@ function Tracker.SetOption(key, value)
         return false
     end
 
-    if key == "enabled" and value == true and talentPoints < 1 then
+    if key == "enabled" and value == true then
+        -- A respec could occur during the disabled period.
         Tracker.ScanTalents()
     end
     if key == "enabled" and value == true and talentPoints < 1 then

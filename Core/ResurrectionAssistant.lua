@@ -133,6 +133,12 @@ function Assistant.SetEnabled(value)
     end
     if UpdateActivityEvents then UpdateActivityEvents() end
     if enabled then
+        -- REGEN transitions were not observed while master Enable was off.
+        if type(UnitAffectingCombat) == "function" then
+            inCombat = UnitAffectingCombat("player") and true or false
+        else
+            inCombat = false
+        end
         Assistant.RefreshRoster()
     else
         Notify()

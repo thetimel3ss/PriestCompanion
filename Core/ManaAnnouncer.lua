@@ -313,6 +313,10 @@ function Mana.SetOption(key, value)
         settings[key] = value and true or false
     end
     SaveSettings()
+    -- Recover current combat state when enabling after disabled periods.
+    if type(UnitAffectingCombat) == "function" then
+        inCombat = UnitAffectingCombat("player") and true or false
+    end
     Rebaseline()
     UpdateActivityEvents()
     return true

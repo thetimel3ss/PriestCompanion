@@ -415,6 +415,10 @@ function Aggro.SetOption(key, value)
         settings[key] = value and true or false
     end
     SaveSettings()
+    -- Combat events may have been unsubscribed while disabled.
+    if type(UnitAffectingCombat) == "function" then
+        inCombat = UnitAffectingCombat("player") and true or false
+    end
     Rebaseline()
     UpdateActivityEvents()
     UpdatePolling()

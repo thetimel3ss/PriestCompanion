@@ -1,5 +1,5 @@
 -- Priest Companion - Options > Tools.
--- Match Announcer: native sub-tabs, two ScrollFrames born under this panel.
+-- Match Announcer: native sub-tabs, independent ScrollFrames born under this panel.
 
 local PC = PriestCompanion
 local parent = PC.UI.OptionsContent
@@ -51,17 +51,18 @@ local assistantTab = CreateToolTab(
 local trackerTab = CreateToolTab(
     2, "Book of Prayer Tracker", assistantTab, "tracker"
 )
+local shieldTab = CreateToolTab(3, "Shield Tracker", trackerTab, "shield")
 -- A client/font with unusually wide native tabs gets shorter titles;
 -- never force SetWidth after PanelTemplates_TabResize.
-if assistantTab:GetWidth() + trackerTab:GetWidth() > 410 then
+if assistantTab:GetWidth() + trackerTab:GetWidth() + shieldTab:GetWidth() > 410 then
     trackerTab:SetText("Book of Prayer")
     PanelTemplates_TabResize(0, trackerTab)
 end
-if assistantTab:GetWidth() + trackerTab:GetWidth() > 410 then
+if assistantTab:GetWidth() + trackerTab:GetWidth() + shieldTab:GetWidth() > 410 then
     assistantTab:SetText("Resurrection")
     PanelTemplates_TabResize(0, assistantTab)
 end
-PanelTemplates_SetNumTabs(subTabs, 2)
+PanelTemplates_SetNumTabs(subTabs, 3)
 PanelTemplates_SetTab(subTabs, 1)
 
 --------------------------------------------------
@@ -89,6 +90,10 @@ local trackerScroll, trackerChild = CreateToolScroll(
     "PriestCompanionAdvancedScroll", 505
 )
 trackerScroll:Hide()
+local shieldScroll, shieldChild = CreateToolScroll("PriestCompanionShieldOptionsScroll", 410)
+shieldScroll:Hide()
+PC.UI.ShieldTrackerOptionsPanel = shieldScroll
+PC.UI.ToolsShieldContent = shieldChild
 
 PC.UI.ResurrectionAssistantOptionsPanel = assistantScroll
 PC.UI.PrayerTrackerOptionsPanel = trackerScroll
@@ -96,10 +101,17 @@ PC.UI.ToolsAssistantContent = assistantChild
 PC.UI.ToolsTrackerContent = trackerChild
 
 function panel.SelectSubTab(id)
-    if id ~= "tracker" then id = "resurrection" end
+    if id ~= "tracker" and id ~= "shield" then id = "resurrection" end
     panel.ActiveSubTab = id
+    if id ~= "shield" then shieldScroll:Hide() end
 
-    if id == "tracker" then
+    if id == "shield" then
+        assistantScroll:Hide()
+        trackerScroll:Hide()
+        shieldScroll:Show()
+        PanelTemplates_SetTab(subTabs, 3)
+        if type(shieldScroll.Refresh) == "function" then shieldScroll.Refresh() end
+    elseif id == "tracker" then
         assistantScroll:Hide()
         trackerScroll:Show()
         PanelTemplates_SetTab(subTabs, 2)
@@ -135,4 +147,5 @@ panel:SetScript("OnHide", function()
     -- Inactive scroll pages run their own Preview cleanup handlers.
     assistantScroll:Hide()
     trackerScroll:Hide()
+    shieldScroll:Hide()
 end)

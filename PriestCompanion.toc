@@ -29,6 +29,7 @@ Core\Announcer.lua
 Core\ManaAnnouncer.lua
 Core\AggroAnnouncer.lua
 Core\ResurrectionAssistant.lua
+Core\ShieldTracker.lua
 
 UI\OptionState.lua
 UI\MainFrame.lua
@@ -45,4 +46,5 @@ UI\ResurrectionAssistantOptionsPanel.lua
 UI\PrayerTrackerOptionsPanel.lua
 UI\ResurrectionAssistant.lua
 UI\PrayerTracker.lua
+UI\ShieldTracker.lua
 UI\MinimapButton.lua

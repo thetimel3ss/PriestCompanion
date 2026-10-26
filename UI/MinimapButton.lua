@@ -170,7 +170,10 @@ local entries = {
               return modules.PrayerTracker.GetOption("enabled")
                   and modules.PrayerTracker.GetTalentPoints() > 0
           end,
-          set = function(v) modules.PrayerTracker.SetOption("enabled", v) end }
+          set = function(v) modules.PrayerTracker.SetOption("enabled", v) end },
+        { text = "Shield Tracker", page = "shield",
+          get = function() return modules.ShieldTracker.GetOption("enabled") end,
+          set = function(v) modules.ShieldTracker.SetOption("enabled", v) end }
     }
 }
 local function MenuRow(parent, text, y, width)

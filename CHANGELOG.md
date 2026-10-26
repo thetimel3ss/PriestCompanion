@@ -2,6 +2,13 @@
 
 ## [Unreleased]
 
+### Added — Shield Tracker prototype (2026-10-26)
+- Add opt-in Tools > Shield Tracker and minimap toggle/settings shortcut for PW: Shield received by the player. Movable HUD shows duration and either an explicit ~ base-rank estimate or unknown absorption; no casting or external libraries.
+- Prefer one provider: ClassicAPI combat log, Nampower >=4.5 structured events, SuperWoW English log, or Vanilla aura/time-only fallback. No process-global CVars changed. Disable removes subscriptions, timer and preview; per-character Enable/Lock/position persist.
+- Unknown capacity for external/unobserved casts, overlapping known possible absorbs and exhausted estimates. Base numbers exclude talents, gear and custom-server modifiers. No runtime shield values persisted.
+- Local checks passed: Lua 5.4 syntax and TOC order; mocked provider priority/isolation, damage/full-absorb offsets, uncertain/external/competing capacity, mid-shield enable/death cleanup, saved options and Tools navigation/Enable/preview cleanup. Test harnesses remain local and are not included in the repository. Minimap toggle/settings regressions also passed locally. These do not replace Vanilla in-game tests.
+- Pending in-game checks: own/external shields, damage/full absorbs, duration/removal, reload/mid-shield enable, optional-provider combinations, Tools/minimap controls and preview/lock/reset. Feature branch only; version remains 0.5.0 until release approval.
+
 ## [0.5.0] - 2026-10-26
 
 ### Added

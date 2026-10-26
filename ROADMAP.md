@@ -123,6 +123,12 @@ All 28 records have `source.note`: 21 world-drop-style entries with `"World drop
 
 ## Next steps
 
+### Shield Tracker prototype (`feature/shield-tracker`)
+
+- [x] Implement opt-in self PW: Shield HUD, aura/time display, ~ base-rank estimates or unknown capacity, single-provider adapters and Tools/minimap integration. No required extension or casting behavior.
+- [ ] Maintainer tests: Vanilla/ClassicAPI/Nampower >=4.5/SuperWoW and mixed stacks; all available ranks, self/other priest shields, physical/spell/periodic/full-absorb damage, overlapping absorbs, expiry/death, reload and enable mid-shield. Check Enable persistence, locked drag/reset, preview cleanup and minimap actions. Base estimates intentionally omit talent/gear/server modifiers.
+- [ ] Release/version/merge only after explicit maintainer approval. Outgoing/group shields and multiple-shield attribution are outside the first prototype.
+
 ### Enable visual feedback — complete, v0.4.1 (2026-10-26)
 
 Inactive Enable captions are red and Book of Prayer uses Enable. Maintainer authorized closing this feature and merging into main. Existing runtime monitoring and saved settings remain unchanged; no further acceptance task is scheduled for this feature.

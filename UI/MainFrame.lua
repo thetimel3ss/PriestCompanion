@@ -211,7 +211,9 @@ local function CreateMainTab(id, label, index, previous)
     return tab
 end
 
-local wandsTab = CreateMainTab("wands", "Wands", 1)
+-- Guides is the future home for Wands, BiS, consumables and enchants.
+-- Keep the existing "wands" ID so links and navigation stay compatible.
+local wandsTab = CreateMainTab("wands", "Guides", 1)
 CreateMainTab("options", "Options", 2, wandsTab)
 
 -- The Blizzard tab controller manages active/pressed visuals,

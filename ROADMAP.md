@@ -124,8 +124,11 @@ All 28 records have `source.note`: 21 world-drop-style entries with `"World drop
 - [x] Stop Mana event subscriptions entirely when master Enable is off (or both warnings off), retaining its startup settings loader.
 - [x] Resurrection Assistant adds independent master Enable (default on to preserve existing behavior); stop roster/death/combat/addon-event subscriptions and hide HUD while off. Existing Show Resurrection button remains a visibility-only choice.
 - [ ] Validate dynamic registrations after /reload, disabling and reenabling during combat, switching each option without stale announcements, preserving all saved values.
-- [ ] Verify Fear Ward/Resurrection cast subscriptions and Tracker provider monitoring are stopped when disabled.
-- [ ] Rename main Wands tab to a broader Guides section (retain internal wand routing and data).
+- [x] Fear Ward and Resurrection cast subscriptions now follow each announcer's Enable checkbox. The Resurrection recipient-resolution ticker stops when disabled; Fear Ward's independently enabled overwrite prevention remains unaffected.
+- [x] Book of Prayer Tracker unsubscribes cast-provider events and optional Nampower refund integration, and removes its periodic OnUpdate when disabled. Re-enabling rescans talents and spellbook.
+- [x] Resurrection Assistant now exposes a master Enable above Show Resurrection button, saving its state per character (default on for existing users), halting roster monitoring and hiding HUD while off. Other options stay saved and are visually disabled while off.
+- [ ] **In-game regression:** verify toggle-off/no-scan and resume-after-enable for all announcers and tools, HUD preview / click behavior, saved options through /reload and recovery from disabled during combat.
+- [x] Rename the main Wands tab to **Guides**, preserving the `wands` internal route and the existing Wand Progression view. Future nested tabs can offer BiS lists, consumables and enchants.
 
 ### Aggro / Survival Announcer — initial implementation (`feature/aggro-announcer`)
 

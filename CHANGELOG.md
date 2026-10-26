@@ -6,7 +6,11 @@
 - Aggro subscribes only to events required by active Aggro, Near Death and Death toggles; the 0.75s target scan stays off in damage-only/disabled modes.
 - Mana subscribes to mana/zone/combat events only when its master Enable and at least one warning are active; disabled modules retain only the settings-load event.
 - Resurrection Assistant now has a persisted master Enable (default on for backwards compatibility) to stop all roster/death/addon monitoring and hide the HUD when off, separately from Show Resurrection button.
-- This is a first-stage core change; opt-in behavior and cross-module regression checks need live testing.
+- Fear Ward and Resurrection subscribe to ClassicAPI cast events only while their own Enable options are active; the Resurrection unresolved-recipient ticker is suspended while disabled. Fear Ward overwrite prevention stays independent.
+- Book of Prayer Tracker unsubscribes cast events and Nampower mana-energy reporting, restores optional legacy CVar and removes the OnUpdate callback when disabled; re-enabling scans talents and spells again.
+- Added a master **Enable** to Resurrection Assistant (default on for backwards compatibility). When off, roster scanning and HUD state are disabled; other options are non-interactive but keep their saved settings, including the independent Show Resurrection button preference.
+- Main **Wands** tab now displays **Guides** as an umbrella for planned BiS, consumable and enchantment tabs. Existing `wands` routing and progression data are untouched.
+- **In-game testing pending** for the new conditional subscription and options behavior; no merge to main.
 
 ### Changed — Damage-only option dependency (2026-10-26)
 - **Only after taking damage** can be selected only when **Aggro Warning** is checked. If Aggro Warning is off, the dependent checkbox and its clickable text area are disabled and the label turns red; reenabling Aggro Warning restores the original interaction and color.

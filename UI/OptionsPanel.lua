@@ -200,7 +200,7 @@ local flavorLabel = CreateLabel(
 
 CreateLabel(
     general,
-    "The Wands tab contains item progression and acquisition details.",
+    "Guides currently contains Wand Progression and acquisition details.",
     18,
     -137,
     385

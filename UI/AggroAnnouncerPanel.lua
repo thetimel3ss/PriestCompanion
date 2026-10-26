@@ -69,53 +69,82 @@ Label("Alerts about your own aggro, low health and death.", 14, 35, 355)
 Checkbox("PriestCompanionAggroEnable", "Enable", 14, 63,
     function() return aggro.GetOption("enabled") end,
     function(v) aggro.SetOption("enabled", v) end,
-    "Enable these announcements. Disabled by default.")
-Checkbox("PriestCompanionAggroWarning", "Aggro Warning", 14, 99,
+    "Master switch for all three alerts: Aggro Warning, " ..
+    "Near Death and Death Announcement. Disabled by default.")
+Checkbox("PriestCompanionAggroWarning", "Aggro Warning", 14, 102,
     function() return aggro.GetOption("aggroEnabled") end,
     function(v) aggro.SetOption("aggroEnabled", v) end,
-    "Announce when a hostile unit is confirmed targeting you in combat. " ..
-    "Uses 0.75-second checks and requires two confirmations.")
-Checkbox("PriestCompanionAggroNearDeath", "Near Death", 204, 99,
-    function() return aggro.GetOption("nearEnabled") end,
-    function(v) aggro.SetOption("nearEnabled", v) end,
-    "Announce when your health drops below its configured percentage.", 150)
-Checkbox("PriestCompanionAggroDamageOnly", "Only after taking damage", 14, 134,
+    "Announce aggro when a hostile unit targets you in combat. " ..
+    "With Only after taking damage checked, alert only after a " ..
+    "confirmed incoming hit reduces your health.", 145)
+Checkbox("PriestCompanionAggroDamageOnly",
+    "Only after taking damage", 192, 102,
     function() return aggro.GetOption("damageOnly") end,
     function(v) aggro.SetOption("damageOnly", v) end,
-    "Unchecked: warn when a hostile target aims at you (target-of-target). " ..
-    "Checked: warn only after hostile combat-log damage and a real " ..
-    "health decrease. Absorbed or avoided hits do not warn. " ..
-    "Neither mode requires selecting the enemy yourself.", 180)
-Checkbox("PriestCompanionAggroDeath", "Death Announcement", 14, 170,
+    "Unchecked: warn when a hostile target aims at you. " ..
+    "Checked: warn only after hostile damage reduces your health. " ..
+    "Fully absorbed or avoided attacks do not warn. " ..
+    "Requires Enable and Aggro Warning.", 166)
+Checkbox("PriestCompanionAggroNearDeath", "Near Death", 14, 139,
+    function() return aggro.GetOption("nearEnabled") end,
+    function(v) aggro.SetOption("nearEnabled", v) end,
+    "Announce when your health falls to the configured threshold. " ..
+    "Rearm only after recovering more than 15 percentage " ..
+    "points above it. Aggro cooldown does not apply.", 145)
+Checkbox("PriestCompanionAggroDeath", "Death Announcement", 192, 139,
     function() return aggro.GetOption("deathEnabled") end,
     function(v) aggro.SetOption("deathEnabled", v) end,
-    "Announce once on PLAYER_DEAD. Independent of Near Death.", 180)
+    "Announce once when you die, independently of Aggro " ..
+    "Warning and Near Death.", 166)
 
-Label("Near Death health threshold", 14, 220, 345, "GameFontNormalSmall")
+Label("Announcement channels (multiple selections allowed)",
+    14, 183, 355, "GameFontNormalSmall")
+local channels = {
+    { "SAY", "Say", 14, 209 },
+    { "PARTY", "Party", 204, 209 },
+    { "RAID", "Raid", 14, 239 },
+    { "SELF", "Self (local chat)", 204, 239 },
+    { "YELL", "Yell", 14, 269 }
+}
+local i
+for i = 1, table.getn(channels) do
+    local row = channels[i]
+    local channel = row[1]
+    Checkbox("PriestCompanionAggroChannel" .. channel, row[2],
+        row[3], row[4],
+        function() return aggro.GetChannel(channel) end,
+        function(v) aggro.SetChannel(channel, v) end,
+        "Unavailable Party/Raid channels are skipped. Self " ..
+        "prints locally and does not send a chat message.")
+end
+
+Label("Near Death health threshold", 14, 314, 345, "GameFontNormalSmall")
 local healthSlider = CreateFrame(
     "Slider", "PriestCompanionAggroHealthThreshold", child,
     "OptionsSliderTemplate")
 healthSlider:SetWidth(194)
 healthSlider:SetHeight(17)
-healthSlider:SetPoint("TOPLEFT", child, "TOPLEFT", 25, -248)
+healthSlider:SetPoint("TOPLEFT", child, "TOPLEFT", 25, -343)
 healthSlider:SetMinMaxValues(1, 99)
 if type(healthSlider.SetValueStep) == "function" then
     healthSlider:SetValueStep(1)
 end
-local healthValue = Label("", 232, 246, 115)
+local healthValue = Label("", 232, 341, 115)
+Label("Rearms after recovery above threshold + 15 points.",
+    14, 372, 355)
 
-Label("Aggro announcement cooldown", 14, 295, 340, "GameFontNormalSmall")
+Label("Aggro announcement cooldown", 14, 405, 340, "GameFontNormalSmall")
 local cooldownSlider = CreateFrame(
     "Slider", "PriestCompanionAggroCooldown", child,
     "OptionsSliderTemplate")
 cooldownSlider:SetWidth(194)
 cooldownSlider:SetHeight(17)
-cooldownSlider:SetPoint("TOPLEFT", child, "TOPLEFT", 25, -323)
+cooldownSlider:SetPoint("TOPLEFT", child, "TOPLEFT", 25, -433)
 cooldownSlider:SetMinMaxValues(5, 120)
 if type(cooldownSlider.SetValueStep) == "function" then
     cooldownSlider:SetValueStep(1)
 end
-local cooldownValue = Label("", 232, 321, 115)
+local cooldownValue = Label("", 232, 431, 115)
 local syncing = false
 healthSlider:SetScript("OnValueChanged", function()
     if syncing then return end
@@ -141,31 +170,11 @@ end)
 healthSlider:SetScript("OnLeave", HideTooltip)
 cooldownSlider:SetScript("OnEnter", function()
     Tooltip(this, "Aggro cooldown",
-        "Minimum delay between new aggro warnings. In damage-only " ..
-        "mode, damage from one continuous attack does not spam.")
+        "Applies only to Aggro Warning; Near Death and Death are " ..
+        "independent. In damage-only mode, continuous damage " ..
+        "does not spam even when cooldown expires.")
 end)
 cooldownSlider:SetScript("OnLeave", HideTooltip)
-
-Label("Announcement channels (multiple selections allowed)",
-    14, 361, 355, "GameFontNormalSmall")
-local channels = {
-    { "SAY", "Say", 14, 384 },
-    { "PARTY", "Party", 204, 384 },
-    { "RAID", "Raid", 14, 414 },
-    { "SELF", "Self (local chat)", 204, 414 },
-    { "YELL", "Yell", 14, 444 }
-}
-local i
-for i = 1, table.getn(channels) do
-    local row = channels[i]
-    local channel = row[1]
-    Checkbox("PriestCompanionAggroChannel" .. channel, row[2],
-        row[3], row[4],
-        function() return aggro.GetChannel(channel) end,
-        function(v) aggro.SetChannel(channel, v) end,
-        "Unavailable Party/Raid channels are skipped. Self " ..
-        "prints locally and does not send a chat message.")
-end
 
 local editors = {}
 local function MessageEditor(kind, y, title)
@@ -247,11 +256,11 @@ local function MessageEditor(kind, y, title)
     }
     Restore()
 end
-MessageEditor("aggro", 487, "Aggro message")
-MessageEditor("near", 606, "Near Death message")
-MessageEditor("death", 725, "Death message")
+MessageEditor("aggro", 479, "Aggro message")
+MessageEditor("near", 598, "Near Death message")
+MessageEditor("death", 717, "Death message")
 Label("Default changes drafts; Save persists. Previews are not sent.",
-    14, 848, 355)
+    14, 841, 355)
 
 local POPUP = "PRIEST_COMPANION_RESET_AGGRO_ANNOUNCER"
 StaticPopupDialogs[POPUP] = {
@@ -278,7 +287,7 @@ local resetButton = CreateFrame(
     child, "UIPanelButtonTemplate")
 resetButton:SetWidth(160)
 resetButton:SetHeight(24)
-resetButton:SetPoint("TOPLEFT", child, "TOPLEFT", 200, -882)
+resetButton:SetPoint("TOPLEFT", child, "TOPLEFT", 200, -875)
 resetButton:SetText("Reset to Defaults")
 resetButton:SetScript("OnClick", function()
     StaticPopup_Show(POPUP)

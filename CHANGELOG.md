@@ -2,6 +2,11 @@
 
 ## [Unreleased]
 
+### Fixed — Tracker menu state without talent (2026-10-26)
+- Tracker's default saved Enable is true, but actual tracking requires Book of Prayer talent points. The minimap menu now follows the options page: without points its row is unchecked/red even if Enable is saved true. Opening Tools refreshes talent eligibility on demand, including after a respec while disabled; no background timer is added.
+- Preserve default/saved settings and existing left-click/core activation guards. No core tracking or refund behavior changed.
+- Maintainer confirmed submenu functionality and saved state survive /reload. Local syntax/TOC and mocked regression checks passed, including saved Enable=true with zero talent points and eligibility changes without overwriting the saved preference. The corrected first-open/no-talent indication still requires an in-game retest.
+
 ### Changed — Minimap module submenus (2026-10-26)
 - Announcer and Tools now show hover submenus with arrows. Announcer lists Fear Ward, Resurrection, Mana and Aggro; Tools lists Resurrection Assistant and Book of Prayer Tracker.
 - Left-click toggles the existing module Enable through its core setter; check marks and gold/red captions reflect the saved state. Right-click opens that module's settings without toggling. ClassicAPI requirements for enabling cast announcements and the Tracker's talent validation are preserved.

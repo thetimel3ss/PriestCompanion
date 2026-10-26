@@ -166,6 +166,10 @@ local entries = {
           set = function(v) modules.ResurrectionAssistant.SetEnabled(v) end },
         { text = "Book of Prayer Tracker", page = "tracker",
           get = function() return modules.PrayerTracker.GetOption("enabled") end,
+          checked = function()
+              return modules.PrayerTracker.GetOption("enabled")
+                  and modules.PrayerTracker.GetTalentPoints() > 0
+          end,
           set = function(v) modules.PrayerTracker.SetOption("enabled", v) end }
     }
 }
@@ -184,7 +188,10 @@ local function MenuRow(parent, text, y, width)
 end
 local subRows = {}
 local function RefreshRow(row)
-    if row.entry.get() then
+    local enabled
+    if row.entry.checked then enabled = row.entry.checked()
+    else enabled = row.entry.get() end
+    if enabled then
         row.check:Show()
         row.label:SetTextColor(1, 0.82, 0.20)
     else
@@ -193,6 +200,9 @@ local function RefreshRow(row)
     end
 end
 local function ShowSubmenu(section, owner)
+    -- Disabled trackers do not scan talents in the background. Refresh only
+    -- on deliberate Tools navigation, as the full Tools options page does.
+    if section == "tools" then modules.PrayerTracker.ScanTalents() end
     local list = entries[section]
     local i
     for i = 1, table.getn(subRows) do subRows[i]:Hide() end

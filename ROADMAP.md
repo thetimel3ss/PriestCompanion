@@ -125,13 +125,14 @@ All 28 records have `source.note`: 21 world-drop-style entries with `"World drop
 
 ### Shield Tracker prototype (`feature/shield-tracker`)
 
-- [x] Implement opt-in self PW: Shield HUD, aura/time display, ~ base-rank estimates or unknown capacity, single-provider adapters and Tools/minimap integration. No required extension or casting behavior.
+- [x] Implement opt-in player PW: Shield HUD, aura/time display, ~ rank/caster estimates or unknown capacity, single-provider adapters and Tools/minimap integration. No required extension or casting behavior.
 - [x] Restyle HUD as a compact ShieldBuddy-like horizontal bar with icon, centered values and duration; keep usage and estimate guidance in the Shield Tracker options page.
-- [x] Learn a per-character per-rank capacity from an observed self-cast shield after a recent damaging hit and aura removal, with no known competing absorb; use it to refine later estimates. The client does not identify the removal cause, so near-simultaneous expiry/dispel cases need validation.
+- [x] Learn per-rank capacity from an observed shield after a recent damaging hit and aura removal, with no known competing absorb; keep local and external caster values separate. Narrow the correlation window, skip removals near known expiry, and cancel learning on explicit dispel events. Very close expiry or unavailable dispel events remain ambiguous.
+- [ ] Group-target tracking: observe PW: Shield on party/raid members and render independent target rows; track only when caster, target, and absorbed amounts can be safely correlated.
 - [x] Visual acceptance: maintainer reports bar, countdown, unknown/preview states, tooltip removal and retained options-page guidance passed in game.
 - [x] Basic functionality, learned-value persistence and control persistence confirmed by the maintainer.
-- [ ] Compatibility and remaining cases: Vanilla/ClassicAPI/Nampower >=4.5/SuperWoW and mixed stacks; all available ranks, self/other priest shields, physical/spell/periodic/full-absorb damage, overlapping absorbs, break-and-learn followed by reload and a later cast, expiry/dispel shortly after a hit, death, and enable mid-shield. Check locked drag/reset, preview cleanup and minimap actions. Base/learned values may differ if talent, gear or server modifiers change.
-- [ ] Release/version/merge only after explicit maintainer approval. Outgoing/group shields and multiple-shield attribution are outside the first prototype.
+- [ ] Compatibility and remaining cases: Vanilla/ClassicAPI/Nampower >=4.5/SuperWoW and mixed stacks; all available ranks, own/other-priest shields on the player, physical/spell/periodic/full-absorb damage, overlapping absorbs, break-and-learn separately for local and external casters followed by reload and later casts, expiry/dispel shortly after a hit, death, and enable mid-shield. Check locked drag/reset, preview cleanup and minimap actions. Base/learned values may differ if talent, gear or server modifiers change.
+- [ ] Release/version/merge only after explicit maintainer approval. Tracking shields on group-member targets and attributing multiple shield types are outside this increment.
 
 ### Enable visual feedback — complete, v0.4.1 (2026-10-26)
 

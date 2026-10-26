@@ -7,8 +7,10 @@
 - Provider compatibility matrix remains pending.
 
 ### Changed — Shield Tracker learning and hover behavior (2026-10-26)
-- Learn a per-character, per-rank capacity after a recent damaging hit and shield removal, when no known competing absorb is active. Reuse that observed value for future estimates; modifiers can still change between casts. The client does not report the aura-removal cause, so an expiry or dispel immediately after a hit may be misclassified; verify this edge case in game.
+- Track PW: Shield applied to the player by another priest, using the observed rank and caster GUID. Save learned capacities separately for the local player and each observed caster/rank so one priest's value cannot seed another priest's estimate.
+- Narrow learning to an aura removal shortly after an absorbed damaging hit, skip removals near the known expiry, and cancel learning on explicit ClassicAPI/Nampower dispel events. The client still does not report every aura-removal cause; very close expiry or unavailable dispel events can remain ambiguous.
 - Remove the HUD hover tooltip. Keep provider, estimate caveats, learning conditions and other guidance on the Options > Tools > Shield Tracker page.
+- Local Lua mocks pass for caster-isolated estimates, per-caster persistence, dispel/near-expiry guards and existing provider/UI regressions. Live-provider and external-caster behavior still need in-game validation.
 
 ### Changed — Shield Tracker countdown precision (2026-10-26)
 - Display the remaining shield duration to three decimal places and turn it red below 5 seconds. Refresh the visible countdown at roughly 10ms intervals while a timed shield is active; pending cast confirmation keeps its slower aura polling.

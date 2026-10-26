@@ -117,7 +117,7 @@ local function Label(text, x, y, width, font)
     return label
 end
 Label("Shield Tracker (prototype)", 14, 12, 355, "GameFontNormal")
-Label("Tracks Power Word: Shield received by your own character.", 14, 38)
+Label("Tracks Power Word: Shield on you, whether cast by you or another Priest.", 14, 38)
 local function Checkbox(name, text, y, key)
     local check = CreateFrame("CheckButton", name, child, "UICheckButtonTemplate")
     check:SetWidth(24)
@@ -145,9 +145,9 @@ Label("A gray bar means the shield is present, but its remaining absorption is u
     14, 179)
 Label("~ values start from the rank's base amount, or a learned value from a previous shield break. Talents, gear and OctoWoW modifiers can still change the result.",
     14, 225)
-Label("External shields, casts missed during reload, and other possible absorption effects use unknown amounts. This prototype does not track shields on other players.",
+Label("Casts missed during reload remain unknown. Other possible absorbs may make the amount unknown. This version does not track shields on party or raid members.",
     14, 283)
-Label("Learning uses a recent damaging hit plus shield removal, with no known competing absorb. A very close expiry or dispel may be indistinguishable from a break.",
+Label("Learning uses a recent damaging hit plus shield removal, with no known competing absorb. A very close expiry may be indistinguishable from a break; dispels are excluded when their event is available.",
     14, 330)
 local previewButton = CreateFrame("Button", nil, child, "UIPanelButtonTemplate")
 previewButton:SetWidth(145)

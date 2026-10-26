@@ -1,15 +1,15 @@
--- Self Power Word: Shield prototype. No cast automation or external libraries.
+-- Player Power Word: Shield tracker. No cast automation or external libraries.
 local PC = PriestCompanion
 local Tracker = {}
 PC.Modules.ShieldTracker = Tracker
 local frame = CreateFrame("Frame")
-local settings = { enabled = false, locked = false, x = 0, y = -220, learned = {} }
+local settings = { enabled = false, locked = false, x = 0, y = -220, learned = {}, learnedByCaster = {} }
 local loaded = false
 local listeners = {}
 local provider = "Vanilla (presence only)"
 local state = { active = false }
 local pending
-local lastCastTime, lastCastID
+local lastCastTime, lastCastKey
 local elapsed = 0
 local UpdateSubscriptions, RefreshAura, UpdateTicker
 local shieldIcon = "spell_holy_powerwordshield"
@@ -19,10 +19,6 @@ local baseAbsorb = {
     [6065] = 301, [6066] = 381, [10898] = 484,
     [10899] = 605, [10900] = 763, [10901] = 942
 }
-local function GetCapacity(id)
-    id = tonumber(id)
-    return (settings.learned and settings.learned[id]) or baseAbsorb[id]
-end
 local competingIcons = {
     "spell_ice_lament", "spell_shadow_detectlesserinvisibility",
     "spell_fire_firearmor", "spell_frost_frostward",
@@ -61,6 +57,16 @@ end
 local function IsPlayer(guid)
     local player = PlayerGUID()
     return player ~= nil and player == NormalizeGUID(guid)
+end
+local function GetLearnedCapacity(id, caster)
+    id, caster = tonumber(id), NormalizeGUID(caster)
+    if not id then return nil end
+    if IsPlayer(caster) then return settings.learned and settings.learned[id] end
+    return caster and settings.learnedByCaster and settings.learnedByCaster[caster]
+        and settings.learnedByCaster[caster][id] or nil
+end
+local function GetCapacity(id, caster)
+    return GetLearnedCapacity(id, caster) or baseAbsorb[tonumber(id)]
 end
 local function IsShield(id, icon)
     return baseAbsorb[tonumber(id)] ~= nil
@@ -123,15 +129,46 @@ local function Unknown(reason)
     state.remaining, state.maximum = nil, nil
     state.reason = reason
 end
-local function FinishShield()
+local function CommitShieldRemoval()
     local candidate = state.breakCandidate
+    local now = GetTime()
+    local removalTime = state.removalObservedAt or now
+    local comfortablyBeforeExpiry = candidate
+        and (not state.expiresAt or state.expiresAt - candidate.time > 0.5)
     if candidate and state.learnable and state.spellID and candidate.amount > 0
-    and GetTime() - candidate.time <= 1 then
-        settings.learned = settings.learned or {}
-        settings.learned[state.spellID] = candidate.amount
-        Save()
+    and removalTime - candidate.time <= 0.25 and comfortablyBeforeExpiry then
+        local caster = NormalizeGUID(state.casterGUID)
+        if IsPlayer(caster) then
+            settings.learned = settings.learned or {}
+            settings.learned[state.spellID] = candidate.amount
+            Save()
+        elseif caster then
+            settings.learnedByCaster = settings.learnedByCaster or {}
+            settings.learnedByCaster[caster] = settings.learnedByCaster[caster] or {}
+            settings.learnedByCaster[caster][state.spellID] = candidate.amount
+            Save()
+        end
     end
     state = { active = false }
+end
+local function FinishShield()
+    if not state.active then return end
+    local candidate = state.breakCandidate
+    local now = GetTime()
+    local recentHit = candidate and now - candidate.time <= 0.25
+    local awayFromExpiry = candidate and (not state.expiresAt or state.expiresAt - candidate.time > 0.5)
+    if not recentHit or not awayFromExpiry then
+        state = { active = false }
+        return
+    end
+    if not state.removalPendingAt then
+        state.removalObservedAt = now
+        state.removalPendingAt = now + 0.25
+        UpdateTicker()
+    end
+end
+local function ClearShieldWithoutLearning()
+    state, pending = { active = false }, nil
 end
 RefreshAura = function()
     if not settings.enabled then return end
@@ -145,6 +182,7 @@ RefreshAura = function()
     elseif not present then
         FinishShield()
     else
+        state.removalPendingAt = nil
         if not state.active then
             state = { active = true, reason = "Cast not observed / external shield" }
         end
@@ -154,18 +192,19 @@ RefreshAura = function()
         end
         state.expiresAt = expiry
         if pending and pending.untilTime >= GetTime() then
-            -- Only an observed own cast can seed the base-rank estimate.
-            if pending.own and not pending.uncertain then
+            -- A confirmed caster and rank allow a base or caster-specific estimate.
+            if not pending.uncertain then
                 state.spellID = pending.id
-                state.learnable = true
+                state.casterGUID = pending.casterGUID
+                state.learnable = pending.casterGUID ~= nil
                 state.absorbedTotal = 0
                 state.breakCandidate = nil
-                state.learnedCapacity = settings.learned and settings.learned[pending.id] ~= nil
-                state.maximum = GetCapacity(pending.id)
+                state.learnedCapacity = GetLearnedCapacity(pending.id, pending.casterGUID) ~= nil
+                state.maximum = GetCapacity(pending.id, pending.casterGUID)
                 state.remaining = state.maximum
                 state.reason = state.learnedCapacity
-                    and "Learned previous capacity; current modifiers may differ"
-                    or "Base-rank estimate; modifiers not included"
+                    and "Learned previous capacity; modifiers may differ"
+                    or "Rank base estimate; caster modifiers not included"
             else
                 state.learnable = false
                 Unknown("External shield or damage before aura confirmation")
@@ -185,10 +224,12 @@ local function ObserveCast(id, caster, target)
     if not IsShield(id) or not IsPlayer(target) then return end
     -- Nampower may report several aura effects for a single application.
     local now = GetTime()
-    if lastCastID == id and lastCastTime and now - lastCastTime < 0.15 then return end
-    lastCastID, lastCastTime = id, now
+    local casterGUID = NormalizeGUID(caster)
+    local castKey = tostring(id) .. ":" .. tostring(casterGUID) .. ":" .. tostring(NormalizeGUID(target))
+    if lastCastKey == castKey and lastCastTime and now - lastCastTime < 0.15 then return end
+    lastCastKey, lastCastTime = castKey, now
     if state.active then state.learnable, state.breakCandidate = false, nil end
-    pending = { id = id, own = IsPlayer(caster), untilTime = now + 1 }
+    pending = { id = id, casterGUID = casterGUID, untilTime = now + 1 }
     -- Do not seed against a previous aura until the aura update arrives.
     UpdateTicker()
 end
@@ -229,7 +270,7 @@ local function Absorb(amount, damageTaken)
     Notify()
 end
 UpdateTicker = function()
-    if settings.enabled and (pending or (state.active and state.expiresAt)) then
+    if settings.enabled and (pending or state.removalPendingAt or (state.active and state.expiresAt)) then
         frame:SetScript("OnUpdate", function()
             elapsed = elapsed + arg1
             -- Pending casts need only poll aura state at 10 Hz. Once active,
@@ -240,6 +281,10 @@ UpdateTicker = function()
             if pending then
                 if pending.untilTime < GetTime() then pending = nil; UpdateTicker()
                 else RefreshAura() end
+            elseif state.removalPendingAt then
+                if state.removalPendingAt <= GetTime() then
+                    CommitShieldRemoval(); UpdateTicker(); Notify()
+                else Notify() end
             elseif state.expiresAt and state.expiresAt <= GetTime() then RefreshAura()
             else Notify() end
         end)
@@ -248,7 +293,8 @@ end
 local commonEvents = { "PLAYER_AURAS_CHANGED", "UNIT_AURA", "PLAYER_ENTERING_WORLD", "PLAYER_DEAD" }
 local classicEvents = { "COMBAT_LOG_EVENT_UNFILTERED" }
 local nampowerEvents = { "AURA_CAST_ON_SELF", "AUTO_ATTACK_SELF", "AUTO_ATTACK_OTHER",
-    "SPELL_DAMAGE_EVENT_SELF", "SPELL_DAMAGE_EVENT_OTHER" }
+    "SPELL_DAMAGE_EVENT_SELF", "SPELL_DAMAGE_EVENT_OTHER", "BUFF_REMOVED_SELF",
+    "SPELL_DISPEL_BY_SELF", "SPELL_DISPEL_BY_OTHER" }
 local textEvents = { "CHAT_MSG_COMBAT_CREATURE_VS_SELF_HITS", "CHAT_MSG_SPELL_CREATURE_VS_SELF_DAMAGE",
     "CHAT_MSG_COMBAT_HOSTILEPLAYER_HITS", "CHAT_MSG_SPELL_HOSTILEPLAYER_DAMAGE",
     "CHAT_MSG_SPELL_PERIODIC_SELF_DAMAGE", "CHAT_MSG_COMBAT_SELF_HITS", "CHAT_MSG_SPELL_SELF_DAMAGE" }
@@ -306,7 +352,7 @@ function Tracker.SetOption(key, value)
     settings[key] = value and true or false
     Save()
     if key == "enabled" then
-        state, pending, lastCastID, lastCastTime = { active = false }, nil, nil, nil
+        state, pending, lastCastKey, lastCastTime = { active = false }, nil, nil, nil
         UpdateSubscriptions()
         if settings.enabled then RefreshAura() end
         UpdateTicker()
@@ -329,8 +375,12 @@ local function HandleClassic()
         ObserveCast(data[12], data[4], data[8])
         return
     end
-    if sub == "SPELL_AURA_REMOVED" and IsShield(data[12]) then
+    if sub == "SPELL_AURA_REMOVED" and IsShield(data[12])
+    and (not state.spellID or tonumber(data[12]) == tonumber(state.spellID)) then
         FinishShield(); UpdateTicker(); Notify(); return
+    end
+    if sub == "SPELL_DISPEL" and IsShield(data[15]) then
+        ClearShieldWithoutLearning(); UpdateTicker(); Notify(); return
     end
     if type(sub) ~= "string" then return end
     if string.find(sub, "_DAMAGE$", 1) or sub == "DAMAGE_SHIELD" or sub == "DAMAGE_SPLIT" then
@@ -363,6 +413,20 @@ frame:SetScript("OnEvent", function()
                     end
                 end
             end
+            if type(saved.learnedByCaster) == "table" then
+                for caster, ranks in pairs(saved.learnedByCaster) do
+                    local casterGUID = NormalizeGUID(caster)
+                    if casterGUID and type(ranks) == "table" then
+                        settings.learnedByCaster[casterGUID] = {}
+                        for id, value in pairs(ranks) do
+                            local spellId, capacity = tonumber(id), tonumber(value)
+                            if baseAbsorb[spellId] and capacity and capacity > 0 then
+                                settings.learnedByCaster[casterGUID][spellId] = math.floor(capacity)
+                            end
+                        end
+                    end
+                end
+            end
         end
         loaded = true; Save(); UpdateSubscriptions()
         if settings.enabled then RefreshAura() end
@@ -377,6 +441,12 @@ frame:SetScript("OnEvent", function()
     elseif event == "COMBAT_LOG_EVENT_UNFILTERED" then HandleClassic()
     elseif event == "UNIT_CASTEVENT" and arg3 == "CAST" then ObserveCast(arg4, arg1, arg2)
     elseif event == "AURA_CAST_ON_SELF" then ObserveCast(arg1, arg2, arg3)
+    elseif event == "BUFF_REMOVED_SELF" and IsPlayer(arg1) and IsShield(arg3)
+    and (not state.spellID or tonumber(arg3) == tonumber(state.spellID)) then
+        FinishShield(); UpdateTicker(); Notify()
+    elseif (event == "SPELL_DISPEL_BY_SELF" or event == "SPELL_DISPEL_BY_OTHER")
+    and IsPlayer(arg2) and IsShield(arg3) then
+        ClearShieldWithoutLearning(); UpdateTicker(); Notify()
     elseif event == "AUTO_ATTACK_SELF" or event == "AUTO_ATTACK_OTHER" then
         if IsPlayer(arg2) then Absorb(arg8, arg3) end
     elseif event == "SPELL_DAMAGE_EVENT_SELF" or event == "SPELL_DAMAGE_EVENT_OTHER" then

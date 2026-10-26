@@ -103,6 +103,14 @@ function panel.SelectSubTab(id)
         assistantScroll:Hide()
         trackerScroll:Show()
         PanelTemplates_SetTab(subTabs, 2)
+        -- With tracking disabled, no talent background scans run.
+        -- Refresh talent eligibility on deliberate navigation here,
+        -- allowing the Enable checkbox to recover after a respec.
+        local prayer = PC.Modules and PC.Modules.PrayerTracker
+        if prayer and not prayer.GetOption("enabled")
+        and type(prayer.ScanTalents) == "function" then
+            prayer.ScanTalents()
+        end
         if type(trackerScroll.Refresh) == "function" then
             trackerScroll.Refresh()
         end

@@ -2,6 +2,13 @@
 
 ## [Unreleased]
 
+### Changed — Minimap module submenus (2026-10-26)
+- Announcer and Tools now show hover submenus with arrows. Announcer lists Fear Ward, Resurrection, Mana and Aggro; Tools lists Resurrection Assistant and Book of Prayer Tracker.
+- Left-click toggles the existing module Enable through its core setter; check marks and gold/red captions reflect the saved state. Right-click opens that module's settings without toggling. ClassicAPI requirements for enabling cast announcements and the Tracker's talent validation are preserved.
+- Rename General options to General; remove Lock minimap position from the menu. Position lock remains available in General, and the launcher tooltip now points there.
+- Use isolated Vanilla menu buttons for separate left/right actions, without modifying Blizzard dropdown rows shared with other addons. Click outside, Close or Escape dismisses the menu; idle menus run no OnUpdate.
+- Local Lua 5.4 syntax, TOC and mocked hover/submenu, all six toggle/settings routes, state marks, provider/talent restrictions and launcher regression checks passed. Pending in-game validation of submenu hover, arrows, all six toggles/settings shortcuts, HUD cleanup, availability restrictions and saved values across /reload.
+
 ### Added — Minimap quick access and position lock (2026-10-26)
 - Right-click now opens a native menu for Guides, Announcer, Resurrection Assistant, Book of Prayer Tracker and General options. Tool shortcuts open the selected options page without enabling or casting anything.
 - Add account-wide Lock position in both the menu and General. Locked dragging cannot reposition or accidentally open the addon; normal clicks, explicit position reset and visibility remain available. Tooltip explains the menu and current lock state.

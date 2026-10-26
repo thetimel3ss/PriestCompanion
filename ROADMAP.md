@@ -290,7 +290,8 @@ Wand Progression / Source Details, filters, reputation and maps are complete for
 - [x] Initial native minimap launcher implemented on feature/minimap-button with the Priest icon, left/right clicks, drag position, saved visibility and General controls.
 - [x] **Maintainer confirmation (2026-10-26):** original minimap button works correctly in game; individual compatibility cases were not separately reported.
 - [x] Add native right-click shortcuts to Guides, Announcer, both Tools pages and General; add account-wide position lock in menu and General.
-- [ ] **Minimap acceptance:** test each menu destination with the addon open and closed, lock/unlock from both entry points, blocked drag without opening, ordinary clicks while locked, /reload/relog lock persistence, General visibility/reset and changed UI/minimap scale. Circular minimap placement is the initial supported shape; test compatibility with minimap addons before expanding shape support. Release and merge require maintainer approval.
+- [x] Group module shortcuts under Announcer/Tools hover submenus with arrows; left-click toggles each core Enable and right-click opens its settings. General is renamed and position lock remains only in General.
+- [ ] **Minimap acceptance:** test submenu hover/arrows, all six module left-click toggles/right-click settings with addon open and closed, checked/colored state, provider/talent restrictions, HUD cleanup, menu dismissal, General lock/unlock, blocked drag without opening, ordinary clicks while locked, /reload/relog state persistence, General visibility/reset and changed UI/minimap scale. Circular minimap placement is the initial supported shape; test compatibility with minimap addons before expanding shape support. Release and merge require maintainer approval.
 - [ ] Priest skills database.
 - [ ] Talent builds.
 - [ ] Best-in-slot lists.

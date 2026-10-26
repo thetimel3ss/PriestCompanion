@@ -45,3 +45,4 @@ UI\ResurrectionAssistantOptionsPanel.lua
 UI\PrayerTrackerOptionsPanel.lua
 UI\ResurrectionAssistant.lua
 UI\PrayerTracker.lua
+UI\MinimapButton.lua

@@ -230,7 +230,33 @@ CreateLabel(
     385
 )
 
+-- Account-wide launcher visibility; independent from module Enable settings.
+local minimapBox = CreateFrame("CheckButton", "PriestCompanionMinimapVisible",
+    general, "UICheckButtonTemplate")
+minimapBox:SetWidth(24)
+minimapBox:SetHeight(24)
+minimapBox:SetPoint("TOPLEFT", general, "TOPLEFT", 14, -290)
+local minimapLabel = CreateLabel(general, "Show minimap button", 44, -295, 220)
+minimapBox:SetScript("OnClick", function()
+    local launcher = PC.UI.MinimapButton
+    if launcher then
+        launcher.SetShownOption(this:GetChecked() == 1 or this:GetChecked() == true)
+    end
+end)
+local minimapReset = CreateFrame("Button", "PriestCompanionMinimapReset",
+    general, "UIPanelButtonTemplate")
+minimapReset:SetWidth(170)
+minimapReset:SetHeight(23)
+minimapReset:SetPoint("TOPLEFT", general, "TOPLEFT", 18, -326)
+minimapReset:SetText("Reset minimap position")
+minimapReset:SetScript("OnClick", function()
+    local launcher = PC.UI.MinimapButton
+    if launcher then launcher.ResetPosition() end
+end)
+
 function general.Refresh()
+    local launcher = PC.UI.MinimapButton
+    minimapBox:SetChecked((not launcher or launcher.GetShownOption()) and 1 or nil)
     versionLabel:SetText(
         "Addon Version: " ..
         tostring(PC.version or "unknown")

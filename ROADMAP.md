@@ -286,8 +286,9 @@ Wand Progression / Source Details, filters, reputation and maps are complete for
 
 ### Later capabilities (scope and feasibility to be assessed)
 
-- [ ] Add more configurable settings to Options → General / Advanced later (quest-history preferences, optional integrations, reset and UI settings). General is currently read-only; Advanced now contains Book of Prayer controls. Restore quest-history diagnostics elsewhere in a future feature.
-- [ ] Minimap launcher, initially using a Priest icon (maintainer choice, 2026-10-26). Implement and test on a dedicated feature branch before merge.
+- [ ] Add more configurable settings to Options → General / Advanced later (quest-history preferences, optional integrations, reset and UI settings). General now includes minimap visibility/reset controls; Book of Prayer settings live under Tools. Restore quest-history diagnostics elsewhere in a future feature.
+- [x] Initial native minimap launcher implemented on feature/minimap-button with the Priest icon, left/right clicks, drag position, saved visibility and General controls.
+- [ ] **Minimap acceptance:** test appearance in Vanilla, clicks, drag without opening, /reload/relog persistence, General visibility/reset and changed UI/minimap scale. Circular minimap placement is the initial supported shape; test compatibility with minimap addons before expanding shape support. Release and merge require maintainer approval.
 - [ ] Priest skills database.
 - [ ] Talent builds.
 - [ ] Best-in-slot lists.
@@ -299,6 +300,8 @@ Wand Progression / Source Details, filters, reputation and maps are complete for
 - [x] Complete the current OctoWoW Wand Progression item database (146 listed wands with corresponding items and sources).
 
 ## Documentation policy
+
+- **Commit/push policy (maintainer, 2026-10-26):** commit and push every completed change on its working branch so the history and current work remain available beyond this machine. This standing authorization does not authorize merging into main or publishing a new version without approval. Persistent repository instructions are in [AGENTS.md](AGENTS.md).
 
 - Versions use MAJOR.MINOR.PATCH: PATCH for fixes/text/small visual adjustments, MINOR for new features, MAJOR for a maturity milestone or major compatibility change. Keep the released version in both TOCs and the Lua fallback; development changes stay under Unreleased until release approval.
 - Work on a dedicated feature branch, implement and test, then version/commit/push and merge only with maintainer authorization. Delete implemented feature branches only after confirming their commits are incorporated into main.

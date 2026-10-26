@@ -2,6 +2,15 @@
 
 ## [Unreleased]
 
+### Documentation — Commit and push workflow (2026-10-26)
+- Record standing maintainer authorization to commit and push every completed change to its working branch, preserving history and access from other machines. Main merges and releases still require explicit approval. Added persistent AGENTS.md instructions.
+
+### Added — Minimap launcher (feature/minimap-button, 2026-10-26)
+- Native Vanilla button with the Priest class icon: left-click toggles the addon, right-click opens Options > General, and dragging moves around the circular minimap. No libraries or client extensions required; OnUpdate exists only during dragging.
+- Account-wide visibility and position persist in PriestCompanionDB.minimap. General adds Show minimap button and Reset minimap position controls. Hidden launchers remain recoverable through /pc options.
+- Local checks passed: Lua 5.4 syntax, both TOC manifests and mocked clicks, scaled dragging, drag click suppression, idle ticker removal, visibility/position reload and reset. These are not Vanilla in-game tests.
+- Pending in-game testing: Priest texture, clicks and drag without accidental opening, position/visibility after /reload and relog, reset, UI scaling and interactions with minimap addons. Not released or merged into main.
+
 ## [0.4.1] - 2026-10-26
 
 ### Release summary

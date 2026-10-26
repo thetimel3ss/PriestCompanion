@@ -2,6 +2,17 @@
 
 ## [Unreleased]
 
+## [0.4.1] - 2026-10-26
+
+### Release summary
+- Red inactive Enable captions across all six module pages; active captions remain gold. Book of Prayer Tracker now uses the same Enable label.
+- Runtime monitoring and dependent option locking are unchanged. Maintainer authorized closing this release and merging into main; no additional in-game test result is inferred from that authorization.
+
+### Changed — Enable visual feedback (2026-10-26)
+- Color inactive module Enable captions red in Fear Ward, Resurrection, Mana, Aggro, Resurrection Assistant and Book of Prayer Tracker; active captions use gold. Existing availability restrictions and dependent option locking remain intact.
+- Shorten Book of Prayer Tracker's Enable Tracker label to Enable. Runtime module settings and event monitoring are unchanged.
+- Syntax checks passed. Released by maintainer authorization; detailed visual/availability edge checks were not separately reported.
+
 ## [0.4.0] - 2026-10-26
 
 ### Release summary

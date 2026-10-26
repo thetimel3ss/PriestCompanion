@@ -2,7 +2,7 @@
 ## Title: Priest Companion
 ## Notes: Wand progression, Book of Prayer tracker, and client diagnostics for Vanilla WoW
 ## Author: Timeless
-## Version: 0.4.0
+## Version: 0.4.1
 ## SavedVariables: PriestCompanionDB
 ## SavedVariablesPerCharacter: PriestCompanionCharDB
 

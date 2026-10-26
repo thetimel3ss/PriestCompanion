@@ -1,7 +1,15 @@
 -- Shared Vanilla-compatible gating for module options. The master stays usable.
 local UI = PriestCompanion.UI
 
+function UI.SetModuleEnableColor(label, enabled)
+    label:SetTextColor(1, enabled and 0.82 or 0.25,
+        enabled and 0.20 or 0.25)
+end
+
 function UI.SetModuleOptionsEnabled(content, master, enabled)
+    if master.optionCaption then
+        UI.SetModuleEnableColor(master.optionCaption, enabled)
+    end
     local children = { content:GetChildren() }
     local i
     for i = 1, table.getn(children) do

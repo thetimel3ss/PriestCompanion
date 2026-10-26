@@ -102,7 +102,7 @@ end
 Label("Resurrection Assistant", 14, 12, 355, "GameFontNormal")
 local StopAssistantPreview
 
-local assistantEnableBox = Checkbox(
+local assistantEnableBox, assistantEnableLabel = Checkbox(
     "PriestCompanionResurrectionAssistantEnable",
     "Enable", 14, 47,
     function(value)
@@ -308,6 +308,7 @@ Label("Preview is blue and never casts. Combat hides the HUD.",
 
 function panel.Refresh()
     local enabled = assistant.GetEnabled()
+    PC.UI.SetModuleEnableColor(assistantEnableLabel, enabled)
     assistantEnableBox:SetChecked(enabled and 1 or nil)
     assistantButtonBox:SetChecked(
         assistant.GetButtonEnabled() and 1 or nil

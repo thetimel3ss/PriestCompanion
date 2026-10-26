@@ -3,8 +3,8 @@
 The roadmap tracks outstanding improvements and ongoing verification. Released functionality belongs in [CHANGELOG.md](CHANGELOG.md), not here.
 
 **Review date:** 2026-10-26
-**Current release:** `0.4.0`
-**Future development:** separate feature branches from `main`
+**Current release:** `0.4.1`
+**Future development:** each new feature gets its own branch from `main`; implement and test there before an explicitly authorized merge into `main`.
 
 **Release decision (2026-10-26):** maintainer authorized v0.4.0 and integration into main. Remaining open checks are follow-up verification, not a claim of executed tests or a current merge hold.
 
@@ -122,6 +122,10 @@ All 28 records have `source.note`: 21 world-drop-style entries with `"World drop
 `Sources[21801]` and `Sources[60805]` no longer contain aggregate-only NPC IDs (15319/91910). `Sources[80799]` no longer has the contradictory `mobCount = 1`. The item entries and their source details are otherwise preserved.
 
 ## Next steps
+
+### Enable visual feedback — complete, v0.4.1 (2026-10-26)
+
+Inactive Enable captions are red and Book of Prayer uses Enable. Maintainer authorized closing this feature and merging into main. Existing runtime monitoring and saved settings remain unchanged; no further acceptance task is scheduled for this feature.
 
 ### Consistent Enable controls (2026-10-26)
 
@@ -283,7 +287,7 @@ Wand Progression / Source Details, filters, reputation and maps are complete for
 ### Later capabilities (scope and feasibility to be assessed)
 
 - [ ] Add more configurable settings to Options → General / Advanced later (quest-history preferences, optional integrations, reset and UI settings). General is currently read-only; Advanced now contains Book of Prayer controls. Restore quest-history diagnostics elsewhere in a future feature.
-- [ ] Minimap launcher.
+- [ ] Minimap launcher, initially using a Priest icon (maintainer choice, 2026-10-26). Implement and test on a dedicated feature branch before merge.
 - [ ] Priest skills database.
 - [ ] Talent builds.
 - [ ] Best-in-slot lists.
@@ -295,6 +299,9 @@ Wand Progression / Source Details, filters, reputation and maps are complete for
 - [x] Complete the current OctoWoW Wand Progression item database (146 listed wands with corresponding items and sources).
 
 ## Documentation policy
+
+- Versions use MAJOR.MINOR.PATCH: PATCH for fixes/text/small visual adjustments, MINOR for new features, MAJOR for a maturity milestone or major compatibility change. Keep the released version in both TOCs and the Lua fallback; development changes stay under Unreleased until release approval.
+- Work on a dedicated feature branch, implement and test, then version/commit/push and merge only with maintainer authorization. Delete implemented feature branches only after confirming their commits are incorporated into main.
 
 - `CHANGELOG.md`: actual versioned additions, fixes, and changes; keep prior release entries intact.
 - `ROADMAP.md`: current limitations, decisions, audited data, future enhancements, and priorities. Keep implementation/test history in CHANGELOG rather than duplicating it here.

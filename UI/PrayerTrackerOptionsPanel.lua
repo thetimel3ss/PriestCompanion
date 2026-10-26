@@ -153,7 +153,7 @@ local function AddPrayerCheckbox(key, text, y, helpText, labelWidth)
     return button
 end
 
-AddPrayerCheckbox("enabled", "Enable Tracker", 66)
+AddPrayerCheckbox("enabled", "Enable", 66)
 AddPrayerCheckbox("expanded", "Expanded mode (previous heal)", 96)
 AddPrayerCheckbox("showSpellName", "Show spell name", 126)
 AddPrayerCheckbox(
@@ -558,7 +558,7 @@ function advanced.Refresh()
             end
         else
             checkboxes.enabled:Enable()
-            checkboxNames.enabled:SetTextColor(1, 0.82, 0.20)
+            PC.UI.SetModuleEnableColor(checkboxNames.enabled, enabled)
             requiredNote:SetText("")
         end
     end

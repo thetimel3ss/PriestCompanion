@@ -3,7 +3,7 @@ local PC = PriestCompanion
 local M = {}
 PC.Modules.AutoMana = M
 local settings = { enabled = false, automatic = false, trigger = "missing",
-    missingMana = 1350, combatOnly = true, minGroup = 1,
+    combatOnly = true, minGroup = 1,
     tea = false, potion = false, rejuvenation = false, flask = false,
     continueSpell = false, locked = false, x = 0, y = -180 }
 local frame = CreateFrame("Frame")
@@ -11,6 +11,16 @@ local loaded, installed, busy = false, false, false
 local lastAttempt = -100
 local listeners, pending, serial = {}, nil, 0
 local tooltip
+local function UpdateSubscriptions()
+    frame:UnregisterAllEvents()
+    if not loaded then frame:RegisterEvent("VARIABLES_LOADED"); return end
+    if not settings.enabled then return end
+    local events = { "BAG_UPDATE", "UNIT_MANA", "UNIT_MAXMANA", "UNIT_INVENTORY_CHANGED",
+        "PLAYER_REGEN_ENABLED", "PLAYER_REGEN_DISABLED", "PARTY_MEMBERS_CHANGED",
+        "RAID_ROSTER_UPDATE", "PLAYER_DEAD", "PLAYER_ALIVE", "PLAYER_UNGHOST",
+        "PLAYER_TARGET_CHANGED", "PLAYER_LEAVING_WORLD", "PLAYER_ENTERING_WORLD" }
+    for _, name in ipairs(events) do frame:RegisterEvent(name) end
+end
 local function Notify()
     for _, fn in ipairs(listeners) do fn() end
 end
@@ -25,8 +35,6 @@ local function Save()
 end
 local function CancelPending()
     pending = nil
-    frame:UnregisterAllEvents()
-    if not loaded then frame:RegisterEvent("VARIABLES_LOADED") end
     frame:SetScript("OnUpdate", nil)
 end
 local function Truth(value) return value == true or value == 1 end
@@ -98,65 +106,159 @@ function M.NeedsMana(context)
     end
     return nil
 end
-local function Allowed()
-    if not loaded or not settings.enabled or busy then return false end
-    if UnitIsDeadOrGhost("player") or UnitOnTaxi("player") then return false end
-    if UnitPowerType("player") ~= 0 then return false end
-    if settings.combatOnly and not UnitAffectingCombat("player") then return false end
-    local raid = GetNumRaidMembers()
-    local size = raid > 0 and raid or (GetNumPartyMembers() + 1)
-    return size >= settings.minGroup
+-- Priority is shared by the HUD, manual click and automatic use. Prefer live
+-- item tooltip ranges; these base ranges are estimates if unavailable.
+local items = {
+    { id = 61675, option = "tea", name = "Nordanaar Herbal Tea", low = 810, high = 1351 },
+    { id = 15723, option = "tea", name = "Tea with Sugar", low = 1050, high = 1751 },
+    { id = 18253, option = "rejuvenation", name = "Major Rejuvenation Potion", low = 1440, high = 1760 },
+    { id = 13444, option = "potion", name = "Major Mana Potion", low = 1350, high = 2250 },
+    -- Flask refill behavior is server-specific, not its maximum-mana buff.
+    { id = 13511, option = "flask", name = "Flask of Distilled Wisdom", flask = true }
+}
+local itemByID = {}
+for _, item in ipairs(items) do itemByID[item.id] = item end
+local inventory, inventoryDirty, itemTooltip = {}, true, nil
+local function ItemID(link)
+    local _, _, raw = string.find(link or "", "item:(%d+)")
+    return tonumber(raw)
 end
-function M.TryConsume(context, manual)
-    if not Allowed() then return false end
-    local now = GetTime()
-    if now - lastAttempt < 1.5 then return false end
-    if not manual then
-        if not settings.automatic or not context then return false end
-        if settings.trigger == "insufficient" then
-            if M.NeedsMana(context) ~= true then return false end
-        elseif UnitManaMax("player") - UnitMana("player") < settings.missingMana then
-            return false
+local function Recovery(bag, slot, spec)
+    if spec.flask then
+        local gain = math.max(0, 2000 - UnitMana("player"))
+        return gain, gain, false
+    end
+    if not itemTooltip then
+        itemTooltip = CreateFrame("GameTooltip", "PriestCompanionAutoManaItemTooltip", UIParent, "GameTooltipTemplate")
+        itemTooltip:SetOwner(UIParent, "ANCHOR_NONE")
+    end
+    itemTooltip:ClearLines()
+    itemTooltip:SetBagItem(bag, slot)
+    local low, high
+    for i = 1, itemTooltip:NumLines() do
+        local line = getglobal("PriestCompanionAutoManaItemTooltipTextLeft" .. i)
+        local text = line and line:GetText()
+        if text then
+            text = string.lower(text)
+            local manaAt = string.find(text, string.lower(MANA or "Mana"), 1, true)
+            -- Do not confuse max-mana buffs or food's regeneration with an
+            -- instant refill. Unsupported/localized wording uses marked estimates.
+            if manaAt and string.find(text, "restor", 1, true)
+                and not string.find(text, "over ", 1, true) then
+                local before = string.sub(text, 1, manaAt - 1)
+                local cursor = 1
+                while true do
+                    local first, last, a, b = string.find(before, "(%d[%d,]*)%s+to%s+(%d[%d,]*)", cursor)
+                    if not first then break end
+                    low = tonumber((string.gsub(a, ",", "")))
+                    high = tonumber((string.gsub(b, ",", "")))
+                    cursor = last + 1
+                end
+                -- A fixed mana amount may follow a separate health range.
+                if low and string.find(string.sub(before, cursor), "%d") then low, high = nil, nil end
+                if not low then
+                    local _, _, amount = string.find(before, "(%d[%d,]*)%s*$")
+                    low = amount and tonumber((string.gsub(amount, ",", "")))
+                    high = low
+                end
+                if low and high then break end
+            end
         end
     end
-    if not GetContainerNumSlots or not GetContainerItemLink
-        or not GetContainerItemInfo or not GetContainerItemCooldown
-        or not UseContainerItem then return false end
-    local missing = UnitManaMax("player") - UnitMana("player")
-    if missing <= 0 then return false end
-    -- Explicit whitelist. Healthstones are not a source of mana.
-    local candidates = {
-        { enabled = settings.tea, ids = {61675, 15723} },
-        { enabled = settings.rejuvenation, ids = {18253} },
-        { enabled = settings.potion, ids = {13444} },
-        { enabled = settings.flask and UnitMana("player") < 2000, ids = {13511} }
-    }
-    for _, candidate in ipairs(candidates) do
-        if candidate.enabled then
-            for _, wanted in ipairs(candidate.ids) do
-                for bag = 0, 4 do
-                    for slot = 1, GetContainerNumSlots(bag) do
-                        local link = GetContainerItemLink(bag, slot)
-                        local _, _, raw = string.find(link or "", "item:(%d+)")
-                        if tonumber(raw) == wanted then
-                            local _, count, locked = GetContainerItemInfo(bag, slot)
-                            local start, duration, usable = GetContainerItemCooldown(bag, slot)
-                            if count and count > 0 and not Truth(locked) and usable == 1
-                                and start and duration and (start == 0 or now >= start + duration) then
-                                -- Vanilla returns no success acknowledgement; throttle attempts.
-                                lastAttempt = now
-                                busy = true
-                                local ok = pcall(UseContainerItem, bag, slot)
-                                busy = false
-                                return ok
-                            end
-                        end
+    itemTooltip:Hide()
+    if low and high and low > 0 and high >= low then return low, high, true end
+    return spec.low, spec.high, false
+end
+local function ScanInventory()
+    inventory = {}
+    inventoryDirty = false
+    if not GetContainerNumSlots or not GetContainerItemLink then return end
+    for bag = 0, 4 do
+        for slot = 1, GetContainerNumSlots(bag) do
+            local id = ItemID(GetContainerItemLink(bag, slot))
+            local spec = itemByID[id]
+            if spec then
+                local ok, low, high, live = pcall(Recovery, bag, slot, spec)
+                if not ok then low, high, live = spec.low, spec.high, false end
+                local entry = { id = id, bag = bag, slot = slot, low = low, high = high, live = live }
+                inventory[id] = inventory[id] or {}
+                table.insert(inventory[id], entry)
+            end
+        end
+    end
+end
+local function Allowed()
+    if not loaded or not settings.enabled or busy then return false, "Disabled" end
+    if UnitIsDeadOrGhost("player") or UnitOnTaxi("player") then return false, "Unavailable" end
+    if UnitPowerType("player") ~= 0 then return false, "No mana bar" end
+    if settings.combatOnly and not UnitAffectingCombat("player") then return false, "Out of combat" end
+    local raid = GetNumRaidMembers()
+    local size = raid > 0 and raid or (GetNumPartyMembers() + 1)
+    if size < settings.minGroup then return false, "Group too small" end
+    return true
+end
+function M.GetNextConsumable(context, manual)
+    local allowed, reason = Allowed()
+    if not allowed then return nil, reason end
+    local now = GetTime()
+    if now - lastAttempt < 1.5 then return nil, "Waiting" end
+    if not manual then
+        if not settings.automatic or not context then return nil, "Manual only" end
+        if settings.trigger == "insufficient" and M.NeedsMana(context) ~= true then
+            return nil, "Spell has enough mana or unknown cost"
+        end
+    end
+    if not GetContainerItemInfo or not GetContainerItemCooldown then return nil, "Inventory unavailable" end
+    local mana, maximum = UnitMana("player"), UnitManaMax("player")
+    local missing = maximum - mana
+    if missing <= 0 then return nil, "Full mana" end
+    -- A moved/deleted item invalidates the cache even if its BAG_UPDATE has
+    -- not reached us yet. Rebuild once before making a selection.
+    if not inventoryDirty then
+        for _, entries in pairs(inventory) do
+            for _, entry in ipairs(entries) do
+                if ItemID(GetContainerItemLink(entry.bag, entry.slot)) ~= entry.id then inventoryDirty = true end
+            end
+        end
+    end
+    if inventoryDirty then ScanInventory() end
+    for _, spec in ipairs(items) do
+        if settings[spec.option] then
+            for _, entry in ipairs(inventory[spec.id] or {}) do
+                local low, high = entry.low, entry.high
+                if spec.flask then low = math.max(0, 2000 - mana); high = low end
+                local fits = manual or settings.trigger == "insufficient"
+                    or (high and missing >= math.min(high, maximum))
+                if (not spec.flask or mana < 2000) and fits and low and high then
+                    local icon, count, locked = GetContainerItemInfo(entry.bag, entry.slot)
+                    local start, duration, usable = GetContainerItemCooldown(entry.bag, entry.slot)
+                    if count and count > 0 and not Truth(locked) and usable == 1
+                        and start and duration and (start == 0 or now >= start + duration) then
+                        local link = GetContainerItemLink(entry.bag, entry.slot)
+                        local _, _, name = string.find(link or "", "%[(.-)%]")
+                        return { id = entry.id, bag = entry.bag, slot = entry.slot,
+                            icon = icon, name = name or spec.name, low = low, high = high,
+                            gainLow = math.min(low, missing), gainHigh = math.min(high, missing),
+                            live = entry.live, flask = spec.flask }
                     end
                 end
             end
         end
     end
-    return false
+    return nil, "No ready item"
+end
+function M.TryConsume(context, manual)
+    local item = M.GetNextConsumable(context, manual)
+    if not item or not UseContainerItem then return false end
+    -- Vanilla returns no success acknowledgement; throttle attempts, not
+    -- claimed successful uses. Selection is re-evaluated at every click/cast.
+    lastAttempt = GetTime()
+    inventoryDirty = true
+    busy = true
+    local ok = pcall(UseContainerItem, item.bag, item.slot)
+    busy = false
+    Notify()
+    return ok
 end
 function M.UseManual()
     CancelPending()
@@ -305,16 +407,17 @@ function M.SetOption(key, value)
     CancelPending()
     if key == "trigger" then
         if value ~= "missing" and value ~= "insufficient" then return end
-    elseif key == "missingMana" or key == "minGroup" then
+    elseif key == "minGroup" then
         value = tonumber(value)
-        if not value or value ~= value then return end
-        value = math.floor(math.max(1, math.min(key == "minGroup" and 40 or 100000, value)))
+        if value ~= 1 and value ~= 5 and value ~= 10 and value ~= 20 then return end
     elseif key == "x" or key == "y" then
         value = tonumber(value)
         if not value or value ~= value or math.abs(value) > 10000 then return end
     else value = value and true or false end
     settings[key] = value
+    if key == "enabled" then inventoryDirty = true end
     Save()
+    UpdateSubscriptions()
     if loaded and settings.enabled and settings.automatic then InstallHooks() end
     Notify()
 end
@@ -333,12 +436,21 @@ frame:SetScript("OnEvent", function()
             end
         end
         if settings.trigger ~= "insufficient" then settings.trigger = "missing" end
-        settings.minGroup = math.max(1, math.min(40, math.floor(settings.minGroup)))
-        settings.missingMana = math.max(1, math.floor(settings.missingMana))
+        -- Migrate legacy arbitrary sizes to the next offered threshold.
+        local size = settings.minGroup
+        settings.minGroup = size <= 1 and 1 or (size <= 5 and 5 or (size <= 10 and 10 or 20))
         loaded = true
-        CancelPending(); Save()
+        CancelPending(); Save(); UpdateSubscriptions()
         if settings.enabled and settings.automatic then InstallHooks() end
         Notify()
-    elseif event == "UNIT_MANA" and arg1 == "player" then CheckPending()
-    elseif event ~= "UNIT_MANA" then CancelPending() end
+    elseif event == "UNIT_MANA" or event == "UNIT_MAXMANA" then
+        if arg1 == "player" then CheckPending(); Notify() end
+    elseif event == "BAG_UPDATE" or event == "UNIT_INVENTORY_CHANGED" then
+        if event == "BAG_UPDATE" or arg1 == "player" then inventoryDirty = true; Notify() end
+    else
+        if event == "PLAYER_DEAD" or event == "PLAYER_TARGET_CHANGED"
+            or event == "PLAYER_LEAVING_WORLD" then CancelPending() end
+        if event == "PLAYER_ENTERING_WORLD" then inventoryDirty = true end
+        Notify()
+    end
 end)

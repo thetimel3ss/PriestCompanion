@@ -126,12 +126,12 @@ All 28 records have `source.note`: 21 world-drop-style entries with `"World drop
 ### Auto Mana prototype (`feature/auto-mana`, OctoWoW)
 
 - [x] Add opt-in Tools/minimap controls and a floating manual-use button with saved position/lock; automatic mode and individual consumables require separate permission.
-- [x] Share item selection, combat/group restrictions and attempt throttling between manual and automatic paths. Add exclusive missing-mana threshold and requested-spell insufficient-mana criteria; do not infer OOM for unknown spells or costs.
-- [x] Add optional Nampower continuation with bounded mana wait, target/action validation and cancellation. No global queue CVars are changed. Disabled mode has no events, ticking or scans.
+- [x] Share item selection, combat/group restrictions and attempt throttling between manual and automatic paths. Add exclusive per-item missing-mana and requested-spell insufficient-mana criteria; do not infer OOM for unknown spells or costs.
+- [x] Add optional Nampower continuation with bounded mana wait, target/action validation and cancellation. No global queue CVars are changed. Three seconds is a maximum wait for sufficient mana, not a fixed delay. Disabled mode has no events, ticking or scans.
 - [x] Local syntax and mocked core/UI checks passed; test harnesses remain local.
-- [ ] OctoWoW: test both criteria with affordable/unaffordable ranks, equality boundaries, talent/free-cast cost changes and unknown-cost spells. Confirm actual item IDs/effects, Tea/Rejuvenation/Mana/Flask priorities, cooldowns, bag moves, manual button with automatic on/off, combat/group conditions and saved settings after reload.
+- [ ] OctoWoW: test both criteria with affordable/unaffordable ranks, per-item recovery boundaries, live item tooltip ranges versus fallback estimates, talent/free-cast cost changes and unknown-cost spells. Confirm actual item IDs/effects, Tea/Rejuvenation/Mana/Flask priorities, cooldowns, bag moves, manual item HUD with automatic on/off, Tea-on-cooldown fallback with enough/insufficient deficit for a potion, combat/group conditions (1/5/10/20) and saved settings after reload.
 - [ ] Nampower: confirm one activation consumes and continues the exact rank on the intended target for direct spells, action buttons and supported macros; test mouseover changes, target changes, newer casts, Escape/stop cast, no target, rejected item use, slow mana restoration and queue overwrites. Continuation is experimental and only attempted with a resolved stable target GUID. Validate Fear Ward overwrite protection and Resurrection integrations.
-- [ ] Validate the four Tools tabs, scrolling, red disabled Enable, dependent-control gating, manual button drag/lock and minimap routes. Vanilla-only and alternate provider combinations still require live testing. No merge/release without maintainer approval.
+- [ ] Validate the four Tools tabs, scrolling, red disabled Enable, dependent-control gating, manual window icon/gain updates, drag/lock, all option tooltips, group slider/wheel and minimap routes. Vanilla-only and alternate provider combinations still require live testing. No merge/release without maintainer approval.
 
 ### Shield Tracker prototype (`feature/shield-tracker`)
 

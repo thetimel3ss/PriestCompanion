@@ -94,7 +94,7 @@ local shieldScroll, shieldChild = CreateToolScroll("PriestCompanionShieldOptions
 shieldScroll:Hide()
 PC.UI.ShieldTrackerOptionsPanel = shieldScroll
 PC.UI.ToolsShieldContent = shieldChild
-local autoManaScroll, autoManaChild = CreateToolScroll("PriestCompanionAutoManaOptionsScroll", 830)
+local autoManaScroll, autoManaChild = CreateToolScroll("PriestCompanionAutoManaOptionsScroll", 785)
 autoManaScroll:Hide()
 PC.UI.AutoManaOptionsPanel = autoManaScroll
 PC.UI.ToolsAutoManaContent = autoManaChild

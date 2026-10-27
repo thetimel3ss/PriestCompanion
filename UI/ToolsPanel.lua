@@ -52,17 +52,17 @@ local trackerTab = CreateToolTab(
     2, "Book of Prayer Tracker", assistantTab, "tracker"
 )
 local shieldTab = CreateToolTab(3, "Shield Tracker", trackerTab, "shield")
--- A client/font with unusually wide native tabs gets shorter titles;
--- never force SetWidth after PanelTemplates_TabResize.
-if assistantTab:GetWidth() + trackerTab:GetWidth() + shieldTab:GetWidth() > 410 then
-    trackerTab:SetText("Book of Prayer")
-    PanelTemplates_TabResize(0, trackerTab)
+local autoManaTab = CreateToolTab(4, "Auto Mana", shieldTab, "automana")
+-- Four pages must fit the same native tab row.
+trackerTab:SetText("Book of Prayer")
+PanelTemplates_TabResize(0, trackerTab)
+assistantTab:SetText("Resurrection")
+PanelTemplates_TabResize(0, assistantTab)
+if assistantTab:GetWidth() + trackerTab:GetWidth() + shieldTab:GetWidth() + autoManaTab:GetWidth() > 410 then
+    shieldTab:SetText("Shield")
+    PanelTemplates_TabResize(0, shieldTab)
 end
-if assistantTab:GetWidth() + trackerTab:GetWidth() + shieldTab:GetWidth() > 410 then
-    assistantTab:SetText("Resurrection")
-    PanelTemplates_TabResize(0, assistantTab)
-end
-PanelTemplates_SetNumTabs(subTabs, 3)
+PanelTemplates_SetNumTabs(subTabs, 4)
 PanelTemplates_SetTab(subTabs, 1)
 
 --------------------------------------------------
@@ -94,6 +94,10 @@ local shieldScroll, shieldChild = CreateToolScroll("PriestCompanionShieldOptions
 shieldScroll:Hide()
 PC.UI.ShieldTrackerOptionsPanel = shieldScroll
 PC.UI.ToolsShieldContent = shieldChild
+local autoManaScroll, autoManaChild = CreateToolScroll("PriestCompanionAutoManaOptionsScroll", 830)
+autoManaScroll:Hide()
+PC.UI.AutoManaOptionsPanel = autoManaScroll
+PC.UI.ToolsAutoManaContent = autoManaChild
 
 PC.UI.ResurrectionAssistantOptionsPanel = assistantScroll
 PC.UI.PrayerTrackerOptionsPanel = trackerScroll
@@ -101,11 +105,18 @@ PC.UI.ToolsAssistantContent = assistantChild
 PC.UI.ToolsTrackerContent = trackerChild
 
 function panel.SelectSubTab(id)
-    if id ~= "tracker" and id ~= "shield" then id = "resurrection" end
+    if id ~= "tracker" and id ~= "shield" and id ~= "automana" then id = "resurrection" end
     panel.ActiveSubTab = id
     if id ~= "shield" then shieldScroll:Hide() end
 
-    if id == "shield" then
+    if id ~= "automana" then autoManaScroll:Hide() end
+    if id == "automana" then
+        assistantScroll:Hide()
+        trackerScroll:Hide()
+        autoManaScroll:Show()
+        PanelTemplates_SetTab(subTabs, 4)
+        if type(autoManaScroll.Refresh) == "function" then autoManaScroll.Refresh() end
+    elseif id == "shield" then
         assistantScroll:Hide()
         trackerScroll:Hide()
         shieldScroll:Show()
@@ -148,4 +159,5 @@ panel:SetScript("OnHide", function()
     assistantScroll:Hide()
     trackerScroll:Hide()
     shieldScroll:Hide()
+    autoManaScroll:Hide()
 end)

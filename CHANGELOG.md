@@ -2,6 +2,14 @@
 
 ## [Unreleased]
 
+### Added — Auto Mana prototype (2026-10-27; OctoWoW feature branch)
+- Added Tools > Auto Mana and a minimap toggle/settings shortcut. Per-character Enable, automatic use and every consumable permission start off. A movable, lockable Mana button allows manual use with automatic mode either on or off.
+- Automatic use has two exclusive criteria: a configurable amount of missing mana (default 1,350), or insufficient mana for the requested spell/rank. The latter uses current spell/action usability or a current localized mana-cost tooltip, not a zero-mana test or cached base cost. Unknown spell/cost information skips consumption. Manual use bypasses the automatic criterion/threshold; both paths respect combat/group restrictions, explicit item permissions, locks and cooldowns, with a shared 1.5-second attempt throttle.
+- Supported priority: Tea (61675 then 15723), Major Rejuvenation Potion, Major Mana Potion, then explicitly permitted Flask of Distilled Wisdom below 2,000 mana. Custom server item IDs/effects require live confirmation. No healthstone use is included in this mana-only selector.
+- Optional experimental Nampower continuation waits up to three seconds for enough mana, then submits the original request through QueueScript. It requires a stable resolved target GUID; target changes, a newer action, stop casting, disable, timeout and replaced action slots cancel the request. Original cast delegates retain rank/target arguments and existing protection hooks. Without continuation, an item attempt replaces that spell activation and the spell must be pressed again. Item-use acceptance is not reported by the Vanilla API.
+- No bag subscriptions or background scanning; disable hides the button, cancels pending work and leaves only inert forwarding hooks if automatic mode was previously used. Both TOC flavors load the module. Version remains 0.5.0; no merge/release.
+- Local Lua 5.4 syntax and mocked checks passed for both criteria, rank/cost changes, Vanilla fallback, boundary values, manual/automatic coexistence, party size, permissions/cooldowns, queue/cancellation, saved options and Tools gating/navigation. Test files remain outside the repository. In-game OctoWoW and Nampower validation is pending.
+
 ### Added — Shield Tracker learned-value reset (2026-10-26)
 - Add a two-click confirmation control in Options > Tools > Shield Tracker to clear learned PW: Shield capacities for the player and all observed external priest casters. Closing the options page cancels a pending confirmation.
 - If a trusted shield is currently active, replace its learned maximum with the rank base estimate while retaining observed absorbed damage; the cleared samples stay empty in saved character settings.

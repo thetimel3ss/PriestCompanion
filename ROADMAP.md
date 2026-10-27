@@ -2,7 +2,7 @@
 
 The roadmap tracks outstanding improvements and ongoing verification. Released functionality belongs in [CHANGELOG.md](CHANGELOG.md), not here.
 
-**Review date:** 2026-10-26
+**Review date:** 2026-10-27
 **Current release:** `0.5.0`
 **Future development:** each new feature gets its own branch from `main`; implement and test there before an explicitly authorized merge into `main`.
 
@@ -122,6 +122,16 @@ All 28 records have `source.note`: 21 world-drop-style entries with `"World drop
 `Sources[21801]` and `Sources[60805]` no longer contain aggregate-only NPC IDs (15319/91910). `Sources[80799]` no longer has the contradictory `mobCount = 1`. The item entries and their source details are otherwise preserved.
 
 ## Next steps
+
+### Auto Mana prototype (`feature/auto-mana`, OctoWoW)
+
+- [x] Add opt-in Tools/minimap controls and a floating manual-use button with saved position/lock; automatic mode and individual consumables require separate permission.
+- [x] Share item selection, combat/group restrictions and attempt throttling between manual and automatic paths. Add exclusive missing-mana threshold and requested-spell insufficient-mana criteria; do not infer OOM for unknown spells or costs.
+- [x] Add optional Nampower continuation with bounded mana wait, target/action validation and cancellation. No global queue CVars are changed. Disabled mode has no events, ticking or scans.
+- [x] Local syntax and mocked core/UI checks passed; test harnesses remain local.
+- [ ] OctoWoW: test both criteria with affordable/unaffordable ranks, equality boundaries, talent/free-cast cost changes and unknown-cost spells. Confirm actual item IDs/effects, Tea/Rejuvenation/Mana/Flask priorities, cooldowns, bag moves, manual button with automatic on/off, combat/group conditions and saved settings after reload.
+- [ ] Nampower: confirm one activation consumes and continues the exact rank on the intended target for direct spells, action buttons and supported macros; test mouseover changes, target changes, newer casts, Escape/stop cast, no target, rejected item use, slow mana restoration and queue overwrites. Continuation is experimental and only attempted with a resolved stable target GUID. Validate Fear Ward overwrite protection and Resurrection integrations.
+- [ ] Validate the four Tools tabs, scrolling, red disabled Enable, dependent-control gating, manual button drag/lock and minimap routes. Vanilla-only and alternate provider combinations still require live testing. No merge/release without maintainer approval.
 
 ### Shield Tracker prototype (`feature/shield-tracker`)
 

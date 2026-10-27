@@ -173,7 +173,10 @@ local entries = {
           set = function(v) modules.PrayerTracker.SetOption("enabled", v) end },
         { text = "Shield Tracker", page = "shield",
           get = function() return modules.ShieldTracker.GetOption("enabled") end,
-          set = function(v) modules.ShieldTracker.SetOption("enabled", v) end }
+          set = function(v) modules.ShieldTracker.SetOption("enabled", v) end },
+        { text = "Auto Mana", page = "automana",
+          get = function() return modules.AutoMana.GetOption("enabled") end,
+          set = function(v) modules.AutoMana.SetOption("enabled", v) end }
     }
 }
 local function MenuRow(parent, text, y, width)

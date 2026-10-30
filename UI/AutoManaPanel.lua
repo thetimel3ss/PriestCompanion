@@ -130,6 +130,26 @@ local icon = button:CreateTexture(nil, "ARTWORK")
 icon:SetWidth(36); icon:SetHeight(36)
 icon:SetPoint("TOP", button, "TOP", 0, -30)
 icon:SetTexCoord(0.07, 0.93, 0.07, 0.93)
+-- The native Cooldown widget is optional. Vanilla keeps the textual status.
+local cooldown
+if PC.Capabilities and PC.Capabilities.classicAPISupported then
+    local ok, widget = pcall(CreateFrame, "Cooldown", nil, button)
+    if ok and widget and type(widget.SetCooldown) == "function" then
+        cooldown = widget
+        cooldown:SetAllPoints(icon)
+        cooldown:EnableMouse(false)
+        if type(cooldown.SetHideCountdownNumbers) == "function" then cooldown:SetHideCountdownNumbers(true) end
+        cooldown:Hide()
+    elseif ok and widget then widget:Hide() end
+end
+local cooldownKey
+local function ClearCooldown()
+    cooldownKey = nil
+    if cooldown then
+        if type(cooldown.Clear) == "function" then cooldown:Clear() end
+        cooldown:Hide()
+    end
+end
 local amount = button:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
 amount:SetPoint("TOP", icon, "BOTTOM", 0, -6)
 amount:SetWidth(96)
@@ -147,7 +167,8 @@ local function HUDTip()
         details = "Left-click: use " .. shownItem.name .. ". Estimated gain: " ..
             GainText(shownItem) .. " mana, capped by missing mana. " ..
             (shownItem.live and "Based on the current item tooltip. " or "Based on a fallback/server-specific estimate. ") ..
-            "Actual rolls, gear and server effects may differ. Manual clicks ignore the automatic trigger."
+            "Actual rolls, gear and server effects may differ. Manual clicks ignore the automatic trigger." ..
+            (shownItem.cooldownRemaining > 0 and (" Ready in about " .. math.ceil(shownItem.cooldownRemaining) .. " seconds.") or "")
     end
     details = details .. " Drag to move when unlocked."
     ShowTip(button, "Auto Mana", details)
@@ -177,13 +198,23 @@ button:SetScript("OnHide", function()
 end)
 local function RenderHUD()
     if not M.GetOption("enabled") then return end
-    local item, reason = M.GetNextConsumable(nil, true)
+    local item, reason = M.GetConsumableDisplay()
     shownItem = item
     icon:SetTexture(item and item.icon or "Interface\\Icons\\INV_Misc_QuestionMark")
-    icon:SetAlpha(item and 1 or 0.35)
+    local ready = item and item.ready
+    icon:SetAlpha(ready and 1 or 0.35)
+    if cooldown and item and item.cooldownRemaining > 0 then
+        local key = item.id .. ":" .. item.cooldownStart .. ":" .. item.cooldownDuration
+        if cooldownKey ~= key then
+            cooldown:SetCooldown(item.cooldownStart, item.cooldownDuration)
+            cooldownKey = key
+        end
+        cooldown:Show()
+    else ClearCooldown() end
     amount:SetText(item and ("~" .. GainText(item) .. " mana") or "-- mana")
     amount:SetTextColor(item and 0.45 or 0.55, item and 0.75 or 0.55, item and 1 or 0.55)
-    status:SetText(item and "Manual ready" or reason)
+    if item and item.cooldownRemaining > 0 then status:SetText("Ready in " .. math.ceil(item.cooldownRemaining) .. "s")
+    else status:SetText(ready and "Manual ready" or reason) end
     button:SetBackdropBorderColor(item and 0.4 or 0.55, item and 0.65 or 0.55, item and 1 or 0.67, 1)
 end
 local elapsed = 0
@@ -231,6 +262,7 @@ local function Refresh()
         button:SetScript("OnUpdate", nil)
         button:Hide()
         shownItem = nil
+        ClearCooldown()
     end
 end
 scroll.Refresh = RefreshOptions

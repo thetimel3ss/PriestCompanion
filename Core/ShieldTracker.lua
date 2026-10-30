@@ -81,10 +81,57 @@ local function Competing(icon)
     end
     return false
 end
+-- ClassicAPI delta tables are reused by the DLL. Retain scalar copies only.
+local auraCache, auraCacheValid, deltaActive = {}, false, false
+local auraRevision = 0
+local auraProvider = "Vanilla"
+local function CopyAura(aura)
+    if type(aura) ~= "table" then return nil end
+    return { spellId = aura.spellId, icon = aura.icon, expirationTime = aura.expirationTime,
+        sourceGUID = aura.sourceGUID, auraInstanceID = aura.auraInstanceID }
+end
+local function AggregateAuras(cache)
+    local present, expiry, conflict, shield = false, nil, false, nil
+    for _, aura in pairs(cache) do
+        if IsShield(aura.spellId, aura.icon) then
+            present, shield = true, aura
+            if type(aura.expirationTime) == "number" and aura.expirationTime > GetTime() then
+                expiry = aura.expirationTime
+            end
+        elseif Competing(aura.icon) then conflict = true end
+    end
+    return present, expiry, conflict, shield
+end
+local function ReadClassicAuras()
+    if type(C_UnitAuras) ~= "table" or type(C_UnitAuras.GetBuffDataByIndex) ~= "function" then return end
+    if deltaActive and auraCacheValid then return AggregateAuras(auraCache) end
+    local cache, allIDs = {}, true
+    for i = 1, 64 do
+        local ok, aura = pcall(C_UnitAuras.GetBuffDataByIndex, "player", i)
+        if not ok or (aura ~= nil and type(aura) ~= "table") then
+            auraCacheValid = false
+            return nil
+        end
+        if not aura then
+            auraCache, auraCacheValid = cache, deltaActive and allIDs
+            auraProvider = auraCacheValid and "ClassicAPI delta" or "ClassicAPI"
+            return AggregateAuras(cache)
+        end
+        local copy = CopyAura(aura)
+        if not copy.auraInstanceID then allIDs = false end
+        cache[copy.auraInstanceID or ("index" .. i)] = copy
+    end
+    -- A provider that never terminates is not a complete snapshot.
+    auraCacheValid = false
+    return nil
+end
 local function ReadAuras()
     local present, expiry, conflict = false, nil, false
     local i
-    -- Vanilla's player-buff duration is authoritative for this unit.
+    local modern, modernExpiry, modernConflict, modernShield = ReadClassicAuras()
+    if modern ~= nil then return modern, modernExpiry, modernConflict, modernShield end
+    auraProvider = "Vanilla"
+    -- Fall back to the native player-buff duration when the modern API fails.
     if type(GetPlayerBuff) == "function" and type(GetPlayerBuffTexture) == "function" then
         for i = 0, 31 do
             local index = GetPlayerBuff(i, "HELPFUL")
@@ -97,20 +144,6 @@ local function ReadAuras()
                     if type(seconds) == "number" and seconds > 0 then expiry = GetTime() + seconds end
                 end
             elseif Competing(icon) then conflict = true end
-        end
-        return present, expiry, conflict
-    end
-    if type(C_UnitAuras) == "table" and type(C_UnitAuras.GetBuffDataByIndex) == "function" then
-        for i = 1, 32 do
-            local ok, aura = pcall(C_UnitAuras.GetBuffDataByIndex, "player", i)
-            if not ok then return nil end
-            if not aura then break end
-            if IsShield(aura.spellId, aura.icon) then
-                present = true
-                if type(aura.expirationTime) == "number" and aura.expirationTime > GetTime() then
-                    expiry = aura.expirationTime
-                end
-            elseif Competing(aura.icon) then conflict = true end
         end
         return present, expiry, conflict
     end
@@ -176,7 +209,7 @@ RefreshAura = function()
         state, pending = { active = false }, nil
         UpdateTicker(); Notify(); return
     end
-    local present, expiry, conflict = ReadAuras()
+    local present, expiry, conflict, aura = ReadAuras()
     if present == nil then
         state = { active = false, reason = "Aura data unavailable" }
     elseif not present then
@@ -186,12 +219,19 @@ RefreshAura = function()
         if not state.active then
             state = { active = true, reason = "Cast not observed / external shield" }
         end
+        if aura and state.auraInstanceID and aura.auraInstanceID
+        and state.auraInstanceID ~= aura.auraInstanceID then
+            state.learnable, state.breakCandidate = false, nil
+            Unknown("Shield instance changed without observed cast")
+        end
+        state.auraInstanceID = aura and aura.auraInstanceID
         if state.expiresAt and expiry and expiry > state.expiresAt + 0.5 then
             Unknown("Shield refreshed without observed cast")
             state.learnable, state.breakCandidate = false, nil
         end
         state.expiresAt = expiry
-        if pending and pending.untilTime >= GetTime() then
+        if pending and pending.untilTime >= GetTime()
+        and (not deltaActive or pending.auraConfirmed or auraRevision > pending.auraRevision) then
             -- A confirmed caster and rank allow a base or caster-specific estimate.
             if not pending.uncertain then
                 state.spellID = pending.id
@@ -219,19 +259,57 @@ RefreshAura = function()
     UpdateTicker()
     Notify()
 end
-local function ObserveCast(id, caster, target)
+local function ObserveCast(id, caster, target, auraConfirmed)
     id = tonumber(id)
     if not IsShield(id) or not IsPlayer(target) then return end
     -- Nampower may report several aura effects for a single application.
     local now = GetTime()
     local casterGUID = NormalizeGUID(caster)
     local castKey = tostring(id) .. ":" .. tostring(casterGUID) .. ":" .. tostring(NormalizeGUID(target))
-    if lastCastKey == castKey and lastCastTime and now - lastCastTime < 0.15 then return end
+    if lastCastKey == castKey and lastCastTime and now - lastCastTime < 0.15 then
+        if pending and auraConfirmed then pending.auraConfirmed = true end
+        return
+    end
     lastCastKey, lastCastTime = castKey, now
     if state.active then state.learnable, state.breakCandidate = false, nil end
-    pending = { id = id, casterGUID = casterGUID, untilTime = now + 1 }
+    pending = { id = id, casterGUID = casterGUID, untilTime = now + 1,
+        auraRevision = auraRevision, auraConfirmed = auraConfirmed }
     -- Do not seed against a previous aura until the aura update arrives.
     UpdateTicker()
+end
+local function HandleAuraDelta(info)
+    if not deltaActive then return end
+    auraRevision = auraRevision + 1
+    if type(info) ~= "table" or info.isFullUpdate or not auraCacheValid then
+        auraCacheValid = false
+        RefreshAura()
+        return
+    end
+    local fresh
+    for _, id in ipairs(info.removedAuraInstanceIDs or {}) do auraCache[id] = nil end
+    for _, list in ipairs({info.addedAuraInstanceIDs or {}, info.updatedAuraInstanceIDs or {}}) do
+        for _, id in ipairs(list) do
+            local old = auraCache[id]
+            local ok, aura = pcall(C_UnitAuras.GetAuraDataByAuraInstanceID, "player", id)
+            if not ok or type(aura) ~= "table" or aura.auraInstanceID ~= id then
+                auraCacheValid = false
+                RefreshAura()
+                return
+            end
+            -- The snapshot contains buffs only; never admit a harmful delta.
+            if aura.isHelpful == true or aura.isHelpful == 1 then
+                local copy = CopyAura(aura)
+                auraCache[id] = copy
+                if IsShield(copy.spellId, copy.icon) and (not old
+                    or (type(copy.expirationTime) == "number" and type(old.expirationTime) == "number"
+                        and copy.expirationTime > old.expirationTime + 0.5)) then fresh = copy end
+            else auraCache[id] = nil end
+        end
+    end
+    -- A new, observed aura supplies a rank/caster even if the combat-log
+    -- packet arrived in the other order. Existing login auras are not seeded.
+    if fresh then ObserveCast(fresh.spellId, fresh.sourceGUID, PlayerGUID(), true) end
+    RefreshAura()
 end
 local function Absorb(amount, damageTaken)
     if pending then
@@ -314,9 +392,17 @@ end
 UpdateSubscriptions = function()
     Unregister(commonEvents); Unregister(classicEvents); Unregister(nampowerEvents)
     Unregister(textEvents); pcall(frame.UnregisterEvent, frame, "UNIT_CASTEVENT")
+    pcall(frame.UnregisterEvent, frame, "UNIT_AURA_DELTA")
+    auraCache, auraCacheValid, deltaActive = {}, false, false
+    auraProvider = "Vanilla"
     provider = "Vanilla (presence only)"
     if not loaded or not settings.enabled then return end
     Register(commonEvents)
+    if type(C_UnitAuras) == "table"
+    and type(C_UnitAuras.GetBuffDataByIndex) == "function"
+    and type(C_UnitAuras.GetAuraDataByAuraInstanceID) == "function" then
+        deltaActive = pcall(frame.RegisterEvent, frame, "UNIT_AURA_DELTA")
+    end
     if PC.Capabilities.classicAPISupported and type(CombatLogGetCurrentEventInfo) == "function"
     and type(UnitGUID) == "function" and Register(classicEvents) then
         provider = "ClassicAPI"
@@ -341,10 +427,11 @@ UpdateSubscriptions = function()
 end
 function Tracker.GetOption(key) return settings[key] end
 function Tracker.GetProvider() return provider end
+function Tracker.GetAuraProvider() return auraProvider end
 function Tracker.GetState()
     return { active = state.active, remaining = state.remaining, maximum = state.maximum,
         reason = state.reason, timeLeft = state.expiresAt and math.max(0, state.expiresAt - GetTime()),
-        provider = provider }
+        provider = provider, auraProvider = auraProvider }
 end
 function Tracker.AddListener(callback) table.insert(listeners, callback) end
 function Tracker.SetOption(key, value)
@@ -388,7 +475,7 @@ local function HandleClassic()
     local data = { CombatLogGetCurrentEventInfo() }
     if not IsPlayer(data[8]) then return end
     local sub = data[2]
-    if (sub == "SPELL_AURA_APPLIED" or sub == "SPELL_CAST_SUCCESS") and IsShield(data[12]) then
+    if (sub == "SPELL_AURA_APPLIED" or sub == "SPELL_AURA_REFRESH" or sub == "SPELL_CAST_SUCCESS") and IsShield(data[12]) then
         ObserveCast(data[12], data[4], data[8])
         return
     end
@@ -453,7 +540,10 @@ frame:SetScript("OnEvent", function()
     if event == "PLAYER_DEAD" then
         state, pending = { active = false }, nil; UpdateTicker(); Notify()
     elseif event == "PLAYER_ENTERING_WORLD" then
-        state, pending = { active = false }, nil; RefreshAura()
+        state, pending = { active = false }, nil
+        auraCache, auraCacheValid = {}, false
+        RefreshAura()
+    elseif event == "UNIT_AURA_DELTA" and arg1 == "player" then HandleAuraDelta(arg2)
     elseif event == "PLAYER_AURAS_CHANGED" or (event == "UNIT_AURA" and arg1 == "player") then RefreshAura()
     elseif event == "COMBAT_LOG_EVENT_UNFILTERED" then HandleClassic()
     elseif event == "UNIT_CASTEVENT" and arg3 == "CAST" then ObserveCast(arg4, arg1, arg2)

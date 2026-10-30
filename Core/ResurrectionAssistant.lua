@@ -310,6 +310,14 @@ local function HasIncomingFromProviders(unit, name)
 end
 
 local function IsIncoming(unit, name)
+    -- ClassicAPI 1.18.2+: only an observed cast in progress, not an offer
+    -- waiting for acceptance. A negative result must not erase other evidence.
+    if type(UnitHasIncomingResurrection) == "function" then
+        local ok, result = pcall(UnitHasIncomingResurrection, unit)
+        if ok and (result == true or result == 1) then
+            return true, "ClassicAPI"
+        end
+    end
     local has, provider = HasIncomingFromMessages(name)
     if has then
         return true, provider
@@ -822,6 +830,11 @@ UpdateActivityEvents = function()
             pcall(events.UnregisterEvent, events, name)
         end
     end
+    if active and type(UnitHasIncomingResurrection) == "function" then
+        pcall(events.RegisterEvent, events, "INCOMING_RESURRECT_CHANGED")
+    else
+        pcall(events.UnregisterEvent, events, "INCOMING_RESURRECT_CHANGED")
+    end
 end
 -- Per-character SavedVariables are ready before PLAYER_ENTERING_WORLD;
 -- delay subscribing until then to honor disabled saved preferences.
@@ -870,6 +883,11 @@ events:SetScript("OnEvent", function()
         -- The selected target overrides class priority when eligible.
         -- This also refreshes the name shown in the floating HUD.
         Notify()
+    elseif event == "INCOMING_RESURRECT_CHANGED" then
+        -- Native events may use target/focus aliases as well as raid tokens.
+        -- Refresh only for an actual member; no cast is dispatched here.
+        local name = arg1 and type(UnitName) == "function" and UnitName(arg1)
+        if name and rosterByName[name] then Notify() end
     elseif event == "UNIT_SPELLCAST_START" then
         if arg1 ~= "player" then
             OnRemoteResurrectionStart(arg1, arg3, arg4)

@@ -182,7 +182,7 @@ Label("Clears saved values for you and other priest casters; an active shield re
 RefreshOptions = function()
     enable:SetChecked(tracker.GetOption("enabled") and 1 or nil)
     locked:SetChecked(tracker.GetOption("locked") and 1 or nil)
-    providerLabel:SetText("Events: " .. tracker.GetProvider())
+    providerLabel:SetText("Events: " .. tracker.GetProvider() .. " | Auras: " .. tracker.GetAuraProvider())
     PC.UI.SetModuleOptionsEnabled(child, enable, tracker.GetOption("enabled"))
     previewButton:SetText(preview and "Close Preview" or "Preview Shield")
 end

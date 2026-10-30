@@ -55,6 +55,52 @@ local function FindSpell(name)
         index = index + 1
     end
 end
+local function ContextForSlot(slot)
+    local name = FullName(slot)
+    if not name then return end
+    local context = { slot = slot, name = name }
+    if type(C_SpellBook) == "table" and type(C_SpellBook.GetSpellBookItemInfo) == "function" then
+        local ok, info = pcall(C_SpellBook.GetSpellBookItemInfo, slot, 0)
+        if ok and type(info) == "table" then context.spellID = info.spellID end
+    end
+    return context
+end
+local function ContextForIdentifier(identifier)
+    local id = type(identifier) == "number" and identifier
+    if type(identifier) == "string" then
+        local _, _, raw = string.find(identifier, "^spellId:(%d+)$")
+        id = raw and tonumber(raw)
+        if not id then
+            local slot = FindSpell(identifier)
+            return slot and ContextForSlot(slot)
+        end
+    end
+    if not id then return end
+    if type(FindSpellBookSlotByID) == "function" then
+        local ok, slot, book = pcall(FindSpellBookSlotByID, id)
+        if ok and slot and slot > 0 and (book == "spell" or book == 0 or book == nil) then
+            local context = ContextForSlot(slot)
+            if context then context.spellID = id end
+            return context
+        end
+        return -- unknown/pet spells must never trigger consumption
+    end
+    -- Older builds may expose spell metadata but not the slot lookup.
+    local name, rank
+    if type(C_Spell) == "table" and type(C_Spell.GetSpellInfo) == "function" then
+        local ok, info = pcall(C_Spell.GetSpellInfo, id)
+        if ok and type(info) == "table" then name, rank = info.name, info.rank end
+    elseif type(GetSpellNameAndRankForId) == "function" then
+        local ok, n, r = pcall(GetSpellNameAndRankForId, id)
+        if ok then name, rank = n, r end
+    end
+    if not name then return end
+    if rank and rank ~= "" then name = name .. "(" .. rank .. ")" end
+    local slot = FindSpell(name)
+    local context = slot and ContextForSlot(slot)
+    if context then context.spellID = id end
+    return context
+end
 local function TooltipMana(context)
     -- Read the current tooltip, including runtime cost modifiers. Never cache
     -- costs from DBC: talents, auras and the selected rank can change them.
@@ -86,13 +132,32 @@ local function TooltipMana(context)
 end
 function M.NeedsMana(context)
     if not context then return nil end
+    local query = context.spellID or context.name
+    if query and type(C_Spell) == "table" then
+        if type(C_Spell.IsSpellUsable) == "function" then
+            local ok, usable, noMana = pcall(C_Spell.IsSpellUsable, query)
+            if ok and (usable ~= nil or noMana ~= nil) then return Truth(noMana) end
+        end
+        if type(C_Spell.GetSpellPowerCost) == "function" then
+            -- Query every time: talents, auras and free casts alter this cost.
+            local ok, costs = pcall(C_Spell.GetSpellPowerCost, query)
+            if ok and type(costs) == "table" then
+                if not next(costs) then return false end
+                for _, cost in ipairs(costs) do
+                    if type(cost) == "table" and cost.type == 0 and type(cost.cost) == "number"
+                    and cost.cost >= 0 and cost.cost == cost.cost then
+                        return UnitMana("player") < cost.cost
+                    end
+                end
+            end
+        end
+    end
     if context.action and type(IsUsableAction) == "function" then
         local ok, _, noMana = pcall(IsUsableAction, context.action)
         if ok and noMana ~= nil then return Truth(noMana) end
         -- Native Vanilla uses nil for false, but some providers omit the flag.
         if ok and not IsSpellUsable and not IsUsableSpell then return false end
     end
-    local query = context.name
     if query then
         local provider = IsSpellUsable or IsUsableSpell
         if type(provider) == "function" then
@@ -197,11 +262,12 @@ local function Allowed()
     if size < settings.minGroup then return false, "Group too small" end
     return true
 end
-function M.GetNextConsumable(context, manual)
+function M.GetNextConsumable(context, manual, displayCooldown)
     local allowed, reason = Allowed()
     if not allowed then return nil, reason end
     local now = GetTime()
-    if now - lastAttempt < 1.5 then return nil, "Waiting" end
+    local throttled = now - lastAttempt < 1.5
+    if throttled and not displayCooldown then return nil, "Waiting" end
     if not manual then
         if not settings.automatic or not context then return nil, "Manual only" end
         if settings.trigger == "insufficient" and M.NeedsMana(context) ~= true then
@@ -222,6 +288,7 @@ function M.GetNextConsumable(context, manual)
         end
     end
     if inventoryDirty then ScanInventory() end
+    local cooling
     for _, spec in ipairs(items) do
         if settings[spec.option] then
             for _, entry in ipairs(inventory[spec.id] or {}) do
@@ -233,19 +300,29 @@ function M.GetNextConsumable(context, manual)
                     local icon, count, locked = GetContainerItemInfo(entry.bag, entry.slot)
                     local start, duration, usable = GetContainerItemCooldown(entry.bag, entry.slot)
                     if count and count > 0 and not Truth(locked) and usable == 1
-                        and start and duration and (start == 0 or now >= start + duration) then
+                        and start and duration then
                         local link = GetContainerItemLink(entry.bag, entry.slot)
                         local _, _, name = string.find(link or "", "%[(.-)%]")
-                        return { id = entry.id, bag = entry.bag, slot = entry.slot,
+                        local remaining = start > 0 and math.max(0, start + duration - now) or 0
+                        local choice = { id = entry.id, bag = entry.bag, slot = entry.slot,
                             icon = icon, name = name or spec.name, low = low, high = high,
                             gainLow = math.min(low, missing), gainHigh = math.min(high, missing),
-                            live = entry.live, flask = spec.flask }
+                            live = entry.live, flask = spec.flask,
+                            ready = remaining == 0 and not throttled,
+                            cooldownStart = start, cooldownDuration = duration, cooldownRemaining = remaining }
+                        if remaining == 0 then return choice, throttled and "Waiting" or nil end
+                        if displayCooldown and (not cooling or remaining < cooling.cooldownRemaining) then cooling = choice end
                     end
                 end
             end
         end
     end
+    if displayCooldown and cooling then return cooling, "Cooldown" end
     return nil, "No ready item"
+end
+function M.GetConsumableDisplay()
+    -- Read-only: cooling items can be displayed but never returned for use.
+    return M.GetNextConsumable(nil, true, true)
 end
 function M.TryConsume(context, manual)
     local item = M.GetNextConsumable(context, manual)
@@ -331,6 +408,14 @@ end
 local function Intercept(context, cast, unit)
     if busy then return false end
     CancelPending() -- a newer player action always replaces our pending request
+    local announcer = PC.Modules.Announcer
+    if context and context.spellID == 6346 and announcer
+    and type(announcer.ShouldBlockFearWard) == "function" then
+        local target = (unit == 1 or unit == true) and "player" or (type(unit) == "string" and unit or "target")
+        if target == "target" and type(UnitExists) == "function" and not UnitExists(target) then target = "player" end
+        local ok, blocked = pcall(announcer.ShouldBlockFearWard, target)
+        if ok and blocked then return false end
+    end
     if M.TryConsume(context, false) then
         AwaitMana(context, cast, unit)
         return true
@@ -356,7 +441,7 @@ local function ActionContext(slot)
         name, rank = GetSpellNameAndRankForId(id)
     elseif type(GetSpellInfo) == "function" then name, rank = GetSpellInfo(id) end
     if name and rank and rank ~= "" then name = name .. "(" .. rank .. ")" end
-    return { action = slot, name = name, actionID = id }
+    return { action = slot, name = name, actionID = id, spellID = id }
 end
 local function InstallHooks()
     if installed then return end
@@ -367,8 +452,7 @@ local function InstallHooks()
     if type(byName) == "function" then
         CastSpellByName = function(a,b,c,d,e,f,g,h,i,j)
             if settings.enabled and settings.automatic and not busy then
-                local slot = FindSpell(a)
-                local context = slot and { name = FullName(slot), slot = slot }
+                local context = ContextForIdentifier(a)
                 if Intercept(context, function() byName(a,b,c,d,e,f,g,h,i,j) end, b) then return end
             end
             return byName(a,b,c,d,e,f,g,h,i,j)
@@ -379,8 +463,7 @@ local function InstallHooks()
             if settings.enabled and settings.automatic and not busy then
                 local context
                 if b ~= "pet" and type(a) == "number" and a > 0 then
-                    local name = FullName(a)
-                    if name then context = { name = name, slot = a } end
+                    context = ContextForSlot(a)
                 end
                 if Intercept(context, function() bySlot(a,b,c,d,e,f,g,h,i,j) end, c) then return end
             end
@@ -393,6 +476,16 @@ local function InstallHooks()
                 if Intercept(ActionContext(a), function() action(a,b,c,d,e,f,g,h,i,j) end, c) then return end
             end
             return action(a,b,c,d,e,f,g,h,i,j)
+        end
+    end
+    if type(C_Spell) == "table" and type(C_Spell.CastAtUnit) == "function" then
+        local atUnit = C_Spell.CastAtUnit
+        C_Spell.CastAtUnit = function(a,b,c,d,e,f,g,h,i,j)
+            if settings.enabled and settings.automatic and not busy then
+                local context = ContextForIdentifier(a)
+                if Intercept(context, function() atUnit(a,b,c,d,e,f,g,h,i,j) end, b) then return false end
+            end
+            return atUnit(a,b,c,d,e,f,g,h,i,j)
         end
     end
     if type(stop) == "function" then

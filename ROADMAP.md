@@ -2,7 +2,7 @@
 
 The roadmap tracks outstanding improvements and ongoing verification. Released functionality belongs in [CHANGELOG.md](CHANGELOG.md), not here.
 
-**Review date:** 2026-10-27
+**Review date:** 2026-10-30
 **Current release:** `0.5.0`
 **Future development:** each new feature gets its own branch from `main`; implement and test there before an explicitly authorized merge into `main`.
 
@@ -38,7 +38,7 @@ The roadmap tracks outstanding improvements and ongoing verification. Released f
 - **Minimum enhanced baseline:** `CLASSIC_API_VERSION >= 11100` (v1.11.0) for this integration. `Core/Capabilities.lua` now differentiates DLL presence, version, supported version, adapter-loaded state, and expected `QUEST_TURNED_IN` support. Future Skills/Talents/BiS/Consumables/reputation/mana/buff modules should probe their own functions before increasing the minimum.
 - **Adapter guard:** `Core/ClassicAPI.lua` leaves the Vanilla API untouched if the version is absent or too old. Item name/icon/count/tooltip enhancements check for callable providers and protect calls with `pcall`, then use their Vanilla fallbacks as appropriate.
 - **Quest history:** `QUEST_TURNED_IN` registration now depends on a supported ClassicAPI runtime, not on the TOC flavor. The registered event provides quest ID in `arg1`. A `pcall(RegisterEvent)` result is recorded as `QuestHistory.LiveTurnInRegistered` but **cannot prove event delivery**.
-- **Impossible native quest history:** `C_QuestLog.IsQuestFlaggedCompleted` is not feasible in the Vanilla 1.12 client; its ClassicAPI adapter override was removed. Retain SavedVariables, live turn-ins, positive injected provider results, the server-specific `.queststatus`/`TWQUEST` protocol, and optional pfQuest import. Never classify an unknown result as definitely incomplete.
+- **Quest-history API status (reviewed 2026-10-30):** plain Vanilla still cannot provide a complete native quest-history bitmap. ClassicAPI 1.18.0 now adds completed-quest queries on Turtle-lineage clients via the server's `.queststatuses`/`TWQUEST` protocol; its initial empty cache is not proof of incompletion. The old unconditional override remains removed, and a new optional adapter is not implemented in this integration branch. Retain SavedVariables, live turn-ins, injected positive providers, the existing server-specific `.queststatus`/`TWQUEST` provider and pfQuest import. Quest UI/data scope remains closed unless explicitly reopened.
 - **Server fallback:** `.queststatus` still uses `GUILD` chat (no unverified alternate channel). The code skips sending when `IsInGuild() == false` and records `not_in_guild`; missing chat API or send failures are also reported by `GetServerQueryState().unavailableReason`. Server support and delivery still need in-game confirmation. No reply means an unknown history state.
 - **Options command and startup:** `/priest options` (or `/pc options`) explicitly opens **Options → General**, which is now also the first-open tab after loading the game. `/priest env` remains removed. Mods shows optional DLL compatibility; Advanced now hosts Book of Prayer options only. Quest-history core remains active but its diagnostic UI was temporarily removed pending relocation. Mods Refresh is display-only.
 - **Maintainer's prior test result:** the expanded `/priest env` command was verified in-game before the Environment UI change. Reported values included ClassicAPI 1.15.9, SuperWoW 2.2, Nampower 4, UnitXP dispatcher detection and a server response containing 932 processed quest IDs. The **new tabbed presentation and refresh behavior** still require in-game validation.
@@ -122,6 +122,24 @@ All 28 records have `source.note`: 21 world-drop-style entries with `"World drop
 `Sources[21801]` and `Sources[60805]` no longer contain aggregate-only NPC IDs (15319/91910). `Sources[80799]` no longer has the contradictory `mobCount = 1`. The item entries and their source details are otherwise preserved.
 
 ## Next steps
+
+### Optional ClassicAPI module integrations (`feature/classicapi-integrations`)
+
+Scope: integration into existing Resurrection Assistant, Shield Tracker and Auto Mana, including cooldown display. Soulstone/self-resurrection UI is excluded by maintainer decision. A completed-quest adapter remains a proposal, not part of this increment. All integrations probe callable providers; the existing optional integration baseline remains 1.11.0.
+
+- [x] Add native incoming-resurrection queries/events while preserving pending-offer and alternate-addon evidence, combat gating and manual clicks.
+- [x] Add scalar aura snapshots/instance deltas, conservative full-update/login behavior, refresh deduplication and native fallback; preserve caster-isolated learned estimates and learning exclusions.
+- [x] Use effective mana costs/exact ranks and the explicit-target ClassicAPI macro path. Preserve the existing Fear Ward protection and Nampower continuation cancellation rules.
+- [x] Show cooldown preview/seconds and optional native cooldown sweep without permitting use of a cooling item. Disable clears all added subscriptions, pending work and HUD ticking.
+- [x] Local syntax and mocked core/UI tests passed; no test files are included in the repository.
+
+Combined in-game acceptance (ClassicAPI 1.18.2+ for native resurrection, plus older/no-DLL fallback checks):
+
+- [ ] **Resurrection:** with two healers, cast at a dead party/raid member and confirm Assistant skips them, including when the other healer lacks Priest Companion. Interrupt and confirm eligibility returns unless another provider still reports a cast/offer. Complete a cast and verify pending-offer evidence is retained where available. Check released-corpse handling, combat gating, disable/reenable and reload.
+- [ ] **Shield:** confirm Options reports the ClassicAPI aura reader; test own/external PW: Shield, rank-specific estimates, damage/full absorbs, refresh/replacement without double subtraction, expiry, dispel after a recent hit and a competing absorb. Verify new break learning and reset persistence. Enable/reload during an already active shield must not invent a full capacity. All numeric absorption remains approximate.
+- [ ] **Auto Mana:** verify both triggers, affordable/unaffordable ranks and Inner Focus/free casts; test direct spells/action buttons and ClassicAPI `@mouseover`, selected-target and `@player` macros. Confirm protected Fear Ward does not consume an item. Verify original macro rank/target and ground-placement behavior survive optional Nampower continuation; change target/request, stop casting and disable to cancel. Three seconds is a maximum mana wait, not a fixed delay.
+- [ ] **Consumable HUD:** select Tea and Major Mana, test ready-item fallback versus each item's missing-mana requirement, and put all permitted items on cooldown. Verify the icon, estimated gain, countdown and optional sweep; a click during cooldown must not consume. Also test drag/lock, group slider, options scrolling, minimap routes and saved settings.
+- [ ] **Fallback/regression:** run the affected modules with older/missing ClassicAPI providers, with and without Nampower, and with every Enable off. Preserve existing Announcers/Book of Prayer behavior. No main merge or release before maintainer acceptance.
 
 ### Auto Mana prototype (`feature/auto-mana`, OctoWoW)
 

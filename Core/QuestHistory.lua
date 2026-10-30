@@ -7,7 +7,7 @@
 --   2. Direct server history query (.queststatus -> TWQUEST).
 --   3. Priest Companion local history (QUEST_TURNED_IN).
 --   4. pfQuest_history import when pfQuest is available.
---   5. Positive answers from an available API provider.
+--   5. Optional ClassicAPI completed-quest snapshots and positive API answers.
 --
 -- Important:
 --   A negative/false answer is never treated as proof that a quest was
@@ -44,10 +44,20 @@ local session = {
     serverResponded = false,
     serverReceived = 0,
     serverUnavailableReason = nil,
-    pfQuestImported = false
+    pfQuestImported = false,
+    databaseReady = false,
+    historyQueryAttempted = false,
+    classicAttempted = false,
+    classicActive = false,
+    classicStartedAt = nil,
+    classicResponded = false,
+    classicReceived = 0,
+    classicUnavailableReason = nil
 }
 
 QuestHistory.Session = session
+local eventFrame
+local UpdateQueryTimer
 
 --------------------------------------------------
 -- Character Identity
@@ -346,6 +356,75 @@ function QuestHistory.ImportPfQuestHistory()
 end
 
 --------------------------------------------------
+-- Optional ClassicAPI completed-quest snapshot
+--------------------------------------------------
+
+local function ValidQuestID(value)
+    local id = tonumber(value)
+    if not id or id ~= id or id < 1 or id > 4294967295 or id ~= math.floor(id) then return nil end
+    return id
+end
+
+local function HasClassicHistoryReader()
+    return type(GetQuestsCompleted) == "function"
+        or (type(C_QuestLog) == "table" and type(C_QuestLog.GetAllCompletedQuestIDs) == "function")
+end
+
+function QuestHistory.ImportClassicAPIHistory()
+    if not session.databaseReady then return 0, false end
+    local data, array
+    if type(GetQuestsCompleted) == "function" then
+        local ok, result = pcall(GetQuestsCompleted)
+        if ok and type(result) == "table" then data = result end
+    end
+    if not data and type(C_QuestLog) == "table"
+    and type(C_QuestLog.GetAllCompletedQuestIDs) == "function" then
+        local ok, result = pcall(C_QuestLog.GetAllCompletedQuestIDs)
+        if ok and type(result) == "table" then data, array = result, true end
+    end
+    if not data then
+        session.classicUnavailableReason = HasClassicHistoryReader() and "read_failed" or "unavailable"
+        return 0, false
+    end
+    local imported, count, seen = 0, 0, {}
+    -- Import positives only, including a nonempty cache surviving /reload.
+    -- An empty table, even after a response, never clears local history.
+    for key, value in pairs(data) do
+        local id = ValidQuestID(array and value or key)
+        if id and not seen[id] and (array or value == true or value == 1) then
+            seen[id] = true
+            count = count + 1
+            local prior = QuestHistory.IsLocallyCompleted(id)
+            if QuestHistory.MarkCompleted(id, "classicapi") and not prior then imported = imported + 1 end
+        end
+    end
+    session.classicReceived = count
+    if imported > 0 then RefreshQuestUI() end
+    return imported, true
+end
+
+local function ImportClassicAPICompletion(questID)
+    if not session.databaseReady or type(C_QuestLog) ~= "table"
+    or type(C_QuestLog.IsQuestFlaggedCompleted) ~= "function" then return false end
+    local ok, result = pcall(C_QuestLog.IsQuestFlaggedCompleted, questID)
+    -- False before the server response means unknown, not incomplete.
+    if ok and (result == true or result == 1) then
+        return QuestHistory.MarkCompleted(questID, "classicapi")
+    end
+    return false
+end
+
+function QuestHistory.GetClassicAPIQueryState()
+    return { available = HasClassicHistoryReader(),
+        canQuery = HasClassicHistoryReader() and type(QueryQuestsCompleted) == "function"
+            and QuestHistory.ClassicQueryRegistered == true,
+        eventRegistered = QuestHistory.ClassicQueryRegistered == true,
+        attempted = session.classicAttempted, active = session.classicActive,
+        responded = session.classicResponded, received = session.classicReceived,
+        unavailableReason = session.classicUnavailableReason }
+end
+
+--------------------------------------------------
 -- API Completion Provider
 --------------------------------------------------
 
@@ -358,6 +437,8 @@ function QuestHistory.ImportCompletionFromAPI(
     if not questID then
         return false
     end
+
+    if ImportClassicAPICompletion(questID) then return true end
 
     if not PC.API
     or type(
@@ -436,7 +517,7 @@ local function FinishServerQuery()
 
     session.queryActive = false
     session.queryStartedAt = nil
-
+    if UpdateQueryTimer then UpdateQueryTimer() end
     RefreshQuestUI()
 end
 
@@ -475,6 +556,7 @@ function QuestHistory.QueryServer(
     session.serverResponded = false
     session.serverReceived = 0
     session.serverUnavailableReason = nil
+    if UpdateQueryTimer then UpdateQueryTimer() end
 
     local success = pcall(
         SendChatMessage,
@@ -488,10 +570,45 @@ function QuestHistory.QueryServer(
         session.queryStartedAt = nil
         session.queryScheduled = false
         session.serverUnavailableReason = "send_failed"
+        if UpdateQueryTimer then UpdateQueryTimer() end
         return false
     end
 
     return true
+end
+
+-- One orchestrated attempt: prefer the DLL's automatic/login cache first,
+-- then its query, and keep the original direct server transport as fallback.
+function QuestHistory.QueryCompletionHistory(force)
+    if not session.databaseReady then return false end
+    if session.classicActive or session.queryActive then return false end
+    if session.historyQueryAttempted and not force then return false end
+    session.historyQueryAttempted = true
+    session.queryScheduled = false
+    QuestHistory.ImportClassicAPIHistory()
+    if not force and (session.classicResponded or session.classicReceived > 0) then
+        if UpdateQueryTimer then UpdateQueryTimer() end
+        return true
+    end
+    if HasClassicHistoryReader() and type(QueryQuestsCompleted) == "function"
+    and QuestHistory.ClassicQueryRegistered then
+        session.classicAttempted = true
+        session.classicActive = true
+        session.classicStartedAt = GetTime()
+        session.classicResponded = false
+        session.classicUnavailableReason = nil
+        if UpdateQueryTimer then UpdateQueryTimer() end
+        local ok, result = pcall(QueryQuestsCompleted)
+        if ok and result ~= false then return true end
+        session.classicActive = false
+        session.classicStartedAt = nil
+        session.classicUnavailableReason = "query_failed"
+    else
+        session.classicUnavailableReason = HasClassicHistoryReader() and "query_unavailable" or "unavailable"
+    end
+    local result = QuestHistory.QueryServer(force)
+    if UpdateQueryTimer then UpdateQueryTimer() end
+    return result
 end
 
 function QuestHistory.GetServerQueryState()
@@ -607,7 +724,7 @@ end
 -- Event Frame
 --------------------------------------------------
 
-local eventFrame =
+eventFrame =
     CreateFrame("Frame")
 
 eventFrame:RegisterEvent(
@@ -638,6 +755,13 @@ and PC.Capabilities.questTurnInEvent then
     )
 end
 
+-- Callable APIs are the capability check: these functions are deliberately
+-- absent on non-Turtle clients, regardless of the DLL version or TOC flavor.
+QuestHistory.ClassicQueryRegistered = false
+if HasClassicHistoryReader() then
+    QuestHistory.ClassicQueryRegistered = pcall(eventFrame.RegisterEvent, eventFrame, "QUEST_QUERY_COMPLETE")
+end
+
 eventFrame:SetScript(
     "OnEvent",
     function()
@@ -647,6 +771,7 @@ eventFrame:SetScript(
 
         if event == "VARIABLES_LOADED" then
             EnsureRootDatabase()
+            session.databaseReady = true
             return
         end
 
@@ -660,12 +785,26 @@ eventFrame:SetScript(
             )
 
             QuestHistory.ImportPfQuestHistory()
+            QuestHistory.ImportClassicAPIHistory()
 
             session.loginTime =
                 GetTime()
 
-            session.queryScheduled = true
+            session.queryScheduled = not session.classicResponded
+            if UpdateQueryTimer then UpdateQueryTimer() end
+            return
+        end
 
+        if event == "QUEST_QUERY_COMPLETE" then
+            local _, readable = QuestHistory.ImportClassicAPIHistory()
+            if readable then
+                session.classicResponded = true
+                session.classicActive = false
+                session.classicStartedAt = nil
+                session.classicUnavailableReason = nil
+                session.queryScheduled = false
+                if UpdateQueryTimer then UpdateQueryTimer() end
+            end
             return
         end
 
@@ -717,39 +856,27 @@ eventFrame:SetScript(
 -- Delayed Query / Timeout
 --------------------------------------------------
 
-eventFrame:SetScript(
-    "OnUpdate",
-    function()
-        local now =
-            GetTime()
-
-        --------------------------------------------------
-        -- Query once after login
-        --------------------------------------------------
-
-        if session.queryScheduled
-        and not session.queryAttempted
-        and session.loginTime
-        and now >=
-        session.loginTime +
-        SERVER_QUERY_DELAY then
-
-            QuestHistory.QueryServer(
-                false
-            )
-        end
-
-        --------------------------------------------------
-        -- Finish collection window
-        --------------------------------------------------
-
-        if session.queryActive
-        and session.queryStartedAt
-        and now >=
-        session.queryStartedAt +
-        SERVER_QUERY_TIMEOUT then
-
-            FinishServerQuery()
-        end
+local function QueryTick()
+    local now = GetTime()
+    if session.queryScheduled and session.loginTime
+    and now >= session.loginTime + SERVER_QUERY_DELAY then
+        QuestHistory.QueryCompletionHistory(false)
     end
-)
+    if session.classicActive and session.classicStartedAt
+    and now >= session.classicStartedAt + SERVER_QUERY_TIMEOUT then
+        session.classicActive = false
+        session.classicStartedAt = nil
+        session.classicUnavailableReason = "timeout"
+        QuestHistory.ImportClassicAPIHistory()
+        -- Preserve the last positive snapshot and try the old transport once.
+        QuestHistory.QueryServer(false)
+    end
+    if session.queryActive and session.queryStartedAt
+    and now >= session.queryStartedAt + SERVER_QUERY_TIMEOUT then FinishServerQuery() end
+    UpdateQueryTimer()
+end
+UpdateQueryTimer = function()
+    if session.queryScheduled or session.classicActive or session.queryActive then
+        eventFrame:SetScript("OnUpdate", QueryTick)
+    else eventFrame:SetScript("OnUpdate", nil) end
+end

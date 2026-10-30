@@ -2,6 +2,13 @@
 
 ## [Unreleased]
 
+### Added — Optional ClassicAPI quest-history adapter (2026-10-30)
+- Added a core-only completion provider for ClassicAPI's Turtle-lineage `GetQuestsCompleted`, `C_QuestLog.GetAllCompletedQuestIDs`, `C_QuestLog.IsQuestFlaggedCompleted` and `QUEST_QUERY_COMPLETE`. No quest UI, acquisition data or map behavior changed.
+- Import validated positive quest IDs into the existing per-character history with a `classicapi` source. Empty snapshots, negative flags, invalid IDs and provider errors never erase previous completions or turn unknown quests into incomplete ones. Current quest-log presentation still wins for active/repeatable quests.
+- Reuse the DLL's automatic response and surviving positive cache first, avoiding a redundant login query when data is already available. Otherwise make one delayed ClassicAPI request; on request failure or a four-second response timeout, try the original `.queststatus`/`TWQUEST` transport. Its guild/send guards remain unchanged. The native query keeps its own server-aware transport and is not blocked by the legacy guild guard.
+- Preserve local turn-ins, pfQuest import, injected positive API answers and explicit direct server queries. Added `GetClassicAPIQueryState` diagnostics and `QueryCompletionHistory` orchestration without overriding `PC.API.IsQuestCompleted`. Query ticking exists only while a delayed query or response/collection timeout is pending.
+- Local Lua syntax and mocked checks passed for snapshots/events, empty/negative/invalid data, retained reload cache, one-shot requests/timeouts, fallback transports/providers, no-guild handling, synchronous events, turn-ins and character isolation. Test harnesses remain outside the repository. Live OctoWoW validation remains pending.
+
 ### Added — Optional ClassicAPI module integrations (2026-10-30)
 - Created `feature/classicapi-integrations` from the current Auto Mana branch to validate the combined changes before any main merge. Version remains 0.5.0; no DLL installation or release changes.
 - Resurrection Assistant now checks `UnitHasIncomingResurrection` and listens for `INCOMING_RESURRECT_CHANGED` when the function exists. Positive native evidence excludes a group member from the queue; false/error results retain message, LibPredict and HealComm evidence. The native query tracks observed casts, not pending acceptance offers. Existing out-of-combat, explicit-click and disabled-module rules remain intact.

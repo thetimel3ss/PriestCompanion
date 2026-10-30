@@ -46,9 +46,9 @@ local VanillaGetItemCount =
     PC.API.GetItemCount
 
 -- Do not override PC.API.IsQuestCompleted here.
--- ClassicAPI cannot provide a complete 1.12 quest-history bitfield.
--- QuestHistory obtains positive results from server, turn-in,
--- SavedVariables, pfQuest or future explicitly supported providers.
+-- QuestHistory owns the optional ClassicAPI 1.18.0+ Turtle-lineage
+-- completed-quest adapter and accepts only positive evidence. The DLL's
+-- initial empty cache must never become an authoritative negative here.
 
 --------------------------------------------------
 -- Item Cache Request

@@ -11,6 +11,7 @@ local state = { active = false }
 local pending
 local lastCastTime, lastCastKey
 local elapsed = 0
+local nativeCountdown = false
 local UpdateSubscriptions, RefreshAura, UpdateTicker
 local shieldIcon = "spell_holy_powerwordshield"
 -- Vanilla base absorbs, not a prediction of OctoWoW talent/gear modifiers.
@@ -351,9 +352,9 @@ UpdateTicker = function()
     if settings.enabled and (pending or state.removalPendingAt or (state.active and state.expiresAt)) then
         frame:SetScript("OnUpdate", function()
             elapsed = elapsed + arg1
-            -- Pending casts need only poll aura state at 10 Hz. Once active,
-            -- refresh the visible expiry countdown at roughly 10ms intervals.
-            local interval = pending and 0.1 or 0.01
+            -- Native text bindings own visual refresh. Keep a 10 Hz lifecycle
+            -- check in that mode; the Lua countdown fallback stays near 10ms.
+            local interval = (pending or nativeCountdown) and 0.1 or 0.01
             if elapsed < interval then return end
             elapsed = 0
             if pending then
@@ -364,7 +365,7 @@ UpdateTicker = function()
                     CommitShieldRemoval(); UpdateTicker(); Notify()
                 else Notify() end
             elseif state.expiresAt and state.expiresAt <= GetTime() then RefreshAura()
-            else Notify() end
+            elseif not nativeCountdown then Notify() end
         end)
     else frame:SetScript("OnUpdate", nil) end
 end
@@ -425,13 +426,19 @@ UpdateSubscriptions = function()
         Register(textEvents)
     end
 end
+-- UI enables this only after a native duration binding works. Core expiry,
+-- pending-cast and learning checks continue independently of presentation.
+function Tracker.SetNativeCountdown(value)
+    value = value and true or false
+    if nativeCountdown ~= value then nativeCountdown = value; UpdateTicker() end
+end
 function Tracker.GetOption(key) return settings[key] end
 function Tracker.GetProvider() return provider end
 function Tracker.GetAuraProvider() return auraProvider end
 function Tracker.GetState()
     return { active = state.active, remaining = state.remaining, maximum = state.maximum,
-        reason = state.reason, timeLeft = state.expiresAt and math.max(0, state.expiresAt - GetTime()),
-        provider = provider, auraProvider = auraProvider }
+        reason = state.reason, expiresAt = state.expiresAt, timeLeft = state.expiresAt and math.max(0, state.expiresAt - GetTime()),
+        provider = provider, auraProvider = auraProvider, nativeCountdown = nativeCountdown }
 end
 function Tracker.AddListener(callback) table.insert(listeners, callback) end
 function Tracker.SetOption(key, value)

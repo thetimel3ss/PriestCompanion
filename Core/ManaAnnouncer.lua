@@ -380,7 +380,7 @@ end
 eventFrame = CreateFrame("Frame")
 eventFrame:RegisterEvent("VARIABLES_LOADED")
 local monitoredEvents = {
-    "PLAYER_ENTERING_WORLD", "UNIT_MANA", "UNIT_MAXMANA",
+    "PLAYER_ENTERING_WORLD",
     "PLAYER_REGEN_ENABLED", "PLAYER_REGEN_DISABLED",
     "PLAYER_DEAD", "PLAYER_ALIVE", "PLAYER_UNGHOST"
 }
@@ -388,6 +388,7 @@ UpdateActivityEvents = function()
     -- The initial settings load is the only event needed while disabled.
     local enabled = loaded and settings.enabled
         and (settings.lowEnabled or settings.oomEnabled)
+    PC.Capabilities.ConfigureManaEvents(eventFrame, enabled)
     local i
     for i = 1, table.getn(monitoredEvents) do
         if enabled then
@@ -412,6 +413,8 @@ eventFrame:SetScript("OnEvent", function()
     elseif event == "PLAYER_REGEN_ENABLED" then
         inCombat = false
         Baseline()
+    elseif event == "UNIT_POWER_UPDATE" or event == "UNIT_MAXPOWER" then
+        if arg1 == "player" and arg2 == "MANA" then Inspect(true) end
     elseif event == "UNIT_MANA" or event == "UNIT_MAXMANA" then
         if arg1 == "player" then Inspect(true) end
     elseif event == "PLAYER_DEAD" or event == "PLAYER_ALIVE"

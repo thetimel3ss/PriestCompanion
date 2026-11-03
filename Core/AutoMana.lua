@@ -15,11 +15,12 @@ local function UpdateSubscriptions()
     frame:UnregisterAllEvents()
     if not loaded then frame:RegisterEvent("VARIABLES_LOADED"); return end
     if not settings.enabled then return end
-    local events = { "BAG_UPDATE", "UNIT_MANA", "UNIT_MAXMANA", "UNIT_INVENTORY_CHANGED",
+    local events = { "BAG_UPDATE", "UNIT_INVENTORY_CHANGED",
         "PLAYER_REGEN_ENABLED", "PLAYER_REGEN_DISABLED", "PARTY_MEMBERS_CHANGED",
         "RAID_ROSTER_UPDATE", "PLAYER_DEAD", "PLAYER_ALIVE", "PLAYER_UNGHOST",
         "PLAYER_TARGET_CHANGED", "PLAYER_LEAVING_WORLD", "PLAYER_ENTERING_WORLD" }
     for _, name in ipairs(events) do frame:RegisterEvent(name) end
+    PC.Capabilities.ConfigureManaEvents(frame, true)
 end
 local function Notify()
     for _, fn in ipairs(listeners) do fn() end
@@ -394,7 +395,6 @@ local function AwaitMana(context, cast, unit)
     serial = serial + 1
     pending = { token = serial, context = context, cast = cast,
         expires = GetTime() + 3, unit = unit, target = target }
-    frame:RegisterEvent("UNIT_MANA")
     frame:RegisterEvent("PLAYER_DEAD")
     frame:RegisterEvent("PLAYER_TARGET_CHANGED")
     frame:RegisterEvent("PLAYER_LEAVING_WORLD")
@@ -536,6 +536,8 @@ frame:SetScript("OnEvent", function()
         CancelPending(); Save(); UpdateSubscriptions()
         if settings.enabled and settings.automatic then InstallHooks() end
         Notify()
+    elseif event == "UNIT_POWER_UPDATE" or event == "UNIT_MAXPOWER" then
+        if arg1 == "player" and arg2 == "MANA" then CheckPending(); Notify() end
     elseif event == "UNIT_MANA" or event == "UNIT_MAXMANA" then
         if arg1 == "player" then CheckPending(); Notify() end
     elseif event == "BAG_UPDATE" or event == "UNIT_INVENTORY_CHANGED" then

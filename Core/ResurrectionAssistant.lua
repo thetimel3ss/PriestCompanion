@@ -811,6 +811,7 @@ local regularEvents = {
 local classicEvents = {
     "UNIT_SPELLCAST_START", "UNIT_SPELLCAST_INTERRUPTED"
 }
+local memberEvents = { "UNIT_CONNECTION", "UNIT_DISTANCE_CHECK_UPDATE", "UNIT_AREA_CHANGED" }
 UpdateActivityEvents = function()
     local active = IsEnabled()
     local i
@@ -829,6 +830,11 @@ UpdateActivityEvents = function()
         else
             pcall(events.UnregisterEvent, events, name)
         end
+    end
+    for _, name in ipairs(memberEvents) do
+        if active and PC.Capabilities.SupportsEvent(name, 11810) then
+            pcall(events.RegisterEvent, events, name)
+        else pcall(events.UnregisterEvent, events, name) end
     end
     if active and type(UnitHasIncomingResurrection) == "function" then
         pcall(events.RegisterEvent, events, "INCOMING_RESURRECT_CHANGED")
@@ -873,6 +879,15 @@ events:SetScript("OnEvent", function()
     elseif event == "PARTY_MEMBER_ENABLE"
     or event == "PARTY_MEMBER_DISABLE" then
         Assistant.RefreshRoster()
+    elseif event == "UNIT_CONNECTION" or event == "UNIT_DISTANCE_CHECK_UPDATE" or event == "UNIT_AREA_CHANGED" then
+        local name = arg1 and UnitName(arg1)
+        local member = name and rosterByName[name]
+        if member then
+            UpdateUnit(member.unit)
+            -- Visibility/zone changes affect eligibility even when dead/online
+            -- fields did not change. Recheck the exact spell at manual use.
+            Notify()
+        end
     elseif event == "UNIT_HEALTH" or event == "UNIT_FLAGS" then
         if arg1 and rosterByUnit[arg1] then
             UpdateUnit(arg1)

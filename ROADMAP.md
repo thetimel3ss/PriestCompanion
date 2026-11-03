@@ -2,7 +2,7 @@
 
 The roadmap tracks outstanding improvements and ongoing verification. Released functionality belongs in [CHANGELOG.md](CHANGELOG.md), not here.
 
-**Review date:** 2026-10-30
+**Review date:** 2026-11-03
 **Current release:** `0.5.0`
 **Future development:** each new feature gets its own branch from `main`; implement and test there before an explicitly authorized merge into `main`.
 
@@ -133,6 +133,17 @@ Scope: integration into existing Resurrection Assistant, Shield Tracker and Auto
 - [x] Show cooldown preview/seconds and optional native cooldown sweep without permitting use of a cooling item. Disable clears all added subscriptions, pending work and HUD ticking.
 - [x] Add a positive-only ClassicAPI quest snapshot/event adapter, reuse existing cache/automatic replies, and retain one-shot native query plus the direct server fallback on failure/timeout. Preserve previous completion sources and unknown status for empty/negative results.
 - [x] Local syntax and mocked core/UI tests passed; no test files are included in the repository.
+
+ClassicAPI 1.18.10–1.19.x additions (2026-11-03):
+
+- [x] React to group connectivity/visibility/zone events in Assistant while preserving precise resurrection eligibility and out-of-combat/manual behavior.
+- [x] Select one mana-event family per module, with capability checks and atomic fallback; retain queued Auto Mana continuation and Mana Announcer edge/cooldown semantics.
+- [x] Complement Aggro target polling with optional UNIT_TARGET notifications; coalesce same-observation bursts and keep damage-only/disabled paths free of target scans.
+- [x] Add optional native duration text to Shield Tracker, preserving decimal precision, red-under-five behavior, preview cleanup and Lua fallback. Native mode retains lifecycle checks, not steady Lua HUD redraws. Absorption remains estimated and damage-driven.
+- [ ] In game with ClassicAPI 1.19.x: disconnect/reconnect and move a dead group member into/out of visibility or zone; confirm Assistant updates without casting and stays paused in combat. Repeat without the new event APIs.
+- [ ] Verify modern player-MANA events trigger Low Mana/OOM and optional queued continuation once, other resources/units are ignored, and older clients use the Vanilla pair. Confirm disable removes both event families.
+- [ ] Test target-change Aggro notifications in party/raid, repeated aliases/target swaps and periodic fallback; verify cooldown/recovery and no scanning with damage-only or master disabled.
+- [ ] Verify Shield nativeCountdown while an actual shield is active, three-decimal/red text, replacement/refresh/expiry, lost/unknown duration, preview, hide/disable/reenable and reload. Check profiler/event trace during native versus fallback operation; no absorption accuracy improvement is implied.
 
 Combined in-game acceptance (ClassicAPI 1.18.2+ for native resurrection, plus older/no-DLL fallback checks):
 

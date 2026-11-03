@@ -45,6 +45,41 @@ PC.Capabilities.classicAPIAdapter =
 PC.Capabilities.questTurnInEvent =
     PC.Capabilities.classicAPISupported
 
+-- Prefer the event catalog over registration success: Vanilla accepts some
+-- unknown names without ever delivering them. Version is a compatibility
+-- fallback only when the catalog is absent.
+function PC.Capabilities.SupportsEvent(name, introducedVersion)
+    if type(C_EventUtils) == "table" and type(C_EventUtils.IsEventValid) == "function" then
+        local ok, valid = pcall(C_EventUtils.IsEventValid, name)
+        if ok then return valid == true or valid == 1 end
+    end
+    return PC.Capabilities.classicAPISupported
+        and (PC.Capabilities.classicAPIVersion or 0) >= introducedVersion or false
+end
+
+function PC.Capabilities.ConfigureManaEvents(frame, active)
+    local names = {"UNIT_MANA", "UNIT_MAXMANA", "UNIT_POWER_UPDATE", "UNIT_MAXPOWER"}
+    for _, name in ipairs(names) do pcall(frame.UnregisterEvent, frame, name) end
+    if not active then return false end
+    if PC.Capabilities.SupportsEvent("UNIT_POWER_UPDATE", 11810)
+    and PC.Capabilities.SupportsEvent("UNIT_MAXPOWER", 11810) then
+        local ok1, ok2
+        if type(frame.RegisterUnitEvent) == "function" then
+            ok1 = pcall(frame.RegisterUnitEvent, frame, "UNIT_POWER_UPDATE", "player")
+            ok2 = pcall(frame.RegisterUnitEvent, frame, "UNIT_MAXPOWER", "player")
+        else
+            ok1 = pcall(frame.RegisterEvent, frame, "UNIT_POWER_UPDATE")
+            ok2 = pcall(frame.RegisterEvent, frame, "UNIT_MAXPOWER")
+        end
+        if ok1 and ok2 then return true end
+        pcall(frame.UnregisterEvent, frame, "UNIT_POWER_UPDATE")
+        pcall(frame.UnregisterEvent, frame, "UNIT_MAXPOWER")
+    end
+    frame:RegisterEvent("UNIT_MANA")
+    frame:RegisterEvent("UNIT_MAXMANA")
+    return false
+end
+
 --------------------------------------------------
 -- SuperWoW
 --------------------------------------------------

@@ -51,6 +51,47 @@ previewLabel:Hide()
 local preview = false
 local moving = false
 local Render, RefreshOptions
+local durationBinding, durationObject, boundExpiry
+local nativeFailed = false
+local function StopNativeCountdown()
+    if durationBinding then pcall(durationBinding.SetEnabled, durationBinding, false) end
+    boundExpiry = nil
+    tracker.SetNativeCountdown(false)
+end
+local function NativeCountdown(data)
+    if nativeFailed or preview or not data.expiresAt or not data.timeLeft then return false end
+    if type(C_DurationUtil) ~= "table" or type(C_DurationUtil.CreateDuration) ~= "function"
+    or type(C_DurationUtil.CreateDurationTextBinding) ~= "function"
+    or type(C_StringUtil) ~= "table" or type(C_StringUtil.CreateNumericRuleFormatter) ~= "function" then return false end
+    local ok = pcall(function()
+        if not durationBinding then
+            durationObject = C_DurationUtil.CreateDuration()
+            local formatter = C_StringUtil.CreateNumericRuleFormatter()
+            formatter:AddBreakpoint({ threshold = 5, format = "%.3fs" })
+            formatter:AddBreakpoint({ threshold = 0, format = "|cffff2626%.3fs|r" })
+            durationBinding = C_DurationUtil.CreateDurationTextBinding()
+            durationBinding:SetEnabled(false)
+            durationBinding:SetFontString(timeText)
+            durationBinding:SetFormatter(formatter)
+            durationBinding:SetExpiredText("|cffff26260.000s|r")
+            durationBinding:SetUpdateInterval(0.01)
+        end
+        if boundExpiry ~= data.expiresAt then
+            durationObject:SetTimeFromEnd(data.expiresAt, math.max(data.timeLeft, 0.001))
+            durationBinding:SetDuration(durationObject)
+            boundExpiry = data.expiresAt
+        end
+        timeText:SetTextColor(0.95, 0.95, 0.95)
+        durationBinding:SetEnabled(true)
+    end)
+    if not ok then
+        nativeFailed = true
+        StopNativeCountdown()
+        return false
+    end
+    tracker.SetNativeCountdown(true)
+    return true
+end
 local function StopMoving()
     if not moving then return end
     moving = false
@@ -65,6 +106,7 @@ end)
 hud:SetScript("OnDragStop", StopMoving)
 hud:SetScript("OnHide", function()
     StopMoving()
+    StopNativeCountdown()
 end)
 function hud.SetPreview(value)
     preview = value and tracker.GetOption("enabled") and true or false
@@ -80,7 +122,9 @@ Render = function()
         hud:SetPoint("CENTER", UIParent, "CENTER", tracker.GetOption("x"), tracker.GetOption("y"))
     end
     local data = tracker.GetState()
-    if not enabled or (not preview and not data.active) then hud:Hide(); return end
+    if not enabled or (not preview and not data.active) then
+        StopNativeCountdown(); hud:Hide(); return
+    end
     barFrame:SetBackdropBorderColor(preview and 0.3 or 0.5,
         preview and 0.65 or 0.5, preview and 1 or 0.5, 1)
     if preview then previewLabel:Show() else previewLabel:Hide() end
@@ -98,11 +142,15 @@ Render = function()
         bar:SetStatusBarColor(0.4, 0.4, 0.5)
         amount:SetText("Absorb unknown")
     end
-    if data.timeLeft then
+    if NativeCountdown(data) then
+        -- C++ updates the text; the absorption bar remains damage-driven.
+    elseif data.timeLeft then
+        StopNativeCountdown()
         timeText:SetText(string.format("%.3fs", data.timeLeft))
         if data.timeLeft < 5 then timeText:SetTextColor(1, 0.15, 0.15)
         else timeText:SetTextColor(0.95, 0.95, 0.95) end
     else
+        StopNativeCountdown()
         timeText:SetText("?s")
         timeText:SetTextColor(0.7, 0.7, 0.7)
     end

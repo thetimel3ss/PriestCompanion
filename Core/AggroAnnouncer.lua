@@ -49,6 +49,7 @@ local aggroHits = 0
 local aggroMisses = 0
 local lastAggroAlert = nil
 local aggroElapsed = 0
+local lastAggroObservation
 local eventFrame
 local UpdateActivityEvents
 -- Pair a hostile combat-log hit with a real player health decrease.
@@ -172,6 +173,7 @@ local function SaveSettings()
 end
 
 local function ResetAggroState()
+    lastAggroObservation = nil
     aggroActive = false
     aggroHits = 0
     aggroMisses = 0
@@ -324,6 +326,10 @@ local function InspectAggro()
         ResetAggroState()
         return
     end
+    local observationTime = GetNow()
+    -- Alias events and the periodic check must not count one observation twice.
+    if lastAggroObservation and observationTime - lastAggroObservation < 0.1 then return end
+    lastAggroObservation = observationTime
     local seen, enemy = AggroEvidence()
     if seen then
         aggroMisses = 0
@@ -481,6 +487,9 @@ UpdateActivityEvents = function()
             eventFrame:UnregisterEvent(name)
         end
     end
+    if aggroActiveNow and not settings.damageOnly and PC.Capabilities.SupportsEvent("UNIT_TARGET", 11810) then
+        pcall(eventFrame.RegisterEvent, eventFrame, "UNIT_TARGET")
+    else pcall(eventFrame.UnregisterEvent, eventFrame, "UNIT_TARGET") end
     Switch("PLAYER_ENTERING_WORLD", active)
     Switch("UNIT_HEALTH", healthActive)
     Switch("UNIT_MAXHEALTH", healthActive)
@@ -512,6 +521,8 @@ eventFrame:SetScript("OnEvent", function()
     elseif event == "PLAYER_REGEN_ENABLED" then
         inCombat = false
         ResetAggroState()
+    elseif event == "UNIT_TARGET" then
+        if settings.enabled and settings.aggroEnabled and not settings.damageOnly then InspectAggro() end
     elseif event == "UNIT_HEALTH" or event == "UNIT_MAXHEALTH" then
         if arg1 == "player" then InspectHealth() end
     elseif event == "CHAT_MSG_COMBAT_CREATURE_VS_SELF_HITS"
